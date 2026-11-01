@@ -20,7 +20,7 @@ Legenda: ✅ Aprovado · 🔧 Proposta técnica · ⏳ Pendente.
 
 | Etapa | Nome | Conteúdo principal | Situação |
 |---|---|---|---|
-| 0 | Fundação técnica | Documentação, esqueleto da aplicação, testes básicos | ✅ Em execução |
+| 0 | Fundação técnica | Documentação, esqueleto da aplicação, testes básicos | ✅ Aprovada em 31/10/2026 |
 | 1 | Banco de dados de desenvolvimento e Cadastro Mestre | Banco PostgreSQL local, estrutura de comitês e projetos/temas, cadastro de pessoas, instituições e vínculos, com dados fictícios | 🔧 |
 | 2 | Avaliações e matriz de poder × interesse | Fichas e versões de avaliação, evidências, matriz por contexto. Depende de Q-01 a Q-07 | 🔧 |
 | 3 | Iniciativas, interações e compromissos | Matriz de iniciativas, registro único de reuniões, encaminhamentos e prazos | 🔧 |
@@ -44,8 +44,9 @@ A autenticação (Etapa 5) precisa estar concluída antes de qualquer hospedagem
 | Aplicação Next.js com TypeScript e página inicial em português | Concluída |
 | Estrutura de pastas para interface, componentes, módulos, banco, validação e testes | Concluída |
 | `.gitignore` ajustado, inclusive para as pastas temporárias do Claude Code | Concluída |
-| Testes: instalação, tipos, qualidade, compilação, teste automatizado e funcionamento da página | Resultados no relatório da Etapa 0 e no Pull Request |
-| Pull Request para revisão | Ver relatório da Etapa 0 |
+| Testes: instalação, tipos, qualidade, compilação, teste automatizado e funcionamento da página | Executados e aprovados: tipos, qualidade e compilação sem erros; 9 de 9 testes; página verificada no navegador |
+| Pull Request para revisão | Branch `feature/fundacao-crm` enviada ao GitHub |
+| Aprovação do gestor | Aprovada em 31/10/2026 |
 
 ### Critérios de aceite
 

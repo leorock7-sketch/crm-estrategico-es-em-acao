@@ -28,6 +28,7 @@ Legenda: ✅ Aprovado · 🔧 Proposta técnica · ⏳ Pendente.
 | D-014 | 31/10/2026 | Trabalho em branch específica por etapa, com Pull Request para revisão e sem incorporação automática à `main`. Não avançar de etapa sem aprovação. | Instruções da Etapa 0 |
 | D-015 | 31/10/2026 | Instalação de dependências e testes da Etapa 0 executados em cópia temporária no disco C:, fora do Google Drive. | Escolha do gestor durante a Etapa 0 |
 | D-016 | 31/10/2026 | Pull Request aberto a partir de link gerado após o envio da branch, uma vez que o GitHub CLI não está instalado. | Escolha do gestor durante a Etapa 0 |
+| D-017 | 31/10/2026 | Etapa 0 — Fundação Técnica aprovada. A incorporação à `main` ocorre pelo Pull Request, por ação do gestor. | Aprovação do gestor |
 
 ## 2. Propostas técnicas 🔧
 
