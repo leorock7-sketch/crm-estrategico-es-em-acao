@@ -8,6 +8,7 @@
 | 0.4 | 01/11/2026 | Etapa 1.1: telas de comitês, projetos e temas (módulo `projetos-temas`) |
 | 0.5 | 01/11/2026 | Etapa 2A: avaliações estratégicas (módulo `avaliacoes`) e permissões por contexto, ainda não homologadas |
 | 0.6 | 01/11/2026 | Repositório público com e-mail *noreply* nos commits (D-039) e proposta de testes no GitHub Actions (P-039) |
+| 0.7 | 01/11/2026 | Verificação automática no GitHub Actions implementada (D-041) |
 
 Legenda: ✅ Aprovado · 🔧 Proposta técnica · ⏳ Pendente.
 
@@ -174,7 +175,7 @@ Regras de organização:
 | Proteção da branch `main` no GitHub. | 🔧 |
 | Repositório público (D-033): verificação de dados pessoais, informações restritas e segredos antes de cada envio; e-mail *noreply* do GitHub nos commits a partir de 01/11/2026 (D-039). O histórico anterior não é reescrito sem aprovação. | ✅ |
 | Controle de acesso por projeto ou tema nas consultas do servidor, com testes (Etapa 2A). Sem autenticação real nem regras no banco: **segurança multiusuário não homologada**. | 🔧 (D-034) |
-| Testes automatizados no GitHub Actions a cada Pull Request (seção 6.1). | 🔧 Proposta (P-039, Q-63) |
+| Verificação automática no GitHub Actions a cada Pull Request e atualização da `main`, com permissões mínimas e sem credenciais (seção 6.1). | ✅ (D-041) |
 
 ## 6. Comandos do projeto
 
@@ -193,15 +194,31 @@ Regras de organização:
 | `npm run banco:reiniciar` | Apaga o banco local, que é recriado vazio na próxima execução (com a aplicação parada) |
 | `npm run banco:gerar` | Gera um novo script SQL após alterar `src/lib/banco/esquema.ts` (uso técnico) |
 
-### 6.1 Testes automatizados no GitHub Actions — proposta 🔧 (P-039, Q-63)
+### 6.1 Verificação automática no GitHub Actions ✅ (D-041)
 
-A cada Pull Request e a cada atualização da `main`, o GitHub executaria a mesma verificação feita no computador, e o resultado apareceria no próprio Pull Request:
+Arquivo: `.github/workflows/verificacao.yml`. A cada Pull Request e a cada atualização da `main`, o GitHub executa a mesma verificação feita no computador, e o resultado aparece no próprio Pull Request (aba "Checks" e resumo de cada execução):
 
-1. Baixar o código da branch.
-2. Instalar o Node.js na versão LTS usada no projeto e as bibliotecas exatas do `package-lock.json` (`npm ci`).
-3. Executar `npm run verificar`: tipos, qualidade, testes (com banco PGlite na memória, só dados fictícios) e compilação.
+1. Baixa o código da branch.
+2. Instala o Node.js — em duas execuções paralelas, **24 e 26**, as versões LTS aceitas pelo projeto (o desenvolvimento usa a 26).
+3. Instala as bibliotecas exatas do `package-lock.json` (`npm ci`, instalação reproduzível).
+4. Executa `npm run verificar`: tipos, qualidade (ESLint), testes (Vitest, com banco PGlite na memória e só dados fictícios) e compilação (Next.js).
+5. Registra um resumo com o resultado e as versões usadas.
 
-Características: sem senhas ou chaves (nenhum segredo é necessário); gratuito para repositório público; arquivo `.github/workflows/verificar.yml`, criado somente após a aprovação. Passo posterior, dependente de Q-57: um segundo teste em PostgreSQL real, para a portabilidade (C8). Opcionalmente, a proteção da `main` poderia exigir que a verificação passe antes do merge.
+Segurança, conforme o guia oficial do GitHub Actions:
+
+| Prática | Como foi aplicada |
+|---|---|
+| Permissões mínimas | `contents: read` (somente leitura) |
+| Pull Requests de terceiros | Evento `pull_request`, que roda sem segredos e sem permissão de escrita; o `pull_request_target` não é usado |
+| Credenciais | Nenhum segredo ou credencial; o checkout não guarda o token no disco (`persist-credentials: false`) |
+| Ações de terceiros | Somente ações oficiais (`actions/checkout` v7.0.1 e `actions/setup-node` v7.1.0), fixadas pelo código completo do commit |
+| Injeção de comandos | Nenhum dado do evento (título, nome da branch etc.) é usado dentro de comandos |
+| Limites | Tempo máximo de 20 minutos; nova atualização do mesmo PR cancela a verificação anterior |
+| Publicação e merge | O fluxo não publica a aplicação e não faz merge |
+
+Recomendação ao administrador da conta 🔧: em Settings → Actions → General, exigir aprovação para executar fluxos de Pull Requests de colaboradores externos e, se desejado, proteger a `main` exigindo que a verificação passe antes do merge.
+
+Passo posterior, dependente de Q-57: um segundo teste em PostgreSQL real, para a portabilidade (C8).
 
 ## 7. Decisões de arquitetura pendentes ⏳
 
@@ -211,7 +228,6 @@ Características: sem senhas ou chaves (nenhum segredo é necessário); gratuito
 | Q-51 | Região de hospedagem dos dados. O Supabase oferece região em São Paulo. |
 | Q-52 | Transferência dos serviços e do repositório para contas institucionais. |
 | Q-57 | Teste de portabilidade em PostgreSQL real (C8). |
-| Q-63 | Aprovação dos testes automatizados no GitHub Actions (P-039). |
 | — | Abordagem das integrações com Microsoft 365 (Microsoft Graph) e de IA assistiva. |
 
 Resolvidas na Etapa 1: local da cópia de trabalho (D-019) e ferramenta de banco local (D-018).

@@ -5,6 +5,7 @@
 | 0.1 | 31/10/2026 | Estrutura para revisão. Critérios, escalas e pesos **não definidos**. |
 | 0.2 | 01/11/2026 | Etapa 2A: decisões do Manual V2.0 e da D-034 incorporadas; estrutura implementada com metodologia de **demonstração**. Critérios, escalas, pesos, fórmula e pontos de corte institucionais continuam **não definidos**. |
 | 0.3 | 01/11/2026 | Grau de confiança aprovado (D-036), metodologia institucional comum (D-037) e "Conduta do ES em Ação" como requisito futuro (D-038). |
+| 0.4 | 01/11/2026 | Procedimento de revisão dos seis critérios originais aprovado (D-042). |
 
 Legenda: ✅ Aprovado · 🔧 Proposta técnica · ⏳ Pendente.
 
@@ -88,7 +89,19 @@ Somente para testar o funcionamento, com dados fictícios. **Não é a metodolog
 
 A planilha "Mapa de Stakeholders" do Comitê de Infraestrutura foi analisada com autorização do gestor (D-034), somente quanto à estrutura metodológica. **Ela não contém os seis critérios, escalas, pesos, fórmulas nem pontos de corte.** O inventário foi entregue ao gestor fora deste repositório, por tratar de informação institucional. A próxima fonte é a planilha "Qualificação de Stakeholders — Comitê Temático de Infraestrutura (Consolidado)" (D-040). Os cálculos institucionais só serão implementados após a revisão e a homologação dos seis critérios, e nenhum critério será substituído antes da aprovação do gestor.
 
-Roteiro proposto 🔧: inventário dos critérios originais (sem nomes nem avaliações individuais) → ficha de análise por critério (o que mede, escala, peso, evidência típica, problemas: ambiguidade, sobreposição, mistura de interesse com posição) → recomendação de manter, reformular, fundir ou excluir → decisão do gestor → metodologia versão 1.0 (Etapa 2B).
+Procedimento aprovado ✅ (D-042), a partir da planilha de Qualificação, em cópia temporária e sem publicar dados reais ou informações restritas:
+
+1. Definição e dimensão de cada um dos seis critérios.
+2. Escalas e significado das notas.
+3. Pesos e fórmulas.
+4. Pontos de corte dos quadrantes.
+5. Sobreposição ou redundância entre critérios.
+6. Distinção entre influência (poder), interesse, posicionamento e conduta institucional.
+7. Aplicabilidade a pessoas e a instituições.
+8. Aplicabilidade aos três comitês temáticos.
+9. Sensibilidade dos resultados aos pesos e aos pontos de corte.
+
+O que não estiver documentado na planilha é registrado como "não encontrado", nunca preenchido por suposição. O resultado é entregue ao gestor fora deste repositório; as recomendações (manter, reformular, fundir ou excluir) são propostas, e nenhum critério é substituído sem aprovação. A homologação dos critérios é condição para a Etapa 2B.
 
 ### 5.4 Metodologias por comitê ou por contexto ✅ (D-037)
 

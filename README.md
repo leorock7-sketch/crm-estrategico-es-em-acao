@@ -138,3 +138,5 @@ A versão compilada (`npm run build` e depois `npm start`) recusa o banco local,
 | `npm test` | Testes automatizados |
 | `npm run build` | Se a aplicação compila para publicação |
 | `npm run verificar` | Executa todas as verificações acima, em sequência |
+
+A mesma verificação roda automaticamente no GitHub Actions a cada Pull Request e a cada atualização da `main`, no Node.js 24 e 26 (arquivo `.github/workflows/verificacao.yml`). O resultado aparece no próprio Pull Request. O fluxo usa somente leitura, não usa credenciais e não publica a aplicação nem faz merge.
