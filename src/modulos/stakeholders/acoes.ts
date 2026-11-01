@@ -11,21 +11,28 @@ import { comoUsuario, obterBanco } from "@/lib/banco/conexao";
 import { esquemaIdentificador } from "@/lib/validacao/comuns";
 import { obterUsuarioAtual } from "@/modulos/acesso/usuario-atual";
 import {
+  arquivarContato,
   atualizarInstituicao,
   atualizarPessoa,
+  contatosRepetidos,
+  criarContato,
   criarInstituicao,
   criarPessoa,
   criarVinculo,
   definirArquivamentoInstituicao,
   definirArquivamentoPessoa,
+  encerrarContato,
   encerrarVinculo,
   obterInstituicao,
   obterPessoa,
+  obterStakeholder,
   possiveisDuplicidadesInstituicao,
   possiveisDuplicidadesPessoa,
   type PossivelDuplicidade,
 } from "./consultas";
 import {
+  esquemaContato,
+  esquemaEncerramentoContato,
   esquemaEncerramentoVinculo,
   esquemaInstituicao,
   esquemaPessoa,
@@ -224,4 +231,83 @@ export async function encerrarVinculoPessoa(
   revalidatePath("/pessoas", "layout");
   revalidatePath("/instituicoes", "layout");
   return { sucesso: true };
+}
+
+// --- Contatos (decisão D-025) ------------------------------------------------
+
+/** Registra contato de pessoa ou instituição; contato repetido gera alerta, não bloqueio. */
+export async function salvarContato(
+  _estadoAnterior: EstadoFormulario,
+  formData: FormData,
+): Promise<EstadoFormulario> {
+  const valores = valoresDoFormulario(formData);
+  const resultado = esquemaContato.safeParse(valores);
+  if (!resultado.success) {
+    return { erros: z.flattenError(resultado.error).fieldErrors, valores };
+  }
+
+  const banco = await obterBanco();
+  const dono = await obterStakeholder(banco, resultado.data.stakeholderId);
+  if (!dono) return { mensagem: "Cadastro não encontrado.", valores };
+  const registro =
+    dono.tipo === "pessoa"
+      ? await obterPessoa(banco, dono.id)
+      : await obterInstituicao(banco, dono.id);
+  if (registro?.arquivadoEm) {
+    return { mensagem: "Não é possível registrar contato em cadastro arquivado.", valores };
+  }
+  if (resultado.data.vinculoId && dono.tipo !== "pessoa") {
+    return { mensagem: "Somente contatos de pessoas podem ser ligados a um vínculo.", valores };
+  }
+
+  if (valores.confirmarDuplicidade !== "sim") {
+    const repetidos = await contatosRepetidos(banco, resultado.data);
+    if (repetidos.length > 0) return { duplicidades: repetidos, valores };
+  }
+
+  const usuario = await obterUsuarioAtual(banco);
+  try {
+    await comoUsuario(banco, usuario.id, (tx) => criarContato(tx, resultado.data));
+  } catch (erro) {
+    return { mensagem: mensagemDeErro(erro), valores };
+  }
+
+  revalidatePath(dono.tipo === "pessoa" ? `/pessoas/${dono.id}` : `/instituicoes/${dono.id}`);
+  return { sucesso: true };
+}
+
+export async function encerrarContatoAcao(
+  _estadoAnterior: EstadoFormulario,
+  formData: FormData,
+): Promise<EstadoFormulario> {
+  const valores = valoresDoFormulario(formData);
+  const resultado = esquemaEncerramentoContato.safeParse(valores);
+  if (!resultado.success) {
+    return { erros: z.flattenError(resultado.error).fieldErrors, valores };
+  }
+
+  const banco = await obterBanco();
+  const usuario = await obterUsuarioAtual(banco);
+  try {
+    const dono = await comoUsuario(banco, usuario.id, (tx) =>
+      encerrarContato(tx, resultado.data.contatoId, resultado.data.dataFim),
+    );
+    if (!dono) return { mensagem: "Este contato já estava encerrado.", valores };
+  } catch (erro) {
+    return { mensagem: mensagemDeErro(erro), valores };
+  }
+
+  revalidatePath("/pessoas", "layout");
+  revalidatePath("/instituicoes", "layout");
+  return { sucesso: true };
+}
+
+/** Arquiva contato registrado por engano; ele deixa de aparecer, mas permanece no histórico. */
+export async function arquivarContatoAcao(contatoId: string) {
+  const id = esquemaIdentificador.parse(contatoId);
+  const banco = await obterBanco();
+  const usuario = await obterUsuarioAtual(banco);
+  await comoUsuario(banco, usuario.id, (tx) => arquivarContato(tx, id));
+  revalidatePath("/pessoas", "layout");
+  revalidatePath("/instituicoes", "layout");
 }

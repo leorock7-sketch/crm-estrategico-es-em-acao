@@ -90,30 +90,18 @@ describe("Pessoas", () => {
     expect(auditoria[0].usuarioId).toBe(usuarioId);
   });
 
-  test("não permite duas pessoas com o mesmo e-mail, sem diferenciar maiúsculas", async () => {
-    await gravar((tx) =>
-      consultas.criarPessoa(tx, { nomeCompleto: "Marcos Teste", email: "marcos@exemplo.org" }),
-    );
-    const mensagem = await mensagemDaFalha(
-      gravar((tx) =>
-        consultas.criarPessoa(tx, { nomeCompleto: "Outro Marcos", email: "MARCOS@exemplo.org" }),
-      ),
-    );
-    expect(mensagem).toBe("Já existe uma pessoa cadastrada com este e-mail.");
-  });
-
   test("registra alteração apenas quando algum dado de fato muda", async () => {
-    const dados = { nomeCompleto: "Nina Modelo Freitas", telefone: "(27) 90000-0101" };
+    const dados = { nomeCompleto: "Nina Modelo Freitas", observacoes: "Primeira versão" };
     const id = await gravar((tx) => consultas.criarPessoa(tx, dados));
 
     await gravar((tx) => consultas.atualizarPessoa(tx, id, dados));
     expect(await auditoriaDe(id)).toHaveLength(1);
 
-    await gravar((tx) => consultas.atualizarPessoa(tx, id, { ...dados, telefone: "(27) 90000-0102" }));
+    await gravar((tx) => consultas.atualizarPessoa(tx, id, { ...dados, observacoes: "Segunda versão" }));
     const auditoria = await auditoriaDe(id);
     expect(auditoria.map((a) => a.operacao)).toEqual(["inclusao", "alteracao"]);
-    expect(auditoria[1].dadosAnteriores).toMatchObject({ telefone: "(27) 90000-0101" });
-    expect(auditoria[1].dadosNovos).toMatchObject({ telefone: "(27) 90000-0102" });
+    expect(auditoria[1].dadosAnteriores).toMatchObject({ observacoes: "Primeira versão" });
+    expect(auditoria[1].dadosNovos).toMatchObject({ observacoes: "Segunda versão" });
   });
 
   test("arquivamento e reativação ficam registrados na auditoria", async () => {
@@ -157,10 +145,8 @@ describe("Pessoas", () => {
     ).toContain(id);
   });
 
-  test("aponta possíveis duplicidades por nome, nome semelhante e e-mail", async () => {
-    await gravar((tx) =>
-      consultas.criarPessoa(tx, { nomeCompleto: "Tereza Modelo Santos", email: "tereza@exemplo.org" }),
-    );
+  test("aponta possíveis duplicidades por nome e nome semelhante", async () => {
+    await gravar((tx) => consultas.criarPessoa(tx, { nomeCompleto: "Tereza Modelo Santos" }));
 
     const mesmoNome = await consultas.possiveisDuplicidadesPessoa(banco, { nomeCompleto: "TEREZA modelo santos" });
     expect(mesmoNome[0]?.motivo).toBe("Mesmo nome");
@@ -168,28 +154,136 @@ describe("Pessoas", () => {
     const semelhante = await consultas.possiveisDuplicidadesPessoa(banco, { nomeCompleto: "Tereza Santos" });
     expect(semelhante[0]?.motivo).toBe("Nome semelhante");
 
-    const mesmoEmail = await consultas.possiveisDuplicidadesPessoa(banco, {
-      nomeCompleto: "Outra Pessoa",
-      email: "Tereza@Exemplo.org",
-    });
-    expect(mesmoEmail[0]?.motivo).toBe("Mesmo e-mail");
-
     const nenhuma = await consultas.possiveisDuplicidadesPessoa(banco, { nomeCompleto: "Ulisses Teste" });
     expect(nenhuma).toHaveLength(0);
   });
 });
 
-describe("Instituições", () => {
-  test("CNPJ é único e aceita o formato alfanumérico", async () => {
-    await gravar((tx) =>
-      consultas.criarInstituicao(tx, { ...instituicaoBase, nome: "Empresa Alfa Exemplo", cnpj: "12ABC34501DE35" }),
+describe("Contatos (D-025)", () => {
+  test("o mesmo e-mail institucional pode ser registrado para duas pessoas, com alerta", async () => {
+    const titular = await gravar((tx) => consultas.criarPessoa(tx, { nomeCompleto: "Titular Antigo Exemplo" }));
+    const sucessor = await gravar((tx) => consultas.criarPessoa(tx, { nomeCompleto: "Titular Novo Exemplo" }));
+    const contato = { tipo: "email" as const, valor: "Gabinete@Exemplo.org", natureza: "funcional" as const, principal: false };
+    await gravar((tx) => consultas.criarContato(tx, { ...contato, stakeholderId: titular }));
+
+    const alerta = await consultas.contatosRepetidos(banco, { tipo: "email", valor: "gabinete@exemplo.org " });
+    expect(alerta.map((a) => [a.nome, a.motivo, a.caminho])).toEqual([
+      ["Titular Antigo Exemplo", "Mesmo contato (funcional)", "/pessoas"],
+    ]);
+
+    await gravar((tx) => consultas.criarContato(tx, { ...contato, stakeholderId: sucessor }));
+    expect(await consultas.listarContatos(banco, sucessor)).toHaveLength(1);
+  });
+
+  test("ao encerrar o vínculo, o contato ligado a ele é encerrado na mesma data", async () => {
+    const pessoaId = await gravar((tx) => consultas.criarPessoa(tx, { nomeCompleto: "Secretária Exemplo Antiga" }));
+    const instituicaoId = await gravar((tx) =>
+      consultas.criarInstituicao(tx, { ...instituicaoBase, nome: "Secretaria Exemplo de Contatos" }),
     );
+    const vinculoId = await gravar((tx) =>
+      consultas.criarVinculo(tx, { pessoaId, instituicaoId, principal: true, cargo: "Secretária" }),
+    );
+    await gravar((tx) =>
+      consultas.criarContato(tx, {
+        stakeholderId: pessoaId,
+        vinculoId,
+        tipo: "email",
+        valor: "secretaria@exemplo.org",
+        natureza: "funcional",
+        principal: false,
+      }),
+    );
+
+    await gravar((tx) => consultas.encerrarVinculo(tx, vinculoId, "2026-10-31"));
+    const [contato] = await consultas.listarContatos(banco, pessoaId);
+    expect(contato).toMatchObject({ dataFim: "2026-10-31", vinculoCargo: "Secretária" });
+    expect(await consultas.contatosRepetidos(banco, { tipo: "email", valor: "secretaria@exemplo.org" })).toHaveLength(0);
+  });
+
+  test("o vínculo ligado ao contato deve ser da própria pessoa", async () => {
+    const dona = await gravar((tx) => consultas.criarPessoa(tx, { nomeCompleto: "Dona do Vínculo Exemplo" }));
+    const outra = await gravar((tx) => consultas.criarPessoa(tx, { nomeCompleto: "Outra Pessoa Exemplo" }));
+    const instituicaoId = await gravar((tx) =>
+      consultas.criarInstituicao(tx, { ...instituicaoBase, nome: "Empresa Vínculo Exemplo" }),
+    );
+    const vinculoId = await gravar((tx) => consultas.criarVinculo(tx, { pessoaId: dona, instituicaoId, principal: false }));
     const mensagem = await mensagemDaFalha(
       gravar((tx) =>
-        consultas.criarInstituicao(tx, { ...instituicaoBase, nome: "Empresa Beta Exemplo", cnpj: "12ABC34501DE35" }),
+        consultas.criarContato(tx, {
+          stakeholderId: outra,
+          vinculoId,
+          tipo: "telefone",
+          valor: "(27) 90000-0000",
+          natureza: "funcional",
+          principal: false,
+        }),
       ),
     );
-    expect(mensagem).toBe("Já existe uma instituição cadastrada com este CNPJ.");
+    expect(mensagem).toBe("O vínculo informado não pertence a esta pessoa.");
+  });
+
+  test("no máximo um contato principal vigente por tipo", async () => {
+    const id = await gravar((tx) => consultas.criarPessoa(tx, { nomeCompleto: "Principal Exemplo Teste" }));
+    const email = { stakeholderId: id, tipo: "email" as const, natureza: "pessoal" as const };
+    await gravar((tx) => consultas.criarContato(tx, { ...email, valor: "um@exemplo.org", principal: true }));
+    const mensagem = await mensagemDaFalha(
+      gravar((tx) => consultas.criarContato(tx, { ...email, valor: "dois@exemplo.org", principal: true })),
+    );
+    expect(mensagem).toContain("Já existe um contato principal vigente deste tipo");
+    await gravar((tx) => consultas.criarContato(tx, { ...email, valor: "dois@exemplo.org", principal: false }));
+  });
+
+  test("a lista mostra o e-mail principal, a busca encontra pelo contato e o histórico o registra", async () => {
+    const id = await gravar((tx) => consultas.criarPessoa(tx, { nomeCompleto: "Zélia Contato Exemplo" }));
+    await gravar((tx) =>
+      consultas.criarContato(tx, { stakeholderId: id, tipo: "email", valor: "zelia@exemplo.org", natureza: "pessoal", principal: true }),
+    );
+
+    const [linha] = await consultas.listarPessoas(banco, { busca: "zelia@exemplo" });
+    expect(linha).toMatchObject({ id, email: "zelia@exemplo.org" });
+
+    const historico = await consultas.historicoDoStakeholder(banco, id);
+    expect(historico.map((r) => r.tabela).sort()).toEqual(["contato", "pessoa"]);
+  });
+});
+
+describe("Instituições", () => {
+  test("CNPJ repetido é permitido e gera alerta (D-024), inclusive no formato alfanumérico", async () => {
+    const orgao = await gravar((tx) =>
+      consultas.criarInstituicao(tx, { ...instituicaoBase, nome: "Empresa Alfa Exemplo", cnpj: "12ABC34501DE35" }),
+    );
+    const alerta = await consultas.possiveisDuplicidadesInstituicao(banco, {
+      nome: "Unidade da Empresa Alfa",
+      cnpj: "12ABC34501DE35",
+    });
+    expect(alerta.map((a) => a.motivo)).toEqual(["Mesmo CNPJ"]);
+    await gravar((tx) =>
+      consultas.criarInstituicao(tx, {
+        ...instituicaoBase,
+        nome: "Unidade da Empresa Alfa",
+        cnpj: "12ABC34501DE35",
+        instituicaoSuperiorId: orgao,
+      }),
+    );
+  });
+
+  test("país padrão é o Brasil; UF e CNPJ só para instituições brasileiras", async () => {
+    const brasileira = await gravar((tx) => consultas.criarInstituicao(tx, { ...instituicaoBase, nome: "Empresa Nacional Exemplo" }));
+    expect((await consultas.obterInstituicao(banco, brasileira))?.pais).toBe("BR");
+
+    await gravar((tx) => consultas.criarInstituicao(tx, { ...instituicaoBase, nome: "Foreign Example Agency", pais: "PT" }));
+    expect(
+      await mensagemDaFalha(
+        gravar((tx) => consultas.criarInstituicao(tx, { ...instituicaoBase, nome: "Foreign Example Two", pais: "PT", uf: "ES" })),
+      ),
+    ).toBe("A UF só se aplica a instituições do Brasil.");
+    expect(
+      await mensagemDaFalha(
+        gravar((tx) =>
+          consultas.criarInstituicao(tx, { ...instituicaoBase, nome: "Foreign Example Three", pais: "PT", cnpj: "11222333000181" }),
+        ),
+      ),
+    ).toBe("O CNPJ só se aplica a instituições do Brasil.");
   });
 
   test("o banco recusa CNPJ fora do formato, mesmo sem passar pela tela", async () => {

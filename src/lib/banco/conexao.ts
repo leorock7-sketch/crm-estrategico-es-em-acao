@@ -16,6 +16,7 @@ import { sql } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/pglite";
 import { migrate } from "drizzle-orm/pglite/migrator";
 import * as esquema from "./esquema";
+import { adquirirTrava, liberarTrava } from "./trava";
 
 function criarBanco(cliente: PGlite) {
   return drizzle(cliente, { schema: esquema });
@@ -34,22 +35,64 @@ export function diretorioDoBanco(): string {
 }
 
 /**
+ * Proteção de ambiente (correção C3): em produção, o banco local só é aceito
+ * com autorização explícita (CRM_BANCO=pglite), destinada a testes locais da
+ * versão compilada. Assim, dados reais nunca são gravados nele por engano.
+ */
+export function verificarUsoDoBancoLocal(ambiente: NodeJS.ProcessEnv = process.env): void {
+  if (ambiente.NODE_ENV === "production" && ambiente.CRM_BANCO !== "pglite") {
+    throw new Error(
+      "O banco local de desenvolvimento (PGlite) não pode ser usado em produção. Configure a " +
+        "conexão definitiva do banco ou, apenas para testes locais da versão compilada, defina " +
+        "CRM_BANCO=pglite no arquivo .env.local.",
+    );
+  }
+}
+
+const pastasAbertas = new WeakMap<Banco, string>();
+
+/**
  * Abre um banco e aplica os scripts pendentes. Sem diretório, o banco fica
- * apenas na memória (usado nos testes automatizados).
+ * apenas na memória (usado nos testes automatizados). Com diretório, obtém
+ * antes a trava exclusiva da pasta (ver trava.ts).
  */
 export async function abrirBanco(diretorio?: string): Promise<Banco> {
-  if (diretorio) mkdirSync(diretorio, { recursive: true });
-  const cliente = diretorio ? new PGlite(diretorio) : new PGlite();
-  const banco = criarBanco(cliente);
-  await migrate(banco, { migrationsFolder: PASTA_MIGRACOES });
-  return banco;
+  if (!diretorio) {
+    const banco = criarBanco(new PGlite());
+    await migrate(banco, { migrationsFolder: PASTA_MIGRACOES });
+    return banco;
+  }
+
+  mkdirSync(diretorio, { recursive: true });
+  adquirirTrava(diretorio);
+  try {
+    const banco = criarBanco(new PGlite(diretorio));
+    await migrate(banco, { migrationsFolder: PASTA_MIGRACOES });
+    pastasAbertas.set(banco, diretorio);
+    return banco;
+  } catch (erro) {
+    liberarTrava(diretorio);
+    throw erro;
+  }
+}
+
+/** Fecha o banco e libera a trava da pasta (usado pelos scripts de manutenção). */
+export async function fecharBanco(banco: Banco): Promise<void> {
+  await banco.$client.close();
+  const diretorio = pastasAbertas.get(banco);
+  if (diretorio) liberarTrava(diretorio);
 }
 
 const global = globalThis as typeof globalThis & { __bancoCrm?: Promise<Banco> };
 
 /** Banco compartilhado pela aplicação (uma única conexão por processo). */
 export function obterBanco(): Promise<Banco> {
-  global.__bancoCrm ??= abrirBanco(diretorioDoBanco());
+  verificarUsoDoBancoLocal();
+  global.__bancoCrm ??= abrirBanco(diretorioDoBanco()).catch((erro) => {
+    // Permite nova tentativa depois que o outro programa liberar o banco.
+    global.__bancoCrm = undefined;
+    throw erro;
+  });
   return global.__bancoCrm;
 }
 

@@ -12,12 +12,15 @@ import { descreverPeriodo, formatarDataHora } from "@/lib/formatacao";
 import { esquemaIdentificador } from "@/lib/validacao/comuns";
 import { alterarArquivamentoPessoa } from "@/modulos/stakeholders/acoes";
 import { BotaoArquivamento } from "@/modulos/stakeholders/componentes/botao-arquivamento";
+import { FormularioContato } from "@/modulos/stakeholders/componentes/formulario-contato";
 import { FormularioEncerramento } from "@/modulos/stakeholders/componentes/formulario-encerramento";
 import { FormularioVinculo } from "@/modulos/stakeholders/componentes/formulario-vinculo";
+import { ListaContatos } from "@/modulos/stakeholders/componentes/lista-contatos";
 import { ListaHistorico } from "@/modulos/stakeholders/componentes/lista-historico";
 import {
   historicoDoStakeholder,
   idsCitadosNoHistorico,
+  listarContatos,
   listarVinculosDaPessoa,
   nomesDosStakeholders,
   obterPessoa,
@@ -42,13 +45,17 @@ async function DetalhePessoa({ params }: Pick<PageProps<"/pessoas/[id]">, "param
   const pessoa = await obterPessoa(banco, id);
   if (!pessoa) notFound();
 
-  const [vinculos, historico, instituicoes] = await Promise.all([
+  const [vinculos, contatos, historico, instituicoes] = await Promise.all([
     listarVinculosDaPessoa(banco, id),
+    listarContatos(banco, id),
     historicoDoStakeholder(banco, id),
     opcoesInstituicoes(banco),
   ]);
   const nomes = await nomesDosStakeholders(banco, idsCitadosNoHistorico(historico));
   const arquivada = pessoa.arquivadoEm !== null;
+  const vinculosVigentes = vinculos
+    .filter((v) => v.dataFim === null)
+    .map((v) => ({ id: v.id, rotulo: [v.cargo, v.instituicaoSigla ?? v.instituicaoNome].filter(Boolean).join(" · ") }));
 
   return (
     <div className="flex flex-col gap-6">
@@ -79,7 +86,7 @@ async function DetalhePessoa({ params }: Pick<PageProps<"/pessoas/[id]">, "param
       {arquivada && (
         <Alerta tom="aviso" titulo="Pessoa arquivada">
           Arquivada em {formatarDataHora(pessoa.arquivadoEm)}. Para editar ou registrar
-          vínculos, reative o cadastro.
+          vínculos e contatos, reative o cadastro.
         </Alerta>
       )}
 
@@ -88,14 +95,35 @@ async function DetalhePessoa({ params }: Pick<PageProps<"/pessoas/[id]">, "param
           Dados
         </h2>
         <dl className="grid gap-4 text-sm sm:grid-cols-2">
-          <ItemDado rotulo="E-mail" valor={pessoa.email} />
-          <ItemDado rotulo="Telefone" valor={pessoa.telefone} />
           <div className="sm:col-span-2">
             <ItemDado rotulo="Observações" valor={pessoa.observacoes} />
           </div>
           <ItemDado rotulo="Cadastrada em" valor={formatarDataHora(pessoa.criadoEm)} />
           <ItemDado rotulo="Última alteração" valor={formatarDataHora(pessoa.atualizadoEm)} />
         </dl>
+      </section>
+
+      <section aria-labelledby="titulo-contatos" className={classeCartao}>
+        <h2 id="titulo-contatos" className="mb-1 text-lg font-semibold">
+          Contatos
+        </h2>
+        <p className="mb-4 text-sm text-texto-secundario">
+          E-mails e telefones com histórico próprio. Um mesmo contato pode ser compartilhado
+          ou passar ao sucessor no cargo.
+        </p>
+        <ListaContatos contatos={contatos} somenteLeitura={arquivada} />
+        {!arquivada && (
+          <details className="mt-4 rounded-lg border border-borda p-4">
+            <summary className="cursor-pointer font-medium">Registrar contato</summary>
+            <div className="mt-4">
+              <FormularioContato
+                stakeholderId={id}
+                naturezaPadrao="institucional"
+                vinculos={vinculosVigentes}
+              />
+            </div>
+          </details>
+        )}
       </section>
 
       <section aria-labelledby="titulo-vinculos" className={classeCartao}>
@@ -133,7 +161,7 @@ async function DetalhePessoa({ params }: Pick<PageProps<"/pessoas/[id]">, "param
                       <summary className="cursor-pointer text-texto-secundario hover:underline">
                         Encerrar vínculo
                       </summary>
-                      <FormularioEncerramento vinculoId={v.id} />
+                      <FormularioEncerramento alvo="vinculo" id={v.id} />
                     </details>
                   )}
                 </li>

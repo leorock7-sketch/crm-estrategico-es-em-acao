@@ -1,12 +1,13 @@
 /**
- * Leitura e gravação do Cadastro Mestre: pessoas, instituições e vínculos.
- * As gravações devem ser feitas dentro de comoUsuario() (ver lib/banco/conexao),
- * para que a trilha de auditoria registre o responsável.
+ * Leitura e gravação do Cadastro Mestre: pessoas, instituições, vínculos e
+ * contatos. As gravações devem ser feitas dentro de comoUsuario() (ver
+ * lib/banco/conexao), para que a trilha de auditoria registre o responsável.
  */
-import { and, asc, desc, eq, ilike, inArray, isNull, ne, or, sql, type SQL } from "drizzle-orm";
+import { and, asc, desc, eq, exists, ilike, inArray, isNull, ne, or, sql, type SQL } from "drizzle-orm";
 import { alias } from "drizzle-orm/pg-core";
 import type { Executor } from "@/lib/banco/conexao";
 import {
+  contato,
   instituicao,
   pessoa,
   registroAuditoria,
@@ -15,13 +16,17 @@ import {
   vinculoPessoaInstituicao as vinculo,
 } from "@/lib/banco/esquema";
 import { escaparLike, normalizarTexto } from "@/lib/texto";
-import type { DadosInstituicao, DadosPessoa, DadosVinculo } from "./esquemas";
+import { normalizarContato } from "./contatos";
+import type { DadosContato, DadosInstituicao, DadosPessoa, DadosVinculo } from "./esquemas";
+import { PAIS_PADRAO } from "./paises";
 
 export type PossivelDuplicidade = {
   id: string;
   nome: string;
   motivo: string;
   arquivado: boolean;
+  /** Página do registro, quando o alerta pode envolver pessoas e instituições. */
+  caminho?: "/pessoas" | "/instituicoes";
 };
 
 /** Vínculo vigente: sem data de término e não arquivado. */
@@ -34,10 +39,22 @@ function camposPessoa(dados: DadosPessoa) {
     nomeCompleto: dados.nomeCompleto,
     nomeTratamento: dados.nomeTratamento ?? null,
     nomeNormalizado: normalizarTexto(dados.nomeCompleto),
-    email: dados.email ?? null,
-    telefone: dados.telefone ?? null,
     observacoes: dados.observacoes ?? null,
   };
+}
+
+/** Contato vigente: sem data de término e não arquivado. */
+const contatoVigente = and(isNull(contato.dataFim), isNull(contato.arquivadoEm));
+
+/** E-mail vigente de um stakeholder, dando preferência ao principal. */
+function emailPrincipal(stakeholderId: typeof pessoa.id) {
+  return sql<string | null>`(
+    select ${contato.valor} from ${contato}
+    where ${contato.stakeholderId} = ${stakeholderId} and ${contato.tipo} = 'email'
+      and ${contato.dataFim} is null and ${contato.arquivadoEm} is null
+    order by ${contato.principal} desc, ${contato.criadoEm}
+    limit 1
+  )`;
 }
 
 export async function listarPessoas(
@@ -49,10 +66,20 @@ export async function listarPessoas(
   const termo = normalizarTexto(filtro.busca ?? "");
   if (termo) {
     const padrao = `%${escaparLike(termo)}%`;
+    const contatoBuscado = banco
+      .select({ id: contato.id })
+      .from(contato)
+      .where(
+        and(
+          eq(contato.stakeholderId, pessoa.id),
+          isNull(contato.arquivadoEm),
+          ilike(contato.valorNormalizado, `%${escaparLike(filtro.busca!.trim().toLowerCase())}%`),
+        ),
+      );
     condicoes.push(
       or(
         ilike(pessoa.nomeNormalizado, padrao),
-        ilike(pessoa.email, `%${escaparLike(filtro.busca!.trim())}%`),
+        exists(contatoBuscado),
         ilike(instituicao.nomeNormalizado, padrao),
       ),
     );
@@ -63,8 +90,7 @@ export async function listarPessoas(
       id: pessoa.id,
       nomeCompleto: pessoa.nomeCompleto,
       nomeTratamento: pessoa.nomeTratamento,
-      email: pessoa.email,
-      telefone: pessoa.telefone,
+      email: emailPrincipal(pessoa.id),
       arquivadoEm: pessoa.arquivadoEm,
       cargo: vinculo.cargo,
       instituicaoId: instituicao.id,
@@ -108,12 +134,13 @@ export async function definirArquivamentoPessoa(banco: Executor, id: string, arq
 }
 
 /**
- * Pessoas que podem ser a mesma: mesmo e-mail, mesmo nome ou mesmo primeiro e
- * último nome (por exemplo, "Maria Silva" e "Maria da Silva").
+ * Pessoas que podem ser a mesma: mesmo nome ou mesmo primeiro e último nome
+ * (por exemplo, "Maria Silva" e "Maria da Silva"). Repetições de e-mail e
+ * telefone são apontadas ao registrar o contato (contatosRepetidos).
  */
 export async function possiveisDuplicidadesPessoa(
   banco: Executor,
-  dados: Pick<DadosPessoa, "nomeCompleto" | "email">,
+  dados: Pick<DadosPessoa, "nomeCompleto">,
   ignorarId?: string,
 ): Promise<PossivelDuplicidade[]> {
   const nome = normalizarTexto(dados.nomeCompleto);
@@ -125,14 +152,12 @@ export async function possiveisDuplicidadesPessoa(
         and regexp_replace(${pessoa.nomeNormalizado}, '^.* ', '') = ${partes.at(-1)}`,
     );
   }
-  if (dados.email) criterios.push(sql`lower(${pessoa.email}) = lower(${dados.email})`);
 
   const encontradas = await banco
     .select({
       id: pessoa.id,
       nome: pessoa.nomeCompleto,
       nomeNormalizado: pessoa.nomeNormalizado,
-      email: pessoa.email,
       arquivadoEm: pessoa.arquivadoEm,
     })
     .from(pessoa)
@@ -142,12 +167,7 @@ export async function possiveisDuplicidadesPessoa(
   return encontradas.map((p) => ({
     id: p.id,
     nome: p.nome,
-    motivo:
-      dados.email && p.email?.toLowerCase() === dados.email.toLowerCase()
-        ? "Mesmo e-mail"
-        : p.nomeNormalizado === nome
-          ? "Mesmo nome"
-          : "Nome semelhante",
+    motivo: p.nomeNormalizado === nome ? "Mesmo nome" : "Nome semelhante",
     arquivado: p.arquivadoEm !== null,
   }));
 }
@@ -161,6 +181,7 @@ function camposInstituicao(dados: DadosInstituicao) {
     nomeNormalizado: normalizarTexto(dados.nome),
     natureza: dados.natureza,
     esfera: dados.esfera ?? null,
+    pais: dados.pais ?? PAIS_PADRAO,
     cnpj: dados.cnpj ?? null,
     uf: dados.uf ?? null,
     municipio: dados.municipio ?? null,
@@ -193,6 +214,7 @@ export async function listarInstituicoes(
       nome: instituicao.nome,
       sigla: instituicao.sigla,
       natureza: instituicao.natureza,
+      pais: instituicao.pais,
       uf: instituicao.uf,
       municipio: instituicao.municipio,
       arquivadoEm: instituicao.arquivadoEm,
@@ -369,9 +391,118 @@ export async function encerrarVinculo(
   return alterados.length > 0;
 }
 
+// --- Contatos (decisão D-025) ------------------------------------------------
+
+export async function obterStakeholder(banco: Executor, id: string) {
+  const [encontrado] = await banco.select().from(stakeholder).where(eq(stakeholder.id, id));
+  return encontrado ?? null;
+}
+
+/** Contatos não arquivados de uma pessoa ou instituição: vigentes primeiro. */
+export async function listarContatos(banco: Executor, stakeholderId: string) {
+  return banco
+    .select({
+      id: contato.id,
+      tipo: contato.tipo,
+      valor: contato.valor,
+      natureza: contato.natureza,
+      principal: contato.principal,
+      dataInicio: contato.dataInicio,
+      dataFim: contato.dataFim,
+      observacao: contato.observacao,
+      vinculoId: contato.vinculoId,
+      vinculoCargo: vinculo.cargo,
+      vinculoInstituicao: instituicao.nome,
+    })
+    .from(contato)
+    .leftJoin(vinculo, eq(vinculo.id, contato.vinculoId))
+    .leftJoin(instituicao, eq(instituicao.id, vinculo.instituicaoId))
+    .where(and(eq(contato.stakeholderId, stakeholderId), isNull(contato.arquivadoEm)))
+    .orderBy(sql`${contato.dataFim} is null desc`, desc(contato.principal), asc(contato.tipo), desc(contato.criadoEm));
+}
+
+export type ContatoListado = Awaited<ReturnType<typeof listarContatos>>[number];
+
+/**
+ * Contatos vigentes com o mesmo valor (por exemplo, o mesmo e-mail) em qualquer
+ * cadastro. Usado para alertar, nunca para bloquear (D-025).
+ */
+export async function contatosRepetidos(
+  banco: Executor,
+  dados: Pick<DadosContato, "tipo" | "valor">,
+): Promise<PossivelDuplicidade[]> {
+  const valorNormalizado = normalizarContato(dados.tipo, dados.valor);
+  const donoPessoa = alias(pessoa, "dono_pessoa");
+  const donoInstituicao = alias(instituicao, "dono_instituicao");
+  const encontrados = await banco
+    .select({
+      stakeholderId: contato.stakeholderId,
+      natureza: contato.natureza,
+      nomePessoa: donoPessoa.nomeCompleto,
+      nomeInstituicao: donoInstituicao.nome,
+      arquivadoPessoa: donoPessoa.arquivadoEm,
+      arquivadoInstituicao: donoInstituicao.arquivadoEm,
+    })
+    .from(contato)
+    .leftJoin(donoPessoa, eq(donoPessoa.id, contato.stakeholderId))
+    .leftJoin(donoInstituicao, eq(donoInstituicao.id, contato.stakeholderId))
+    .where(and(eq(contato.valorNormalizado, valorNormalizado), contatoVigente))
+    .limit(10);
+
+  return encontrados.map((c) => ({
+    id: c.stakeholderId,
+    nome: c.nomePessoa ?? c.nomeInstituicao ?? "cadastro não identificado",
+    motivo: `Mesmo contato (${c.natureza})`,
+    arquivado: (c.arquivadoPessoa ?? c.arquivadoInstituicao) !== null,
+    caminho: c.nomePessoa ? "/pessoas" : "/instituicoes",
+  }));
+}
+
+export async function criarContato(banco: Executor, dados: DadosContato): Promise<string> {
+  const [novo] = await banco
+    .insert(contato)
+    .values({
+      stakeholderId: dados.stakeholderId,
+      vinculoId: dados.vinculoId ?? null,
+      tipo: dados.tipo,
+      valor: dados.valor,
+      valorNormalizado: normalizarContato(dados.tipo, dados.valor),
+      natureza: dados.natureza,
+      principal: dados.principal,
+      dataInicio: dados.dataInicio ?? null,
+      observacao: dados.observacao ?? null,
+    })
+    .returning({ id: contato.id });
+  return novo.id;
+}
+
+/** Encerra um contato vigente. Retorna o dono do contato, ou null se já estava encerrado. */
+export async function encerrarContato(
+  banco: Executor,
+  contatoId: string,
+  dataFim: string,
+): Promise<string | null> {
+  const [alterado] = await banco
+    .update(contato)
+    .set({ dataFim })
+    .where(and(eq(contato.id, contatoId), isNull(contato.dataFim)))
+    .returning({ stakeholderId: contato.stakeholderId });
+  return alterado?.stakeholderId ?? null;
+}
+
+/** Arquiva um contato registrado por engano (permanece no histórico). Retorna o dono. */
+export async function arquivarContato(banco: Executor, contatoId: string): Promise<string | null> {
+  const [alterado] = await banco
+    .update(contato)
+    .set({ arquivadoEm: sql`now()` })
+    .where(and(eq(contato.id, contatoId), isNull(contato.arquivadoEm)))
+    .returning({ stakeholderId: contato.stakeholderId });
+  return alterado?.stakeholderId ?? null;
+}
+
 // --- Histórico ---------------------------------------------------------------
 
-/** Registros da trilha de auditoria de uma pessoa ou instituição, incluindo seus vínculos. */
+/** Registros da trilha de auditoria de uma pessoa ou instituição, incluindo vínculos e contatos. */
 export async function historicoDoStakeholder(banco: Executor, id: string) {
   const dados = sql`coalesce(${registroAuditoria.dadosNovos}, ${registroAuditoria.dadosAnteriores})`;
   return banco
@@ -393,6 +524,7 @@ export async function historicoDoStakeholder(banco: Executor, id: string) {
           eq(registroAuditoria.tabela, "vinculo_pessoa_instituicao"),
           or(sql`${dados} ->> 'pessoa_id' = ${id}`, sql`${dados} ->> 'instituicao_id' = ${id}`),
         ),
+        and(eq(registroAuditoria.tabela, "contato"), sql`${dados} ->> 'stakeholder_id' = ${id}`),
       ),
     )
     .orderBy(desc(registroAuditoria.ocorridoEm), desc(registroAuditoria.id))
@@ -401,14 +533,17 @@ export async function historicoDoStakeholder(banco: Executor, id: string) {
 
 export type RegistroHistorico = Awaited<ReturnType<typeof historicoDoStakeholder>>[number];
 
-/** Nomes de pessoas e instituições a partir dos identificadores (usado no histórico). */
+/**
+ * Nomes de pessoas, instituições e vínculos (cargo e instituição) a partir dos
+ * identificadores citados no histórico.
+ */
 export async function nomesDosStakeholders(
   banco: Executor,
   ids: string[],
 ): Promise<Map<string, string>> {
   const unicos = [...new Set(ids)];
   if (unicos.length === 0) return new Map();
-  const [pessoas, instituicoes] = await Promise.all([
+  const [pessoas, instituicoes, vinculos] = await Promise.all([
     banco
       .select({ id: pessoa.id, nome: pessoa.nomeCompleto })
       .from(pessoa)
@@ -417,8 +552,16 @@ export async function nomesDosStakeholders(
       .select({ id: instituicao.id, nome: instituicao.nome })
       .from(instituicao)
       .where(inArray(instituicao.id, unicos)),
+    banco
+      .select({ id: vinculo.id, cargo: vinculo.cargo, instituicao: instituicao.nome })
+      .from(vinculo)
+      .innerJoin(instituicao, eq(instituicao.id, vinculo.instituicaoId))
+      .where(inArray(vinculo.id, unicos)),
   ]);
-  return new Map([...pessoas, ...instituicoes].map((registro) => [registro.id, registro.nome]));
+  return new Map([
+    ...[...pessoas, ...instituicoes].map((registro) => [registro.id, registro.nome] as const),
+    ...vinculos.map((v) => [v.id, [v.cargo, v.instituicao].filter(Boolean).join(" · ")] as const),
+  ]);
 }
 
 /** Identificadores de pessoas e instituições citados nos registros do histórico. */

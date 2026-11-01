@@ -31,9 +31,13 @@ Legenda: ✅ Aprovado · 🔧 Proposta técnica · ⏳ Pendente.
 | D-017 | 31/10/2026 | Etapa 0 — Fundação Técnica aprovada. A incorporação à `main` ocorre pelo Pull Request, por ação do gestor. | Aprovação do gestor |
 | D-018 | 31/10/2026 | Banco de dados de desenvolvimento: PGlite (PostgreSQL executado dentro do projeto, sem instalação de programas). Os mesmos scripts de criação serão aplicados futuramente no Supabase. | Escolha do gestor para a Etapa 1 |
 | D-019 | 31/10/2026 | Cópia de trabalho do projeto em pasta local (`C:\Projetos\crm-estrategico-es-em-acao`), fora do Google Drive. O GitHub é a cópia de segurança. Resolve Q-53. | Escolha do gestor para a Etapa 1 |
-| D-020 | 31/10/2026 | Cada projeto ou tema tem um único comitê responsável; não há hierarquia entre temas e projetos. Pode ser ampliado no futuro. Resolve Q-10 e Q-11. | Escolha do gestor para a Etapa 1 |
-| D-021 | 31/10/2026 | Cadastro de pessoas com dados mínimos: nome, nome de tratamento, e-mail, telefone, observações e vínculos. Sem CPF, endereço ou data de nascimento. A análise LGPD (Q-13) continua necessária antes do uso de dados reais. | Escolha do gestor para a Etapa 1 |
+| D-020 | 31/10/2026 | Cada projeto ou tema tem um único comitê responsável; não há hierarquia entre temas e projetos. Pode ser ampliado no futuro. Resolve Q-10 e Q-11. **Revisada em 01/11/2026 pela D-023 quanto aos comitês participantes**; a ausência de hierarquia entre temas e projetos permanece. | Escolha do gestor para a Etapa 1 |
+| D-021 | 31/10/2026 | Cadastro de pessoas com dados mínimos: nome, nome de tratamento, e-mail, telefone, observações e vínculos. Sem CPF, endereço ou data de nascimento. A análise LGPD (Q-13) continua necessária antes do uso de dados reais. E-mails e telefones passaram à tabela de contatos (D-025). | Escolha do gestor para a Etapa 1 |
 | D-022 | 31/10/2026 | Etapa 1 — Banco de dados de desenvolvimento e Cadastro Mestre aprovada para execução, na branch `feature/cadastro-mestre`. | Aprovação do gestor |
+| D-023 | 01/11/2026 | Cada projeto ou tema tem um **comitê principal** responsável e pode ter **comitês participantes**, registrados em tabela de ligação própria (`projeto_tema_comite`), com período e auditoria. A hierarquia institucional (Comitê de Desenvolvimento → Infraestrutura, Atração de Investimentos e Inovação) é preservada. Implementação na Etapa 1.1. | Revisão de homologação da Etapa 1; aprovação do gestor |
+| D-024 | 01/11/2026 | CNPJ repetido **gera alerta, não bloqueio**: subunidades sem CNPJ próprio podem usar o do órgão superior. Instituições estrangeiras têm país próprio, sem CNPJ e sem UF; para instituições brasileiras, a UF é obrigatória. | Revisão de homologação da Etapa 1; aprovação do gestor |
+| D-025 | 01/11/2026 | Contatos (e-mail, telefone, celular, site) em tabela própria, com natureza (pessoal, institucional ou funcional), período, contato principal, vínculo opcional com o cargo e histórico. **Sem unicidade do valor**: e-mails institucionais compartilhados ou passados ao sucessor geram alerta, não bloqueio. Pessoas e instituições mantêm identificadores permanentes. | Revisão de homologação da Etapa 1; aprovação do gestor |
+| D-026 | 01/11/2026 | Plano de correções da revisão de homologação aprovado: trava do banco local (C1), contatos (C2), proteção de produção (C3), política de CNPJ (C4) e país (C5) nesta revisão; reforço da auditoria (C6) e comandos de cópia de segurança (C7) planejados; teste de portabilidade em PostgreSQL real (C8) depende de autorização específica. | Aprovação do gestor |
 
 ## 2. Propostas técnicas 🔧
 
@@ -63,6 +67,10 @@ Sugestões adotadas provisoriamente na Etapa 0. Podem ser revistas na validaçã
 | P-020 | Validação do CNPJ alfanumérico, adotado pela Receita Federal a partir de julho de 2026. | Novas inscrições podem conter letras; o sistema já as aceita. |
 | P-021 | Alerta de possível duplicidade por nome, nome semelhante (primeiro e último nome), e-mail, sigla ou CNPJ, com confirmação expressa; na edição, só quando os dados de identificação mudam. | Atende ao Cadastro Mestre único sem impedir homônimos legítimos. |
 | P-022 | Telas e ações do servidor organizadas por módulo (`src/modulos/stakeholders`), com a validação repetida no servidor. | Separa regras de negócio da interface e protege contra envios adulterados. |
+| P-023 | Trava exclusiva da pasta do banco local por arquivo criado de forma atômica (`.dados/pglite.trava`), com substituição automática de travas abandonadas. | A revisão comprovou perda silenciosa de gravações com dois processos na mesma pasta (correção C1). |
+| P-024 | Em produção, o banco local só é aceito com `CRM_BANCO=pglite`, destinado a testes locais da versão compilada. | Impede que dados reais sejam gravados por engano no banco de desenvolvimento (correção C3). |
+| P-025 | Lista de países pelos 249 códigos ISO 3166-1, com nomes em português obtidos do próprio sistema. | Evita manter nomes de países à mão; um teste confere a lista. |
+| P-026 | Contato funcional ligado ao vínculo é encerrado automaticamente quando o vínculo termina. | Representa a passagem do e-mail ou telefone do cargo ao sucessor. |
 
 ## 3. Decisões pendentes ⏳
 
@@ -87,3 +95,5 @@ Sugestões adotadas provisoriamente na Etapa 0. Podem ser revistas na validaçã
 | Q-54 | Quem fará a validação técnica independente. | [Governança](GOVERNANCA.md) | Gestor |
 | Q-55 | Indicadores dos painéis executivos da primeira versão. | [Requisitos](REQUISITOS.md) | Gestor |
 | Q-56 | Conferência desta documentação com o Manual de Especificação V2.0 e o Guia de Implantação. | Todos | Gestor |
+| Q-57 | Autorização para o teste de portabilidade em PostgreSQL real (por exemplo, GitHub Actions) e definição da versão de destino. | [Arquitetura](ARQUITETURA.md) | Gestor |
+| Q-58 | Política de retenção, anonimização e eliminação de dados pessoais, inclusive na trilha de auditoria. | [Governança](GOVERNANCA.md) | Instância jurídica / gestor |

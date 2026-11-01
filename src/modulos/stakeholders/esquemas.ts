@@ -2,30 +2,36 @@ import { z } from "zod";
 import { cnpjValido, limparCnpj } from "@/lib/validacao/cnpj";
 import {
   esquemaDataOpcional,
-  esquemaEmailOpcional,
   esquemaIdentificador,
   textoObrigatorio,
   textoOpcional,
   vazioParaAusente,
 } from "@/lib/validacao/comuns";
-import { ESFERAS, NATUREZAS, UFS } from "./rotulos";
+import { erroDoValorContato } from "./contatos";
+import { CODIGOS_PAISES, PAIS_PADRAO } from "./paises";
+import { ESFERAS, NATUREZAS, NATUREZAS_CONTATO, TIPOS_CONTATO, UFS } from "./rotulos";
 
-/** Pessoa: somente dados mínimos (decisão D-021). */
+/** Pessoa: somente dados mínimos (D-021); contatos ficam em tabela própria (D-025). */
 export const esquemaPessoa = z.object({
   nomeCompleto: textoObrigatorio("Nome completo", 200),
   nomeTratamento: textoOpcional("Nome de tratamento", 100),
-  email: esquemaEmailOpcional,
-  telefone: textoOpcional("Telefone", 40),
   observacoes: textoOpcional("Observações", 2000),
 });
 
 export type DadosPessoa = z.infer<typeof esquemaPessoa>;
 
-export const esquemaInstituicao = z.object({
+const camposInstituicao = z.object({
   nome: textoObrigatorio("Nome", 200),
   sigla: textoOpcional("Sigla", 30),
   natureza: z.enum(NATUREZAS, { error: "Selecione a natureza da instituição." }),
   esfera: z.preprocess(vazioParaAusente, z.enum(ESFERAS, { error: "Esfera inválida." }).optional()),
+  pais: z.preprocess(
+    vazioParaAusente,
+    z
+      .string()
+      .refine((codigo) => CODIGOS_PAISES.includes(codigo), { error: "País inválido." })
+      .optional(),
+  ),
   cnpj: z.preprocess(
     (valor) => (typeof valor === "string" ? vazioParaAusente(limparCnpj(valor)) : valor),
     z
@@ -50,7 +56,45 @@ export const esquemaInstituicao = z.object({
   instituicaoSuperiorId: z.preprocess(vazioParaAusente, esquemaIdentificador.optional()),
 });
 
-export type DadosInstituicao = z.infer<typeof esquemaInstituicao>;
+/** Instituição: UF (obrigatória) e CNPJ só se aplicam a instituições do Brasil (correção C5). */
+export const esquemaInstituicao = camposInstituicao.superRefine((dados, contexto) => {
+  const brasileira = (dados.pais ?? PAIS_PADRAO) === PAIS_PADRAO;
+  if (brasileira && !dados.uf) {
+    contexto.addIssue({ code: "custom", message: "Informe a UF.", path: ["uf"] });
+  }
+  if (!brasileira && dados.uf) {
+    contexto.addIssue({ code: "custom", message: "A UF só se aplica a instituições do Brasil.", path: ["uf"] });
+  }
+  if (!brasileira && dados.cnpj) {
+    contexto.addIssue({ code: "custom", message: "O CNPJ só se aplica a instituições do Brasil.", path: ["cnpj"] });
+  }
+});
+
+export type DadosInstituicao = z.infer<typeof camposInstituicao>;
+
+/** Contato de pessoa ou instituição (decisão D-025). */
+export const esquemaContato = z
+  .object({
+    stakeholderId: esquemaIdentificador,
+    tipo: z.enum(TIPOS_CONTATO, { error: "Selecione o tipo de contato." }),
+    valor: z.string({ error: "Informe o contato." }).trim(),
+    natureza: z.enum(NATUREZAS_CONTATO, { error: "Selecione a natureza do contato." }),
+    vinculoId: z.preprocess(vazioParaAusente, esquemaIdentificador.optional()),
+    principal: z.preprocess((valor) => valor === "on" || valor === true, z.boolean()),
+    dataInicio: esquemaDataOpcional,
+    observacao: textoOpcional("Observação", 500),
+  })
+  .superRefine((dados, contexto) => {
+    const erro = erroDoValorContato(dados.tipo, dados.valor);
+    if (erro) contexto.addIssue({ code: "custom", message: erro, path: ["valor"] });
+  });
+
+export type DadosContato = z.infer<typeof esquemaContato>;
+
+export const esquemaEncerramentoContato = z.object({
+  contatoId: esquemaIdentificador,
+  dataFim: z.iso.date({ error: "Informe a data de término." }),
+});
 
 export const esquemaVinculo = z
   .object({

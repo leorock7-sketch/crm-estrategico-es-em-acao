@@ -59,6 +59,11 @@ export const esferaInstituicao = pgEnum("esfera_instituicao", [
   "nao_se_aplica",
 ]);
 
+export const tipoContato = pgEnum("tipo_contato", ["email", "telefone", "celular", "site", "outro"]);
+
+/** Pessoal; institucional (da instituição); funcional (do cargo, pode passar ao sucessor ou ser compartilhado). */
+export const naturezaContato = pgEnum("natureza_contato", ["pessoal", "institucional", "funcional"]);
+
 export const operacaoAuditoria = pgEnum("operacao_auditoria", [
   "inclusao",
   "alteracao",
@@ -170,7 +175,10 @@ export const stakeholder = pgTable(
   (t) => [unique("stakeholder_id_tipo_unico").on(t.id, t.tipo)],
 );
 
-/** Pessoas: somente dados mínimos (decisão D-021). */
+/**
+ * Pessoas: somente dados mínimos (decisão D-021). E-mails e telefones ficam na
+ * tabela contato, com vínculo e histórico próprios (decisão D-025).
+ */
 export const pessoa = pgTable(
   "pessoa",
   {
@@ -179,8 +187,6 @@ export const pessoa = pgTable(
     nomeCompleto: text("nome_completo").notNull(),
     nomeTratamento: text("nome_tratamento"),
     nomeNormalizado: text("nome_normalizado").notNull(),
-    email: text("email"),
-    telefone: text("telefone"),
     observacoes: text("observacoes"),
     ...colunasControle(),
   },
@@ -192,9 +198,6 @@ export const pessoa = pgTable(
     }),
     check("pessoa_tipo_stakeholder", sql`${t.tipoStakeholder} = 'pessoa'`),
     check("pessoa_nome_preenchido", sql`length(trim(${t.nomeCompleto})) > 0`),
-    uniqueIndex("pessoa_email_unico")
-      .on(sql`lower(${t.email})`)
-      .where(sql`${t.email} is not null`),
     index("pessoa_nome_normalizado_idx").on(t.nomeNormalizado),
   ],
 );
@@ -209,6 +212,8 @@ export const instituicao = pgTable(
     nomeNormalizado: text("nome_normalizado").notNull(),
     natureza: naturezaInstituicao("natureza").notNull(),
     esfera: esferaInstituicao("esfera"),
+    /** País (código ISO 3166-1 de duas letras); padrão Brasil. */
+    pais: text("pais").notNull().default("BR"),
     cnpj: text("cnpj"),
     uf: text("uf"),
     municipio: text("municipio"),
@@ -229,11 +234,16 @@ export const instituicao = pgTable(
     // CNPJ numérico ou alfanumérico (Receita Federal, a partir de julho de 2026).
     check("instituicao_cnpj_formato", sql`${t.cnpj} is null or ${t.cnpj} ~ '^[0-9A-Z]{12}[0-9]{2}$'`),
     check("instituicao_uf_formato", sql`${t.uf} is null or ${t.uf} ~ '^[A-Z]{2}$'`),
+    check("instituicao_pais_formato", sql`${t.pais} ~ '^[A-Z]{2}$'`),
+    // UF e CNPJ são próprios de instituições brasileiras.
+    check("instituicao_uf_somente_brasil", sql`${t.pais} = 'BR' or ${t.uf} is null`),
+    check("instituicao_cnpj_somente_brasil", sql`${t.pais} = 'BR' or ${t.cnpj} is null`),
     check(
       "instituicao_nao_superior_de_si",
       sql`${t.instituicaoSuperiorId} is distinct from ${t.id}`,
     ),
-    uniqueIndex("instituicao_cnpj_unico").on(t.cnpj).where(sql`${t.cnpj} is not null`),
+    // CNPJ repetido gera alerta, não bloqueio (decisão D-024): subunidades podem usar o do órgão superior.
+    index("instituicao_cnpj_idx").on(t.cnpj),
     index("instituicao_nome_normalizado_idx").on(t.nomeNormalizado),
   ],
 );
@@ -266,5 +276,44 @@ export const vinculoPessoaInstituicao = pgTable(
       .where(sql`${t.principal} and ${t.dataFim} is null and ${t.arquivadoEm} is null`),
     index("vinculo_pessoa_idx").on(t.pessoaId),
     index("vinculo_instituicao_idx").on(t.instituicaoId),
+  ],
+);
+
+/**
+ * Contatos de pessoas e instituições, com natureza, período e histórico
+ * próprios (decisão D-025). Não há unicidade do valor: o mesmo e-mail pode ser
+ * compartilhado ou passar de um ocupante do cargo ao seguinte; repetições geram
+ * alerta. Um contato funcional pode ser ligado ao vínculo (cargo) da pessoa e é
+ * encerrado automaticamente quando esse vínculo termina.
+ */
+export const contato = pgTable(
+  "contato",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    stakeholderId: uuid("stakeholder_id")
+      .notNull()
+      .references(() => stakeholder.id),
+    vinculoId: uuid("vinculo_id").references(() => vinculoPessoaInstituicao.id),
+    tipo: tipoContato("tipo").notNull(),
+    valor: text("valor").notNull(),
+    valorNormalizado: text("valor_normalizado").notNull(),
+    natureza: naturezaContato("natureza").notNull(),
+    principal: boolean("principal").notNull().default(false),
+    dataInicio: date("data_inicio"),
+    dataFim: date("data_fim"),
+    observacao: text("observacao"),
+    ...colunasControle(),
+  },
+  (t) => [
+    check("contato_valor_preenchido", sql`length(trim(${t.valor})) > 0`),
+    check(
+      "contato_datas",
+      sql`${t.dataInicio} is null or ${t.dataFim} is null or ${t.dataFim} >= ${t.dataInicio}`,
+    ),
+    uniqueIndex("contato_principal_vigente_unico")
+      .on(t.stakeholderId, t.tipo)
+      .where(sql`${t.principal} and ${t.dataFim} is null and ${t.arquivadoEm} is null`),
+    index("contato_stakeholder_idx").on(t.stakeholderId),
+    index("contato_valor_normalizado_idx").on(t.valorNormalizado),
   ],
 );

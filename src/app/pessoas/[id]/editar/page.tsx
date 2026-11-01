@@ -38,8 +38,6 @@ async function EdicaoPessoa({ params }: Pick<PageProps<"/pessoas/[id]/editar">, 
           id: pessoa.id,
           nomeCompleto: pessoa.nomeCompleto,
           nomeTratamento: pessoa.nomeTratamento,
-          email: pessoa.email,
-          telefone: pessoa.telefone,
           observacoes: pessoa.observacoes,
         }}
       />

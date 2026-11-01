@@ -19,10 +19,13 @@ describe("Formulário de pessoa", () => {
   test("apresenta os campos do cadastro mínimo, com o nome obrigatório", () => {
     render(<FormularioPessoa />);
     expect(screen.getByLabelText(/Nome completo/)).toHaveProperty("required", true);
-    for (const rotulo of ["Nome de tratamento", "E-mail", "Telefone", "Observações"]) {
+    for (const rotulo of ["Nome de tratamento", "Observações"]) {
       expect(screen.getByLabelText(rotulo)).toBeDefined();
     }
-    expect(screen.queryByLabelText(/CPF/)).toBeNull();
+    // Sem CPF (D-021); e-mail e telefone ficam na seção de contatos (D-025).
+    for (const ausente of [/CPF/, /E-mail/, /Telefone/]) {
+      expect(screen.queryByLabelText(ausente)).toBeNull();
+    }
   });
 
   test("ao detectar possível duplicidade, exige confirmação e mantém o que foi digitado", async () => {

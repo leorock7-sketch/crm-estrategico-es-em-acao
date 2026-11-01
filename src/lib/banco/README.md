@@ -6,7 +6,8 @@ Banco de dados de **desenvolvimento** (decisão D-018): PGlite, um PostgreSQL co
 |---|---|
 | `esquema.ts` | Estrutura das tabelas, chaves e regras de integridade (fonte única) |
 | `migracoes/` | Scripts SQL versionados, aplicados automaticamente ao abrir o banco |
-| `conexao.ts` | Abertura do banco e `comoUsuario()`, que registra o responsável por cada gravação |
+| `conexao.ts` | Abertura do banco, proteção de produção (`CRM_BANCO`) e `comoUsuario()`, que registra o responsável por cada gravação |
+| `trava.ts` | Trava exclusiva da pasta de dados: impede que dois programas usem o banco local ao mesmo tempo |
 | `requisicao.ts` | Acesso ao banco pelas telas, lendo dados a cada acesso |
 | `erros.ts` | Localização do erro original do PostgreSQL |
 

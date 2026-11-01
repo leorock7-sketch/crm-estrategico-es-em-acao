@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useActionState } from "react";
+import { useActionState, useState } from "react";
 import { Alerta } from "@/componentes/alerta";
 import { Campo, idErroCampo } from "@/componentes/campo";
 import {
@@ -11,6 +11,7 @@ import {
   classeEntrada,
 } from "@/componentes/estilos";
 import { type EstadoFormulario, salvarInstituicao } from "../acoes";
+import type { OpcaoPais } from "../paises";
 import { ESFERAS, NATUREZAS, ROTULOS_ESFERA, ROTULOS_NATUREZA, UFS } from "../rotulos";
 import { AvisoDuplicidades } from "./aviso-duplicidades";
 
@@ -20,6 +21,7 @@ export type ValoresInstituicao = {
   sigla?: string | null;
   natureza?: string;
   esfera?: string | null;
+  pais?: string;
   cnpj?: string | null;
   uf?: string | null;
   municipio?: string | null;
@@ -34,9 +36,12 @@ const ESTADO_INICIAL: EstadoFormulario = {};
 export function FormularioInstituicao({
   inicial = {},
   opcoesSuperior,
+  opcoesPaises,
 }: {
   inicial?: ValoresInstituicao;
   opcoesSuperior: OpcaoInstituicao[];
+  /** Lista calculada no servidor, para que os nomes sejam idênticos no navegador. */
+  opcoesPaises: OpcaoPais[];
 }) {
   const [estado, acao, enviando] = useActionState(salvarInstituicao, ESTADO_INICIAL);
   const erros = estado.erros ?? {};
@@ -45,6 +50,9 @@ export function FormularioInstituicao({
   const atributosErro = (campo: string) =>
     erros[campo] ? { "aria-invalid": true, "aria-describedby": idErroCampo(campo) } : {};
   const superiores = opcoesSuperior.filter((opcao) => opcao.id !== inicial.id);
+  // UF e CNPJ só se aplicam a instituições do Brasil (correção C5).
+  const [pais, setPais] = useState(valor("pais") || "BR");
+  const brasileira = pais === "BR";
 
   return (
     // A chave recria o formulário com os valores enviados: após um erro, o React
@@ -117,10 +125,30 @@ export function FormularioInstituicao({
             ))}
           </select>
         </Campo>
+        <Campo id="pais" rotulo="País" obrigatorio erros={erros.pais}>
+          <select
+            id="pais"
+            name="pais"
+            value={pais}
+            onChange={(evento) => setPais(evento.target.value)}
+            className={classeEntrada}
+            {...atributosErro("pais")}
+          >
+            {opcoesPaises.map((opcao) => (
+              <option key={opcao.codigo} value={opcao.codigo}>
+                {opcao.nome}
+              </option>
+            ))}
+          </select>
+        </Campo>
         <Campo
           id="cnpj"
           rotulo="CNPJ"
-          ajuda="Com ou sem pontuação. Aceita também o novo CNPJ alfanumérico."
+          ajuda={
+            brasileira
+              ? "Com ou sem pontuação. Aceita também o novo CNPJ alfanumérico. Pode repetir o de outra instituição (por exemplo, órgão superior), com alerta."
+              : "Somente para instituições do Brasil."
+          }
           erros={erros.cnpj}
         >
           <input
@@ -128,20 +156,29 @@ export function FormularioInstituicao({
             name="cnpj"
             maxLength={18}
             autoComplete="off"
+            disabled={!brasileira}
             defaultValue={valor("cnpj")}
-            className={`${classeEntrada} uppercase`}
+            className={`${classeEntrada} uppercase disabled:opacity-50`}
             {...atributosErro("cnpj")}
           />
         </Campo>
-        <Campo id="uf" rotulo="UF" erros={erros.uf}>
+        <Campo
+          id="uf"
+          rotulo="UF"
+          obrigatorio={brasileira}
+          ajuda={brasileira ? undefined : "Somente para instituições do Brasil."}
+          erros={erros.uf}
+        >
           <select
             id="uf"
             name="uf"
+            required={brasileira}
+            disabled={!brasileira}
             defaultValue={valor("uf")}
-            className={classeEntrada}
+            className={`${classeEntrada} disabled:opacity-50`}
             {...atributosErro("uf")}
           >
-            <option value="">Não informada</option>
+            <option value="">Selecione…</option>
             {UFS.map((uf) => (
               <option key={uf} value={uf}>
                 {uf}

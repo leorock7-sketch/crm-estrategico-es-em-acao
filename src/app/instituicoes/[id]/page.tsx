@@ -13,15 +13,19 @@ import { formatarCnpj } from "@/lib/validacao/cnpj";
 import { esquemaIdentificador } from "@/lib/validacao/comuns";
 import { alterarArquivamentoInstituicao } from "@/modulos/stakeholders/acoes";
 import { BotaoArquivamento } from "@/modulos/stakeholders/componentes/botao-arquivamento";
+import { FormularioContato } from "@/modulos/stakeholders/componentes/formulario-contato";
+import { ListaContatos } from "@/modulos/stakeholders/componentes/lista-contatos";
 import { ListaHistorico } from "@/modulos/stakeholders/componentes/lista-historico";
 import {
   historicoDoStakeholder,
   idsCitadosNoHistorico,
+  listarContatos,
   listarSubordinadas,
   listarVinculosDaInstituicao,
   nomesDosStakeholders,
   obterInstituicao,
 } from "@/modulos/stakeholders/consultas";
+import { nomePais } from "@/modulos/stakeholders/paises";
 import { ROTULOS_ESFERA, ROTULOS_NATUREZA } from "@/modulos/stakeholders/rotulos";
 
 export const metadata: Metadata = { title: "Instituição" };
@@ -42,9 +46,10 @@ async function DetalheInstituicao({ params }: Pick<PageProps<"/instituicoes/[id]
   const instituicao = await obterInstituicao(banco, id);
   if (!instituicao) notFound();
 
-  const [vinculos, subordinadas, historico] = await Promise.all([
+  const [vinculos, subordinadas, contatos, historico] = await Promise.all([
     listarVinculosDaInstituicao(banco, id),
     listarSubordinadas(banco, id),
+    listarContatos(banco, id),
     historicoDoStakeholder(banco, id),
   ]);
   const nomes = await nomesDosStakeholders(banco, idsCitadosNoHistorico(historico));
@@ -92,6 +97,7 @@ async function DetalheInstituicao({ params }: Pick<PageProps<"/instituicoes/[id]
         </h2>
         <dl className="grid gap-4 text-sm sm:grid-cols-2">
           <ItemDado rotulo="Esfera" valor={instituicao.esfera && ROTULOS_ESFERA[instituicao.esfera]} />
+          <ItemDado rotulo="País" valor={nomePais(instituicao.pais)} />
           <ItemDado rotulo="CNPJ" valor={instituicao.cnpj && formatarCnpj(instituicao.cnpj)} />
           <ItemDado
             rotulo="Local"
@@ -153,6 +159,24 @@ async function DetalheInstituicao({ params }: Pick<PageProps<"/instituicoes/[id]
           <div className="mt-6">
             <ListaVinculos titulo="Encerrados" vinculos={encerrados} vazio="" />
           </div>
+        )}
+      </section>
+
+      <section aria-labelledby="titulo-contatos" className={classeCartao}>
+        <h2 id="titulo-contatos" className="mb-1 text-lg font-semibold">
+          Contatos institucionais
+        </h2>
+        <p className="mb-4 text-sm text-texto-secundario">
+          Telefones, e-mails e sites da instituição, com histórico próprio.
+        </p>
+        <ListaContatos contatos={contatos} somenteLeitura={arquivada} />
+        {!arquivada && (
+          <details className="mt-4 rounded-lg border border-borda p-4">
+            <summary className="cursor-pointer font-medium">Registrar contato</summary>
+            <div className="mt-4">
+              <FormularioContato stakeholderId={id} naturezaPadrao="institucional" />
+            </div>
+          </details>
         )}
       </section>
 

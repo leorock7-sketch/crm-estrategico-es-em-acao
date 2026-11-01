@@ -4,6 +4,7 @@
 |---|---|---|
 | 0.1 | 31/10/2026 | Arquitetura da Etapa 0 para revisão |
 | 0.2 | 31/10/2026 | Etapa 1: banco de desenvolvimento (PGlite), acesso a dados (Drizzle ORM) e Cadastro Mestre |
+| 0.3 | 01/11/2026 | Revisão de homologação: trava do banco local, proteção de produção e contatos |
 
 Legenda: ✅ Aprovado · 🔧 Proposta técnica · ⏳ Pendente.
 
@@ -33,7 +34,9 @@ O PGlite é um PostgreSQL completo que roda dentro da própria aplicação, sem 
 
 Cuidados:
 
-- o banco local aceita um processo por vez: pare a aplicação antes de rodar `npm run banco:exemplos` ou `npm run banco:reiniciar`;
+- o banco local aceita um processo por vez. **Trava exclusiva** (correção C1): ao abrir o banco, o sistema cria `.dados/pglite.trava` com o número do processo; um segundo programa é recusado com mensagem clara, em vez de perder gravações sem aviso, como a revisão comprovou que ocorria. Travas deixadas por processos já encerrados são substituídas automaticamente. Pare a aplicação antes de rodar `npm run banco:exemplos` ou `npm run banco:reiniciar`;
+- **proteção de produção** (correção C3): em modo de produção (`npm start`), o banco local só é aceito com a variável `CRM_BANCO=pglite` (por exemplo, no arquivo `.env.local`), destinada apenas a testes locais da versão compilada;
+- **cópia de segurança:** com a aplicação parada, copiar a pasta `.dados/pglite` restaura o banco integralmente; a revisão também testou o arquivo compactado gerado pelo PGlite (`dumpDataDir`). Comandos próprios estão planejados (C7);
 - é exclusivo para desenvolvimento e testes, com dados fictícios.
 
 ## 2. Tecnologias
@@ -156,6 +159,8 @@ Regras de organização:
 | Comunicação sempre por HTTPS na hospedagem. | 🔧 |
 | Trilha de auditoria das alterações, gravada pelo próprio banco e protegida contra alteração. | 🔧 (implementada na Etapa 1) |
 | Registros nunca excluídos, apenas arquivados. | 🔧 (implementado na Etapa 1) |
+| Trava exclusiva do banco local e proteção contra uso do banco local em produção. | 🔧 (revisão de homologação, C1 e C3) |
+| Limites conhecidos da auditoria: responsável informado pela aplicação; `TRUNCATE` não bloqueado; o dono do banco pode desativar gatilhos; cópias integrais de dados pessoais. | ⏳ Reforço planejado (C6) e identificação real na etapa de autenticação |
 | Validação de todos os dados no servidor, inclusive endereços de site (somente http e https). | 🔧 (implementado na Etapa 1) |
 | Princípio do menor privilégio: cada usuário acessa apenas os contextos de que precisa. | 🔧 |
 | Proteção da branch `main` no GitHub. | 🔧 |

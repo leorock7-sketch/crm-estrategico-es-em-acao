@@ -8,6 +8,7 @@ import { formatarCnpj } from "@/lib/validacao/cnpj";
 import { esquemaIdentificador } from "@/lib/validacao/comuns";
 import { FormularioInstituicao } from "@/modulos/stakeholders/componentes/formulario-instituicao";
 import { obterInstituicao, opcoesInstituicoes } from "@/modulos/stakeholders/consultas";
+import { opcoesPaises } from "@/modulos/stakeholders/paises";
 
 export const metadata: Metadata = { title: "Editar instituição" };
 
@@ -43,12 +44,14 @@ async function EdicaoInstituicao({
       />
       <FormularioInstituicao
         opcoesSuperior={opcoes}
+        opcoesPaises={opcoesPaises()}
         inicial={{
           id: instituicao.id,
           nome: instituicao.nome,
           sigla: instituicao.sigla,
           natureza: instituicao.natureza,
           esfera: instituicao.esfera,
+          pais: instituicao.pais,
           cnpj: instituicao.cnpj && formatarCnpj(instituicao.cnpj),
           uf: instituicao.uf,
           municipio: instituicao.municipio,

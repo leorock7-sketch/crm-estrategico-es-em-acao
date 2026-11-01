@@ -116,12 +116,16 @@ Depois abra o navegador em <http://localhost:3000>. Para encerrar, volte ao term
 
 Na primeira execução, a aplicação cria sozinha um banco de dados local na pasta `.dados/` do projeto, já com a estrutura das tabelas e os quatro comitês. Essa pasta **não** vai para o GitHub.
 
-Com a aplicação parada (o banco local aceita um programa por vez):
+O banco local aceita um programa por vez. Se você tentar usá-lo com a aplicação aberta, aparecerá a mensagem "O banco de dados local já está em uso": feche a aplicação (`Ctrl + C` no terminal) e tente de novo. Com a aplicação parada:
 
 | Comando | O que faz |
 |---|---|
 | `npm run banco:exemplos` | Carrega pessoas e instituições fictícias para testar as telas |
 | `npm run banco:reiniciar` | Apaga o banco local; um banco novo e vazio é criado na próxima execução |
+
+Para fazer uma cópia de segurança, pare a aplicação e copie a pasta `.dados/pglite` para outro lugar. Para restaurar, coloque a cópia de volta no mesmo lugar.
+
+A versão compilada (`npm run build` e depois `npm start`) recusa o banco local, para que ele nunca seja usado em produção por engano. Para testá-la no seu computador, crie um arquivo `.env.local` com a linha `CRM_BANCO=pglite`.
 
 ### 5. Verificações de qualidade
 

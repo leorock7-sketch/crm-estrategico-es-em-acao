@@ -2,12 +2,15 @@ import { erroDoBanco } from "@/lib/banco/erros";
 
 /** Mensagens para as regras de integridade do banco (nomes definidos em esquema.ts). */
 const MENSAGENS_POR_REGRA: Record<string, string> = {
-  pessoa_email_unico: "Já existe uma pessoa cadastrada com este e-mail.",
-  instituicao_cnpj_unico: "Já existe uma instituição cadastrada com este CNPJ.",
   vinculo_principal_vigente_unico:
     "Esta pessoa já tem um vínculo principal vigente. Encerre-o antes ou desmarque a opção “vínculo principal”.",
   vinculo_datas: "A data de término não pode ser anterior à data de início.",
   instituicao_nao_superior_de_si: "Uma instituição não pode ser superior a si mesma.",
+  instituicao_uf_somente_brasil: "A UF só se aplica a instituições do Brasil.",
+  instituicao_cnpj_somente_brasil: "O CNPJ só se aplica a instituições do Brasil.",
+  contato_principal_vigente_unico:
+    "Já existe um contato principal vigente deste tipo. Encerre-o antes ou desmarque a opção “principal”.",
+  contato_datas: "A data de término não pode ser anterior à data de início.",
 };
 
 /** Traduz um erro de gravação em mensagem compreensível para o usuário. */

@@ -1,7 +1,7 @@
 import { formatarDataHora } from "@/lib/formatacao";
 import type { RegistroHistorico } from "../consultas";
 import { alteracoesEntre } from "../historico";
-import { ROTULOS_OPERACAO } from "../rotulos";
+import { ROTULOS_OPERACAO, ROTULOS_TIPO_CONTATO } from "../rotulos";
 
 type Dados = Record<string, unknown> | null;
 
@@ -17,8 +17,12 @@ function descreverRegistro(
   nomes: Map<string, string>,
   perspectiva: PropriedadesHistorico["perspectiva"],
 ) {
-  if (registro.tabela !== "vinculo_pessoa_instituicao") return "Cadastro";
   const dados = (registro.dadosNovos ?? registro.dadosAnteriores) as Dados;
+  if (registro.tabela === "contato") {
+    const tipo = ROTULOS_TIPO_CONTATO[String(dados?.tipo) as keyof typeof ROTULOS_TIPO_CONTATO];
+    return `Contato (${tipo ?? "contato"}): ${String(dados?.valor ?? "")}`;
+  }
+  if (registro.tabela !== "vinculo_pessoa_instituicao") return "Cadastro";
   const outroId = String(dados?.[perspectiva === "pessoa" ? "instituicao_id" : "pessoa_id"] ?? "");
   const nome = nomes.get(outroId) ?? "registro não identificado";
   return perspectiva === "pessoa" ? `Vínculo com ${nome}` : `Vínculo de ${nome}`;

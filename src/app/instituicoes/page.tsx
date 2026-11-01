@@ -14,6 +14,7 @@ import { SeloSituacao } from "@/componentes/selo-situacao";
 import { bancoDaRequisicao } from "@/lib/banco/requisicao";
 import { BuscaCadastro } from "@/modulos/stakeholders/componentes/busca-cadastro";
 import { listarInstituicoes } from "@/modulos/stakeholders/consultas";
+import { nomePais } from "@/modulos/stakeholders/paises";
 import { ROTULOS_NATUREZA } from "@/modulos/stakeholders/rotulos";
 
 export const metadata: Metadata = { title: "Instituições" };
@@ -108,7 +109,9 @@ async function ListaInstituicoes({
                   </td>
                   <td className={classeCelula}>{ROTULOS_NATUREZA[i.natureza]}</td>
                   <td className={`${classeCelula} hidden md:table-cell`}>
-                    {[i.municipio, i.uf].filter(Boolean).join(" – ") || "—"}
+                    {i.pais === "BR"
+                      ? [i.municipio, i.uf].filter(Boolean).join(" – ") || "—"
+                      : [i.municipio, nomePais(i.pais)].filter(Boolean).join(" – ")}
                   </td>
                   <td className={`${classeCelula} text-right tabular-nums`}>
                     {i.pessoasVinculadas}

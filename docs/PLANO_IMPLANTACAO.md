@@ -21,7 +21,8 @@ Legenda: ✅ Aprovado · 🔧 Proposta técnica · ⏳ Pendente.
 | Etapa | Nome | Conteúdo principal | Situação |
 |---|---|---|---|
 | 0 | Fundação técnica | Documentação, esqueleto da aplicação, testes básicos | ✅ Aprovada em 31/10/2026 |
-| 1 | Banco de dados de desenvolvimento e Cadastro Mestre | Banco PostgreSQL local, estrutura de comitês e projetos/temas, cadastro de pessoas, instituições e vínculos, com dados fictícios | ✅ Aprovada (D-022); entregue para revisão |
+| 1 | Banco de dados de desenvolvimento e Cadastro Mestre | Banco PostgreSQL local, estrutura de comitês e projetos/temas, cadastro de pessoas, instituições e vínculos, com dados fictícios | ✅ Aprovada (D-022); revisão de homologação com correções (D-026) em revisão |
+| 1.1 | Projetos, temas e contextos | Telas de comitês, projetos e temas; comitês participantes (D-023); associação de stakeholders aos contextos, sem avaliação de poder × interesse | 🔧 Proposta; não iniciar sem aprovação |
 | 2 | Avaliações e matriz de poder × interesse | Fichas e versões de avaliação, evidências, matriz por contexto. Depende de Q-01 a Q-07 | 🔧 |
 | 3 | Iniciativas, interações e compromissos | Matriz de iniciativas, registro único de reuniões, encaminhamentos e prazos | 🔧 |
 | 4 | Plano de ação e matriz de riscos | Versões e aprovação, acompanhamento, riscos, gatilhos e respostas | 🔧 |
@@ -96,6 +97,19 @@ Ficaram de fora, conforme o plano: login real, telas de projetos e temas, avalia
 3. Regras de integridade garantidas pelo banco, inclusive sem passar pelas telas.
 4. Toda alteração registrada no histórico, com responsável e data.
 5. Somente dados fictícios; nenhum serviço externo conectado.
+
+### Revisão de homologação (01/11/2026) — D-026
+
+| Correção | Situação |
+|---|---|
+| C1. Trava exclusiva da pasta do banco local | Concluída e testada (dois processos: o segundo é recusado) |
+| C2. Contatos com natureza, vínculo e histórico (D-025) | Concluída; e-mails e telefones existentes migrados |
+| C3. Proteção contra uso do banco local em produção | Concluída e testada |
+| C4. CNPJ repetido gera alerta, não bloqueio (D-024) | Concluída |
+| C5. País da instituição; UF e CNPJ só para o Brasil (D-024) | Concluída |
+| C6. Reforço da auditoria | Planejada |
+| C7. Comandos de cópia de segurança e restauração | Planejada |
+| C8. Teste de portabilidade em PostgreSQL real | Depende de autorização (Q-57) |
 
 ## 5. Local de trabalho ✅ (D-019)
 

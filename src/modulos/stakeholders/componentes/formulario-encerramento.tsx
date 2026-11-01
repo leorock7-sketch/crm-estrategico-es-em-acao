@@ -2,19 +2,25 @@
 
 import { useActionState } from "react";
 import { classeBotaoSecundario, classeEntrada } from "@/componentes/estilos";
-import { encerrarVinculoPessoa, type EstadoFormulario } from "../acoes";
+import { encerrarContatoAcao, encerrarVinculoPessoa, type EstadoFormulario } from "../acoes";
 
 const ESTADO_INICIAL: EstadoFormulario = {};
 
-/** Encerra um vínculo vigente, informando a data de término. */
-export function FormularioEncerramento({ vinculoId }: { vinculoId: string }) {
-  const [estado, acao, enviando] = useActionState(encerrarVinculoPessoa, ESTADO_INICIAL);
-  const idCampo = `encerrar-${vinculoId}`;
+const CONFIGURACAO = {
+  vinculo: { acao: encerrarVinculoPessoa, campo: "vinculoId" },
+  contato: { acao: encerrarContatoAcao, campo: "contatoId" },
+} as const;
+
+/** Encerra um vínculo ou contato vigente, informando a data de término. */
+export function FormularioEncerramento({ id, alvo }: { id: string; alvo: keyof typeof CONFIGURACAO }) {
+  const { acao: acaoServidor, campo } = CONFIGURACAO[alvo];
+  const [estado, acao, enviando] = useActionState(acaoServidor, ESTADO_INICIAL);
+  const idCampo = `encerrar-${id}`;
   const erro = estado.erros?.dataFim?.join(" ") ?? estado.mensagem;
 
   return (
     <form action={acao} className="mt-2 flex flex-col gap-2">
-      <input type="hidden" name="vinculoId" value={vinculoId} />
+      <input type="hidden" name={campo} value={id} />
       <label htmlFor={idCampo} className="text-xs font-medium">
         Data de término
       </label>

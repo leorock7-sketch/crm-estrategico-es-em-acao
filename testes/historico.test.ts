@@ -38,6 +38,22 @@ describe("Descrição do histórico", () => {
     expect(formatarValor("cnpj", "12ABC34501DE35", nomes)).toBe("12.ABC.345/01DE-35");
     expect(formatarValor("principal", true, nomes)).toBe("Sim");
   });
+
+  test("apresenta contatos e país de forma legível e oculta campos técnicos do contato", () => {
+    const nomes = new Map([["v-1", "Secretária · SEXD"]]);
+    const alteracoes = alteracoesEntre(
+      null,
+      { stakeholder_id: "p-1", tipo: "email", valor: "gabinete@exemplo.org", valor_normalizado: "gabinete@exemplo.org", natureza: "funcional", vinculo_id: "v-1" },
+      nomes,
+    );
+    expect(alteracoes.map((a) => [a.rotulo, a.depois])).toEqual([
+      ["Tipo", "E-mail"],
+      ["Contato", "gabinete@exemplo.org"],
+      ["Natureza", "Funcional (do cargo ou compartilhado)"],
+      ["Vínculo", "Secretária · SEXD"],
+    ]);
+    expect(formatarValor("pais", "PT", nomes)).toBe("Portugal");
+  });
 });
 
 describe("Formatação de datas", () => {
@@ -56,12 +72,11 @@ describe("Formatação de datas", () => {
 });
 
 describe("Verificação de duplicidade na edição", () => {
-  const pessoaAtual = { nomeNormalizado: "ana souza", email: "ana@exemplo.org" };
+  const pessoaAtual = { nomeNormalizado: "ana souza" };
 
-  test("pessoa: só verifica de novo se o nome ou o e-mail mudarem", () => {
-    expect(identificacaoPessoaMudou(pessoaAtual, { nomeCompleto: "Ana Souza", email: "ANA@exemplo.org" })).toBe(false);
-    expect(identificacaoPessoaMudou(pessoaAtual, { nomeCompleto: "Ana Souza Lima", email: "ana@exemplo.org" })).toBe(true);
-    expect(identificacaoPessoaMudou(pessoaAtual, { nomeCompleto: "Ana Souza" })).toBe(true);
+  test("pessoa: só verifica de novo se o nome mudar", () => {
+    expect(identificacaoPessoaMudou(pessoaAtual, { nomeCompleto: "ANA Souza" })).toBe(false);
+    expect(identificacaoPessoaMudou(pessoaAtual, { nomeCompleto: "Ana Souza Lima" })).toBe(true);
   });
 
   test("instituição: só verifica de novo se o nome, a sigla ou o CNPJ mudarem", () => {

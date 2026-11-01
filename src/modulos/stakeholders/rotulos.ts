@@ -38,6 +38,24 @@ export const UFS = [
   "PB", "PR", "PE", "PI", "RJ", "RN", "RS", "RO", "RR", "SC", "SP", "SE", "TO",
 ] as const;
 
+export const TIPOS_CONTATO = ["email", "telefone", "celular", "site", "outro"] as const;
+
+export const ROTULOS_TIPO_CONTATO: Record<(typeof TIPOS_CONTATO)[number], string> = {
+  email: "E-mail",
+  telefone: "Telefone",
+  celular: "Celular",
+  site: "Site",
+  outro: "Outro",
+};
+
+export const NATUREZAS_CONTATO = ["pessoal", "institucional", "funcional"] as const;
+
+export const ROTULOS_NATUREZA_CONTATO: Record<(typeof NATUREZAS_CONTATO)[number], string> = {
+  pessoal: "Pessoal",
+  institucional: "Institucional",
+  funcional: "Funcional (do cargo ou compartilhado)",
+};
+
 export const ROTULOS_OPERACAO: Record<string, string> = {
   inclusao: "Inclusão",
   alteracao: "Alteração",
@@ -57,6 +75,7 @@ export const ROTULOS_CAMPOS: Record<string, string> = {
   sigla: "Sigla",
   natureza: "Natureza",
   esfera: "Esfera",
+  pais: "País",
   cnpj: "CNPJ",
   uf: "UF",
   municipio: "Município",
@@ -68,6 +87,10 @@ export const ROTULOS_CAMPOS: Record<string, string> = {
   area: "Área",
   data_inicio: "Início",
   data_fim: "Término",
-  principal: "Vínculo principal",
+  principal: "Principal",
   arquivado_em: "Arquivado em",
+  tipo: "Tipo",
+  valor: "Contato",
+  vinculo_id: "Vínculo",
+  observacao: "Observação",
 };

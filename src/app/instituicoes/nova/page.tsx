@@ -5,6 +5,7 @@ import { Carregando } from "@/componentes/carregando";
 import { bancoDaRequisicao } from "@/lib/banco/requisicao";
 import { FormularioInstituicao } from "@/modulos/stakeholders/componentes/formulario-instituicao";
 import { opcoesInstituicoes } from "@/modulos/stakeholders/consultas";
+import { opcoesPaises } from "@/modulos/stakeholders/paises";
 
 export const metadata: Metadata = { title: "Nova instituição" };
 
@@ -24,5 +25,10 @@ export default function PaginaNovaInstituicao() {
 
 async function Formulario() {
   const banco = await bancoDaRequisicao();
-  return <FormularioInstituicao opcoesSuperior={await opcoesInstituicoes(banco)} />;
+  return (
+    <FormularioInstituicao
+      opcoesSuperior={await opcoesInstituicoes(banco)}
+      opcoesPaises={opcoesPaises()}
+    />
+  );
 }

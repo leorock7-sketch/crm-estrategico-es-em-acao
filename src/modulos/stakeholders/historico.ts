@@ -4,7 +4,14 @@
  */
 import { formatarData, formatarDataHora } from "@/lib/formatacao";
 import { formatarCnpj } from "@/lib/validacao/cnpj";
-import { ROTULOS_CAMPOS, ROTULOS_ESFERA, ROTULOS_NATUREZA } from "./rotulos";
+import { nomePais } from "./paises";
+import {
+  ROTULOS_CAMPOS,
+  ROTULOS_ESFERA,
+  ROTULOS_NATUREZA,
+  ROTULOS_NATUREZA_CONTATO,
+  ROTULOS_TIPO_CONTATO,
+} from "./rotulos";
 
 type Dados = Record<string, unknown> | null;
 
@@ -24,6 +31,8 @@ const CAMPOS_OCULTOS = new Set([
   "criado_por",
   "atualizado_em",
   "atualizado_por",
+  "stakeholder_id",
+  "valor_normalizado",
 ]);
 
 const CAMPOS_DE_DATA = new Set(["data_inicio", "data_fim"]);
@@ -40,8 +49,16 @@ export function formatarValor(campo: string, valor: unknown, nomes: Map<string, 
   if (CAMPOS_DE_DATA.has(campo)) return formatarData(texto);
   if (campo === "arquivado_em") return formatarDataHora(texto);
   if (campo === "cnpj") return formatarCnpj(texto);
-  if (campo === "natureza") return ROTULOS_NATUREZA[texto as keyof typeof ROTULOS_NATUREZA] ?? texto;
+  if (campo === "natureza") {
+    return (
+      ROTULOS_NATUREZA[texto as keyof typeof ROTULOS_NATUREZA] ??
+      ROTULOS_NATUREZA_CONTATO[texto as keyof typeof ROTULOS_NATUREZA_CONTATO] ??
+      texto
+    );
+  }
   if (campo === "esfera") return ROTULOS_ESFERA[texto as keyof typeof ROTULOS_ESFERA] ?? texto;
+  if (campo === "tipo") return ROTULOS_TIPO_CONTATO[texto as keyof typeof ROTULOS_TIPO_CONTATO] ?? texto;
+  if (campo === "pais") return nomePais(texto);
   return texto;
 }
 

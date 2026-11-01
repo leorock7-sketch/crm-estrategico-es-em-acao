@@ -17,14 +17,15 @@ export type ValoresPessoa = {
   id?: string;
   nomeCompleto?: string;
   nomeTratamento?: string | null;
-  email?: string | null;
-  telefone?: string | null;
   observacoes?: string | null;
 };
 
 const ESTADO_INICIAL: EstadoFormulario = {};
 
-/** Inclusão e edição de pessoa (dados mínimos — decisão D-021). */
+/**
+ * Inclusão e edição de pessoa (dados mínimos — decisão D-021). E-mails e
+ * telefones são registrados na seção de contatos da página da pessoa (D-025).
+ */
 export function FormularioPessoa({ inicial = {} }: { inicial?: ValoresPessoa }) {
   const [estado, acao, enviando] = useActionState(salvarPessoa, ESTADO_INICIAL);
   const erros = estado.erros ?? {};
@@ -72,29 +73,6 @@ export function FormularioPessoa({ inicial = {} }: { inicial?: ValoresPessoa }) 
             defaultValue={valor("nomeTratamento")}
             className={classeEntrada}
             {...atributosErro("nomeTratamento")}
-          />
-        </Campo>
-        <Campo id="email" rotulo="E-mail" erros={erros.email}>
-          <input
-            id="email"
-            name="email"
-            type="email"
-            autoComplete="off"
-            defaultValue={valor("email")}
-            className={classeEntrada}
-            {...atributosErro("email")}
-          />
-        </Campo>
-        <Campo id="telefone" rotulo="Telefone" erros={erros.telefone}>
-          <input
-            id="telefone"
-            name="telefone"
-            type="tel"
-            maxLength={40}
-            autoComplete="off"
-            defaultValue={valor("telefone")}
-            className={classeEntrada}
-            {...atributosErro("telefone")}
           />
         </Campo>
         <div className="sm:col-span-2">

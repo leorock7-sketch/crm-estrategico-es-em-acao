@@ -5,15 +5,15 @@ function mesmoTexto(a?: string | null, b?: string | null) {
 }
 
 /**
- * Na edição, a busca por possível duplicidade só é refeita quando mudam os
- * dados que identificam a pessoa (nome ou e-mail). Assim, corrigir um telefone
- * não exige nova confirmação.
+ * Na edição, a busca por possível duplicidade só é refeita quando muda o dado
+ * que identifica a pessoa (o nome). Assim, corrigir as observações não exige
+ * nova confirmação. Repetições de contatos são verificadas ao registrá-los.
  */
 export function identificacaoPessoaMudou(
-  atual: { nomeNormalizado: string; email: string | null },
-  novo: { nomeCompleto: string; email?: string },
+  atual: { nomeNormalizado: string },
+  novo: { nomeCompleto: string },
 ) {
-  return atual.nomeNormalizado !== normalizarTexto(novo.nomeCompleto) || !mesmoTexto(atual.email, novo.email);
+  return atual.nomeNormalizado !== normalizarTexto(novo.nomeCompleto);
 }
 
 /** Equivalente para instituições: nome, sigla ou CNPJ. */
