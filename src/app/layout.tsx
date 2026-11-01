@@ -12,6 +12,8 @@ export const metadata: Metadata = {
 };
 
 const LINKS_MENU = [
+  { href: "/comites", rotulo: "Comitês" },
+  { href: "/projetos-temas", rotulo: "Projetos e temas" },
   { href: "/pessoas", rotulo: "Pessoas" },
   { href: "/instituicoes", rotulo: "Instituições" },
 ] as const;
@@ -26,7 +28,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
               CRM Estratégico <span className="text-texto-secundario">— ES em Ação</span>
             </Link>
             <nav aria-label="Menu principal">
-              <ul className="flex gap-4 text-sm">
+              <ul className="flex flex-wrap gap-x-4 gap-y-1 text-sm">
                 {LINKS_MENU.map((link) => (
                   <li key={link.href}>
                     <Link href={link.href} className="hover:underline">

@@ -12,6 +12,9 @@ Os testes conferem, de forma automática e repetível, se o sistema se comporta 
 | `historico.test.ts` | Descrição legível do histórico (inclusive contatos e país), datas no padrão brasileiro e verificação de duplicidade na edição. |
 | `formulario-pessoa.test.tsx` | Formulário de pessoa: campos mínimos e alerta de possível duplicidade. |
 | `formulario-instituicao.test.tsx` | Formulário de instituição: mantém o que foi digitado após um erro; UF e CNPJ desativados para instituição estrangeira. |
+| `banco-projetos-temas.test.ts` | Regras do banco de projetos, temas e contextos: nome normalizado, nome repetido no mesmo comitê, datas, proibição de exclusão, comitê principal que não é participante (nos dois sentidos), participações e associações vigentes únicas, filtro por comitê, ausência de campos de poder ou interesse e histórico. |
+| `validacao-projetos-temas.test.ts` | Validações de projeto ou tema, participação e associação; nomes legíveis no histórico; listas da tela iguais às do banco. |
+| `formulario-projeto-tema.test.tsx` | Formulário de projeto ou tema com alerta de nome parecido; formulário de associação com a lista neutra de tipos de relação. |
 
 Ferramentas: [Vitest](https://vitest.dev) e [Testing Library](https://testing-library.com).
 

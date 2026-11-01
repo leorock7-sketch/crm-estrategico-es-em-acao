@@ -3,6 +3,7 @@
 | Versão | Data | Situação |
 |---|---|---|
 | 0.1 | 31/10/2026 | Registro inicial (Etapa 0) |
+| 0.2 | 01/11/2026 | Etapa 1, revisão de homologação, homologação (D-027), incorporação (D-028) e Etapa 1.1 (D-029, D-030, P-027 a P-031) |
 
 Este documento consolida o que já foi decidido, o que é sugestão técnica e o que ainda precisa de decisão. Ao decidir uma questão pendente, ela deve ser movida para a seção 1, com data e origem.
 
@@ -41,6 +42,7 @@ Legenda: ✅ Aprovado · 🔧 Proposta técnica · ⏳ Pendente.
 | D-027 | 01/11/2026 | **Etapa 1 homologada** — Banco de Dados de Desenvolvimento e Cadastro Mestre de Stakeholders, incluindo as correções C1 a C5 (commit `77bfea8`), **para fins de desenvolvimento e testes**. As pendências C6 (reforço da auditoria), C7 (cópia de segurança e restauração) e C8 (portabilidade em PostgreSQL real) permanecem registradas e devem ser solucionadas antes das respectivas etapas de implantação e do uso de dados institucionais reais. **A homologação não autoriza implantação em produção nem uso de dados reais.** | Homologação do gestor |
 | D-028 | 01/11/2026 | Incorporação à `main`, após a revisão dos Pull Requests: primeiro a Etapa 0, depois a Etapa 1, preservando os respectivos históricos (merge com "Create a merge commit", sem squash nem rebase) e os resultados dos testes registrados nos Pull Requests. | Homologação do gestor |
 | D-029 | 01/11/2026 | Etapa 1.1 — Projetos e Temas, incluindo os relacionamentos com stakeholders e comitês, autorizada **para planejamento**. A implementação depende da aprovação do plano. | Homologação do gestor |
+| D-030 | 01/11/2026 | Plano da Etapa 1.1 aprovado: telas de comitês (**somente consulta**), projetos e temas; comitês participantes (D-023); associação de stakeholders aos contextos com **lista neutra de tipos de relação** (órgão competente ou regulador, parceiro, financiador ou investidor, executor, beneficiário ou afetado, representação setorial, outro) **e descrição livre**, sem poder, interesse ou posicionamento. Implementação iniciada após a incorporação das Etapas 0 e 1 à `main` (commit `f2fc7c9`), na branch `feature/projetos-temas`. | Aprovação do gestor |
 
 ## 2. Propostas técnicas 🔧
 
@@ -74,6 +76,11 @@ Sugestões adotadas provisoriamente na Etapa 0. Podem ser revistas na validaçã
 | P-024 | Em produção, o banco local só é aceito com `CRM_BANCO=pglite`, destinado a testes locais da versão compilada. | Impede que dados reais sejam gravados por engano no banco de desenvolvimento (correção C3). |
 | P-025 | Lista de países pelos 249 códigos ISO 3166-1, com nomes em português obtidos do próprio sistema. | Evita manter nomes de países à mão; um teste confere a lista. |
 | P-026 | Contato funcional ligado ao vínculo é encerrado automaticamente quando o vínculo termina. | Representa a passagem do e-mail ou telefone do cargo ao sucessor. |
+| P-027 | Projeto ou tema com o mesmo nome e tipo no mesmo comitê é recusado; nome igual ou parecido em outro comitê gera alerta com confirmação. | Evita repetição sem impedir nomes legítimos em comitês diferentes. |
+| P-028 | A regra "o comitê principal não é participante" é garantida pelo banco nos dois sentidos: ao incluir participante e ao trocar o comitê principal. | Uma troca de principal não pode criar a situação proibida pela D-023. |
+| P-029 | A mesma pessoa ou instituição pode ter mais de um tipo de relação vigente com o mesmo contexto (por exemplo, executor e financiador), mas não o mesmo tipo repetido. | Representa papéis acumulados sem duplicar registros. |
+| P-030 | Encerramento de participações e associações por data de término, sem exclusão; os encerrados continuam visíveis e no histórico. | Mesmo padrão dos vínculos e contatos (arquivar, nunca excluir). |
+| P-031 | A carga de dados fictícios é feita por grupo: pessoas e instituições se não houver nenhuma pessoa; projetos e temas se não houver nenhum, localizando os stakeholders pelo nome. | Permite acrescentar os exemplos da Etapa 1.1 a um banco local que já tem os da Etapa 1. |
 
 ## 3. Decisões pendentes ⏳
 

@@ -37,9 +37,9 @@ A arquitetura tecnológica inicialmente proposta utiliza Next.js, TypeScript, Po
 
 ## Situação atual
 
-Projeto em fase inicial de desenvolvimento — **Etapa 1: Banco de dados de desenvolvimento e Cadastro Mestre**.
+Projeto em fase inicial de desenvolvimento — **Etapa 1.1: Projetos, temas e contextos** (a Etapa 1, Banco de dados de desenvolvimento e Cadastro Mestre, foi homologada para desenvolvimento e testes).
 
-Já existem a documentação, um banco de dados local de desenvolvimento e as telas do Cadastro Mestre (pessoas, instituições, vínculos e histórico de alterações). Ainda não há autenticação, hospedagem nem os demais módulos.
+Já existem a documentação, um banco de dados local de desenvolvimento, as telas do Cadastro Mestre (pessoas, instituições, vínculos, contatos e histórico de alterações) e as telas de comitês (somente consulta), projetos e temas, com comitês participantes e stakeholders associados. Ainda não há avaliação de poder × interesse, autenticação, hospedagem nem os demais módulos.
 
 O ambiente de testes utilizará exclusivamente dados fictícios até que o tratamento de dados institucionais reais seja devidamente autorizado.
 
@@ -120,7 +120,7 @@ O banco local aceita um programa por vez. Se você tentar usá-lo com a aplicaç
 
 | Comando | O que faz |
 |---|---|
-| `npm run banco:exemplos` | Carrega pessoas e instituições fictícias para testar as telas |
+| `npm run banco:exemplos` | Carrega pessoas, instituições, projetos e temas fictícios para testar as telas (cada grupo só entra se ainda estiver vazio) |
 | `npm run banco:reiniciar` | Apaga o banco local; um banco novo e vazio é criado na próxima execução |
 
 Para fazer uma cópia de segurança, pare a aplicação e copie a pasta `.dados/pglite` para outro lugar. Para restaurar, coloque a cópia de volta no mesmo lugar.

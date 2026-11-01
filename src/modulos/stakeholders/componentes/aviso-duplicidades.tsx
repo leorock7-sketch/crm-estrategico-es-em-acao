@@ -5,7 +5,7 @@ import type { PossivelDuplicidade } from "../consultas";
 type PropriedadesAviso = {
   duplicidades: PossivelDuplicidade[];
   /** Página padrão dos registros; cada item pode indicar a sua. */
-  caminho?: "/pessoas" | "/instituicoes";
+  caminho?: NonNullable<PossivelDuplicidade["caminho"]>;
   titulo?: string;
   confirmacao?: string;
 };

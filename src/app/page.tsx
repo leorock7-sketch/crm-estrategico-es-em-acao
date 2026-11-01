@@ -4,6 +4,16 @@ import { SeloSituacao } from "@/componentes/selo-situacao";
 
 const MODULOS = [
   {
+    href: "/comites",
+    titulo: "Comitês",
+    descricao: "Estrutura de governança e os projetos e temas de cada comitê.",
+  },
+  {
+    href: "/projetos-temas",
+    titulo: "Projetos e temas",
+    descricao: "Contextos de atuação, com comitês participantes e stakeholders associados.",
+  },
+  {
     href: "/pessoas",
     titulo: "Pessoas",
     descricao: "Cadastro Mestre de pessoas, com vínculos institucionais e histórico.",
@@ -31,14 +41,14 @@ export default function PaginaInicial() {
         </p>
 
         <p className="mt-8 border-t border-borda pt-6 text-sm text-texto-secundario">
-          Esta aplicação está em desenvolvimento (Etapa 1 — Cadastro Mestre). O ambiente de
+          Esta aplicação está em desenvolvimento (Etapa 1.1 — Projetos, temas e contextos). O ambiente de
           testes utiliza exclusivamente dados fictícios.
         </p>
       </section>
 
       <section aria-labelledby="titulo-modulos">
         <h2 id="titulo-modulos" className="mb-3 text-lg font-semibold">
-          Cadastro Mestre
+          Módulos
         </h2>
         <ul className="grid gap-4 sm:grid-cols-2">
           {MODULOS.map((modulo) => (

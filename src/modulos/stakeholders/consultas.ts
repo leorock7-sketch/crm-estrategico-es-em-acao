@@ -7,9 +7,11 @@ import { and, asc, desc, eq, exists, ilike, inArray, isNull, ne, or, sql, type S
 import { alias } from "drizzle-orm/pg-core";
 import type { Executor } from "@/lib/banco/conexao";
 import {
+  comite,
   contato,
   instituicao,
   pessoa,
+  projetoTema,
   registroAuditoria,
   stakeholder,
   usuario,
@@ -26,7 +28,7 @@ export type PossivelDuplicidade = {
   motivo: string;
   arquivado: boolean;
   /** Página do registro, quando o alerta pode envolver pessoas e instituições. */
-  caminho?: "/pessoas" | "/instituicoes";
+  caminho?: "/pessoas" | "/instituicoes" | "/projetos-temas";
 };
 
 /** Vínculo vigente: sem data de término e não arquivado. */
@@ -524,7 +526,10 @@ export async function historicoDoStakeholder(banco: Executor, id: string) {
           eq(registroAuditoria.tabela, "vinculo_pessoa_instituicao"),
           or(sql`${dados} ->> 'pessoa_id' = ${id}`, sql`${dados} ->> 'instituicao_id' = ${id}`),
         ),
-        and(eq(registroAuditoria.tabela, "contato"), sql`${dados} ->> 'stakeholder_id' = ${id}`),
+        and(
+          inArray(registroAuditoria.tabela, ["contato", "stakeholder_contexto"]),
+          sql`${dados} ->> 'stakeholder_id' = ${id}`,
+        ),
       ),
     )
     .orderBy(desc(registroAuditoria.ocorridoEm), desc(registroAuditoria.id))
@@ -534,16 +539,16 @@ export async function historicoDoStakeholder(banco: Executor, id: string) {
 export type RegistroHistorico = Awaited<ReturnType<typeof historicoDoStakeholder>>[number];
 
 /**
- * Nomes de pessoas, instituições e vínculos (cargo e instituição) a partir dos
- * identificadores citados no histórico.
+ * Nomes de pessoas, instituições, vínculos (cargo e instituição), comitês e
+ * projetos ou temas a partir dos identificadores citados no histórico.
  */
-export async function nomesDosStakeholders(
+export async function nomesDosRegistros(
   banco: Executor,
   ids: string[],
 ): Promise<Map<string, string>> {
   const unicos = [...new Set(ids)];
   if (unicos.length === 0) return new Map();
-  const [pessoas, instituicoes, vinculos] = await Promise.all([
+  const [pessoas, instituicoes, vinculos, comites, projetos] = await Promise.all([
     banco
       .select({ id: pessoa.id, nome: pessoa.nomeCompleto })
       .from(pessoa)
@@ -557,9 +562,16 @@ export async function nomesDosStakeholders(
       .from(vinculo)
       .innerJoin(instituicao, eq(instituicao.id, vinculo.instituicaoId))
       .where(inArray(vinculo.id, unicos)),
+    banco.select({ id: comite.id, nome: comite.nome }).from(comite).where(inArray(comite.id, unicos)),
+    banco
+      .select({ id: projetoTema.id, nome: projetoTema.nome })
+      .from(projetoTema)
+      .where(inArray(projetoTema.id, unicos)),
   ]);
   return new Map([
-    ...[...pessoas, ...instituicoes].map((registro) => [registro.id, registro.nome] as const),
+    ...[...pessoas, ...instituicoes, ...comites, ...projetos].map(
+      (registro) => [registro.id, registro.nome] as const,
+    ),
     ...vinculos.map((v) => [v.id, [v.cargo, v.instituicao].filter(Boolean).join(" · ")] as const),
   ]);
 }

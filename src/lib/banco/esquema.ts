@@ -64,6 +64,17 @@ export const tipoContato = pgEnum("tipo_contato", ["email", "telefone", "celular
 /** Pessoal; institucional (da instituição); funcional (do cargo, pode passar ao sucessor ou ser compartilhado). */
 export const naturezaContato = pgEnum("natureza_contato", ["pessoal", "institucional", "funcional"]);
 
+/** Papel do stakeholder no projeto ou tema, sem julgamento de poder ou interesse (decisão D-030). */
+export const tipoRelacaoContexto = pgEnum("tipo_relacao_contexto", [
+  "orgao_competente",
+  "parceiro",
+  "financiador",
+  "executor",
+  "beneficiario",
+  "representacao_setorial",
+  "outro",
+]);
+
 export const operacaoAuditoria = pgEnum("operacao_auditoria", [
   "inclusao",
   "alteracao",
@@ -135,13 +146,17 @@ export const comite = pgTable(
   ],
 );
 
-/** Projetos e temas: um único comitê responsável, sem hierarquia (decisão D-020). */
+/**
+ * Projetos e temas. `comite_id` é o comitê principal; os comitês participantes
+ * ficam em projeto_tema_comite (D-023). Sem hierarquia entre temas e projetos (D-020).
+ */
 export const projetoTema = pgTable(
   "projeto_tema",
   {
     id: uuid("id").primaryKey().defaultRandom(),
     tipo: tipoProjetoTema("tipo").notNull(),
     nome: text("nome").notNull(),
+    nomeNormalizado: text("nome_normalizado").notNull(),
     descricao: text("descricao"),
     comiteId: uuid("comite_id")
       .notNull()
@@ -158,6 +173,37 @@ export const projetoTema = pgTable(
       "projeto_tema_datas",
       sql`${t.dataInicio} is null or ${t.dataFim} is null or ${t.dataFim} >= ${t.dataInicio}`,
     ),
+    check("projeto_tema_nome_preenchido", sql`length(trim(${t.nome})) > 0`),
+    index("projeto_tema_comite_principal_idx").on(t.comiteId),
+    index("projeto_tema_nome_normalizado_idx").on(t.nomeNormalizado),
+  ],
+);
+
+/** Comitês participantes de um projeto ou tema, com período (decisão D-023). */
+export const projetoTemaComite = pgTable(
+  "projeto_tema_comite",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    projetoTemaId: uuid("projeto_tema_id")
+      .notNull()
+      .references(() => projetoTema.id),
+    comiteId: uuid("comite_id")
+      .notNull()
+      .references(() => comite.id),
+    dataInicio: date("data_inicio"),
+    dataFim: date("data_fim"),
+    observacao: text("observacao"),
+    ...colunasControle(),
+  },
+  (t) => [
+    check(
+      "projeto_tema_comite_datas",
+      sql`${t.dataInicio} is null or ${t.dataFim} is null or ${t.dataFim} >= ${t.dataInicio}`,
+    ),
+    uniqueIndex("projeto_tema_comite_vigente_unico")
+      .on(t.projetoTemaId, t.comiteId)
+      .where(sql`${t.dataFim} is null and ${t.arquivadoEm} is null`),
+    index("projeto_tema_comite_comite_idx").on(t.comiteId),
   ],
 );
 
@@ -315,5 +361,39 @@ export const contato = pgTable(
       .where(sql`${t.principal} and ${t.dataFim} is null and ${t.arquivadoEm} is null`),
     index("contato_stakeholder_idx").on(t.stakeholderId),
     index("contato_valor_normalizado_idx").on(t.valorNormalizado),
+  ],
+);
+
+/**
+ * Stakeholders de um contexto (projeto ou tema): quem se relaciona com ele e
+ * em que papel. Não registra poder, interesse nem posicionamento, que serão
+ * tratados nas avaliações da Etapa 2 (decisão D-030).
+ */
+export const stakeholderContexto = pgTable(
+  "stakeholder_contexto",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    stakeholderId: uuid("stakeholder_id")
+      .notNull()
+      .references(() => stakeholder.id),
+    projetoTemaId: uuid("projeto_tema_id")
+      .notNull()
+      .references(() => projetoTema.id),
+    tipoRelacao: tipoRelacaoContexto("tipo_relacao").notNull(),
+    descricao: text("descricao"),
+    dataInicio: date("data_inicio"),
+    dataFim: date("data_fim"),
+    ...colunasControle(),
+  },
+  (t) => [
+    check(
+      "stakeholder_contexto_datas",
+      sql`${t.dataInicio} is null or ${t.dataFim} is null or ${t.dataFim} >= ${t.dataInicio}`,
+    ),
+    uniqueIndex("stakeholder_contexto_vigente_unico")
+      .on(t.stakeholderId, t.projetoTemaId, t.tipoRelacao)
+      .where(sql`${t.dataFim} is null and ${t.arquivadoEm} is null`),
+    index("stakeholder_contexto_projeto_idx").on(t.projetoTemaId),
+    index("stakeholder_contexto_stakeholder_idx").on(t.stakeholderId),
   ],
 );

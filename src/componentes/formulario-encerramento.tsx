@@ -2,18 +2,33 @@
 
 import { useActionState } from "react";
 import { classeBotaoSecundario, classeEntrada } from "@/componentes/estilos";
-import { encerrarContatoAcao, encerrarVinculoPessoa, type EstadoFormulario } from "../acoes";
 
-const ESTADO_INICIAL: EstadoFormulario = {};
+/** Estado devolvido pelas ações de encerramento (mesmo formato dos demais formulários). */
+type EstadoEncerramento = {
+  erros?: Record<string, string[] | undefined>;
+  mensagem?: string;
+  valores?: Record<string, string>;
+  sucesso?: boolean;
+};
 
-const CONFIGURACAO = {
-  vinculo: { acao: encerrarVinculoPessoa, campo: "vinculoId" },
-  contato: { acao: encerrarContatoAcao, campo: "contatoId" },
-} as const;
+type AcaoEncerramento = (estado: EstadoEncerramento, formData: FormData) => Promise<EstadoEncerramento>;
 
-/** Encerra um vínculo ou contato vigente, informando a data de término. */
-export function FormularioEncerramento({ id, alvo }: { id: string; alvo: keyof typeof CONFIGURACAO }) {
-  const { acao: acaoServidor, campo } = CONFIGURACAO[alvo];
+const ESTADO_INICIAL: EstadoEncerramento = {};
+
+/**
+ * Encerra um registro vigente (vínculo, contato, participação ou associação),
+ * informando a data de término. A ação do servidor e o nome do campo do
+ * identificador são definidos por quem usa o componente.
+ */
+export function FormularioEncerramento({
+  acao: acaoServidor,
+  campo,
+  id,
+}: {
+  acao: AcaoEncerramento;
+  campo: string;
+  id: string;
+}) {
   const [estado, acao, enviando] = useActionState(acaoServidor, ESTADO_INICIAL);
   const idCampo = `encerrar-${id}`;
   const erro = estado.erros?.dataFim?.join(" ") ?? estado.mensagem;

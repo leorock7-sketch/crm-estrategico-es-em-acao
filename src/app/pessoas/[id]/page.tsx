@@ -10,10 +10,12 @@ import { SeloSituacao } from "@/componentes/selo-situacao";
 import { bancoDaRequisicao } from "@/lib/banco/requisicao";
 import { descreverPeriodo, formatarDataHora } from "@/lib/formatacao";
 import { esquemaIdentificador } from "@/lib/validacao/comuns";
-import { alterarArquivamentoPessoa } from "@/modulos/stakeholders/acoes";
+import { ListaContextos } from "@/modulos/projetos-temas/componentes/lista-contextos";
+import { contextosDoStakeholder } from "@/modulos/projetos-temas/consultas";
+import { alterarArquivamentoPessoa, encerrarVinculoPessoa } from "@/modulos/stakeholders/acoes";
 import { BotaoArquivamento } from "@/modulos/stakeholders/componentes/botao-arquivamento";
 import { FormularioContato } from "@/modulos/stakeholders/componentes/formulario-contato";
-import { FormularioEncerramento } from "@/modulos/stakeholders/componentes/formulario-encerramento";
+import { FormularioEncerramento } from "@/componentes/formulario-encerramento";
 import { FormularioVinculo } from "@/modulos/stakeholders/componentes/formulario-vinculo";
 import { ListaContatos } from "@/modulos/stakeholders/componentes/lista-contatos";
 import { ListaHistorico } from "@/modulos/stakeholders/componentes/lista-historico";
@@ -22,7 +24,7 @@ import {
   idsCitadosNoHistorico,
   listarContatos,
   listarVinculosDaPessoa,
-  nomesDosStakeholders,
+  nomesDosRegistros,
   obterPessoa,
   opcoesInstituicoes,
 } from "@/modulos/stakeholders/consultas";
@@ -45,13 +47,14 @@ async function DetalhePessoa({ params }: Pick<PageProps<"/pessoas/[id]">, "param
   const pessoa = await obterPessoa(banco, id);
   if (!pessoa) notFound();
 
-  const [vinculos, contatos, historico, instituicoes] = await Promise.all([
+  const [vinculos, contatos, historico, instituicoes, contextos] = await Promise.all([
     listarVinculosDaPessoa(banco, id),
     listarContatos(banco, id),
     historicoDoStakeholder(banco, id),
     opcoesInstituicoes(banco),
+    contextosDoStakeholder(banco, id),
   ]);
-  const nomes = await nomesDosStakeholders(banco, idsCitadosNoHistorico(historico));
+  const nomes = await nomesDosRegistros(banco, idsCitadosNoHistorico(historico));
   const arquivada = pessoa.arquivadoEm !== null;
   const vinculosVigentes = vinculos
     .filter((v) => v.dataFim === null)
@@ -161,7 +164,7 @@ async function DetalhePessoa({ params }: Pick<PageProps<"/pessoas/[id]">, "param
                       <summary className="cursor-pointer text-texto-secundario hover:underline">
                         Encerrar vínculo
                       </summary>
-                      <FormularioEncerramento alvo="vinculo" id={v.id} />
+                      <FormularioEncerramento acao={encerrarVinculoPessoa} campo="vinculoId" id={v.id} />
                     </details>
                   )}
                 </li>
@@ -188,6 +191,16 @@ async function DetalhePessoa({ params }: Pick<PageProps<"/pessoas/[id]">, "param
           )}
         </section>
       )}
+
+      <section aria-labelledby="titulo-contextos" className={classeCartao}>
+        <h2 id="titulo-contextos" className="mb-1 text-lg font-semibold">
+          Projetos e temas
+        </h2>
+        <p className="mb-4 text-sm text-texto-secundario">
+          As associações são registradas na página de cada projeto ou tema.
+        </p>
+        <ListaContextos contextos={contextos} />
+      </section>
 
       <section aria-labelledby="titulo-historico" className={classeCartao}>
         <h2 id="titulo-historico" className="mb-4 text-lg font-semibold">

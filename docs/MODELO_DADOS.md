@@ -5,6 +5,7 @@
 | 0.1 | 31/10/2026 | Modelo lógico inicial para revisão. Nenhuma tabela foi criada. |
 | 0.2 | 31/10/2026 | Etapa 1: decisões D-020 e D-021 incorporadas; as 8 tabelas da seção 9 foram criadas no banco de desenvolvimento. |
 | 0.3 | 01/11/2026 | Revisão de homologação: contatos em tabela própria (D-025), país e CNPJ sem unicidade (D-024), comitês participantes previstos (D-023). |
+| 0.4 | 01/11/2026 | Etapa 1.1: tabelas `projeto_tema_comite` (D-023) e `stakeholder_contexto` (D-030) criadas; nome normalizado em `projeto_tema`. |
 
 Legenda: ✅ Aprovado · 🔧 Proposta técnica · ⏳ Pendente (ver [REQUISITOS.md](REQUISITOS.md#como-ler-este-documento)).
 
@@ -63,8 +64,10 @@ erDiagram
     instituicao |o--o{ instituicao : "subordina"
     stakeholder ||--o{ contato : "possui"
     vinculo_pessoa_instituicao |o--o{ contato : "funcional do cargo"
-    projeto_tema ||--o{ projeto_tema_comite : "tem participantes (Etapa 1.1)"
+    projeto_tema ||--o{ projeto_tema_comite : "tem participantes"
     comite ||--o{ projeto_tema_comite : "participa de"
+    projeto_tema ||--o{ stakeholder_contexto : "envolve"
+    stakeholder ||--o{ stakeholder_contexto : "relaciona-se com"
 ```
 
 ### 4.2 Avaliações de stakeholders
@@ -180,6 +183,7 @@ Projetos e temas estratégicos, que são os **contextos** das avaliações e das
 |---|---|---|---|---|
 | `tipo` | lista: `projeto`, `tema` | | Sim | |
 | `nome` | texto | | Sim | |
+| `nome_normalizado` | texto | | Sim | Preenchido pela aplicação (sem acentos, minúsculas), para busca e alerta de nome parecido |
 | `descricao` | texto longo | | Não | |
 | `comite_id` | UUID | FK → `comite.id` | Sim | Único comitê responsável ✅ (D-020) |
 | `situacao` | lista | | Sim | Proposta: `proposto`, `ativo`, `suspenso`, `concluido` 🔧 |
@@ -191,8 +195,41 @@ Cardinalidades: comitê 1:N projeto_tema; projeto_tema 1:N avaliações, planos,
 Regras de integridade:
 - UK (`comite_id`, `tipo`, `nome`): não repetir nome de projeto ou tema no mesmo comitê. 🔧
 - `data_fim` ≥ `data_inicio`. 🔧
-- `comite_id` é o **comitê principal** responsável. Comitês participantes ficam na tabela `projeto_tema_comite` (`projeto_tema_id`, `comite_id`, período e auditoria; o principal não pode ser também participante). ✅ (D-023) Implementação prevista na Etapa 1.1.
+- `comite_id` é o **comitê principal** responsável. Comitês participantes ficam na tabela `projeto_tema_comite`. ✅ (D-023)
 - Não há hierarquia entre temas e projetos. ✅ (D-020)
+- Nome igual ou parecido em outro comitê gera alerta com confirmação, não bloqueio. 🔧
+
+#### `projeto_tema_comite` ✅ (D-023)
+
+Comitês participantes de um projeto ou tema, além do comitê principal.
+
+| Campo | Tipo | Chave | Obr. | Observação |
+|---|---|---|---|---|
+| `projeto_tema_id` | UUID | FK → `projeto_tema.id` | Sim | |
+| `comite_id` | UUID | FK → `comite.id` | Sim | |
+| `data_inicio`, `data_fim` | data | | Não | Participação vigente = sem `data_fim` |
+| `observacao` | texto | | Não | |
+
+Regras de integridade:
+- O comitê principal não pode ser também participante; e um participante vigente só se torna principal depois de encerrada a participação (gatilhos). ✅ (D-023)
+- Um comitê tem no máximo uma participação vigente por projeto ou tema; encerrada, pode ser registrada de novo. 🔧
+- `data_fim` ≥ `data_inicio`. 🔧
+
+#### `stakeholder_contexto` ✅ (D-030)
+
+Pessoas e instituições associadas a um projeto ou tema. Registra **apenas o papel** do stakeholder no contexto; poder, interesse e posicionamento ficam para a Etapa 2, após a revisão dos critérios. ✅
+
+| Campo | Tipo | Chave | Obr. | Observação |
+|---|---|---|---|---|
+| `stakeholder_id` | UUID | FK → `stakeholder.id` | Sim | Pessoa ou instituição |
+| `projeto_tema_id` | UUID | FK → `projeto_tema.id` | Sim | |
+| `tipo_relacao` | lista neutra | | Sim | `orgao_competente`, `parceiro`, `financiador`, `executor`, `beneficiario`, `representacao_setorial`, `outro` ✅ (D-030) |
+| `descricao` | texto | | Não | Descrição livre da relação ✅ (D-030) |
+| `data_inicio`, `data_fim` | data | | Não | Associação vigente = sem `data_fim` |
+
+Regras de integridade:
+- A mesma pessoa ou instituição pode ter mais de um tipo de relação com o mesmo contexto, mas não o mesmo tipo vigente repetido. 🔧
+- `data_fim` ≥ `data_inicio`. 🔧
 
 ### 6.2 Cadastro Mestre ✅ (global; pessoas e instituições separadas)
 
@@ -688,17 +725,17 @@ Enquanto houver um único administrador, ele vê tudo; as regras acima passam a 
 5. Visibilidade do Cadastro Mestre para todos os usuários.
 6. Análise LGPD dos dados pessoais registrados.
 
-Resolvidas na Etapa 1: hierarquia entre temas e projetos (D-020); dados mínimos de pessoas (D-021). Na revisão de homologação: comitês participantes (D-023), CNPJ e país (D-024), contatos (D-025). As decisões são acompanhadas em [REGISTRO_DECISOES.md](REGISTRO_DECISOES.md).
+Resolvidas na Etapa 1: hierarquia entre temas e projetos (D-020); dados mínimos de pessoas (D-021). Na revisão de homologação: comitês participantes (D-023), CNPJ e país (D-024), contatos (D-025). Na Etapa 1.1: tipos de relação dos stakeholders com os contextos (D-030). As decisões são acompanhadas em [REGISTRO_DECISOES.md](REGISTRO_DECISOES.md).
 
 ## 9. Situação da implementação
 
 | Tabela | Etapa | Situação |
 |---|---|---|
 | `usuario`, `registro_auditoria` | 1 | Criadas no banco de desenvolvimento |
-| `comite` (com os 4 comitês), `projeto_tema` | 1 | Criadas; projetos e temas ainda sem telas |
+| `comite` (com os 4 comitês), `projeto_tema` | 1 | Criadas; telas na Etapa 1.1 (comitês somente consulta) |
 | `stakeholder`, `pessoa`, `instituicao`, `vinculo_pessoa_instituicao` | 1 | Criadas, com telas do Cadastro Mestre |
 | `contato` | 1 (revisão) | Criada, com telas; e-mails e telefones antigos migrados |
-| `projeto_tema_comite` | 1.1 | Prevista (D-023) |
+| `projeto_tema_comite`, `stakeholder_contexto` | 1.1 | Criadas, com telas |
 | Demais tabelas | 2 a 4 | Não criadas |
 
 Onde está cada parte:
@@ -708,12 +745,14 @@ Onde está cada parte:
   - `0000`: tabelas, chaves e regras;
   - `0001`: gatilhos de auditoria, de preenchimento automático e de proteção;
   - `0002`: carga dos 4 comitês;
-  - `0003`: revisão de homologação — tabela de contatos (com migração dos dados), país e CNPJ sem unicidade.
+  - `0003`: revisão de homologação — tabela de contatos (com migração dos dados), país e CNPJ sem unicidade;
+  - `0004`: Etapa 1.1 — comitês participantes, stakeholders dos contextos e nome normalizado dos projetos e temas (preenchido também nos registros existentes).
 - **Regras garantidas por gatilhos** 🔧:
   - preenchimento automático de quem criou ou alterou cada registro, e quando;
   - trilha de auditoria a cada inclusão, alteração, arquivamento e reativação, sem registrar alterações que não mudam nenhum dado;
   - proibição de excluir registros (somente arquivar) e de alterar a auditoria;
   - comitê temático subordinado apenas ao comitê de desenvolvimento;
+  - comitê principal de um projeto ou tema que não é, ao mesmo tempo, participante;
   - hierarquia de instituições sem ciclos;
   - tipo do stakeholder imutável.
 

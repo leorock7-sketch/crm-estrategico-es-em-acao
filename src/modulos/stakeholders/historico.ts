@@ -4,6 +4,11 @@
  */
 import { formatarData, formatarDataHora } from "@/lib/formatacao";
 import { formatarCnpj } from "@/lib/validacao/cnpj";
+import {
+  ROTULOS_SITUACAO_PROJETO_TEMA,
+  ROTULOS_TIPO_PROJETO_TEMA,
+  ROTULOS_TIPO_RELACAO,
+} from "@/modulos/projetos-temas/rotulos";
 import { nomePais } from "./paises";
 import {
   ROTULOS_CAMPOS,
@@ -57,8 +62,18 @@ export function formatarValor(campo: string, valor: unknown, nomes: Map<string, 
     );
   }
   if (campo === "esfera") return ROTULOS_ESFERA[texto as keyof typeof ROTULOS_ESFERA] ?? texto;
-  if (campo === "tipo") return ROTULOS_TIPO_CONTATO[texto as keyof typeof ROTULOS_TIPO_CONTATO] ?? texto;
+  if (campo === "tipo") {
+    return (
+      ROTULOS_TIPO_CONTATO[texto as keyof typeof ROTULOS_TIPO_CONTATO] ??
+      ROTULOS_TIPO_PROJETO_TEMA[texto as keyof typeof ROTULOS_TIPO_PROJETO_TEMA] ??
+      texto
+    );
+  }
   if (campo === "pais") return nomePais(texto);
+  if (campo === "situacao") {
+    return ROTULOS_SITUACAO_PROJETO_TEMA[texto as keyof typeof ROTULOS_SITUACAO_PROJETO_TEMA] ?? texto;
+  }
+  if (campo === "tipo_relacao") return ROTULOS_TIPO_RELACAO[texto as keyof typeof ROTULOS_TIPO_RELACAO] ?? texto;
   return texto;
 }
 
