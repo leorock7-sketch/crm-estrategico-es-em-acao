@@ -53,7 +53,9 @@ A titularidade definitiva do código, os direitos de uso e as responsabilidades 
 
 ## Segurança
 
-O repositório deverá permanecer privado.
+Por decisão do gestor do projeto (D-033, de 01/11/2026), este repositório é mantido **público** por enquanto, com ciência dos riscos dessa escolha. A visibilidade pública do código **não** autoriza divulgar informações reais de stakeholders, documentos internos, planilhas institucionais, senhas, tokens, credenciais, dados de produção ou informações confidenciais. Antes de cada envio ao GitHub, os arquivos adicionados ou modificados e o histórico relevante são verificados quanto a dados pessoais, informações institucionais restritas e segredos.
+
+O repositório ser público não significa que o futuro banco de dados do CRM será público: os dados ficarão em banco próprio, com acesso restrito.
 
 É proibido armazenar senhas, tokens, chaves de acesso ou outras credenciais no código-fonte.
 

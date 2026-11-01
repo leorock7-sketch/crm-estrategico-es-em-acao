@@ -3,7 +3,7 @@
 | Versão | Data | Situação |
 |---|---|---|
 | 0.1 | 31/10/2026 | Registro inicial (Etapa 0) |
-| 0.2 | 01/11/2026 | Etapa 1, revisão de homologação, homologação (D-027), incorporação (D-028) e Etapa 1.1 (D-029, D-030, P-027 a P-031); homologação da Etapa 1.1 (D-031) e planejamento da Etapa 2A (D-032) |
+| 0.2 | 01/11/2026 | Etapa 1, revisão de homologação, homologação (D-027), incorporação (D-028) e Etapa 1.1 (D-029, D-030, P-027 a P-031); homologação da Etapa 1.1 (D-031), planejamento da Etapa 2A (D-032) e repositório público (D-033; a questão Q-59 foi resolvida por essa decisão) |
 
 Este documento consolida o que já foi decidido, o que é sugestão técnica e o que ainda precisa de decisão. Ao decidir uma questão pendente, ela deve ser movida para a seção 1, com data e origem.
 
@@ -19,7 +19,7 @@ Legenda: ✅ Aprovado · 🔧 Proposta técnica · ⏳ Pendente.
 | D-004 | Anterior à Etapa 0 | Arquitetura de referência: Next.js com TypeScript; PostgreSQL, futuramente gerenciado pelo Supabase; Supabase Auth quando a autenticação for configurada; Vercel como hospedagem proposta. Sujeita a validação técnica e institucional. | README / instruções da Etapa 0 |
 | D-005 | Anterior à Etapa 0 | Apenas dados fictícios em testes até autorização para dados reais. | README |
 | D-006 | Anterior à Etapa 0 | Repositório em conta pessoal, provisoriamente, com transferência prevista para conta institucional. Sem transferência automática de direitos. | README |
-| D-007 | Anterior à Etapa 0 | Repositório privado; proibido armazenar credenciais no código; alterações documentadas e testadas antes da implantação. | README |
+| D-007 | Anterior à Etapa 0 | Repositório privado (**substituído pela D-033**); proibido armazenar credenciais no código; alterações documentadas e testadas antes da implantação. | README |
 | D-008 | 31/10/2026 | Operação inicial por um único administrador, com expansão para vários usuários e permissões por projeto ou tema. | Instruções da Etapa 0 |
 | D-009 | 31/10/2026 | Cadastro Mestre global, com pessoas e instituições separadas, vínculos e histórico. | Instruções da Etapa 0 |
 | D-010 | 31/10/2026 | O mesmo stakeholder pode ter posicionamento, influência e interesse diferentes em cada projeto ou tema. Avaliações independentes, versionadas e com visibilidade restrita por contexto. | Instruções da Etapa 0 |
@@ -45,6 +45,7 @@ Legenda: ✅ Aprovado · 🔧 Proposta técnica · ⏳ Pendente.
 | D-030 | 01/11/2026 | Plano da Etapa 1.1 aprovado: telas de comitês (**somente consulta**), projetos e temas; comitês participantes (D-023); associação de stakeholders aos contextos com **lista neutra de tipos de relação** (órgão competente ou regulador, parceiro, financiador ou investidor, executor, beneficiário ou afetado, representação setorial, outro) **e descrição livre**, sem poder, interesse ou posicionamento. Implementação iniciada após a incorporação das Etapas 0 e 1 à `main` (commit `f2fc7c9`), na branch `feature/projetos-temas`. | Aprovação do gestor |
 | D-031 | 01/11/2026 | **Etapa 1.1 homologada** — Projetos, Temas e Contextos (commit `9c030e8`, Pull Request #1), **para o ambiente de desenvolvimento com dados fictícios**, por estar aderente à estrutura institucional e às regras de relacionamento aprovadas. Antes da incorporação à `main`, confirmar que o Pull Request corresponde ao commit homologado, não tem conflitos e apresenta as verificações aprovadas; o merge não é automático. As pendências C6, C7 e C8 continuam registradas (D-027). | Homologação do gestor |
 | D-032 | 01/11/2026 | Etapa 2A — Metodologia de Avaliação Estratégica de Stakeholders autorizada **para planejamento**. O plano deve tratar: revisão dos seis critérios originais; escalas, pesos e fórmulas (indicando o que depende de aprovação); grau de confiança; posicionamento em cinco níveis e "não avaliado"; justificativas, evidências e histórico; versionamento; acesso por projeto ou tema; ficha individual e matriz interativa; critérios de aceite e testes. **Não inventar a metodologia quantitativa institucional**, não implementar cálculos definitivos e não avançar para a Matriz de Iniciativas antes da aprovação. | Homologação do gestor |
+| D-033 | 01/11/2026 | **Repositório mantido público** por enquanto, por decisão do gestor, ciente dos riscos; substitui a exigência de repositório privado (D-007 e RNF-01). A visibilidade pública não autoriza divulgar informações reais de stakeholders, documentos internos, planilhas institucionais, senhas, tokens, credenciais, dados de produção ou informações confidenciais. Antes de cada envio ao GitHub, verificar os arquivos adicionados ou modificados e o histórico relevante (dados pessoais, informações institucionais restritas e segredos). O repositório público não torna público o futuro banco de dados do CRM. | Deliberação do gestor |
 
 ## 2. Propostas técnicas 🔧
 
@@ -109,5 +110,4 @@ Sugestões adotadas provisoriamente na Etapa 0. Podem ser revistas na validaçã
 | Q-56 | Conferência desta documentação com o Manual de Especificação V2.0 e o Guia de Implantação. | Todos | Gestor |
 | Q-57 | Autorização para o teste de portabilidade em PostgreSQL real (por exemplo, GitHub Actions) e definição da versão de destino. | [Arquitetura](ARQUITETURA.md) | Gestor |
 | Q-58 | Política de retenção, anonimização e eliminação de dados pessoais, inclusive na trilha de auditoria. | [Governança](GOVERNANCA.md) | Instância jurídica / gestor |
-| Q-59 | Visibilidade do repositório: em 01/11/2026 o repositório no GitHub foi constatado como **público**, contrariando a regra de que deve permanecer privado. A alteração para privado é feita pelo administrador da conta (Settings → General → Danger Zone → Change visibility). | [Governança](GOVERNANCA.md) | Gestor (administrador da conta) |
 | Q-60 | Planilhas originais de qualificação de stakeholders do ES em Ação (critérios, escalas, pesos e fórmulas), necessárias para a revisão da metodologia da Etapa 2A. | [Metodologia](METODOLOGIA_STAKEHOLDERS.md) | Gestor |

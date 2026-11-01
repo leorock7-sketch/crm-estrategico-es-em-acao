@@ -48,7 +48,9 @@ Conforme o README:
 
 ## 5. Segurança ✅
 
-- O repositório deve permanecer **privado**.
+- O repositório é mantido **público** por decisão do gestor (D-033, de 01/11/2026, que substitui a exigência de repositório privado da D-007), com ciência dos riscos. Não podem ser publicados: informações reais de stakeholders, documentos internos, planilhas institucionais, senhas, tokens, credenciais, dados de produção ou informações confidenciais. ✅
+- Antes de cada envio ao GitHub, verificar os arquivos adicionados ou modificados e o histórico relevante, procurando dados pessoais, informações institucionais restritas e segredos. ✅
+- O código público não torna público o banco de dados do CRM, que terá acesso restrito. ✅
 - É **proibido** armazenar senhas, tokens, chaves de acesso ou outras credenciais no código-fonte. Configurações sensíveis ficarão em variáveis de ambiente, fora do repositório; o arquivo `.env.example` lista apenas os nomes, sem valores. 🔧
 - Alterações devem ser **documentadas e testadas** antes da implantação.
 
