@@ -88,6 +88,12 @@ export function ListaHistorico({ registros, nomes, perspectiva }: PropriedadesHi
                 ))}
               </dl>
             )}
+            {registro.operacao === "alteracao" && alteracoes.length === 0 && (
+              <p className="mt-1 text-xs text-texto-secundario">
+                Ajuste técnico, sem mudança nos dados exibidos (por exemplo, a forma do nome usada na
+                busca).
+              </p>
+            )}
           </li>
         );
       })}
