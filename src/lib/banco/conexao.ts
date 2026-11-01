@@ -16,6 +16,7 @@ import { sql } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/pglite";
 import { migrate } from "drizzle-orm/pglite/migrator";
 import * as esquema from "./esquema";
+import { alinharValoresNormalizados } from "./normalizacao";
 import { adquirirTrava, liberarTrava } from "./trava";
 
 function criarBanco(cliente: PGlite) {
@@ -51,6 +52,12 @@ export function verificarUsoDoBancoLocal(ambiente: NodeJS.ProcessEnv = process.e
 
 const pastasAbertas = new WeakMap<Banco, string>();
 
+/** Aplica os scripts pendentes e realinha os valores normalizados (ver normalizacao.ts). */
+async function prepararBanco(banco: Banco) {
+  await migrate(banco, { migrationsFolder: PASTA_MIGRACOES });
+  await alinharValoresNormalizados(banco);
+}
+
 /**
  * Abre um banco e aplica os scripts pendentes. Sem diretório, o banco fica
  * apenas na memória (usado nos testes automatizados). Com diretório, obtém
@@ -59,7 +66,7 @@ const pastasAbertas = new WeakMap<Banco, string>();
 export async function abrirBanco(diretorio?: string): Promise<Banco> {
   if (!diretorio) {
     const banco = criarBanco(new PGlite());
-    await migrate(banco, { migrationsFolder: PASTA_MIGRACOES });
+    await prepararBanco(banco);
     return banco;
   }
 
@@ -67,7 +74,7 @@ export async function abrirBanco(diretorio?: string): Promise<Banco> {
   adquirirTrava(diretorio);
   try {
     const banco = criarBanco(new PGlite(diretorio));
-    await migrate(banco, { migrationsFolder: PASTA_MIGRACOES });
+    await prepararBanco(banco);
     pastasAbertas.set(banco, diretorio);
     return banco;
   } catch (erro) {

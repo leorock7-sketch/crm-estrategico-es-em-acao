@@ -6,6 +6,7 @@ import {
   textoOpcional,
   vazioParaAusente,
 } from "@/lib/validacao/comuns";
+import { normalizarTexto } from "@/lib/texto";
 import { SITUACOES_PROJETO_TEMA, TIPOS_PROJETO_TEMA, TIPOS_RELACAO } from "./rotulos";
 
 const datasCoerentes = (dados: { dataInicio?: string; dataFim?: string }) =>
@@ -14,7 +15,9 @@ const datasCoerentes = (dados: { dataInicio?: string; dataFim?: string }) =>
 export const esquemaProjetoTema = z
   .object({
     tipo: z.enum(TIPOS_PROJETO_TEMA, { error: "Selecione se é projeto ou tema." }),
-    nome: textoObrigatorio("Nome", 200),
+    nome: textoObrigatorio("Nome", 200).refine((nome) => normalizarTexto(nome) !== "", {
+      error: "O nome deve conter letras ou números.",
+    }),
     descricao: textoOpcional("Descrição", 2000),
     comiteId: z.preprocess(vazioParaAusente, z.uuid({ error: "Selecione o comitê principal." })),
     situacao: z.enum(SITUACOES_PROJETO_TEMA, { error: "Selecione a situação." }),

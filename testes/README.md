@@ -14,6 +14,7 @@ Os testes conferem, de forma automática e repetível, se o sistema se comporta 
 | `formulario-instituicao.test.tsx` | Formulário de instituição: mantém o que foi digitado após um erro; UF e CNPJ desativados para instituição estrangeira. |
 | `banco-projetos-temas.test.ts` | Regras do banco de projetos, temas e contextos: nome normalizado, nome repetido no mesmo comitê, datas, proibição de exclusão, comitê principal que não é participante (nos dois sentidos), participações e associações vigentes únicas, filtro por comitê, ausência de campos de poder ou interesse e histórico. |
 | `validacao-projetos-temas.test.ts` | Validações de projeto ou tema, participação e associação; nomes legíveis no histórico; listas da tela iguais às do banco. |
+| `normalizacao.test.ts` | Regra única de normalização (acentos, maiúsculas, pontuação, apóstrofos e acentos usados como apóstrofo); busca e duplicidade de projetos e temas com essas variações; realinhamento de valores gravados pela regra antiga, inclusive ao reabrir um banco existente, de forma idempotente e auditada. |
 | `formulario-projeto-tema.test.tsx` | Formulário de projeto ou tema com alerta de nome parecido; formulário de associação com a lista neutra de tipos de relação. |
 
 Ferramentas: [Vitest](https://vitest.dev) e [Testing Library](https://testing-library.com).

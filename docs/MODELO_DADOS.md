@@ -755,5 +755,6 @@ Onde está cada parte:
   - comitê principal de um projeto ou tema que não é, ao mesmo tempo, participante;
   - hierarquia de instituições sem ciclos;
   - tipo do stakeholder imutável.
+- **Valores normalizados** (nomes de pessoas, instituições, projetos e temas; contatos), usados na busca e na identificação de duplicidades: seguem uma regra única da aplicação (`src/lib/texto.ts` e `src/modulos/stakeholders/contatos.ts`) — sem acentos, em minúsculas, com qualquer sinal trocado por espaço. Ao abrir o banco, depois das migrações, valores gravados com outra regra são realinhados automaticamente (`src/lib/banco/normalizacao.ts`), o que corrige o preenchimento simplificado feito pelas migrações 0003 e 0004 em bancos que já tinham registros.
 
 Enquanto não houver login (etapa de autenticação), todas as operações são atribuídas ao usuário fictício "Administrador (desenvolvimento)". 🔧
