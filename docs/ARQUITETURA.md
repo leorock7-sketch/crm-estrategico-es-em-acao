@@ -7,6 +7,7 @@
 | 0.3 | 01/11/2026 | Revisão de homologação: trava do banco local, proteção de produção e contatos |
 | 0.4 | 01/11/2026 | Etapa 1.1: telas de comitês, projetos e temas (módulo `projetos-temas`) |
 | 0.5 | 01/11/2026 | Etapa 2A: avaliações estratégicas (módulo `avaliacoes`) e permissões por contexto, ainda não homologadas |
+| 0.6 | 01/11/2026 | Repositório público com e-mail *noreply* nos commits (D-039) e proposta de testes no GitHub Actions (P-039) |
 
 Legenda: ✅ Aprovado · 🔧 Proposta técnica · ⏳ Pendente.
 
@@ -171,6 +172,9 @@ Regras de organização:
 | Validação de todos os dados no servidor, inclusive endereços de site (somente http e https). | 🔧 (implementado na Etapa 1) |
 | Princípio do menor privilégio: cada usuário acessa apenas os contextos de que precisa. | 🔧 |
 | Proteção da branch `main` no GitHub. | 🔧 |
+| Repositório público (D-033): verificação de dados pessoais, informações restritas e segredos antes de cada envio; e-mail *noreply* do GitHub nos commits a partir de 01/11/2026 (D-039). O histórico anterior não é reescrito sem aprovação. | ✅ |
+| Controle de acesso por projeto ou tema nas consultas do servidor, com testes (Etapa 2A). Sem autenticação real nem regras no banco: **segurança multiusuário não homologada**. | 🔧 (D-034) |
+| Testes automatizados no GitHub Actions a cada Pull Request (seção 6.1). | 🔧 Proposta (P-039, Q-63) |
 
 ## 6. Comandos do projeto
 
@@ -185,9 +189,19 @@ Regras de organização:
 | `npm run build` | Compila a aplicação para produção |
 | `npm start` | Executa a versão compilada |
 | `npm run verificar` | Executa tipos, qualidade, testes e compilação, em sequência |
-| `npm run banco:exemplos` | Carrega pessoas e instituições fictícias no banco local (com a aplicação parada) |
+| `npm run banco:exemplos` | Carrega pessoas, instituições, projetos, temas e avaliações de demonstração fictícios no banco local (com a aplicação parada) |
 | `npm run banco:reiniciar` | Apaga o banco local, que é recriado vazio na próxima execução (com a aplicação parada) |
 | `npm run banco:gerar` | Gera um novo script SQL após alterar `src/lib/banco/esquema.ts` (uso técnico) |
+
+### 6.1 Testes automatizados no GitHub Actions — proposta 🔧 (P-039, Q-63)
+
+A cada Pull Request e a cada atualização da `main`, o GitHub executaria a mesma verificação feita no computador, e o resultado apareceria no próprio Pull Request:
+
+1. Baixar o código da branch.
+2. Instalar o Node.js na versão LTS usada no projeto e as bibliotecas exatas do `package-lock.json` (`npm ci`).
+3. Executar `npm run verificar`: tipos, qualidade, testes (com banco PGlite na memória, só dados fictícios) e compilação.
+
+Características: sem senhas ou chaves (nenhum segredo é necessário); gratuito para repositório público; arquivo `.github/workflows/verificar.yml`, criado somente após a aprovação. Passo posterior, dependente de Q-57: um segundo teste em PostgreSQL real, para a portabilidade (C8). Opcionalmente, a proteção da `main` poderia exigir que a verificação passe antes do merge.
 
 ## 7. Decisões de arquitetura pendentes ⏳
 
@@ -196,6 +210,8 @@ Regras de organização:
 | Q-50 | Login por e-mail e senha (Supabase Auth) ou por contas Microsoft 365 institucionais (Microsoft Entra ID, também suportado pelo Supabase Auth). |
 | Q-51 | Região de hospedagem dos dados. O Supabase oferece região em São Paulo. |
 | Q-52 | Transferência dos serviços e do repositório para contas institucionais. |
+| Q-57 | Teste de portabilidade em PostgreSQL real (C8). |
+| Q-63 | Aprovação dos testes automatizados no GitHub Actions (P-039). |
 | — | Abordagem das integrações com Microsoft 365 (Microsoft Graph) e de IA assistiva. |
 
 Resolvidas na Etapa 1: local da cópia de trabalho (D-019) e ferramenta de banco local (D-018).

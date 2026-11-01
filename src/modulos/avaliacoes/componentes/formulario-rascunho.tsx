@@ -125,7 +125,7 @@ export function FormularioRascunho({
         <Campo
           id="grauConfianca"
           rotulo="Grau de confiança"
-          ajuda="Escolha do avaliador. Considere a natureza e a confiabilidade da fonte, a independência das evidências, a atualidade e a consistência. Os critérios de apoio aguardam aprovação e não são aplicados automaticamente."
+          ajuda="Informado e justificado pelo responsável, sem classificação automática (D-036). Considere a confiabilidade da fonte, a independência das evidências, a atualidade, a pertinência e a consistência."
           erros={erros.grauConfianca}
         >
           <select

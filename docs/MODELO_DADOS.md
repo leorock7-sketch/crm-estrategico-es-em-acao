@@ -338,6 +338,8 @@ Estrutura criada na Etapa 2A (D-034). **Nenhum critério, escala, peso, fórmula
 
 Regras (gatilhos): no máximo uma `vigente`; só entra em vigor com ao menos um critério de poder e um de interesse; vigente, só pode ser encerrada; encerrada, não muda mais. 🔧
 
+Metodologia institucional comum, por ora (D-037). Se uma metodologia específica por comitê ou contexto for aprovada, esta tabela receberá a indicação do escopo, com uma metodologia vigente por escopo; pontuações de metodologias diferentes continuam sem comparação automática.
+
 #### `criterio_avaliacao`
 
 | Campo | Tipo | Chave | Obr. | Observação |
@@ -709,7 +711,7 @@ Enquanto houver um único administrador, ele vê tudo; as regras acima passam a 
 ## 8. Questões de modelagem pendentes ⏳
 
 1. Escalas de poder e interesse, os seis critérios, seus pesos, a fórmula e os pontos de corte da matriz.
-2. Critérios de apoio ao grau de confiança (Q-61) e eventual metodologia por comitê ou contexto (Q-62).
+2. Categorias da "Conduta do ES em Ação" e regras de correspondência com os quadrantes (Q-64, requisito futuro RF-28).
 3. Um único plano de ação por projeto/tema ou vários?
 4. Escalas de probabilidade e impacto e fórmula de criticidade.
 5. Visibilidade do Cadastro Mestre para todos os usuários.

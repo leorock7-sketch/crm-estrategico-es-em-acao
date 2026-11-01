@@ -4,6 +4,7 @@
 |---|---|---|
 | 0.1 | 31/10/2026 | Estrutura para revisão. Critérios, escalas e pesos **não definidos**. |
 | 0.2 | 01/11/2026 | Etapa 2A: decisões do Manual V2.0 e da D-034 incorporadas; estrutura implementada com metodologia de **demonstração**. Critérios, escalas, pesos, fórmula e pontos de corte institucionais continuam **não definidos**. |
+| 0.3 | 01/11/2026 | Grau de confiança aprovado (D-036), metodologia institucional comum (D-037) e "Conduta do ES em Ação" como requisito futuro (D-038). |
 
 Legenda: ✅ Aprovado · 🔧 Proposta técnica · ⏳ Pendente.
 
@@ -35,31 +36,36 @@ Legenda: ✅ Aprovado · 🔧 Proposta técnica · ⏳ Pendente.
 |---|---|---|
 | **Poder** e **interesse** | Calculados a partir das notas por critério. Na demonstração: escala de 0 a 100 (ver seção 5). | Critérios, escalas, pesos e fórmula institucionais ⏳ |
 | **Posicionamento** | Cinco níveis: favorável, parcialmente favorável, neutro, parcialmente contrário e contrário. "Não avaliado" é uma condição distinta, nunca neutro nem zero. | ✅ (Manual V2.0) |
-| **Grau de confiança** | Três níveis: alto, médio e baixo, escolhidos pelo avaliador, com justificativa. Sem classificação automática. | ✅ níveis (D-034) · critérios de apoio 🔧 (seção 4) |
+| **Grau de confiança** | Três níveis qualitativos: alto, médio e baixo, informados e justificados pelo responsável. Sem classificação automática. | ✅ (D-036, seção 4) |
 | **Justificativa** | Obrigatória para publicar. | ✅ (Manual V2.0) |
 | **Evidências** | Pelo menos uma, obrigatória para publicar: documento, link ou observação, com fonte e data. | ✅ (Manual V2.0) |
 | **Validação institucional** | Obrigatória para publicar posicionamento de uma instituição. | ✅ (Manual V2.0) |
 | **Data de referência e próxima revisão** | A próxima revisão é marcada para um ano após a data de referência, sem prejuízo de reavaliação por evento relevante. | ✅ (Manual V2.0) |
 | **Tendência** | Comparação do posicionamento com a versão anterior (o posicionamento não depende da metodologia). | ✅ (Manual V2.0) / 🔧 forma de exibição |
 
-## 4. Grau de confiança: critérios de apoio — proposta para aprovação 🔧
+## 4. Grau de confiança ✅ (D-036)
 
-Aprovados os três níveis (alto, médio, baixo); **não** aprovadas, por ora, regras quantitativas automáticas (D-034). A proposta abaixo é qualitativa e considera quatro aspectos: natureza e confiabilidade da fonte, independência das evidências, atualidade e consistência. **Enquanto não for aprovada, o sistema não a aplica**: o avaliador escolhe o nível e justifica.
+Aprovado: **três níveis qualitativos — alto, médio e baixo** —, informados e justificados pelo responsável pela avaliação. **Não há regras automáticas baseadas exclusivamente na quantidade de evidências**; o sistema não calcula o nível. ✅
+
+Aspectos a considerar (D-036) ✅:
 
 | Aspecto | O que observar |
 |---|---|
-| Natureza e confiabilidade da fonte | Fonte primária (manifestação formal, documento oficial, interação direta registrada com o próprio stakeholder) ou secundária (relato de terceiros, imprensa, percepção interna). |
+| Confiabilidade da fonte | Fonte primária (manifestação formal, documento oficial, interação direta registrada com o próprio stakeholder) ou secundária (relato de terceiros, imprensa, percepção interna). |
 | Independência das evidências | As evidências vêm de origens distintas ou repetem a mesma origem? |
 | Atualidade | As evidências são recentes em relação à data de referência e ao ciclo anual de revisão? |
+| Pertinência | As evidências tratam deste stakeholder e deste projeto ou tema, e do aspecto avaliado? |
 | Consistência | As evidências convergem? Há contradições, e elas estão explicadas na justificativa? |
 
-| Nível | Descrição proposta |
-|---|---|
-| **Alto** | Fontes primárias e confiáveis, com evidências independentes que convergem, atuais em relação à data de referência, sem contradições relevantes não explicadas. |
-| **Médio** | Ao menos uma fonte confiável, mas com limitações: evidências de uma mesma origem, parcialmente desatualizadas ou com divergências pontuais explicadas. |
-| **Baixo** | Apoio predominante em fontes secundárias ou de confiabilidade incerta, evidência única ou antiga, ou contradições não resolvidas. |
+Orientação para cada nível 🔧 (texto de apoio ao avaliador, coerente com a D-036):
 
-Questões para a aprovação (Q-61): os textos dos níveis; se a evidência deve registrar a natureza da fonte (primária ou secundária); se, depois de aprovados, os critérios serão apenas orientação ao avaliador ou também uma sugestão calculada pelo sistema.
+| Nível | Orientação |
+|---|---|
+| **Alto** | Fontes confiáveis e pertinentes, com evidências independentes que convergem, atuais em relação à data de referência, sem contradições relevantes não explicadas. |
+| **Médio** | Ao menos uma fonte confiável e pertinente, mas com limitações: evidências de uma mesma origem, parcialmente desatualizadas, de pertinência parcial ou com divergências pontuais explicadas. |
+| **Baixo** | Apoio predominante em fontes de confiabilidade incerta ou pouco pertinentes, evidência antiga ou contradições não resolvidas. |
+
+Como funciona no sistema: o avaliador escolhe o nível e escreve a justificativa, obrigatória para publicar (regra do banco de dados). A tela lista os cinco aspectos como lembrete.
 
 ## 5. Metodologia e cálculo
 
@@ -80,11 +86,17 @@ Somente para testar o funcionamento, com dados fictícios. **Não é a metodolog
 
 ### 5.3 Revisão dos seis critérios originais ⏳ (Q-01, Q-60)
 
-A planilha "Mapa de Stakeholders" do Comitê de Infraestrutura foi analisada com autorização do gestor (D-034), somente quanto à estrutura metodológica. **Ela não contém os seis critérios, escalas, pesos, fórmulas nem pontos de corte.** O inventário foi entregue ao gestor fora deste repositório, por tratar de informação institucional. Os critérios originais dependem das planilhas de qualificação de stakeholders. Nenhum critério será substituído antes da aprovação do gestor.
+A planilha "Mapa de Stakeholders" do Comitê de Infraestrutura foi analisada com autorização do gestor (D-034), somente quanto à estrutura metodológica. **Ela não contém os seis critérios, escalas, pesos, fórmulas nem pontos de corte.** O inventário foi entregue ao gestor fora deste repositório, por tratar de informação institucional. A próxima fonte é a planilha "Qualificação de Stakeholders — Comitê Temático de Infraestrutura (Consolidado)" (D-040). Os cálculos institucionais só serão implementados após a revisão e a homologação dos seis critérios, e nenhum critério será substituído antes da aprovação do gestor.
 
 Roteiro proposto 🔧: inventário dos critérios originais (sem nomes nem avaliações individuais) → ficha de análise por critério (o que mede, escala, peso, evidência típica, problemas: ambiguidade, sobreposição, mistura de interesse com posição) → recomendação de manter, reformular, fundir ou excluir → decisão do gestor → metodologia versão 1.0 (Etapa 2B).
 
-### 5.4 Metodologias por comitê ou por contexto — análise 🔧 (Q-62)
+### 5.4 Metodologias por comitê ou por contexto ✅ (D-037)
+
+Decisão: adotar inicialmente **uma metodologia institucional comum**. A arquitetura deve permitir metodologias específicas por comitê ou contexto, sujeitas a aprovação e fundamentação técnica, **sem pressupor comparabilidade automática** entre metodologias diferentes.
+
+Como a arquitetura atende 🔧: hoje existe uma metodologia vigente para todos. Quando uma metodologia específica for aprovada, a versão da metodologia passará a indicar seu escopo (comitê ou projeto/tema), com uma metodologia vigente por escopo; a matriz já mostra no mesmo gráfico apenas avaliações de uma mesma metodologia. Nenhuma alteração de estrutura é necessária antes dessa aprovação.
+
+Análise que fundamentou a decisão:
 
 | Opção | Vantagens | Riscos |
 |---|---|---|
@@ -92,7 +104,7 @@ Roteiro proposto 🔧: inventário dos critérios originais (sem nomes nem avali
 | **B. Núcleo comum + critérios complementares por comitê** | Mantém a comparação no núcleo; permite critérios específicos. | Exige regra clara: só o núcleo entra na matriz comparável. |
 | **C. Metodologias independentes por comitê ou contexto** | Máxima adaptação. | Perde a comparação; agregações entre comitês exigiriam justificativa técnica. |
 
-Recomendação: manter a opção A até a revisão dos seis critérios e reavaliar a opção B depois dela. A estrutura atual já impede comparar pontuações de metodologias diferentes; as opções B e C exigiriam indicar o escopo da metodologia (comitê ou contexto) e permitir uma metodologia vigente por escopo.
+
 
 ## 6. Matriz de poder × interesse
 
@@ -103,7 +115,8 @@ Recomendação: manter a opção A até a revisão dos seis critérios e reavali
 | No gráfico, somente avaliações da **metodologia vigente** com poder e interesse; pontuações de metodologias diferentes não são comparadas automaticamente. | ✅ (D-034) |
 | Listas próprias, sem ocultar registros: avaliações históricas (metodologia anterior), exigem reavaliação (metodologia anterior ou revisão anual vencida), sem pontuação, não avaliados e associação encerrada. | ✅ (D-034) |
 | Total exibido com denominador ("X de Y associados"). | ✅ (Manual V2.0) |
-| Pontos de corte, nomes dos quadrantes e conduta por quadrante. | ⏳ (Q-05) — sem quadrantes até a aprovação |
+| Pontos de corte e nomes dos quadrantes. | ⏳ (Q-05) — sem quadrantes até a aprovação |
+| **Conduta do ES em Ação** — dimensão identificada na planilha "Mapa de Stakeholders", registrada **separadamente** de poder, interesse e posicionamento. Não será derivada automaticamente dos quadrantes até a definição das categorias e das regras de correspondência. | ⏳ Requisito futuro (RF-28, D-038, Q-64) |
 | Filtros por comitê, período e responsável, em visão agregada. | ⏳ Etapa de painéis |
 
 Modelo de referência (não aprovado): quatro quadrantes de Mendelow — manter satisfeito, gerenciar de perto, monitorar, manter informado.
@@ -129,7 +142,6 @@ As avaliações só são visíveis a quem tem permissão no projeto ou tema: adm
 | Q-05 | Pontos de corte e nomes dos quadrantes da matriz. |
 | Q-06 | Pesos entre critérios e fórmula institucional. |
 | Q-60 | Planilhas originais de qualificação de stakeholders (a planilha analisada não contém os critérios). |
-| Q-61 | Aprovação dos critérios de apoio ao grau de confiança (seção 4). |
-| Q-62 | Metodologia única ou por comitê ou contexto (seção 5.4). |
+| Q-64 | Categorias da "Conduta do ES em Ação" e regras de correspondência com os quadrantes. |
 
-Resolvidas: Q-03 (grau de confiança: robustez da evidência, três níveis — D-034), Q-04 (cinco níveis de posicionamento — Manual V2.0), Q-07 (estrutura com metodologia de demonstração e dados fictícios antes da homologação — D-034) e Q-08 (revisão anual e por evento relevante — Manual V2.0). Consolidação em [REGISTRO_DECISOES.md](REGISTRO_DECISOES.md).
+Resolvidas: Q-03 (grau de confiança: robustez da evidência, três níveis — D-034), Q-04 (cinco níveis de posicionamento — Manual V2.0), Q-07 (estrutura com metodologia de demonstração e dados fictícios antes da homologação — D-034) e Q-08 (revisão anual e por evento relevante — Manual V2.0); Q-61 (grau de confiança — D-036) e Q-62 (metodologia comum, com arquitetura para metodologias específicas — D-037). Consolidação em [REGISTRO_DECISOES.md](REGISTRO_DECISOES.md).

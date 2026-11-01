@@ -107,7 +107,7 @@ export const posicionamento = pgEnum("posicionamento", [
   "contrario",
 ]);
 
-/** Três níveis aprovados (D-034); a classificação é feita pelo avaliador, sem regra automática. */
+/** Três níveis qualitativos (D-036): informados e justificados pelo responsável, sem regra automática. */
 export const grauConfianca = pgEnum("grau_confianca", ["alto", "medio", "baixo"]);
 
 export const tipoEvidencia = pgEnum("tipo_evidencia", ["documento", "link", "observacao"]);

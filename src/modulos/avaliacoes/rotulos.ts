@@ -26,7 +26,7 @@ export const ROTULOS_POSICIONAMENTO: Record<Posicionamento, string> = {
 /** Condição distinta dos cinco níveis: nunca é "neutro" nem pontuação zero. */
 export const ROTULO_NAO_AVALIADO = "Não avaliado";
 
-/** Três níveis aprovados (D-034). A classificação é do avaliador, sem regra automática. */
+/** Três níveis qualitativos (D-036): informados e justificados pelo responsável, sem regra automática. */
 export const GRAUS_CONFIANCA = ["alto", "medio", "baixo"] as const;
 
 export type GrauConfianca = (typeof GRAUS_CONFIANCA)[number];

@@ -5,6 +5,7 @@
 | 0.1 | 31/10/2026 | Proposta de sequência de etapas para aprovação |
 | 0.2 | 01/11/2026 | Homologação da Etapa 1 (D-027), incorporação à `main` (D-028) e Etapa 1.1 (D-029, D-030) |
 | 0.3 | 01/11/2026 | Homologação da Etapa 1.1 (D-031), repositório público (D-033) e Etapa 2A (D-032, D-034) |
+| 0.4 | 01/11/2026 | Aprovação funcional da Etapa 2A (D-035), decisões D-036 a D-040 e consolidação das pendências |
 
 Legenda: ✅ Aprovado · 🔧 Proposta técnica · ⏳ Pendente.
 
@@ -25,8 +26,8 @@ Legenda: ✅ Aprovado · 🔧 Proposta técnica · ⏳ Pendente.
 | 0 | Fundação técnica | Documentação, esqueleto da aplicação, testes básicos | ✅ Aprovada em 31/10/2026 |
 | 1 | Banco de dados de desenvolvimento e Cadastro Mestre | Banco PostgreSQL local, estrutura de comitês e projetos/temas, cadastro de pessoas, instituições e vínculos, com dados fictícios | ✅ **Homologada em 01/11/2026** para desenvolvimento e testes (D-027); pendências C6, C7 e C8 |
 | 1.1 | Projetos, temas e contextos | Telas de comitês, projetos e temas; comitês participantes (D-023); associação de stakeholders aos contextos, sem avaliação de poder × interesse | ✅ **Homologada em 01/11/2026** para desenvolvimento com dados fictícios (D-031); Pull Request #1 |
-| 2A | Metodologia e estrutura da avaliação estratégica | Fichas e versões, evidências, posicionamento, grau de confiança, permissões e matriz com metodologia de demonstração e dados fictícios | 🔧 Entregue para revisão (D-034), branch `feature/avaliacao-stakeholders` |
-| 2B | Metodologia institucional e cálculos definitivos | Critérios, escalas, pesos, fórmula e pontos de corte homologados. Depende de Q-01, Q-02, Q-05, Q-06 e Q-60 | ⏳ Depende da aprovação da metodologia |
+| 2A | Metodologia e estrutura da avaliação estratégica | Fichas e versões, evidências, posicionamento, grau de confiança, permissões e matriz com metodologia de demonstração e dados fictícios | ✅ **Aprovada funcionalmente em 01/11/2026** para desenvolvimento e testes com dados fictícios, condicionada à revisão do Pull Request (D-035); branch `feature/avaliacao-stakeholders` |
+| 2B | Metodologia institucional e cálculos definitivos | Critérios, escalas, pesos, fórmula e pontos de corte homologados. Depende de Q-01, Q-02, Q-05, Q-06 e Q-60 | ⏳ Cálculos só após a revisão e homologação dos seis critérios (D-040); próxima atividade: análise da planilha de Qualificação (Consolidado) |
 | 3 | Iniciativas, interações e compromissos | Matriz de iniciativas, registro único de reuniões, encaminhamentos e prazos | 🔧 |
 | 4 | Plano de ação e matriz de riscos | Versões e aprovação, acompanhamento, riscos, gatilhos e respostas | 🔧 |
 | 5 | Autenticação e permissões | Supabase Auth, perfis e permissões por projeto/tema, segurança no banco. Depende de Q-50 | 🔧 |
@@ -188,7 +189,7 @@ Construir a estrutura das avaliações de stakeholders — fichas, versões, evi
 | Proposta de critérios de apoio ao grau de confiança e análise de metodologias por comitê | Apresentadas para aprovação (Q-61, Q-62) |
 | Testes automatizados | Executados e aprovados em 01/11/2026: tipos, qualidade e compilação sem erros; 127 de 127 testes (91 anteriores e 36 novos) |
 | Verificação no navegador (versão compilada, dados fictícios) | Executada em 01/11/2026: matriz e listas, ficha, tendência, nova versão, recusa sem validação institucional, publicação, evidência (link inválido recusado, inclusão e retirada), salvar rascunho, metodologias e celular; corrigidos o formato dos números (87,5) e o tamanho do texto do gráfico no celular; sem erros no servidor |
-| Aprovação do gestor | Aguardando revisão |
+| Aprovação do gestor | Aprovada funcionalmente em 01/11/2026, para desenvolvimento e testes com dados fictícios, condicionada à revisão do Pull Request (D-035). Não abrange a metodologia quantitativa institucional, a autenticação multiusuário nem dados reais |
 
 Ficaram de fora, conforme a D-034: critérios, pesos, fórmula e pontos de corte institucionais (Etapa 2B), classificação automática do grau de confiança, gestão de metodologias e de permissões pelas telas, autenticação, Matriz de Iniciativas, C6, C7, C8 e dados reais.
 
@@ -204,6 +205,20 @@ Ficaram de fora, conforme a D-034: critérios, pesos, fórmula e pontos de corte
 8. Todo resultado de demonstração marcado como não homologado; nenhum critério institucional no sistema.
 9. Funciona em celular e computador.
 
-## 7. Local de trabalho ✅ (D-019)
+## 7. Pendências efetivas (01/11/2026)
+
+| Pendência | Bloqueia | Situação |
+|---|---|---|
+| C6. Reforço da auditoria | Etapas 7 e 8 (D-027) | Planejada |
+| C7. Cópia de segurança e restauração | Etapas 7 e 8 (D-027) | Planejada |
+| C8. Portabilidade em PostgreSQL real | Etapas 7 e 8 (D-027) | Depende de autorização (Q-57) |
+| Autenticação e segurança multiusuário (inclusive regras de acesso no banco) | Uso por mais de uma pessoa; Etapas 7 e 8 | Etapa 5; estrutura de permissões preparada na 2A, não homologada |
+| Seis critérios originais, escalas, pesos, fórmula e pontos de corte | Etapa 2B (D-040) | Aguardando a planilha de Qualificação (Q-01, Q-02, Q-05, Q-06, Q-60) |
+| Conduta do ES em Ação | Requisito futuro RF-28 | Categorias e regras de correspondência a definir (Q-64) |
+| Testes automatizados no GitHub Actions | — | Proposta aguardando aprovação (P-039, Q-63) |
+| Revisão e incorporação dos Pull Requests das Etapas 1.1 e 2A | Base correta da Etapa 2A | Etapa 1.1: PR #1 aberto; Etapa 2A: PR a abrir |
+| Análise LGPD, retenção e anonimização | Etapa 8 | Q-13, Q-58 |
+
+## 8. Local de trabalho ✅ (D-019)
 
 A cópia de trabalho do projeto fica em `C:\Projetos\crm-estrategico-es-em-acao`, obtida pelo GitHub, fora do Google Drive. O GitHub cumpre o papel de cópia de segurança e histórico. A pasta antiga no Google Drive não foi apagada.

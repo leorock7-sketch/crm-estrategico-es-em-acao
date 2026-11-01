@@ -5,6 +5,7 @@
 | 0.1 | 31/10/2026 | Rascunho para revisão do gestor do projeto |
 | 0.2 | 01/11/2026 | Etapa 1.1: comitês participantes e associação de stakeholders aos contextos (D-023, D-030) |
 | 0.3 | 01/11/2026 | Etapa 2A: estrutura de avaliações com metodologia de demonstração (D-034) |
+| 0.4 | 01/11/2026 | Grau de confiança (D-036), metodologia comum (D-037) e Conduta do ES em Ação como requisito futuro (D-038) |
 
 ## Como ler este documento
 
@@ -74,8 +75,9 @@ Sistema próprio de gestão estratégica de relacionamentos institucionais (CRM)
 | RF-23 | Avaliações versionadas: uma reavaliação cria nova versão e preserva as anteriores, com suas metodologias, no histórico. | ✅ (implementado na Etapa 2A) |
 | RF-24 | Visibilidade das avaliações restrita ao contexto (projeto ou tema) a que pertencem. | ✅ (estrutura e testes na Etapa 2A; segurança multiusuário não homologada) |
 | RF-25 | Matriz de poder × interesse por projeto ou tema, distinguindo metodologia vigente, avaliações históricas e situações que exigem reavaliação. | ✅ (demonstração na Etapa 2A, sem pontos de corte) |
-| RF-26 | Critérios de avaliação de poder e interesse configuráveis, associados a uma versão da metodologia. | 🔧 (estrutura implementada na Etapa 2A) |
+| RF-26 | Critérios de avaliação de poder e interesse configuráveis, associados a uma versão da metodologia. Inicialmente uma metodologia institucional comum; a arquitetura deve permitir metodologias específicas por comitê ou contexto, aprovadas e fundamentadas, sem comparabilidade automática. | ✅ (D-037; estrutura implementada na Etapa 2A) |
 | RF-27 | Os seis critérios históricos de poder e interesse, suas escalas e pesos. | ⏳ Em revisão — não definidos (Q-01, Q-60) |
+| RF-28 | Dimensão "Conduta do ES em Ação", registrada separadamente de poder, interesse e posicionamento, sem derivação automática dos quadrantes até a definição das regras de correspondência. | ⏳ Requisito futuro (D-038, Q-64) |
 
 Detalhes em [METODOLOGIA_STAKEHOLDERS.md](METODOLOGIA_STAKEHOLDERS.md).
 
