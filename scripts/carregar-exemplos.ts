@@ -3,7 +3,9 @@
  * no banco local, para testes e demonstração. Comando: npm run banco:exemplos
  *
  * Cada grupo só é carregado se ainda estiver vazio: pessoas e instituições,
- * se não houver nenhuma pessoa; projetos e temas, se não houver nenhum.
+ * se não houver nenhuma pessoa; projetos e temas, se não houver nenhum;
+ * metodologias e avaliações de DEMONSTRAÇÃO, se não houver nenhuma metodologia.
+ * As avaliações são fictícias e seus resultados não são homologados (D-034).
  *
  * Execute com a aplicação parada (o banco local aceita um processo por vez;
  * se estiver em uso, o script avisa e não grava nada). Nenhum dado aqui
@@ -12,8 +14,19 @@
 import { comoUsuario, diretorioDoBanco, fecharBanco, obterBanco } from "@/lib/banco/conexao";
 import { isNull } from "drizzle-orm";
 import type { Executor } from "@/lib/banco/conexao";
-import { instituicao, pessoa, projetoTema } from "@/lib/banco/esquema";
+import { instituicao, metodologiaVersao, pessoa, projetoTema } from "@/lib/banco/esquema";
 import { obterUsuarioAtual } from "@/modulos/acesso/usuario-atual";
+import {
+  adicionarEvidencia,
+  alterarSituacaoMetodologia,
+  criarMetodologia,
+  criteriosDaMetodologia,
+  iniciarRascunho,
+  type NovaMetodologia,
+  publicarRascunho,
+  salvarRascunho,
+} from "@/modulos/avaliacoes/consultas";
+import type { DadosRascunho } from "@/modulos/avaliacoes/esquemas";
 import {
   criarAssociacao,
   criarParticipacao,
@@ -227,17 +240,201 @@ async function carregarProjetosTemas(tx: Executor) {
   return { associacoes, ignorados: [...new Set(ignorados)] };
 }
 
+/**
+ * Metodologias de DEMONSTRAÇÃO: critérios, escalas e pesos inventados apenas
+ * para testar o funcionamento. Não representam os seis critérios originais
+ * nem qualquer proposta de revisão (D-034).
+ */
+const METODOLOGIAS_DEMONSTRACAO: NovaMetodologia[] = [
+  {
+    nome: "Demonstração 0.1 (fictícia, encerrada)",
+    descricao: "Metodologia fictícia, já encerrada, para exibir avaliações históricas. Não homologada.",
+    criterios: [
+      { dimensao: "poder", nome: "Critério fictício A", escalaMinima: 1, escalaMaxima: 5 },
+      { dimensao: "interesse", nome: "Critério fictício B", escalaMinima: 1, escalaMaxima: 5 },
+    ],
+  },
+  {
+    nome: "Demonstração 0.2 (fictícia)",
+    descricao: "Metodologia fictícia vigente, somente para testar fichas e matriz. Não homologada.",
+    criterios: [
+      { dimensao: "poder", nome: "Critério fictício P1", descricao: "Texto de exemplo.", escalaMinima: 1, escalaMaxima: 5, peso: 2 },
+      { dimensao: "poder", nome: "Critério fictício P2", descricao: "Texto de exemplo.", escalaMinima: 1, escalaMaxima: 5, peso: 1 },
+      { dimensao: "interesse", nome: "Critério fictício I1", descricao: "Texto de exemplo.", escalaMinima: 1, escalaMaxima: 5, peso: 1 },
+      { dimensao: "interesse", nome: "Critério fictício I2", descricao: "Texto de exemplo.", escalaMinima: 1, escalaMaxima: 5, peso: 1 },
+    ],
+  },
+];
+
+type AvaliacaoExemplo = {
+  projeto: string;
+  stakeholder: string;
+  /** Notas na ordem dos critérios da metodologia vigente no momento. */
+  notas: number[];
+  dados: Omit<DadosRascunho, "versaoId">;
+  /** Se falso, fica como rascunho em andamento. */
+  publicar?: boolean;
+};
+
+const EVIDENCIA_FICTICIA = {
+  tipo: "observacao" as const,
+  descricao: "Registro fictício de reunião de demonstração.",
+  fonte: "Dados de exemplo",
+  dataEvidencia: "2026-09-15",
+};
+
+const AVALIACOES_ANTIGAS: AvaliacaoExemplo[] = [
+  {
+    projeto: "Ampliação do Porto Modelo",
+    stakeholder: "Porto Modelo S.A.",
+    notas: [5, 4],
+    dados: {
+      posicionamento: "favoravel",
+      grauConfianca: "medio",
+      justificativaConfianca: "Exemplo fictício.",
+      justificativa: "Avaliação fictícia feita com a metodologia de demonstração anterior.",
+      validacaoInstitucional: "Exemplo fictício de validação institucional.",
+      dataReferencia: "2026-03-10",
+    },
+  },
+  {
+    projeto: "Ampliação do Porto Modelo",
+    stakeholder: "Secretaria Exemplo de Desenvolvimento",
+    notas: [4, 3],
+    dados: {
+      posicionamento: "neutro",
+      justificativa: "Primeira avaliação fictícia, com a metodologia anterior.",
+      validacaoInstitucional: "Exemplo fictício de validação institucional.",
+      dataReferencia: "2026-03-12",
+    },
+  },
+];
+
+const AVALIACOES_ATUAIS: AvaliacaoExemplo[] = [
+  {
+    projeto: "Ampliação do Porto Modelo",
+    stakeholder: "Secretaria Exemplo de Desenvolvimento",
+    notas: [5, 4, 4, 5],
+    dados: {
+      posicionamento: "parcialmente_favoravel",
+      grauConfianca: "alto",
+      justificativaConfianca: "Exemplo fictício: fontes diretas e recentes.",
+      justificativa: "Segunda avaliação fictícia, já com a metodologia de demonstração vigente.",
+      validacaoInstitucional: "Exemplo fictício de validação institucional.",
+      dataReferencia: "2026-10-05",
+    },
+  },
+  {
+    projeto: "Ampliação do Porto Modelo",
+    stakeholder: "Eduarda Teste Martins",
+    notas: [3, 3, 5, 4],
+    dados: {
+      posicionamento: "favoravel",
+      grauConfianca: "baixo",
+      justificativaConfianca: "Exemplo fictício: uma única fonte indireta.",
+      justificativa: "Avaliação fictícia antiga, com revisão anual vencida.",
+      dataReferencia: "2025-06-10",
+    },
+  },
+  {
+    projeto: "Ampliação do Porto Modelo",
+    stakeholder: "Federação Exemplo da Indústria",
+    notas: [2, 3, 3, 2],
+    dados: {
+      justificativa: "Avaliação fictícia de poder e interesse, ainda sem base para o posicionamento.",
+      dataReferencia: "2026-09-20",
+    },
+  },
+  {
+    projeto: "Ampliação do Porto Modelo",
+    stakeholder: "Prefeitura Municipal de Vila Exemplo",
+    notas: [2, 2, 5, 5],
+    dados: {
+      posicionamento: "parcialmente_contrario",
+      grauConfianca: "medio",
+      justificativaConfianca: "Exemplo fictício.",
+      justificativa: "Avaliação fictícia de demonstração.",
+      validacaoInstitucional: "Exemplo fictício de validação institucional.",
+      dataReferencia: "2026-10-01",
+    },
+  },
+  {
+    projeto: "Ampliação do Porto Modelo",
+    stakeholder: "Porto Modelo S.A.",
+    notas: [5, 5, 4],
+    dados: { posicionamento: "favoravel", justificativa: "Reavaliação fictícia em andamento." },
+    publicar: false,
+  },
+  {
+    projeto: "Parque Tecnológico Exemplo",
+    stakeholder: "Universidade Fictícia do Sudeste",
+    notas: [4, 3, 5, 5],
+    dados: {
+      posicionamento: "neutro",
+      grauConfianca: "medio",
+      justificativaConfianca: "Exemplo fictício.",
+      justificativa: "Avaliação fictícia em outro contexto: cada projeto ou tema tem avaliações independentes.",
+      validacaoInstitucional: "Exemplo fictício de validação institucional.",
+      dataReferencia: "2026-10-10",
+    },
+  },
+];
+
+/** Carrega as metodologias e avaliações de demonstração (somente dados fictícios). */
+async function carregarAvaliacoes(tx: Executor) {
+  const [projetos, pessoas, instituicoes] = await Promise.all([
+    tx.select({ id: projetoTema.id, nome: projetoTema.nome }).from(projetoTema).where(isNull(projetoTema.arquivadoEm)),
+    tx.select({ id: pessoa.id, nome: pessoa.nomeCompleto }).from(pessoa).where(isNull(pessoa.arquivadoEm)),
+    tx.select({ id: instituicao.id, nome: instituicao.nome }).from(instituicao).where(isNull(instituicao.arquivadoEm)),
+  ]);
+  const idProjeto = new Map(projetos.map((p) => [p.nome, p.id]));
+  const idStakeholder = new Map([...pessoas, ...instituicoes].map((s) => [s.nome, s.id]));
+  let publicadas = 0;
+  const ignoradas: string[] = [];
+
+  async function avaliar(lista: AvaliacaoExemplo[], metodologiaId: string) {
+    const criterios = await criteriosDaMetodologia(tx, metodologiaId);
+    for (const exemplo of lista) {
+      const projetoTemaId = idProjeto.get(exemplo.projeto);
+      const stakeholderId = idStakeholder.get(exemplo.stakeholder);
+      if (!projetoTemaId || !stakeholderId) {
+        ignoradas.push(`${exemplo.stakeholder} (${exemplo.projeto})`);
+        continue;
+      }
+      const versaoId = await iniciarRascunho(tx, projetoTemaId, stakeholderId);
+      const notas = new Map(exemplo.notas.map((valor, indice) => [criterios[indice].id, valor]));
+      await salvarRascunho(tx, { versaoId, ...exemplo.dados }, notas);
+      await adicionarEvidencia(tx, { versaoId, ...EVIDENCIA_FICTICIA });
+      if (exemplo.publicar !== false) {
+        await publicarRascunho(tx, versaoId);
+        publicadas++;
+      }
+    }
+  }
+
+  const [antiga, atual] = METODOLOGIAS_DEMONSTRACAO;
+  const antigaId = await criarMetodologia(tx, antiga);
+  await alterarSituacaoMetodologia(tx, antigaId, "vigente");
+  await avaliar(AVALIACOES_ANTIGAS, antigaId);
+  await alterarSituacaoMetodologia(tx, antigaId, "encerrada");
+  const atualId = await criarMetodologia(tx, atual);
+  await alterarSituacaoMetodologia(tx, atualId, "vigente");
+  await avaliar(AVALIACOES_ATUAIS, atualId);
+  return { publicadas, ignoradas };
+}
+
 async function principal() {
   console.log(`Banco local: ${diretorioDoBanco()}`);
   const banco = await obterBanco();
   try {
-    const [pessoasExistentes, projetosExistentes] = await Promise.all([
+    const [pessoasExistentes, projetosExistentes, metodologiasExistentes] = await Promise.all([
       banco.$count(pessoa),
       banco.$count(projetoTema),
+      banco.$count(metodologiaVersao),
     ]);
-    if (pessoasExistentes > 0 && projetosExistentes > 0) {
+    if (pessoasExistentes > 0 && projetosExistentes > 0 && metodologiasExistentes > 0) {
       console.log(
-        `O banco já tem ${pessoasExistentes} pessoa(s) e ${projetosExistentes} projeto(s) ou tema(s). Nada foi carregado.`,
+        `O banco já tem ${pessoasExistentes} pessoa(s), ${projetosExistentes} projeto(s) ou tema(s) e ${metodologiasExistentes} metodologia(s). Nada foi carregado.`,
       );
       console.log('Para recomeçar do zero: "npm run banco:reiniciar" e depois "npm run banco:exemplos".');
       return;
@@ -263,6 +460,15 @@ async function principal() {
         }
       } else {
         console.log(`Projetos e temas: o banco já tem ${projetosExistentes}; mantidos como estão.`);
+      }
+      if (metodologiasExistentes === 0) {
+        const { publicadas, ignoradas } = await carregarAvaliacoes(tx);
+        console.log(
+          `Carregadas: ${METODOLOGIAS_DEMONSTRACAO.length} metodologias de demonstração e ${publicadas} avaliações fictícias publicadas (resultados não homologados).`,
+        );
+        if (ignoradas.length > 0) console.log(`Não encontrados, avaliação ignorada: ${ignoradas.join(", ")}.`);
+      } else {
+        console.log(`Metodologias: o banco já tem ${metodologiasExistentes}; avaliações mantidas como estão.`);
       }
     });
   } finally {

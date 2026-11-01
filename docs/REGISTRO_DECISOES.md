@@ -4,6 +4,7 @@
 |---|---|---|
 | 0.1 | 31/10/2026 | Registro inicial (Etapa 0) |
 | 0.2 | 01/11/2026 | Etapa 1, revisão de homologação, homologação (D-027), incorporação (D-028) e Etapa 1.1 (D-029, D-030, P-027 a P-031); homologação da Etapa 1.1 (D-031), planejamento da Etapa 2A (D-032) e repositório público (D-033; a questão Q-59 foi resolvida por essa decisão) |
+| 0.3 | 01/11/2026 | Etapa 2A: D-034, propostas P-032 a P-038; Q-03, Q-04, Q-07 e Q-08 resolvidas (Manual V2.0 e D-034); novas questões Q-61 e Q-62 |
 
 Este documento consolida o que já foi decidido, o que é sugestão técnica e o que ainda precisa de decisão. Ao decidir uma questão pendente, ela deve ser movida para a seção 1, com data e origem.
 
@@ -46,6 +47,7 @@ Legenda: ✅ Aprovado · 🔧 Proposta técnica · ⏳ Pendente.
 | D-031 | 01/11/2026 | **Etapa 1.1 homologada** — Projetos, Temas e Contextos (commit `9c030e8`, Pull Request #1), **para o ambiente de desenvolvimento com dados fictícios**, por estar aderente à estrutura institucional e às regras de relacionamento aprovadas. Antes da incorporação à `main`, confirmar que o Pull Request corresponde ao commit homologado, não tem conflitos e apresenta as verificações aprovadas; o merge não é automático. As pendências C6, C7 e C8 continuam registradas (D-027). | Homologação do gestor |
 | D-032 | 01/11/2026 | Etapa 2A — Metodologia de Avaliação Estratégica de Stakeholders autorizada **para planejamento**. O plano deve tratar: revisão dos seis critérios originais; escalas, pesos e fórmulas (indicando o que depende de aprovação); grau de confiança; posicionamento em cinco níveis e "não avaliado"; justificativas, evidências e histórico; versionamento; acesso por projeto ou tema; ficha individual e matriz interativa; critérios de aceite e testes. **Não inventar a metodologia quantitativa institucional**, não implementar cálculos definitivos e não avançar para a Matriz de Iniciativas antes da aprovação. | Homologação do gestor |
 | D-033 | 01/11/2026 | **Repositório mantido público** por enquanto, por decisão do gestor, ciente dos riscos; substitui a exigência de repositório privado (D-007 e RNF-01). A visibilidade pública não autoriza divulgar informações reais de stakeholders, documentos internos, planilhas institucionais, senhas, tokens, credenciais, dados de produção ou informações confidenciais. Antes de cada envio ao GitHub, verificar os arquivos adicionados ou modificados e o histórico relevante (dados pessoais, informações institucionais restritas e segredos). O repositório público não torna público o futuro banco de dados do CRM. | Deliberação do gestor |
+| D-034 | 01/11/2026 | **Plano da Etapa 2A aprovado com ajustes** e desenvolvimento autorizado com dados fictícios, na branch `feature/avaliacao-stakeholders`, sem merge sem autorização: (1) análise metodológica da planilha "Mapa de Stakeholders" do Comitê de Infraestrutura, só para critérios, escalas, pesos, fórmulas e pontos de corte, sem transcrever nomes, avaliações ou dados reais para código, documentação pública, testes ou GitHub, e sem substituir critérios antes da aprovação; (2) estrutura de avaliações com stakeholders, evidências e pontuações **fictícios**, com todas as demonstrações indicando que os resultados **não estão homologados**; (3) grau de confiança em **três níveis (alto, médio, baixo)**, sem regras quantitativas automáticas, com critérios a reformular e aprovar antes de qualquer automação; (4) preservar integralmente as avaliações publicadas e suas metodologias; a matriz distingue metodologia vigente, avaliações históricas e situações que exigem reavaliação, sem ocultar registros e sem comparar automaticamente pontuações de metodologias diferentes; avaliar metodologias por comitê ou contexto; (5) estruturas e testes de autorização por contexto, deixando explícito que a segurança multiusuário ainda não foi homologada; (6) não implementar cálculos definitivos com critérios e pesos institucionais nem avançar para a Etapa 2B sem aprovação da metodologia. | Deliberação do gestor |
 
 ## 2. Propostas técnicas 🔧
 
@@ -84,6 +86,13 @@ Sugestões adotadas provisoriamente na Etapa 0. Podem ser revistas na validaçã
 | P-029 | A mesma pessoa ou instituição pode ter mais de um tipo de relação vigente com o mesmo contexto (por exemplo, executor e financiador), mas não o mesmo tipo repetido. | Representa papéis acumulados sem duplicar registros. |
 | P-030 | Encerramento de participações e associações por data de término, sem exclusão; os encerrados continuam visíveis e no histórico. | Mesmo padrão dos vínculos e contatos (arquivar, nunca excluir). |
 | P-031 | A carga de dados fictícios é feita por grupo: pessoas e instituições se não houver nenhuma pessoa; projetos e temas se não houver nenhum, localizando os stakeholders pelo nome. | Permite acrescentar os exemplos da Etapa 1.1 a um banco local que já tem os da Etapa 1. |
+| P-032 | Poder e interesse consolidados gravados na versão, na escala técnica de 0 a 100; na demonstração, média ponderada das notas convertidas para essa escala. | Permite desenhar a matriz e preservar o resultado da época, sem antecipar a fórmula institucional (Etapa 2B). |
+| P-033 | Regras de publicação garantidas pelo banco: versão nasce como rascunho; publicar exige justificativa, data de referência, evidência, justificativa do grau de confiança (se informado) e validação institucional (instituição com posicionamento); publicada, só pode passar a "substituída". | Protege o histórico mesmo sem passar pelas telas. |
+| P-034 | Um rascunho por ficha; nova versão copia posicionamento, confiança, validação institucional e evidências da vigente, e as notas só quando a metodologia é a mesma; justificativas recomeçam em branco. | Facilita a reavaliação sem misturar metodologias nem reaproveitar justificativas antigas. |
+| P-035 | Próxima revisão calculada pelo banco: data de referência + 1 ano; a matriz sinaliza a revisão vencida. | Aplica a revisão anual do Manual V2.0. |
+| P-036 | Na matriz, apenas a metodologia vigente vai para o gráfico; avaliações históricas, sem pontuação, não avaliados e associação encerrada aparecem em listas. Sem quadrantes até a aprovação dos pontos de corte. | Atende à D-034: distinguir sem ocultar e sem comparar metodologias diferentes. |
+| P-037 | Escala de cores divergente para o posicionamento (azul favorável, cinza neutro, vermelho contrário), verificada para daltonismo, sempre acompanhada de número, legenda e tabela; "não avaliado" vazado. | Leitura acessível, inclusive em celular. |
+| P-038 | Perfis por contexto: gestor e colaborador veem e alteram; leitor só vê; administrador vê tudo; permissão com validade opcional. | Estrutura para a etapa de autenticação (segurança ainda não homologada). |
 
 ## 3. Decisões pendentes ⏳
 
@@ -91,12 +100,8 @@ Sugestões adotadas provisoriamente na Etapa 0. Podem ser revistas na validaçã
 |---|---|---|---|
 | Q-01 | Critérios de poder e de interesse (revisão dos seis critérios históricos). | [Metodologia](METODOLOGIA_STAKEHOLDERS.md) | Gestor / instância institucional |
 | Q-02 | Escala de poder e interesse. | [Metodologia](METODOLOGIA_STAKEHOLDERS.md) | Gestor |
-| Q-03 | Significado de "grau de confiança". | [Metodologia](METODOLOGIA_STAKEHOLDERS.md) | Gestor |
-| Q-04 | Categorias de posicionamento. | [Metodologia](METODOLOGIA_STAKEHOLDERS.md) | Gestor |
 | Q-05 | Quadrantes e pontos de corte da matriz de poder × interesse. | [Metodologia](METODOLOGIA_STAKEHOLDERS.md) | Gestor |
-| Q-06 | Pesos entre critérios. | [Metodologia](METODOLOGIA_STAKEHOLDERS.md) | Gestor |
-| Q-07 | Avaliações antes da aprovação da metodologia. | [Metodologia](METODOLOGIA_STAKEHOLDERS.md) | Gestor |
-| Q-08 | Periodicidade de revisão das avaliações. | [Metodologia](METODOLOGIA_STAKEHOLDERS.md) | Gestor |
+| Q-06 | Pesos entre critérios e fórmula institucional. | [Metodologia](METODOLOGIA_STAKEHOLDERS.md) | Gestor |
 | Q-12 | Visibilidade do Cadastro Mestre para todos os usuários (relevante a partir da etapa de autenticação). | [Modelo de dados](MODELO_DADOS.md) | Gestor |
 | Q-13 | Análise LGPD dos dados pessoais do cadastro, antes do uso de dados reais (o conjunto mínimo de campos já foi definido em D-021). | [Governança](GOVERNANCA.md) | Instância jurídica |
 | Q-20 a Q-24 | Apresentação da matriz, prioridade, "reunião relevante", papéis, vínculo obrigatório a projeto. | [Iniciativas](MATRIZ_INICIATIVAS.md) | Gestor |
@@ -110,4 +115,6 @@ Sugestões adotadas provisoriamente na Etapa 0. Podem ser revistas na validaçã
 | Q-56 | Conferência desta documentação com o Manual de Especificação V2.0 e o Guia de Implantação. | Todos | Gestor |
 | Q-57 | Autorização para o teste de portabilidade em PostgreSQL real (por exemplo, GitHub Actions) e definição da versão de destino. | [Arquitetura](ARQUITETURA.md) | Gestor |
 | Q-58 | Política de retenção, anonimização e eliminação de dados pessoais, inclusive na trilha de auditoria. | [Governança](GOVERNANCA.md) | Instância jurídica / gestor |
-| Q-60 | Planilhas originais de qualificação de stakeholders do ES em Ação (critérios, escalas, pesos e fórmulas), necessárias para a revisão da metodologia da Etapa 2A. | [Metodologia](METODOLOGIA_STAKEHOLDERS.md) | Gestor |
+| Q-60 | Planilhas originais de qualificação de stakeholders do ES em Ação (critérios, escalas, pesos e fórmulas). A planilha "Mapa de Stakeholders" do Comitê de Infraestrutura, analisada em 01/11/2026, **não contém** os seis critérios; o inventário foi entregue ao gestor fora do repositório. | [Metodologia](METODOLOGIA_STAKEHOLDERS.md) | Gestor |
+| Q-61 | Critérios de apoio ao grau de confiança (proposta qualitativa: natureza e confiabilidade da fonte, independência, atualidade e consistência), antes de qualquer automação. | [Metodologia](METODOLOGIA_STAKEHOLDERS.md) | Gestor |
+| Q-62 | Metodologia única ou específica por comitê ou contexto (análise com três opções). | [Metodologia](METODOLOGIA_STAKEHOLDERS.md) | Gestor |

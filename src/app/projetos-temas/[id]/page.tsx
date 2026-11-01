@@ -31,6 +31,11 @@ import {
   ROTULOS_TIPO_PROJETO_TEMA,
   ROTULOS_TIPO_RELACAO,
 } from "@/modulos/projetos-temas/rotulos";
+import { permissaoNoContexto } from "@/modulos/acesso/permissoes";
+import { obterUsuarioAtual } from "@/modulos/acesso/usuario-atual";
+import { SeloPosicionamento } from "@/modulos/avaliacoes/componentes/selo-posicionamento";
+import { fichasDoContexto } from "@/modulos/avaliacoes/consultas";
+import type { FichaParaMatriz } from "@/modulos/avaliacoes/matriz";
 import { BotaoArquivamento } from "@/modulos/stakeholders/componentes/botao-arquivamento";
 import { ListaHistorico } from "@/modulos/stakeholders/componentes/lista-historico";
 import { idsCitadosNoHistorico, nomesDosRegistros } from "@/modulos/stakeholders/consultas";
@@ -61,6 +66,9 @@ async function DetalheProjetoTema({ params }: Pick<PageProps<"/projetos-temas/[i
     opcoesStakeholders(banco),
   ]);
   const nomes = await nomesDosRegistros(banco, idsCitadosNoHistorico(historico));
+  const usuario = await obterUsuarioAtual(banco);
+  const permissao = await permissaoNoContexto(banco, usuario.id, id);
+  const fichas = permissao.ver ? await fichasDoContexto(banco, id) : [];
   const arquivado = projeto.arquivadoEm !== null;
   const tipo = ROTULOS_TIPO_PROJETO_TEMA[projeto.tipo];
   // O comitê principal e os que já participam não podem ser incluídos de novo.
@@ -212,6 +220,8 @@ async function DetalheProjetoTema({ params }: Pick<PageProps<"/projetos-temas/[i
         )}
       </section>
 
+      <SecaoAvaliacoes projetoTemaId={id} fichas={fichas} podeVer={permissao.ver} />
+
       <section aria-labelledby="titulo-historico" className={classeCartao}>
         <h2 id="titulo-historico" className="mb-4 text-lg font-semibold">
           Histórico de alterações
@@ -219,6 +229,63 @@ async function DetalheProjetoTema({ params }: Pick<PageProps<"/projetos-temas/[i
         <ListaHistorico registros={historico} nomes={nomes} perspectiva="projeto" />
       </section>
     </div>
+  );
+}
+
+/** Situação da avaliação de cada stakeholder do contexto, com acesso à ficha e à matriz. */
+function SecaoAvaliacoes({
+  projetoTemaId,
+  fichas,
+  podeVer,
+}: {
+  projetoTemaId: string;
+  fichas: FichaParaMatriz[];
+  podeVer: boolean;
+}) {
+  return (
+    <section aria-labelledby="titulo-avaliacoes" className={classeCartao}>
+      <div className="mb-1 flex flex-wrap items-baseline justify-between gap-2">
+        <h2 id="titulo-avaliacoes" className="text-lg font-semibold">
+          Avaliações estratégicas
+        </h2>
+        {podeVer && (
+          <Link href={`/projetos-temas/${projetoTemaId}/matriz`} className={classeLink}>
+            Abrir a matriz de poder × interesse
+          </Link>
+        )}
+      </div>
+      <p className="mb-4 text-sm text-texto-secundario">
+        Demonstração com dados fictícios: resultados não homologados. Visíveis somente a quem tem permissão neste
+        projeto ou tema.
+      </p>
+      {!podeVer ? (
+        <p className="text-sm text-texto-secundario">Você não tem permissão para ver as avaliações deste contexto.</p>
+      ) : fichas.length === 0 ? (
+        <p className="text-sm text-texto-secundario">Associe stakeholders para poder avaliá-los.</p>
+      ) : (
+        <ul className="flex flex-col divide-y divide-borda text-sm">
+          {fichas.map((f) => (
+            <li key={f.stakeholderId} className="flex flex-wrap items-center justify-between gap-2 py-2">
+              <Link href={`/projetos-temas/${projetoTemaId}/avaliacoes/${f.stakeholderId}`} className={classeLink}>
+                {f.nome}
+              </Link>
+              <span className="flex flex-wrap items-center gap-2 text-texto-secundario">
+                {f.vigente ? (
+                  <>
+                    <SeloPosicionamento posicionamento={f.vigente.posicionamento} />
+                    <span className="text-xs">versão {f.vigente.numeroVersao}</span>
+                  </>
+                ) : (
+                  <span>Não avaliado</span>
+                )}
+                {f.temRascunho && <SeloSituacao tom="aviso">Rascunho</SeloSituacao>}
+                {!f.associado && <SeloSituacao tom="neutro">Associação encerrada</SeloSituacao>}
+              </span>
+            </li>
+          ))}
+        </ul>
+      )}
+    </section>
   );
 }
 

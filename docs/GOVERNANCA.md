@@ -38,6 +38,8 @@ flowchart TD
 
 Inicialmente existirá apenas o Administrador. ✅ As permissões são concedidas por projeto ou tema. ✅
 
+Na Etapa 2A foram criadas a tabela de permissões por contexto e as verificações no servidor, com testes de autorização (D-034). **A segurança multiusuário ainda não foi homologada**: não há autenticação real (Etapa 5) nem regras de segurança no próprio banco de dados.
+
 ## 4. Titularidade provisória ✅
 
 Conforme o README:

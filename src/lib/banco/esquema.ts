@@ -15,7 +15,9 @@ import {
   date,
   foreignKey,
   index,
+  integer,
   jsonb,
+  numeric,
   pgEnum,
   pgTable,
   text,
@@ -82,6 +84,35 @@ export const operacaoAuditoria = pgEnum("operacao_auditoria", [
   "reativacao",
   "exclusao",
 ]);
+
+// Avaliação estratégica (Etapa 2A). Critérios, escalas e pesos institucionais
+// ainda não foram homologados: as tabelas só guardam a estrutura (D-032, D-034).
+
+export const situacaoMetodologia = pgEnum("situacao_metodologia", ["rascunho", "vigente", "encerrada"]);
+
+export const dimensaoCriterio = pgEnum("dimensao_criterio", ["poder", "interesse"]);
+
+export const situacaoVersaoAvaliacao = pgEnum("situacao_versao_avaliacao", [
+  "rascunho",
+  "vigente",
+  "substituida",
+]);
+
+/** Cinco níveis do Manual V2.0; "não avaliado" é a ausência de valor, nunca um nível. */
+export const posicionamento = pgEnum("posicionamento", [
+  "favoravel",
+  "parcialmente_favoravel",
+  "neutro",
+  "parcialmente_contrario",
+  "contrario",
+]);
+
+/** Três níveis aprovados (D-034); a classificação é feita pelo avaliador, sem regra automática. */
+export const grauConfianca = pgEnum("grau_confianca", ["alto", "medio", "baixo"]);
+
+export const tipoEvidencia = pgEnum("tipo_evidencia", ["documento", "link", "observacao"]);
+
+export const perfilContexto = pgEnum("perfil_contexto", ["gestor", "colaborador", "leitor"]);
 
 // --- Acesso e auditoria ------------------------------------------------------
 
@@ -395,5 +426,184 @@ export const stakeholderContexto = pgTable(
       .where(sql`${t.dataFim} is null and ${t.arquivadoEm} is null`),
     index("stakeholder_contexto_projeto_idx").on(t.projetoTemaId),
     index("stakeholder_contexto_stakeholder_idx").on(t.stakeholderId),
+  ],
+);
+
+// --- Avaliação estratégica de stakeholders (Etapa 2A) ------------------------
+
+/**
+ * Versões da metodologia de avaliação. Enquanto os critérios institucionais
+ * não forem homologados, só existem metodologias de demonstração, com
+ * `homologada` = false e resultados marcados como não homologados.
+ */
+export const metodologiaVersao = pgTable(
+  "metodologia_versao",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    nome: text("nome").notNull().unique("metodologia_versao_nome_unico"),
+    descricao: text("descricao"),
+    situacao: situacaoMetodologia("situacao").notNull().default("rascunho"),
+    homologada: boolean("homologada").notNull().default(false),
+    vigenteDesde: date("vigente_desde"),
+    vigenteAte: date("vigente_ate"),
+    ...colunasControle(),
+  },
+  (t) => [
+    uniqueIndex("metodologia_vigente_unica").on(t.situacao).where(sql`${t.situacao} = 'vigente'`),
+    check(
+      "metodologia_versao_datas",
+      sql`${t.vigenteDesde} is null or ${t.vigenteAte} is null or ${t.vigenteAte} >= ${t.vigenteDesde}`,
+    ),
+  ],
+);
+
+/** Critérios de poder e de interesse de uma versão da metodologia. */
+export const criterioAvaliacao = pgTable(
+  "criterio_avaliacao",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    metodologiaVersaoId: uuid("metodologia_versao_id")
+      .notNull()
+      .references(() => metodologiaVersao.id),
+    dimensao: dimensaoCriterio("dimensao").notNull(),
+    nome: text("nome").notNull(),
+    descricao: text("descricao"),
+    escalaMinima: integer("escala_minima").notNull(),
+    escalaMaxima: integer("escala_maxima").notNull(),
+    peso: numeric("peso", { precision: 8, scale: 4, mode: "number" }),
+    ordem: integer("ordem").notNull().default(0),
+    ...colunasControle(),
+  },
+  (t) => [
+    unique("criterio_avaliacao_nome_unico").on(t.metodologiaVersaoId, t.dimensao, t.nome),
+    check("criterio_avaliacao_escala", sql`${t.escalaMaxima} > ${t.escalaMinima}`),
+    check("criterio_avaliacao_peso", sql`${t.peso} is null or ${t.peso} >= 0`),
+  ],
+);
+
+/** Ficha: reúne as versões da avaliação de um stakeholder em um projeto ou tema. */
+export const avaliacao = pgTable(
+  "avaliacao",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    stakeholderId: uuid("stakeholder_id")
+      .notNull()
+      .references(() => stakeholder.id),
+    projetoTemaId: uuid("projeto_tema_id")
+      .notNull()
+      .references(() => projetoTema.id),
+    ...colunasControle(),
+  },
+  (t) => [
+    unique("avaliacao_stakeholder_contexto_unica").on(t.stakeholderId, t.projetoTemaId),
+    index("avaliacao_projeto_idx").on(t.projetoTemaId),
+  ],
+);
+
+/**
+ * Cada versão é uma avaliação completa. Nasce como rascunho; ao ser publicada
+ * torna-se a vigente e não pode mais ser alterada (só passar a "substituída").
+ * Poder e interesse ficam gravados como resultado na escala de 0 a 100.
+ */
+export const avaliacaoVersao = pgTable(
+  "avaliacao_versao",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    avaliacaoId: uuid("avaliacao_id")
+      .notNull()
+      .references(() => avaliacao.id),
+    numeroVersao: integer("numero_versao").notNull(),
+    situacao: situacaoVersaoAvaliacao("situacao").notNull().default("rascunho"),
+    metodologiaVersaoId: uuid("metodologia_versao_id").references(() => metodologiaVersao.id),
+    poder: numeric("poder", { precision: 6, scale: 2, mode: "number" }),
+    interesse: numeric("interesse", { precision: 6, scale: 2, mode: "number" }),
+    posicionamento: posicionamento("posicionamento"),
+    grauConfianca: grauConfianca("grau_confianca"),
+    justificativaConfianca: text("justificativa_confianca"),
+    justificativa: text("justificativa"),
+    validacaoInstitucional: text("validacao_institucional"),
+    dataReferencia: date("data_referencia"),
+    proximaRevisao: date("proxima_revisao"),
+    avaliadorId: uuid("avaliador_id").references(() => usuario.id),
+    publicadaEm: timestamp("publicada_em", { withTimezone: true }),
+    ...colunasControle(),
+  },
+  (t) => [
+    unique("avaliacao_versao_numero_unico").on(t.avaliacaoId, t.numeroVersao),
+    uniqueIndex("avaliacao_versao_vigente_unica")
+      .on(t.avaliacaoId)
+      .where(sql`${t.situacao} = 'vigente'`),
+    uniqueIndex("avaliacao_versao_rascunho_unico")
+      .on(t.avaliacaoId)
+      .where(sql`${t.situacao} = 'rascunho' and ${t.arquivadoEm} is null`),
+    check("avaliacao_versao_poder", sql`${t.poder} is null or (${t.poder} >= 0 and ${t.poder} <= 100)`),
+    check(
+      "avaliacao_versao_interesse",
+      sql`${t.interesse} is null or (${t.interesse} >= 0 and ${t.interesse} <= 100)`,
+    ),
+  ],
+);
+
+/** Nota de cada critério numa versão de avaliação. */
+export const avaliacaoNotaCriterio = pgTable(
+  "avaliacao_nota_criterio",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    avaliacaoVersaoId: uuid("avaliacao_versao_id")
+      .notNull()
+      .references(() => avaliacaoVersao.id),
+    criterioAvaliacaoId: uuid("criterio_avaliacao_id")
+      .notNull()
+      .references(() => criterioAvaliacao.id),
+    nota: numeric("nota", { precision: 6, scale: 2, mode: "number" }).notNull(),
+    justificativa: text("justificativa"),
+    ...colunasControle(),
+  },
+  (t) => [unique("avaliacao_nota_criterio_unica").on(t.avaliacaoVersaoId, t.criterioAvaliacaoId)],
+);
+
+/** Fundamentos de uma versão de avaliação; exigidos para publicar (Manual V2.0). */
+export const evidencia = pgTable(
+  "evidencia",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    avaliacaoVersaoId: uuid("avaliacao_versao_id")
+      .notNull()
+      .references(() => avaliacaoVersao.id),
+    tipo: tipoEvidencia("tipo").notNull(),
+    descricao: text("descricao").notNull(),
+    fonte: text("fonte"),
+    url: text("url"),
+    dataEvidencia: date("data_evidencia"),
+    ...colunasControle(),
+  },
+  (t) => [
+    check("evidencia_descricao_preenchida", sql`length(trim(${t.descricao})) > 0`),
+    index("evidencia_versao_idx").on(t.avaliacaoVersaoId),
+  ],
+);
+
+/**
+ * Permissões por projeto ou tema (D-008). Estrutura preparada e testada na
+ * Etapa 2A; a segurança multiusuário só será homologada com a autenticação.
+ */
+export const permissaoContexto = pgTable(
+  "permissao_contexto",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    usuarioId: uuid("usuario_id")
+      .notNull()
+      .references(() => usuario.id),
+    projetoTemaId: uuid("projeto_tema_id")
+      .notNull()
+      .references(() => projetoTema.id),
+    perfil: perfilContexto("perfil").notNull(),
+    validaAte: date("valida_ate"),
+    ...colunasControle(),
+  },
+  (t) => [
+    uniqueIndex("permissao_contexto_unica")
+      .on(t.usuarioId, t.projetoTemaId)
+      .where(sql`${t.arquivadoEm} is null`),
   ],
 );

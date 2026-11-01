@@ -23,6 +23,11 @@ const MODULOS = [
     titulo: "Instituições",
     descricao: "Órgãos, empresas, entidades e demais instituições, com sua hierarquia.",
   },
+  {
+    href: "/metodologias",
+    titulo: "Metodologias de avaliação",
+    descricao: "Versões da metodologia de poder e interesse. Por ora, apenas demonstrações não homologadas.",
+  },
 ] as const;
 
 export default function PaginaInicial() {
@@ -41,7 +46,7 @@ export default function PaginaInicial() {
         </p>
 
         <p className="mt-8 border-t border-borda pt-6 text-sm text-texto-secundario">
-          Esta aplicação está em desenvolvimento (Etapa 1.1 — Projetos, temas e contextos). O ambiente de
+          Esta aplicação está em desenvolvimento (Etapa 2A — avaliação estratégica com metodologia de demonstração, não homologada). O ambiente de
           testes utiliza exclusivamente dados fictícios.
         </p>
       </section>

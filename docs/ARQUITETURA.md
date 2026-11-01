@@ -6,6 +6,7 @@
 | 0.2 | 31/10/2026 | Etapa 1: banco de desenvolvimento (PGlite), acesso a dados (Drizzle ORM) e Cadastro Mestre |
 | 0.3 | 01/11/2026 | Revisão de homologação: trava do banco local, proteção de produção e contatos |
 | 0.4 | 01/11/2026 | Etapa 1.1: telas de comitês, projetos e temas (módulo `projetos-temas`) |
+| 0.5 | 01/11/2026 | Etapa 2A: avaliações estratégicas (módulo `avaliacoes`) e permissões por contexto, ainda não homologadas |
 
 Legenda: ✅ Aprovado · 🔧 Proposta técnica · ⏳ Pendente.
 
@@ -97,7 +98,8 @@ crm-estrategico-es-em-acao/
 │   │   ├── layout.tsx        Moldura comum: cabeçalho, menu e rodapé
 │   │   ├── page.tsx          Página inicial
 │   │   ├── comites/          Lista e detalhe dos comitês (somente consulta)
-│   │   ├── projetos-temas/   Lista com filtros, inclusão, detalhe e edição de projetos e temas
+│   │   ├── projetos-temas/   Projetos e temas; [id]/avaliacoes (fichas e rascunhos) e [id]/matriz
+│   │   ├── metodologias/     Consulta das metodologias de avaliação
 │   │   ├── pessoas/          Lista, inclusão, detalhe e edição de pessoas
 │   │   ├── instituicoes/     Lista, inclusão, detalhe e edição de instituições
 │   │   ├── not-found.tsx     Página "não encontrado"
@@ -107,6 +109,7 @@ crm-estrategico-es-em-acao/
 │   ├── componentes/          Componentes visuais reutilizáveis (campos, alertas, selos…)
 │   ├── modulos/
 │   │   ├── acesso/           Usuário atual (provisório até a autenticação)
+│   │   ├── avaliacoes/       Avaliação estratégica: cálculo de demonstração, matriz, consultas, ações e telas
 │   │   ├── projetos-temas/   Comitês, projetos, temas e contextos: validações, consultas, ações e componentes
 │   │   └── stakeholders/     Cadastro Mestre: validações, consultas, ações e componentes
 │   └── lib/

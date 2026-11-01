@@ -14,6 +14,10 @@ Os testes conferem, de forma automática e repetível, se o sistema se comporta 
 | `formulario-instituicao.test.tsx` | Formulário de instituição: mantém o que foi digitado após um erro; UF e CNPJ desativados para instituição estrangeira. |
 | `banco-projetos-temas.test.ts` | Regras do banco de projetos, temas e contextos: nome normalizado, nome repetido no mesmo comitê, datas, proibição de exclusão, comitê principal que não é participante (nos dois sentidos), participações e associações vigentes únicas, filtro por comitê, ausência de campos de poder ou interesse e histórico. |
 | `validacao-projetos-temas.test.ts` | Validações de projeto ou tema, participação e associação; nomes legíveis no histórico; listas da tela iguais às do banco. |
+| `banco-avaliacoes.test.ts` | Regras do banco da avaliação estratégica: ficha só para stakeholder associado, exigências da publicação, cálculo gravado, "não avaliado" nunca é zero, validação institucional, versões imutáveis, histórico e independência entre contextos, rascunho único, metodologias e notas. |
+| `permissoes.test.ts` | Autorização por contexto com usuários fictícios: administrador, gestor, colaborador, leitor, sem permissão, permissão vencida ou arquivada e usuário inativo. |
+| `calculo-avaliacoes.test.ts` | Cálculo de demonstração, tendência, classificação da matriz (vigente, histórica, reavaliação, sem pontuação, não avaliados), validações e listas iguais às do banco. |
+| `formulario-rascunho.test.tsx` | Formulário de avaliação: "não avaliado" e "sem nota" como padrão, validação institucional para instituições e valores mantidos após recusa. |
 | `formulario-projeto-tema.test.tsx` | Formulário de projeto ou tema com alerta de nome parecido; formulário de associação com a lista neutra de tipos de relação. |
 
 Ferramentas: [Vitest](https://vitest.dev) e [Testing Library](https://testing-library.com).
