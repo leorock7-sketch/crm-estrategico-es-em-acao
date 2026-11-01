@@ -23,8 +23,8 @@ Legenda: ✅ Aprovado · 🔧 Proposta técnica · ⏳ Pendente.
 |---|---|---|---|
 | 0 | Fundação técnica | Documentação, esqueleto da aplicação, testes básicos | ✅ Aprovada em 31/10/2026 |
 | 1 | Banco de dados de desenvolvimento e Cadastro Mestre | Banco PostgreSQL local, estrutura de comitês e projetos/temas, cadastro de pessoas, instituições e vínculos, com dados fictícios | ✅ **Homologada em 01/11/2026** para desenvolvimento e testes (D-027); pendências C6, C7 e C8 |
-| 1.1 | Projetos, temas e contextos | Telas de comitês, projetos e temas; comitês participantes (D-023); associação de stakeholders aos contextos, sem avaliação de poder × interesse | 🔧 Entregue para revisão (D-030), branch `feature/projetos-temas` |
-| 2 | Avaliações e matriz de poder × interesse | Fichas e versões de avaliação, evidências, matriz por contexto. Depende de Q-01 a Q-07 | 🔧 |
+| 1.1 | Projetos, temas e contextos | Telas de comitês, projetos e temas; comitês participantes (D-023); associação de stakeholders aos contextos, sem avaliação de poder × interesse | ✅ **Homologada em 01/11/2026** para desenvolvimento com dados fictícios (D-031); Pull Request #1 |
+| 2 | Avaliações e matriz de poder × interesse | Fichas e versões de avaliação, evidências, matriz por contexto. Depende de Q-01 a Q-07 e Q-60 | ✅ Etapa 2A (metodologia) autorizada para planejamento (D-032); implementação depende da aprovação do plano |
 | 3 | Iniciativas, interações e compromissos | Matriz de iniciativas, registro único de reuniões, encaminhamentos e prazos | 🔧 |
 | 4 | Plano de ação e matriz de riscos | Versões e aprovação, acompanhamento, riscos, gatilhos e respostas | 🔧 |
 | 5 | Autenticação e permissões | Supabase Auth, perfis e permissões por projeto/tema, segurança no banco. Depende de Q-50 | 🔧 |
@@ -143,9 +143,11 @@ Dar telas aos comitês, projetos e temas e registrar quem se relaciona com cada 
 | Dados fictícios: 2 projetos e 2 temas (comando `npm run banco:exemplos`) | Concluída; em banco novo, 16 associações de stakeholders |
 | Testes automatizados | Executados e aprovados em 01/11/2026: tipos, qualidade e compilação sem erros; 91 de 91 testes (67 anteriores e 24 novos) |
 | Verificação no navegador (versão compilada, dados fictícios) | Executada em 01/11/2026. Encontrou um erro na lista de comitês (consulta com coluna ambígua), corrigido e coberto por teste; depois, todas as telas e regras verificadas, sem erros no servidor |
-| Aprovação do gestor | Aguardando revisão |
+| Aprovação do gestor | Homologada em 01/11/2026, para desenvolvimento com dados fictícios (D-031) |
 
 Ficaram de fora, conforme o plano: matriz de poder × interesse, avaliações, alteração de comitês, C6, C7 e C8, hospedagem e dados reais.
+
+**Homologação (D-031):** Etapa 1.1 homologada em 01/11/2026 (commit `9c030e8`, Pull Request #1), para o ambiente de desenvolvimento com dados fictícios. Antes da incorporação à `main`: Pull Request correspondente ao commit homologado, sem conflitos e com as verificações aprovadas; merge não automático. C6, C7 e C8 continuam pendentes (D-027).
 
 ### Critérios de aceite
 
