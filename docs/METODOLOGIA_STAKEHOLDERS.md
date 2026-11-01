@@ -6,6 +6,7 @@
 | 0.2 | 01/11/2026 | Etapa 2A: decisões do Manual V2.0 e da D-034 incorporadas; estrutura implementada com metodologia de **demonstração**. Critérios, escalas, pesos, fórmula e pontos de corte institucionais continuam **não definidos**. |
 | 0.3 | 01/11/2026 | Grau de confiança aprovado (D-036), metodologia institucional comum (D-037) e "Conduta do ES em Ação" como requisito futuro (D-038). |
 | 0.4 | 01/11/2026 | Procedimento de revisão dos seis critérios originais aprovado (D-042). |
+| 0.5 | 01/11/2026 | Posicionamento preservado (D-048), dimensões distintas (D-049), estudo de escalas (D-050) e matriz em quatro camadas (D-051). |
 
 Legenda: ✅ Aprovado · 🔧 Proposta técnica · ⏳ Pendente.
 
@@ -43,6 +44,19 @@ Legenda: ✅ Aprovado · 🔧 Proposta técnica · ⏳ Pendente.
 | **Validação institucional** | Obrigatória para publicar posicionamento de uma instituição. | ✅ (Manual V2.0) |
 | **Data de referência e próxima revisão** | A próxima revisão é marcada para um ano após a data de referência, sem prejuízo de reavaliação por evento relevante. | ✅ (Manual V2.0) |
 | **Tendência** | Comparação do posicionamento com a versão anterior (o posicionamento não depende da metodologia). | ✅ (Manual V2.0) / 🔧 forma de exibição |
+
+### 3.1 Dimensões distintas da avaliação ✅ (D-048, D-049)
+
+| Dimensão | Definição |
+|---|---|
+| Poder / influência | Capacidade de afetar decisões, resultados ou condições de execução de um projeto. |
+| Interesse | Grau de relevância e atenção que o projeto desperta no stakeholder, independentemente de sua posição favorável ou contrária. |
+| Posicionamento | Orientação favorável, neutra ou contrária, na escala de cinco categorias do Manual V2.0, preservada integralmente; "não avaliado" é distinto. |
+| Engajamento | Intensidade e natureza da participação ou do envolvimento, que não corresponde necessariamente a apoio. |
+| Confiança da avaliação | Robustez das informações e evidências que fundamentam a classificação (seção 4). |
+| Conduta do ES em Ação | Estratégia institucional de relacionamento ou atuação diante do stakeholder (RF-28). |
+
+Essas dimensões não se confundem nem se substituem. A classificação binária das planilhas históricas não substitui a escala de posicionamento. O engajamento ainda não é campo do CRM: sua forma de registro depende da decisão Q-65.3.
 
 ## 4. Grau de confiança ✅ (D-036)
 
@@ -119,6 +133,10 @@ Análise que fundamentou a decisão:
 
 
 
+### 5.5 Mensuração de poder e interesse — alternativas em estudo 🔧 (D-050)
+
+Em comparação: (A) binário Alto/Baixo, referência do histórico; (B) ordinal de cinco níveis (muito baixo a muito alto), com definições objetivas por nível; (C) quantitativo normalizado (por exemplo, 0 a 100) a partir de critérios ponderados — apenas alternativa de estudo. O relatório técnico de 01/11/2026, entregue ao gestor fora deste repositório, compara as três quanto a vantagens, limitações, informação exigida, complexidade, subjetividade e comparabilidade, e avalia se mais granularidade traz informação útil ou só aparência de precisão. Regras já fixadas: as avaliações históricas binárias são preservadas sem conversão para escalas mais precisas, e os quadrantes continuam disponíveis. Decisão pendente (Q-65.2).
+
 ## 6. Matriz de poder × interesse
 
 | Item | Situação |
@@ -133,6 +151,8 @@ Análise que fundamentou a decisão:
 | Filtros por comitê, período e responsável, em visão agregada. | ⏳ Etapa de painéis |
 
 Modelo de referência (não aprovado): quatro quadrantes de Mendelow — manter satisfeito, gerenciar de perto, monitorar, manter informado.
+
+Estrutura em quatro camadas ✅ (D-051): (1) poder × interesse, com posição contínua e quadrantes; (2) posicionamento; (3) engajamento e confiança; (4) conduta institucional, decidida pelo responsável e nunca preenchida automaticamente. Assim, stakeholders com influência e interesse elevados, mas posicionamentos opostos, aparecem no mesmo quadrante com leituras e condutas diferentes.
 
 ## 7. Fluxo de avaliação ✅ / 🔧
 
@@ -156,6 +176,6 @@ As avaliações só são visíveis a quem tem permissão no projeto ou tema: adm
 | Q-06 | Pesos entre critérios e fórmula institucional. |
 | Q-60 | Planilhas originais de qualificação de stakeholders (a planilha analisada não contém os critérios). |
 | Q-64 | Categorias da "Conduta do ES em Ação" e regras de correspondência com os quadrantes. |
-| Q-65 | Decisões para homologar a metodologia original (inventário de 01/11/2026, entregue fora do repositório). |
+| Q-65 | Seis decisões para homologação individual (relatório técnico de 01/11/2026, fora do repositório): estrutura conceitual dos elementos históricos; escala de poder e interesse; engajamento; posição no ecossistema e relacionamento; resultados derivados; tratamento do histórico e versão oficial das planilhas. |
 
 Resolvidas: Q-03 (grau de confiança: robustez da evidência, três níveis — D-034), Q-04 (cinco níveis de posicionamento — Manual V2.0), Q-07 (estrutura com metodologia de demonstração e dados fictícios antes da homologação — D-034) e Q-08 (revisão anual e por evento relevante — Manual V2.0); Q-61 (grau de confiança — D-036) e Q-62 (metodologia comum, com arquitetura para metodologias específicas — D-037). Consolidação em [REGISTRO_DECISOES.md](REGISTRO_DECISOES.md).

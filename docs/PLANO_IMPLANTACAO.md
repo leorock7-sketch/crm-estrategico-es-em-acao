@@ -8,6 +8,7 @@
 | 0.4 | 01/11/2026 | Aprovação funcional da Etapa 2A (D-035), decisões D-036 a D-040 e consolidação das pendências |
 | 0.5 | 01/11/2026 | Verificação automática no GitHub Actions (D-041), plano de revisão metodológica (D-042) e fluxo dos Pull Requests (D-043) |
 | 0.6 | 01/11/2026 | Correção da normalização (D-044), proteção da `main` (D-045) e inventário metodológico (D-046) |
+| 0.7 | 01/11/2026 | Homologação da Etapa 1.1 (D-047), providências concluídas (D-052) e relatório técnico de revisão metodológica (D-050) |
 
 Legenda: ✅ Aprovado · 🔧 Proposta técnica · ⏳ Pendente.
 
@@ -27,9 +28,9 @@ Legenda: ✅ Aprovado · 🔧 Proposta técnica · ⏳ Pendente.
 |---|---|---|---|
 | 0 | Fundação técnica | Documentação, esqueleto da aplicação, testes básicos | ✅ Aprovada em 31/10/2026 |
 | 1 | Banco de dados de desenvolvimento e Cadastro Mestre | Banco PostgreSQL local, estrutura de comitês e projetos/temas, cadastro de pessoas, instituições e vínculos, com dados fictícios | ✅ **Homologada em 01/11/2026** para desenvolvimento e testes (D-027); pendências C6, C7 e C8 |
-| 1.1 | Projetos, temas e contextos | Telas de comitês, projetos e temas; comitês participantes (D-023); associação de stakeholders aos contextos, sem avaliação de poder × interesse | ✅ **Homologada em 01/11/2026** para desenvolvimento com dados fictícios (D-031); Pull Request #1 |
+| 1.1 | Projetos, temas e contextos | Telas de comitês, projetos e temas; comitês participantes (D-023); associação de stakeholders aos contextos, sem avaliação de poder × interesse | ✅ **Homologada em 01/11/2026** para desenvolvimento com dados fictícios (D-031, D-047, incluindo a correção de normalização); Pull Request #1 com incorporação manual autorizada |
 | 2A | Metodologia e estrutura da avaliação estratégica | Fichas e versões, evidências, posicionamento, grau de confiança, permissões e matriz com metodologia de demonstração e dados fictícios | ✅ **Aprovada funcionalmente em 01/11/2026** para desenvolvimento e testes com dados fictícios, condicionada à revisão do Pull Request (D-035); branch `feature/avaliacao-stakeholders` |
-| 2B | Metodologia institucional e cálculos definitivos | Critérios, escalas, pesos, fórmula e pontos de corte homologados. Depende de Q-01, Q-02, Q-05, Q-06 e Q-60 | ⏳ Cálculos só após a revisão e homologação dos seis critérios (D-040); próxima atividade: análise da planilha de Qualificação (Consolidado) |
+| 2B | Metodologia institucional e cálculos definitivos | Critérios, escalas, pesos, fórmula e pontos de corte homologados. Depende de Q-01, Q-02, Q-05, Q-06 e Q-60 | ⏳ Relatório técnico de revisão metodológica entregue (D-046, D-050); cálculos definitivos aguardam a homologação das decisões Q-65 |
 | 3 | Iniciativas, interações e compromissos | Matriz de iniciativas, registro único de reuniões, encaminhamentos e prazos | 🔧 |
 | 4 | Plano de ação e matriz de riscos | Versões e aprovação, acompanhamento, riscos, gatilhos e respostas | 🔧 |
 | 5 | Autenticação e permissões | Supabase Auth, perfis e permissões por projeto/tema, segurança no banco. Depende de Q-50 | 🔧 |
@@ -215,11 +216,11 @@ Ficaram de fora, conforme a D-034: critérios, pesos, fórmula e pontos de corte
 | C7. Cópia de segurança e restauração | Etapas 7 e 8 (D-027) | Planejada |
 | C8. Portabilidade em PostgreSQL real | Etapas 7 e 8 (D-027) | Depende de autorização (Q-57) |
 | Autenticação e segurança multiusuário (inclusive regras de acesso no banco) | Uso por mais de uma pessoa; Etapas 7 e 8 | Etapa 5; estrutura de permissões preparada na 2A, não homologada |
-| Seis critérios originais, escalas, pesos, fórmula e pontos de corte | Etapa 2B (D-040) | Inventário da planilha de Qualificação concluído em 01/11/2026 e entregue fora do repositório (D-046); aguardando as decisões de homologação (Q-65) |
+| Seis critérios originais, escalas, pesos, fórmula e pontos de corte | Etapa 2B (D-040) | Inventário e relatório técnico de revisão metodológica entregues fora do repositório (D-046, D-050); aguardando a manifestação do gestor sobre as seis decisões Q-65 |
 | Conduta do ES em Ação | Requisito futuro RF-28 | Categorias e regras de correspondência a definir (Q-64) |
 | Verificação automática no GitHub Actions | — | ✅ Implementada (D-041): Node.js 24 e 26, a cada Pull Request e atualização da `main` |
-| Proteção da `main` (verificações obrigatórias antes do merge) | — | Instruções entregues; configuração pelo administrador na interface do GitHub (D-045) |
-| Revisão e incorporação dos Pull Requests das Etapas 1.1 e 2A | Base correta da Etapa 2A | Etapa 1.1: PR #1 com a correção da normalização (D-044) e verificação automática aprovada em Node.js 24 e 26, pronto para o merge manual; Etapa 2A: PR a abrir com base `main` após o merge do PR #1 (D-043) |
+| Proteção da `main` (verificações obrigatórias antes do merge) | — | ✅ Configurada pelo administrador e conferida (D-045, D-052) |
+| Revisão e incorporação dos Pull Requests das Etapas 1.1 e 2A | Base correta da Etapa 2A | Etapa 1.1 homologada (D-047): PR #1 sem conflitos e com verificações aprovadas, aguardando a incorporação manual pelo gestor; Etapa 2A: PR a abrir com base na `main` atualizada após a confirmação (D-043, D-047) |
 | Análise LGPD, retenção e anonimização | Etapa 8 | Q-13, Q-58 |
 
 ## 8. Local de trabalho ✅ (D-019)
