@@ -172,7 +172,7 @@ Regras de organização:
 | Limites conhecidos da auditoria: responsável informado pela aplicação; `TRUNCATE` não bloqueado; o dono do banco pode desativar gatilhos; cópias integrais de dados pessoais. | ⏳ Reforço planejado (C6) e identificação real na etapa de autenticação |
 | Validação de todos os dados no servidor, inclusive endereços de site (somente http e https). | 🔧 (implementado na Etapa 1) |
 | Princípio do menor privilégio: cada usuário acessa apenas os contextos de que precisa. | 🔧 |
-| Proteção da branch `main` no GitHub. | 🔧 |
+| Proteção da branch `main` no GitHub: verificações automáticas obrigatórias antes do merge, sem exigir outro revisor (D-045). | 🔧 Configuração pelo administrador |
 | Repositório público (D-033): verificação de dados pessoais, informações restritas e segredos antes de cada envio; e-mail *noreply* do GitHub nos commits a partir de 01/11/2026 (D-039). O histórico anterior não é reescrito sem aprovação. | ✅ |
 | Controle de acesso por projeto ou tema nas consultas do servidor, com testes (Etapa 2A). Sem autenticação real nem regras no banco: **segurança multiusuário não homologada**. | 🔧 (D-034) |
 | Verificação automática no GitHub Actions a cada Pull Request e atualização da `main`, com permissões mínimas e sem credenciais (seção 6.1). | ✅ (D-041) |

@@ -7,6 +7,7 @@
 | 0.3 | 01/11/2026 | Homologação da Etapa 1.1 (D-031), repositório público (D-033) e Etapa 2A (D-032, D-034) |
 | 0.4 | 01/11/2026 | Aprovação funcional da Etapa 2A (D-035), decisões D-036 a D-040 e consolidação das pendências |
 | 0.5 | 01/11/2026 | Verificação automática no GitHub Actions (D-041), plano de revisão metodológica (D-042) e fluxo dos Pull Requests (D-043) |
+| 0.6 | 01/11/2026 | Correção da normalização (D-044), proteção da `main` (D-045) e inventário metodológico (D-046) |
 
 Legenda: ✅ Aprovado · 🔧 Proposta técnica · ⏳ Pendente.
 
@@ -214,10 +215,11 @@ Ficaram de fora, conforme a D-034: critérios, pesos, fórmula e pontos de corte
 | C7. Cópia de segurança e restauração | Etapas 7 e 8 (D-027) | Planejada |
 | C8. Portabilidade em PostgreSQL real | Etapas 7 e 8 (D-027) | Depende de autorização (Q-57) |
 | Autenticação e segurança multiusuário (inclusive regras de acesso no banco) | Uso por mais de uma pessoa; Etapas 7 e 8 | Etapa 5; estrutura de permissões preparada na 2A, não homologada |
-| Seis critérios originais, escalas, pesos, fórmula e pontos de corte | Etapa 2B (D-040) | Plano de revisão aprovado (D-042); aguardando a planilha de Qualificação (Q-01, Q-02, Q-05, Q-06, Q-60) |
+| Seis critérios originais, escalas, pesos, fórmula e pontos de corte | Etapa 2B (D-040) | Inventário da planilha de Qualificação concluído em 01/11/2026 e entregue fora do repositório (D-046); aguardando as decisões de homologação (Q-65) |
 | Conduta do ES em Ação | Requisito futuro RF-28 | Categorias e regras de correspondência a definir (Q-64) |
 | Verificação automática no GitHub Actions | — | ✅ Implementada (D-041): Node.js 24 e 26, a cada Pull Request e atualização da `main` |
-| Revisão e incorporação dos Pull Requests das Etapas 1.1 e 2A | Base correta da Etapa 2A | Etapa 1.1: PR #1 aberto, revisado e com a verificação automática executada; Etapa 2A: PR a abrir com base `main` após o merge do PR #1 (D-043) |
+| Proteção da `main` (verificações obrigatórias antes do merge) | — | Instruções entregues; configuração pelo administrador na interface do GitHub (D-045) |
+| Revisão e incorporação dos Pull Requests das Etapas 1.1 e 2A | Base correta da Etapa 2A | Etapa 1.1: PR #1 com a correção da normalização (D-044) e verificação automática aprovada em Node.js 24 e 26, pronto para o merge manual; Etapa 2A: PR a abrir com base `main` após o merge do PR #1 (D-043) |
 | Análise LGPD, retenção e anonimização | Etapa 8 | Q-13, Q-58 |
 
 ## 8. Local de trabalho ✅ (D-019)

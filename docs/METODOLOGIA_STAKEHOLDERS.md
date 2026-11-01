@@ -101,7 +101,7 @@ Procedimento aprovado ✅ (D-042), a partir da planilha de Qualificação, em c�
 8. Aplicabilidade aos três comitês temáticos.
 9. Sensibilidade dos resultados aos pesos e aos pontos de corte.
 
-O que não estiver documentado na planilha é registrado como "não encontrado", nunca preenchido por suposição. O resultado é entregue ao gestor fora deste repositório; as recomendações (manter, reformular, fundir ou excluir) são propostas, e nenhum critério é substituído sem aprovação. A homologação dos critérios é condição para a Etapa 2B.
+Situação: inventário da planilha de Qualificação (Consolidado) do Comitê de Infraestrutura realizado em 01/11/2026 e entregue ao gestor fora deste repositório (D-046); as decisões de homologação estão pendentes (Q-65). O que não estiver documentado na planilha é registrado como "não encontrado", nunca preenchido por suposição. O resultado é entregue ao gestor fora deste repositório; as recomendações (manter, reformular, fundir ou excluir) são propostas, e nenhum critério é substituído sem aprovação. A homologação dos critérios é condição para a Etapa 2B.
 
 ### 5.4 Metodologias por comitê ou por contexto ✅ (D-037)
 
@@ -156,5 +156,6 @@ As avaliações só são visíveis a quem tem permissão no projeto ou tema: adm
 | Q-06 | Pesos entre critérios e fórmula institucional. |
 | Q-60 | Planilhas originais de qualificação de stakeholders (a planilha analisada não contém os critérios). |
 | Q-64 | Categorias da "Conduta do ES em Ação" e regras de correspondência com os quadrantes. |
+| Q-65 | Decisões para homologar a metodologia original (inventário de 01/11/2026, entregue fora do repositório). |
 
 Resolvidas: Q-03 (grau de confiança: robustez da evidência, três níveis — D-034), Q-04 (cinco níveis de posicionamento — Manual V2.0), Q-07 (estrutura com metodologia de demonstração e dados fictícios antes da homologação — D-034) e Q-08 (revisão anual e por evento relevante — Manual V2.0); Q-61 (grau de confiança — D-036) e Q-62 (metodologia comum, com arquitetura para metodologias específicas — D-037). Consolidação em [REGISTRO_DECISOES.md](REGISTRO_DECISOES.md).
