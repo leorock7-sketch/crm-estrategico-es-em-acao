@@ -1,0 +1,74 @@
+# Verificação automática do CRM Estratégico ES em Ação (decisão D-041).
+#
+# Em cada Pull Request e em cada atualização da branch main, executa a mesma
+# verificação feita no computador de desenvolvimento: instalação reproduzível
+# das dependências, tipos, qualidade do código, testes automatizados e
+# compilação, no Node.js 24 e 26. Os testes usam somente dados fictícios, em um
+# banco criado na memória.
+#
+# Segurança (guia oficial "Security hardening for GitHub Actions"):
+# - evento pull_request (e não pull_request_target): Pull Requests de terceiros
+#   rodam sem segredos e com permissão somente de leitura;
+# - nenhum segredo ou credencial é usado;
+# - ações fixadas pelo código completo do commit (SHA), com a versão em comentário;
+# - o checkout não guarda a credencial do GitHub no disco;
+# - nenhum dado do evento (título, branch etc.) é usado dentro de comandos.
+# Este fluxo não publica a aplicação e não faz merge.
+
+name: Verificação
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+# Uma nova atualização do mesmo Pull Request cancela a verificação anterior.
+concurrency:
+  group: verificacao-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verificar:
+    name: Node.js ${{ matrix.node }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        node: ["24", "26"]
+    env:
+      NEXT_TELEMETRY_DISABLED: "1"
+    steps:
+      - name: Baixar o código
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Instalar o Node.js ${{ matrix.node }}
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: ${{ matrix.node }}
+          cache: npm
+
+      - name: Instalar as dependências (versões exatas do package-lock.json)
+        run: npm ci
+
+      - name: Verificar tipos, qualidade, testes e compilação
+        run: npm run verificar
+
+      - name: Registrar o resumo no Pull Request
+        if: always()
+        env:
+          RESULTADO: ${{ job.status }}
+          VERSAO_NODE: ${{ matrix.node }}
+        run: |
+          {
+            echo "### Verificação no Node.js $VERSAO_NODE: $RESULTADO"
+            echo ""
+            echo "- Node.js $(node --version), npm $(npm --version)"
+            echo "- Etapas: instalação (npm ci), tipos, qualidade (ESLint), testes (Vitest) e compilação (Next.js)"
+            echo "- Somente dados fictícios; nenhum segredo utilizado; sem publicação nem merge"
+          } >> "$GITHUB_STEP_SUMMARY"
