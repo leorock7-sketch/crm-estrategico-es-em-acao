@@ -14,8 +14,33 @@ export function textoObrigatorio(nomeCampo: string, tamanhoMaximo = 255) {
     });
 }
 
+/** Converte campo de formulário vazio (ou só com espaços) em "ausente". */
+export function vazioParaAusente(valor: unknown) {
+  return typeof valor === "string" && valor.trim() === "" ? undefined : valor;
+}
+
+/** Texto opcional: campo vazio é tratado como ausente; se preenchido, respeita o tamanho máximo. */
+export function textoOpcional(nomeCampo: string, tamanhoMaximo = 255) {
+  return z.preprocess(
+    vazioParaAusente,
+    z
+      .string()
+      .trim()
+      .max(tamanhoMaximo, {
+        error: `${nomeCampo} deve ter no máximo ${tamanhoMaximo} caracteres.`,
+      })
+      .optional(),
+  );
+}
+
 /** E-mail opcional: campo vazio é tratado como ausente; se preenchido, deve ser válido. */
 export const esquemaEmailOpcional = z.preprocess(
-  (valor) => (typeof valor === "string" && valor.trim() === "" ? undefined : valor),
+  vazioParaAusente,
   z.email({ error: "E-mail inválido." }).optional(),
+);
+
+/** Data opcional no formato do campo de data do navegador (AAAA-MM-DD). */
+export const esquemaDataOpcional = z.preprocess(
+  vazioParaAusente,
+  z.iso.date({ error: "Data inválida." }).optional(),
 );

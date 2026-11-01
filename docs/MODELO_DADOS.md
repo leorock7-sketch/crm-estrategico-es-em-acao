@@ -3,6 +3,7 @@
 | Versão | Data | Situação |
 |---|---|---|
 | 0.1 | 31/10/2026 | Modelo lógico inicial para revisão. Nenhuma tabela foi criada. |
+| 0.2 | 31/10/2026 | Etapa 1: decisões D-020 e D-021 incorporadas; as 8 tabelas da seção 9 foram criadas no banco de desenvolvimento. |
 
 Legenda: ✅ Aprovado · 🔧 Proposta técnica · ⏳ Pendente (ver [REQUISITOS.md](REQUISITOS.md#como-ler-este-documento)).
 
@@ -54,7 +55,6 @@ Os diagramas abaixo são desenhados automaticamente pelo GitHub. Nos diagramas, 
 erDiagram
     comite |o--o{ comite : "subordina"
     comite ||--o{ projeto_tema : "é responsável por"
-    projeto_tema |o--o{ projeto_tema : "agrupa"
     stakeholder ||--o| pessoa : "é uma"
     stakeholder ||--o| instituicao : "é uma"
     pessoa ||--o{ vinculo_pessoa_instituicao : "possui"
@@ -176,8 +176,7 @@ Projetos e temas estratégicos, que são os **contextos** das avaliações e das
 | `tipo` | lista: `projeto`, `tema` | | Sim | |
 | `nome` | texto | | Sim | |
 | `descricao` | texto longo | | Não | |
-| `comite_id` | UUID | FK → `comite.id` | Sim | Comitê responsável |
-| `projeto_tema_pai_id` | UUID | FK → `projeto_tema.id` | Não | Agrupamento opcional ⏳ |
+| `comite_id` | UUID | FK → `comite.id` | Sim | Único comitê responsável ✅ (D-020) |
 | `situacao` | lista | | Sim | Proposta: `proposto`, `ativo`, `suspenso`, `concluido` 🔧 |
 | `data_inicio`, `data_fim` | data | | Não | |
 | `responsavel_id` | UUID | FK → `usuario.id` | Não | |
@@ -187,7 +186,7 @@ Cardinalidades: comitê 1:N projeto_tema; projeto_tema 1:N avaliações, planos,
 Regras de integridade:
 - UK (`comite_id`, `tipo`, `nome`): não repetir nome de projeto ou tema no mesmo comitê. 🔧
 - `data_fim` ≥ `data_inicio`. 🔧
-- Projetos ligados a mais de um comitê: ⏳ (se aprovado, cria-se tabela de ligação `projeto_tema_comite`).
+- Cada projeto ou tema tem um único comitê responsável, e não há hierarquia entre temas e projetos. ✅ (D-020) Se no futuro isso mudar, cria-se uma tabela de ligação `projeto_tema_comite`, sem perda de dados.
 
 ### 6.2 Cadastro Mestre ✅ (global; pessoas e instituições separadas)
 
@@ -212,8 +211,9 @@ Regras de integridade:
 | `email` | texto | UK quando preenchido | Não | |
 | `telefone` | texto | | Não | |
 | `observacoes` | texto longo | | Não | |
+| `nome_normalizado` | texto | | Sim | Campo técnico: nome sem acentos e em minúsculas, usado na busca e no alerta de duplicidade 🔧 |
 
-Dados pessoais adicionais (CPF, data de nascimento, endereço) **não** estão previstos, em respeito ao princípio de minimização da LGPD. ⏳ Revisar após análise jurídica.
+Somente dados mínimos. ✅ (D-021) Dados pessoais adicionais (CPF, data de nascimento, endereço) **não** são registrados. A análise LGPD (Q-13) continua necessária antes do uso de dados reais.
 
 #### `instituicao`
 
@@ -224,7 +224,8 @@ Dados pessoais adicionais (CPF, data de nascimento, endereço) **não** estão p
 | `sigla` | texto | | Não | |
 | `natureza` | lista | | Sim | Proposta: órgão público, empresa, entidade de classe, academia, terceiro setor, imprensa, outra 🔧 ⏳ |
 | `esfera` | lista: `federal`, `estadual`, `municipal`, `nao_se_aplica` | | Não | |
-| `cnpj` | texto (14 dígitos) | UK quando preenchido | Não | |
+| `cnpj` | texto (14 caracteres) | UK quando preenchido | Não | Numérico ou alfanumérico (formato da Receita Federal desde julho de 2026) |
+| `nome_normalizado` | texto | | Sim | Campo técnico para busca e duplicidade 🔧 |
 | `uf`, `municipio` | texto | | Não | |
 | `site` | texto | | Não | |
 | `instituicao_superior_id` | UUID | FK → `instituicao.id` | Não | Ex.: secretaria → governo estadual |
@@ -627,7 +628,7 @@ Preenchida automaticamente pelo banco a cada inclusão, alteração ou arquivame
 | `id` | número sequencial | PK |
 | `tabela` | texto | |
 | `registro_id` | UUID | |
-| `operacao` | lista: `inclusao`, `alteracao`, `arquivamento`, `exclusao` | |
+| `operacao` | lista: `inclusao`, `alteracao`, `arquivamento`, `reativacao`, `exclusao` | |
 | `dados_anteriores`, `dados_novos` | JSON | |
 | `usuario_id` | UUID | FK → `usuario.id` |
 | `ocorrido_em` | data e hora com fuso | |
@@ -649,13 +650,37 @@ Enquanto houver um único administrador, ele vê tudo; as regras acima passam a 
 
 ## 8. Questões de modelagem pendentes ⏳
 
-1. Projeto ou tema pode pertencer a mais de um comitê?
-2. Temas agrupam projetos (hierarquia)?
-3. Escalas de poder e interesse, os seis critérios e seus pesos.
-4. Categorias de posicionamento e significado de "grau de confiança".
-5. Um único plano de ação por projeto/tema ou vários?
-6. Escalas de probabilidade e impacto e fórmula de criticidade.
-7. Visibilidade do Cadastro Mestre para todos os usuários.
-8. Quais dados pessoais podem ser registrados (análise LGPD).
+1. Escalas de poder e interesse, os seis critérios e seus pesos.
+2. Categorias de posicionamento e significado de "grau de confiança".
+3. Um único plano de ação por projeto/tema ou vários?
+4. Escalas de probabilidade e impacto e fórmula de criticidade.
+5. Visibilidade do Cadastro Mestre para todos os usuários.
+6. Análise LGPD dos dados pessoais registrados.
 
-As decisões são acompanhadas em [REGISTRO_DECISOES.md](REGISTRO_DECISOES.md).
+Resolvidas na Etapa 1: comitê por projeto/tema e hierarquia (D-020); dados mínimos de pessoas (D-021). As decisões são acompanhadas em [REGISTRO_DECISOES.md](REGISTRO_DECISOES.md).
+
+## 9. Situação da implementação
+
+| Tabela | Etapa | Situação |
+|---|---|---|
+| `usuario`, `registro_auditoria` | 1 | Criadas no banco de desenvolvimento |
+| `comite` (com os 4 comitês), `projeto_tema` | 1 | Criadas; projetos e temas ainda sem telas |
+| `stakeholder`, `pessoa`, `instituicao`, `vinculo_pessoa_instituicao` | 1 | Criadas, com telas do Cadastro Mestre |
+| Demais tabelas | 2 a 4 | Não criadas |
+
+Onde está cada parte:
+
+- **Estrutura das tabelas:** `src/lib/banco/esquema.ts`.
+- **Scripts SQL (migrations):** `src/lib/banco/migracoes/`.
+  - `0000`: tabelas, chaves e regras;
+  - `0001`: gatilhos de auditoria, de preenchimento automático e de proteção;
+  - `0002`: carga dos 4 comitês.
+- **Regras garantidas por gatilhos** 🔧:
+  - preenchimento automático de quem criou ou alterou cada registro, e quando;
+  - trilha de auditoria a cada inclusão, alteração, arquivamento e reativação, sem registrar alterações que não mudam nenhum dado;
+  - proibição de excluir registros (somente arquivar) e de alterar a auditoria;
+  - comitê temático subordinado apenas ao comitê de desenvolvimento;
+  - hierarquia de instituições sem ciclos;
+  - tipo do stakeholder imutável.
+
+Enquanto não houver login (etapa de autenticação), todas as operações são atribuídas ao usuário fictício "Administrador (desenvolvimento)". 🔧

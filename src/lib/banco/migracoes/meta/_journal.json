@@ -1,0 +1,27 @@
+{
+  "version": "7",
+  "dialect": "postgresql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "7",
+      "when": 1793494133029,
+      "tag": "0000_estrutura_inicial",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1793494146355,
+      "tag": "0001_gatilhos",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1793494150430,
+      "tag": "0002_carga_comites",
+      "breakpoints": true
+    }
+  ]
+}

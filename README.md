@@ -37,9 +37,9 @@ A arquitetura tecnológica inicialmente proposta utiliza Next.js, TypeScript, Po
 
 ## Situação atual
 
-Projeto em fase inicial de estruturação e desenvolvimento — **Etapa 0: Fundação Técnica**.
+Projeto em fase inicial de desenvolvimento — **Etapa 1: Banco de dados de desenvolvimento e Cadastro Mestre**.
 
-Nesta etapa existem apenas a documentação e uma aplicação inicial que exibe a página "CRM Estratégico — ES em Ação — em desenvolvimento". Ainda não há banco de dados, autenticação nem módulos operacionais.
+Já existem a documentação, um banco de dados local de desenvolvimento e as telas do Cadastro Mestre (pessoas, instituições, vínculos e histórico de alterações). Ainda não há autenticação, hospedagem nem os demais módulos.
 
 O ambiente de testes utilizará exclusivamente dados fictícios até que o tratamento de dados institucionais reais seja devidamente autorizado.
 
@@ -112,7 +112,18 @@ Abra o terminal na pasta do projeto e execute, um comando por vez:
 
 Depois abra o navegador em <http://localhost:3000>. Para encerrar, volte ao terminal e pressione `Ctrl + C`.
 
-### 4. Verificações de qualidade
+### 4. Banco de dados local (somente dados fictícios)
+
+Na primeira execução, a aplicação cria sozinha um banco de dados local na pasta `.dados/` do projeto, já com a estrutura das tabelas e os quatro comitês. Essa pasta **não** vai para o GitHub.
+
+Com a aplicação parada (o banco local aceita um programa por vez):
+
+| Comando | O que faz |
+|---|---|
+| `npm run banco:exemplos` | Carrega pessoas e instituições fictícias para testar as telas |
+| `npm run banco:reiniciar` | Apaga o banco local; um banco novo e vazio é criado na próxima execução |
+
+### 5. Verificações de qualidade
 
 | Comando | O que verifica |
 |---|---|
