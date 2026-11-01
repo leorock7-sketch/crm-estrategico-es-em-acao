@@ -21,14 +21,15 @@ Legenda: ✅ Aprovado · 🔧 Proposta técnica · ⏳ Pendente.
 | Etapa | Nome | Conteúdo principal | Situação |
 |---|---|---|---|
 | 0 | Fundação técnica | Documentação, esqueleto da aplicação, testes básicos | ✅ Aprovada em 31/10/2026 |
-| 1 | Banco de dados de desenvolvimento e Cadastro Mestre | Banco PostgreSQL local, estrutura de comitês e projetos/temas, cadastro de pessoas, instituições e vínculos, com dados fictícios | 🔧 |
+| 1 | Banco de dados de desenvolvimento e Cadastro Mestre | Banco PostgreSQL local, estrutura de comitês e projetos/temas, cadastro de pessoas, instituições e vínculos, com dados fictícios | ✅ **Homologada em 01/11/2026** para desenvolvimento e testes (D-027); pendências C6, C7 e C8 |
+| 1.1 | Projetos, temas e contextos | Telas de comitês, projetos e temas; comitês participantes (D-023); associação de stakeholders aos contextos, sem avaliação de poder × interesse | ✅ Autorizada para planejamento (D-029); implementação depende da aprovação do plano |
 | 2 | Avaliações e matriz de poder × interesse | Fichas e versões de avaliação, evidências, matriz por contexto. Depende de Q-01 a Q-07 | 🔧 |
 | 3 | Iniciativas, interações e compromissos | Matriz de iniciativas, registro único de reuniões, encaminhamentos e prazos | 🔧 |
 | 4 | Plano de ação e matriz de riscos | Versões e aprovação, acompanhamento, riscos, gatilhos e respostas | 🔧 |
 | 5 | Autenticação e permissões | Supabase Auth, perfis e permissões por projeto/tema, segurança no banco. Depende de Q-50 | 🔧 |
 | 6 | Painéis e relatórios | Indicadores executivos e relatórios. Depende de Q-55 | 🔧 |
-| 7 | Homologação e hospedagem | Supabase e Vercel com dados fictícios, validação técnica e institucional, plano de cópias de segurança | 🔧 ⏳ (exige contas e autorização) |
-| 8 | Piloto com dados reais | Somente após autorização formal e análise LGPD | ⏳ |
+| 7 | Homologação e hospedagem | Supabase e Vercel com dados fictícios, validação técnica e institucional, plano de cópias de segurança. **Pré-requisitos: C6, C7 e C8 solucionadas** (D-027) | 🔧 ⏳ (exige contas e autorização) |
+| 8 | Piloto com dados reais | Somente após autorização formal, análise LGPD e solução de C6, C7 e C8 (D-027) | ⏳ |
 | 9 | Integrações | Outlook, calendário, SharePoint, OneDrive e IA assistiva | ✅ Futuro / 🔧 (ordem) |
 
 A autenticação (Etapa 5) precisa estar concluída antes de qualquer hospedagem acessível pela internet (Etapa 7). 🔧
@@ -56,29 +57,64 @@ A autenticação (Etapa 5) precisa estar concluída antes de qualquer hospedagem
 4. Documentação diferencia aprovado, proposta e pendente.
 5. Nenhuma alteração na `main` sem aprovação.
 
-## 4. Etapa 1 — proposta preliminar 🔧 (não iniciar sem aprovação)
+## 4. Etapa 1 — Banco de dados de desenvolvimento e Cadastro Mestre ✅ (D-022)
 
 ### Objetivo
 
 Criar o banco de dados **local** de desenvolvimento e o primeiro módulo funcional, o Cadastro Mestre, usando apenas dados fictícios.
 
-### Conteúdo sugerido
-
-1. Banco PostgreSQL local, preferencialmente com as ferramentas de desenvolvimento local do Supabase, que dispensam conta ou contrato. Requer instalar o Docker Desktop, a ser decidido.
-2. Scripts versionados de criação das tabelas (*migrations*): `comite`, `projeto_tema`, `stakeholder`, `pessoa`, `instituicao`, `vinculo_pessoa_instituicao`, `usuario` e `registro_auditoria`.
-3. Carga dos quatro comitês e de dados fictícios para testes.
-4. Telas de listagem, cadastro, edição e arquivamento de pessoas, instituições e vínculos, com alerta de duplicidade.
-5. Validação dos dados (Zod) e testes automatizados das regras.
-
-### Decisões necessárias antes da Etapa 1
+### Decisões tomadas para a etapa
 
 | ID | Decisão |
 |---|---|
-| Q-10, Q-11 | Projetos ou temas com mais de um comitê; hierarquia entre temas e projetos |
-| Q-12, Q-13 | Visibilidade do Cadastro Mestre e dados pessoais permitidos |
-| Q-53 | Local definitivo da cópia de trabalho (Google Drive ou pasta local) |
-| — | Instalação do Docker Desktop para o banco local, ou alternativa |
+| D-018 | Banco local PGlite, sem instalação de programas |
+| D-019 | Cópia de trabalho em `C:\Projetos\crm-estrategico-es-em-acao` |
+| D-020 | Um comitê responsável por projeto/tema, sem hierarquia |
+| D-021 | Pessoas com dados mínimos |
 
-## 5. Local de trabalho recomendado 🔧
+### Entregas
 
-O projeto está hoje dentro do Google Drive. Para as próximas etapas, recomenda-se manter uma cópia de trabalho em pasta local (por exemplo, `C:\Projetos\crm-estrategico-es-em-acao`), obtida pelo GitHub. O GitHub já cumpre o papel de cópia de segurança e histórico; a sincronização do Drive sobre dependências e banco local tende a causar lentidão, conflitos e corrupção de arquivos. ⏳ Decisão Q-53.
+| Entrega | Situação |
+|---|---|
+| Branch `feature/cadastro-mestre` | Concluída |
+| Banco PGlite local, aplicado automaticamente ao iniciar a aplicação | Concluída |
+| Scripts SQL versionados das 8 tabelas, com regras de integridade e gatilhos de auditoria | Concluída |
+| Carga dos 4 comitês (script) e de dados fictícios (comando `npm run banco:exemplos`) | Concluída |
+| Telas de pessoas e instituições: lista com busca, inclusão, edição, arquivamento e reativação | Concluída |
+| Vínculos: registro, encerramento e regra de um único vínculo principal vigente | Concluída |
+| Histórico de alterações por pessoa e por instituição | Concluída |
+| Alerta de possível duplicidade com confirmação expressa | Concluída |
+| Validação de CNPJ numérico e alfanumérico | Concluída |
+| Testes automatizados e verificação no navegador | Resultados no relatório da Etapa 1 e no Pull Request |
+| Aprovação do gestor | Homologada em 01/11/2026, com as correções C1 a C5, para desenvolvimento e testes (D-027) |
+
+Ficaram de fora, conforme o plano: login real, telas de projetos e temas, avaliações, iniciativas, hospedagem e dados reais.
+
+### Critérios de aceite
+
+1. Tipos, qualidade, testes e compilação sem erros.
+2. Cadastro, edição, arquivamento e reativação de pessoas e instituições funcionando no navegador.
+3. Regras de integridade garantidas pelo banco, inclusive sem passar pelas telas.
+4. Toda alteração registrada no histórico, com responsável e data.
+5. Somente dados fictícios; nenhum serviço externo conectado.
+
+### Revisão de homologação (01/11/2026) — D-026
+
+| Correção | Situação |
+|---|---|
+| C1. Trava exclusiva da pasta do banco local | Concluída e testada (dois processos: o segundo é recusado) |
+| C2. Contatos com natureza, vínculo e histórico (D-025) | Concluída; e-mails e telefones existentes migrados |
+| C3. Proteção contra uso do banco local em produção | Concluída e testada |
+| C4. CNPJ repetido gera alerta, não bloqueio (D-024) | Concluída |
+| C5. País da instituição; UF e CNPJ só para o Brasil (D-024) | Concluída |
+| C6. Reforço da auditoria | Planejada |
+| C7. Comandos de cópia de segurança e restauração | Planejada |
+| C8. Teste de portabilidade em PostgreSQL real | Depende de autorização (Q-57) |
+
+**Homologação (D-027):** Etapa 1 homologada em 01/11/2026, com as correções C1 a C5, para fins de desenvolvimento e testes. C6, C7 e C8 continuam pendentes e são pré-requisitos das etapas de implantação (7) e de uso de dados reais (8). A homologação **não** autoriza implantação em produção nem uso de dados reais.
+
+**Incorporação à `main` (D-028):** após a revisão dos Pull Requests, primeiro a Etapa 0 e depois a Etapa 1, com "Create a merge commit", preservando históricos e resultados dos testes.
+
+## 5. Local de trabalho ✅ (D-019)
+
+A cópia de trabalho do projeto fica em `C:\Projetos\crm-estrategico-es-em-acao`, obtida pelo GitHub, fora do Google Drive. O GitHub cumpre o papel de cópia de segurança e histórico. A pasta antiga no Google Drive não foi apagada.

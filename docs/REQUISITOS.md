@@ -46,8 +46,10 @@ Sistema próprio de gestão estratégica de relacionamentos institucionais (CRM)
 | RF-02 | Pessoas e instituições cadastradas separadamente. | ✅ |
 | RF-03 | Registro de vínculos entre pessoas e instituições (cargo, área, período), preservando o histórico de vínculos anteriores. | ✅ |
 | RF-04 | Histórico de alterações dos cadastros (quem alterou, quando e o que mudou). | ✅ |
-| RF-05 | Alerta de possível duplicidade ao cadastrar pessoa ou instituição com nome, e-mail ou CNPJ semelhante a um já existente. | 🔧 |
+| RF-05 | Alerta de possível duplicidade ao cadastrar pessoa ou instituição com nome, e-mail ou CNPJ semelhante a um já existente, sem bloquear situações institucionais legítimas. | ✅ (D-024, D-025) |
 | RF-06 | Hierarquia entre instituições (por exemplo, secretaria vinculada a um governo). | 🔧 |
+| RF-07 | Contatos de pessoas e instituições com natureza (pessoal, institucional, funcional), período, vínculo opcional com o cargo e histórico; o mesmo contato pode ser compartilhado ou passar ao sucessor. | ✅ (D-025) |
+| RF-08 | Instituições estrangeiras, com país, sem CNPJ e sem UF. | ✅ (D-024) |
 
 ### 4.2 Projetos e temas estratégicos
 
@@ -55,8 +57,8 @@ Sistema próprio de gestão estratégica de relacionamentos institucionais (CRM)
 |---|---|---|
 | RF-10 | Cadastro de projetos e temas estratégicos. | ✅ |
 | RF-11 | Cada projeto ou tema vinculado a um comitê responsável. | 🔧 |
-| RF-12 | Possibilidade de um projeto ou tema envolver mais de um comitê. | ⏳ |
-| RF-13 | Possibilidade de agrupar projetos dentro de temas (hierarquia). | ⏳ |
+| RF-12 | Um projeto ou tema tem um comitê principal e pode ter comitês participantes. | ✅ (D-023; implementação na Etapa 1.1) |
+| RF-13 | Possibilidade de agrupar projetos dentro de temas (hierarquia). | Não adotado (D-020) |
 
 ### 4.3 Avaliação de stakeholders
 

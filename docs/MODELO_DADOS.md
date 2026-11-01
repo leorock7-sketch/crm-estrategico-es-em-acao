@@ -3,6 +3,8 @@
 | Versão | Data | Situação |
 |---|---|---|
 | 0.1 | 31/10/2026 | Modelo lógico inicial para revisão. Nenhuma tabela foi criada. |
+| 0.2 | 31/10/2026 | Etapa 1: decisões D-020 e D-021 incorporadas; as 8 tabelas da seção 9 foram criadas no banco de desenvolvimento. |
+| 0.3 | 01/11/2026 | Revisão de homologação: contatos em tabela própria (D-025), país e CNPJ sem unicidade (D-024), comitês participantes previstos (D-023). |
 
 Legenda: ✅ Aprovado · 🔧 Proposta técnica · ⏳ Pendente (ver [REQUISITOS.md](REQUISITOS.md#como-ler-este-documento)).
 
@@ -54,12 +56,15 @@ Os diagramas abaixo são desenhados automaticamente pelo GitHub. Nos diagramas, 
 erDiagram
     comite |o--o{ comite : "subordina"
     comite ||--o{ projeto_tema : "é responsável por"
-    projeto_tema |o--o{ projeto_tema : "agrupa"
     stakeholder ||--o| pessoa : "é uma"
     stakeholder ||--o| instituicao : "é uma"
     pessoa ||--o{ vinculo_pessoa_instituicao : "possui"
     instituicao ||--o{ vinculo_pessoa_instituicao : "abriga"
     instituicao |o--o{ instituicao : "subordina"
+    stakeholder ||--o{ contato : "possui"
+    vinculo_pessoa_instituicao |o--o{ contato : "funcional do cargo"
+    projeto_tema ||--o{ projeto_tema_comite : "tem participantes (Etapa 1.1)"
+    comite ||--o{ projeto_tema_comite : "participa de"
 ```
 
 ### 4.2 Avaliações de stakeholders
@@ -176,8 +181,7 @@ Projetos e temas estratégicos, que são os **contextos** das avaliações e das
 | `tipo` | lista: `projeto`, `tema` | | Sim | |
 | `nome` | texto | | Sim | |
 | `descricao` | texto longo | | Não | |
-| `comite_id` | UUID | FK → `comite.id` | Sim | Comitê responsável |
-| `projeto_tema_pai_id` | UUID | FK → `projeto_tema.id` | Não | Agrupamento opcional ⏳ |
+| `comite_id` | UUID | FK → `comite.id` | Sim | Único comitê responsável ✅ (D-020) |
 | `situacao` | lista | | Sim | Proposta: `proposto`, `ativo`, `suspenso`, `concluido` 🔧 |
 | `data_inicio`, `data_fim` | data | | Não | |
 | `responsavel_id` | UUID | FK → `usuario.id` | Não | |
@@ -187,7 +191,8 @@ Cardinalidades: comitê 1:N projeto_tema; projeto_tema 1:N avaliações, planos,
 Regras de integridade:
 - UK (`comite_id`, `tipo`, `nome`): não repetir nome de projeto ou tema no mesmo comitê. 🔧
 - `data_fim` ≥ `data_inicio`. 🔧
-- Projetos ligados a mais de um comitê: ⏳ (se aprovado, cria-se tabela de ligação `projeto_tema_comite`).
+- `comite_id` é o **comitê principal** responsável. Comitês participantes ficam na tabela `projeto_tema_comite` (`projeto_tema_id`, `comite_id`, período e auditoria; o principal não pode ser também participante). ✅ (D-023) Implementação prevista na Etapa 1.1.
+- Não há hierarquia entre temas e projetos. ✅ (D-020)
 
 ### 6.2 Cadastro Mestre ✅ (global; pessoas e instituições separadas)
 
@@ -209,11 +214,10 @@ Regras de integridade:
 | `id` | UUID | PK e FK → `stakeholder.id` | Sim | Mesmo identificador do stakeholder |
 | `nome_completo` | texto | | Sim | |
 | `nome_tratamento` | texto | | Não | Como prefere ser chamada |
-| `email` | texto | UK quando preenchido | Não | |
-| `telefone` | texto | | Não | |
 | `observacoes` | texto longo | | Não | |
+| `nome_normalizado` | texto | | Sim | Campo técnico: nome sem acentos e em minúsculas, usado na busca e no alerta de duplicidade 🔧 |
 
-Dados pessoais adicionais (CPF, data de nascimento, endereço) **não** estão previstos, em respeito ao princípio de minimização da LGPD. ⏳ Revisar após análise jurídica.
+Somente dados mínimos. ✅ (D-021) Dados pessoais adicionais (CPF, data de nascimento, endereço) **não** são registrados. A análise LGPD (Q-13) continua necessária antes do uso de dados reais.
 
 #### `instituicao`
 
@@ -224,12 +228,14 @@ Dados pessoais adicionais (CPF, data de nascimento, endereço) **não** estão p
 | `sigla` | texto | | Não | |
 | `natureza` | lista | | Sim | Proposta: órgão público, empresa, entidade de classe, academia, terceiro setor, imprensa, outra 🔧 ⏳ |
 | `esfera` | lista: `federal`, `estadual`, `municipal`, `nao_se_aplica` | | Não | |
-| `cnpj` | texto (14 dígitos) | UK quando preenchido | Não | |
+| `pais` | texto (código ISO de 2 letras) | | Sim | Padrão `BR` ✅ (D-024) |
+| `cnpj` | texto (14 caracteres) | Índice, **sem unicidade** | Não | Numérico ou alfanumérico; repetição gera alerta ✅ (D-024); só para instituições do Brasil |
+| `nome_normalizado` | texto | | Sim | Campo técnico para busca e duplicidade 🔧 |
 | `uf`, `municipio` | texto | | Não | |
 | `site` | texto | | Não | |
 | `instituicao_superior_id` | UUID | FK → `instituicao.id` | Não | Ex.: secretaria → governo estadual |
 
-Regras: CNPJ com 14 dígitos e dígitos verificadores válidos; instituição não pode ser superior de si mesma. 🔧
+Regras: CNPJ com 14 caracteres e dígitos verificadores válidos; UF e CNPJ só para `pais = 'BR'` (garantido pelo banco); UF obrigatória para instituições brasileiras (validação do formulário); instituição não pode ser superior de si mesma. 🔧 / ✅ (D-024)
 
 #### `vinculo_pessoa_instituicao`
 
@@ -251,6 +257,32 @@ Regras de integridade:
 - `data_fim` ≥ `data_inicio`. 🔧
 - No máximo um vínculo **principal e vigente** por pessoa. 🔧
 - Vínculos não são excluídos; são encerrados com `data_fim`. 🔧
+- Ao encerrar um vínculo, os contatos ligados a ele são encerrados na mesma data (gatilho). 🔧
+
+#### `contato` ✅ (D-025)
+
+Contatos de pessoas e instituições, com natureza, período e histórico próprios. Substitui os antigos campos `email` e `telefone` da pessoa (migrados automaticamente na revisão de homologação).
+
+| Campo | Tipo | Chave | Obr. | Observação |
+|---|---|---|---|---|
+| `stakeholder_id` | UUID | FK → `stakeholder.id` | Sim | Pessoa ou instituição dona do contato |
+| `vinculo_id` | UUID | FK → `vinculo_pessoa_instituicao.id` | Não | Contato funcional ligado a um cargo da própria pessoa |
+| `tipo` | lista: `email`, `telefone`, `celular`, `site`, `outro` | | Sim | |
+| `valor` | texto | | Sim | Como foi informado |
+| `valor_normalizado` | texto | Índice, **sem unicidade** | Sim | Para comparação: e-mail em minúsculas, telefone só com dígitos |
+| `natureza` | lista: `pessoal`, `institucional`, `funcional` | | Sim | Funcional = do cargo; pode ser compartilhado ou passar ao sucessor |
+| `principal` | sim/não | | Sim | |
+| `data_inicio`, `data_fim` | data | | Não | Nulo em `data_fim` = vigente |
+| `observacao` | texto | | Não | |
+
+Cardinalidades: stakeholder 1:N contato; vínculo 1:N contato (opcional).
+
+Regras de integridade:
+- O mesmo valor pode existir em vários cadastros; repetições geram alerta com confirmação expressa. ✅ (D-025)
+- No máximo um contato **principal vigente** por pessoa/instituição e tipo. 🔧
+- `data_fim` ≥ `data_inicio`. 🔧
+- O vínculo informado deve pertencer à própria pessoa (gatilho). 🔧
+- Contatos não são excluídos: são encerrados (`data_fim`) ou arquivados quando registrados por engano. Todas as operações ficam na auditoria. 🔧
 
 ### 6.3 Avaliações de stakeholders ✅ (independentes, versionadas, com visibilidade por contexto)
 
@@ -627,7 +659,7 @@ Preenchida automaticamente pelo banco a cada inclusão, alteração ou arquivame
 | `id` | número sequencial | PK |
 | `tabela` | texto | |
 | `registro_id` | UUID | |
-| `operacao` | lista: `inclusao`, `alteracao`, `arquivamento`, `exclusao` | |
+| `operacao` | lista: `inclusao`, `alteracao`, `arquivamento`, `reativacao`, `exclusao` | |
 | `dados_anteriores`, `dados_novos` | JSON | |
 | `usuario_id` | UUID | FK → `usuario.id` |
 | `ocorrido_em` | data e hora com fuso | |
@@ -649,13 +681,40 @@ Enquanto houver um único administrador, ele vê tudo; as regras acima passam a 
 
 ## 8. Questões de modelagem pendentes ⏳
 
-1. Projeto ou tema pode pertencer a mais de um comitê?
-2. Temas agrupam projetos (hierarquia)?
-3. Escalas de poder e interesse, os seis critérios e seus pesos.
-4. Categorias de posicionamento e significado de "grau de confiança".
-5. Um único plano de ação por projeto/tema ou vários?
-6. Escalas de probabilidade e impacto e fórmula de criticidade.
-7. Visibilidade do Cadastro Mestre para todos os usuários.
-8. Quais dados pessoais podem ser registrados (análise LGPD).
+1. Escalas de poder e interesse, os seis critérios e seus pesos.
+2. Categorias de posicionamento e significado de "grau de confiança".
+3. Um único plano de ação por projeto/tema ou vários?
+4. Escalas de probabilidade e impacto e fórmula de criticidade.
+5. Visibilidade do Cadastro Mestre para todos os usuários.
+6. Análise LGPD dos dados pessoais registrados.
 
-As decisões são acompanhadas em [REGISTRO_DECISOES.md](REGISTRO_DECISOES.md).
+Resolvidas na Etapa 1: hierarquia entre temas e projetos (D-020); dados mínimos de pessoas (D-021). Na revisão de homologação: comitês participantes (D-023), CNPJ e país (D-024), contatos (D-025). As decisões são acompanhadas em [REGISTRO_DECISOES.md](REGISTRO_DECISOES.md).
+
+## 9. Situação da implementação
+
+| Tabela | Etapa | Situação |
+|---|---|---|
+| `usuario`, `registro_auditoria` | 1 | Criadas no banco de desenvolvimento |
+| `comite` (com os 4 comitês), `projeto_tema` | 1 | Criadas; projetos e temas ainda sem telas |
+| `stakeholder`, `pessoa`, `instituicao`, `vinculo_pessoa_instituicao` | 1 | Criadas, com telas do Cadastro Mestre |
+| `contato` | 1 (revisão) | Criada, com telas; e-mails e telefones antigos migrados |
+| `projeto_tema_comite` | 1.1 | Prevista (D-023) |
+| Demais tabelas | 2 a 4 | Não criadas |
+
+Onde está cada parte:
+
+- **Estrutura das tabelas:** `src/lib/banco/esquema.ts`.
+- **Scripts SQL (migrations):** `src/lib/banco/migracoes/`.
+  - `0000`: tabelas, chaves e regras;
+  - `0001`: gatilhos de auditoria, de preenchimento automático e de proteção;
+  - `0002`: carga dos 4 comitês;
+  - `0003`: revisão de homologação — tabela de contatos (com migração dos dados), país e CNPJ sem unicidade.
+- **Regras garantidas por gatilhos** 🔧:
+  - preenchimento automático de quem criou ou alterou cada registro, e quando;
+  - trilha de auditoria a cada inclusão, alteração, arquivamento e reativação, sem registrar alterações que não mudam nenhum dado;
+  - proibição de excluir registros (somente arquivar) e de alterar a auditoria;
+  - comitê temático subordinado apenas ao comitê de desenvolvimento;
+  - hierarquia de instituições sem ciclos;
+  - tipo do stakeholder imutável.
+
+Enquanto não houver login (etapa de autenticação), todas as operações são atribuídas ao usuário fictício "Administrador (desenvolvimento)". 🔧

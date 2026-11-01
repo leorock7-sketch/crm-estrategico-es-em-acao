@@ -37,9 +37,9 @@ A arquitetura tecnológica inicialmente proposta utiliza Next.js, TypeScript, Po
 
 ## Situação atual
 
-Projeto em fase inicial de estruturação e desenvolvimento — **Etapa 0: Fundação Técnica**.
+Projeto em fase inicial de desenvolvimento — **Etapa 1: Banco de dados de desenvolvimento e Cadastro Mestre**.
 
-Nesta etapa existem apenas a documentação e uma aplicação inicial que exibe a página "CRM Estratégico — ES em Ação — em desenvolvimento". Ainda não há banco de dados, autenticação nem módulos operacionais.
+Já existem a documentação, um banco de dados local de desenvolvimento e as telas do Cadastro Mestre (pessoas, instituições, vínculos e histórico de alterações). Ainda não há autenticação, hospedagem nem os demais módulos.
 
 O ambiente de testes utilizará exclusivamente dados fictícios até que o tratamento de dados institucionais reais seja devidamente autorizado.
 
@@ -112,7 +112,22 @@ Abra o terminal na pasta do projeto e execute, um comando por vez:
 
 Depois abra o navegador em <http://localhost:3000>. Para encerrar, volte ao terminal e pressione `Ctrl + C`.
 
-### 4. Verificações de qualidade
+### 4. Banco de dados local (somente dados fictícios)
+
+Na primeira execução, a aplicação cria sozinha um banco de dados local na pasta `.dados/` do projeto, já com a estrutura das tabelas e os quatro comitês. Essa pasta **não** vai para o GitHub.
+
+O banco local aceita um programa por vez. Se você tentar usá-lo com a aplicação aberta, aparecerá a mensagem "O banco de dados local já está em uso": feche a aplicação (`Ctrl + C` no terminal) e tente de novo. Com a aplicação parada:
+
+| Comando | O que faz |
+|---|---|
+| `npm run banco:exemplos` | Carrega pessoas e instituições fictícias para testar as telas |
+| `npm run banco:reiniciar` | Apaga o banco local; um banco novo e vazio é criado na próxima execução |
+
+Para fazer uma cópia de segurança, pare a aplicação e copie a pasta `.dados/pglite` para outro lugar. Para restaurar, coloque a cópia de volta no mesmo lugar.
+
+A versão compilada (`npm run build` e depois `npm start`) recusa o banco local, para que ele nunca seja usado em produção por engano. Para testá-la no seu computador, crie um arquivo `.env.local` com a linha `CRM_BANCO=pglite`.
+
+### 5. Verificações de qualidade
 
 | Comando | O que verifica |
 |---|---|

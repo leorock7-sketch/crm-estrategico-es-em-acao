@@ -1,12 +1,23 @@
 # Acesso ao banco de dados
 
-Local reservado para a conexão futura com o PostgreSQL (gerenciado pelo Supabase). **Na Etapa 0 não há banco de dados nem conexão.**
+Banco de dados de **desenvolvimento** (decisão D-018): PGlite, um PostgreSQL completo executado dentro da própria aplicação, sem instalação de programas. Os dados ficam em `.dados/pglite` (ignorada pelo Git) e são exclusivamente fictícios.
 
-Quando o banco for criado (Etapa 1, sujeita a aprovação):
+| Arquivo | Conteúdo |
+|---|---|
+| `esquema.ts` | Estrutura das tabelas, chaves e regras de integridade (fonte única) |
+| `migracoes/` | Scripts SQL versionados, aplicados automaticamente ao abrir o banco |
+| `conexao.ts` | Abertura do banco, proteção de produção (`CRM_BANCO`) e `comoUsuario()`, que registra o responsável por cada gravação |
+| `trava.ts` | Trava exclusiva da pasta de dados: impede que dois programas usem o banco local ao mesmo tempo |
+| `requisicao.ts` | Acesso ao banco pelas telas, lendo dados a cada acesso |
+| `erros.ts` | Localização do erro original do PostgreSQL |
 
-- a conexão será configurada aqui, em um único lugar, e usada pelos módulos em `src/modulos/`;
+Regras:
+
 - endereços e chaves de acesso ficarão **apenas** em variáveis de ambiente (arquivo `.env.local`, que o Git ignora), nunca no código;
-- os scripts de criação e alteração das tabelas (*migrations*) serão versionados em pasta própria;
-- o controle de acesso por projeto ou tema será aplicado no próprio banco (Row Level Security).
+- toda gravação passa por `comoUsuario()`, para que a trilha de auditoria registre o responsável;
+- para alterar a estrutura, edite `esquema.ts` e execute `npm run banco:gerar`; gatilhos e cargas de dados ficam em scripts SQL próprios dentro de `migracoes/`;
+- scripts já publicados não devem ser alterados: cada mudança gera um novo script.
 
-O modelo de dados previsto está em [docs/MODELO_DADOS.md](../../../docs/MODELO_DADOS.md).
+Na etapa de hospedagem, a conexão será trocada pela do Supabase, reaproveitando os mesmos scripts. O controle de acesso por projeto ou tema será aplicado no próprio banco (Row Level Security).
+
+O modelo de dados está em [docs/MODELO_DADOS.md](../../../docs/MODELO_DADOS.md).

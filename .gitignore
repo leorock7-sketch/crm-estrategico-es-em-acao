@@ -42,6 +42,9 @@ next-env.d.ts
 *.p12
 *.pfx
 
+# --- Banco de dados local de desenvolvimento (PGlite; somente dados fictícios) ---
+/.dados/
+
 # --- Hospedagem e serviços (configurações locais) ---
 .vercel
 /supabase/.temp/
