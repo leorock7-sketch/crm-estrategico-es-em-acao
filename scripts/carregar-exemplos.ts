@@ -4,8 +4,9 @@
  *
  * Cada grupo só é carregado se ainda estiver vazio: pessoas e instituições,
  * se não houver nenhuma pessoa; projetos e temas, se não houver nenhum;
- * metodologias e avaliações de DEMONSTRAÇÃO, se não houver nenhuma metodologia.
- * As avaliações são fictícias e seus resultados não são homologados (D-034).
+ * metodologias e avaliações, se não houver nenhuma metodologia. As metodologias
+ * de DEMONSTRAÇÃO (0 a 100) ficam como histórico; a vigente é a V2.2, com as
+ * rubricas homologadas (Q-66 1.0). Todas as avaliações são fictícias.
  *
  * Execute com a aplicação parada (o banco local aceita um processo por vez;
  * se estiver em uso, o script avisa e não grava nada). Nenhum dado aqui
@@ -27,6 +28,7 @@ import {
   salvarRascunho,
 } from "@/modulos/avaliacoes/consultas";
 import type { DadosRascunho } from "@/modulos/avaliacoes/esquemas";
+import { METODOLOGIA_V22 } from "@/modulos/avaliacoes/rubricas-v22";
 import {
   criarAssociacao,
   criarParticipacao,
@@ -153,6 +155,23 @@ const PROJETOS_TEMAS: (Omit<DadosProjetoTema, "comiteId"> & {
       { nome: "Federação Exemplo da Indústria", tipoRelacao: "representacao_setorial" },
       { nome: "Isabela Teste Nunes", tipoRelacao: "representacao_setorial", descricao: "Gerente de Infraestrutura da FEXI." },
       { nome: "Terminal de Cargas do Porto Modelo", tipoRelacao: "beneficiario" },
+    ] },
+  { tipo: "projeto", nome: "Corredor Logístico Exemplo", comite: "infraestrutura", situacao: "ativo", dataInicio: "2026-07-01",
+    descricao: "Projeto fictício usado para demonstrar a matriz 3 × 3 da metodologia V2.2.",
+    participantes: [{ comite: "investimentos", inicio: "2026-07-01" }],
+    stakeholders: [
+      { nome: "Governo do Estado Exemplo", tipoRelacao: "orgao_competente" },
+      { nome: "Secretaria Exemplo de Desenvolvimento", tipoRelacao: "orgao_competente" },
+      { nome: "Example Trade Agency", tipoRelacao: "financiador", descricao: "Possível financiador estrangeiro." },
+      { nome: "Federação Exemplo da Indústria", tipoRelacao: "representacao_setorial" },
+      { nome: "Prefeitura Municipal de Vila Exemplo", tipoRelacao: "beneficiario" },
+      { nome: "Universidade Fictícia do Sudeste", tipoRelacao: "parceiro" },
+      { nome: "Jornal Diário Exemplo", tipoRelacao: "outro" },
+      { nome: "Terminal de Cargas do Porto Modelo", tipoRelacao: "beneficiario" },
+      { nome: "Isabela Teste Nunes", tipoRelacao: "representacao_setorial" },
+      { nome: "Agência Exemplo de Inovação", tipoRelacao: "parceiro" },
+      { nome: "Daniel Exemplo Rocha", tipoRelacao: "representacao_setorial" },
+      { nome: "Bruno Fictício Lima", tipoRelacao: "orgao_competente", descricao: "Ainda sem avaliação." },
     ] },
   { tipo: "tema", nome: "Ambiente de negócios", comite: "investimentos", situacao: "ativo", dataInicio: "2025-09-01",
     descricao: "Simplificação de procedimentos para novos empreendimentos (exemplo fictício).",
@@ -380,6 +399,112 @@ const AVALIACOES_ATUAIS: AvaliacaoExemplo[] = [
   },
 ];
 
+type AvaliacaoV22 = {
+  projeto: string;
+  stakeholder: string;
+  dados: Omit<DadosRascunho, "versaoId">;
+  /** Evidências são opcionais na V2.2 (D-067). */
+  comEvidencia?: boolean;
+};
+
+const ORIGEM_FICTICIA = "Exemplo fictício.";
+
+/** Avaliações fictícias na escala V2.2: as nove células, Neutro, "não avaliado", preliminares e alertas mantidos. */
+const AVALIACOES_V22: AvaliacaoV22[] = [
+  { projeto: "Corredor Logístico Exemplo", stakeholder: "Governo do Estado Exemplo", comEvidencia: true,
+    dados: { nivelPoder: "alto", justificativaPoder: "Aprova a licença estadual do corredor (norma fictícia).",
+      nivelInteresse: "alto", justificativaInteresse: "O corredor consta do plano estadual fictício de logística.",
+      posicionamento: "favoravel", naturezaPosicionamento: "manifestacao_formal", validacaoInstitucional: "Ofício fictício do gabinete.",
+      situacaoRessalvas: "nao_identificadas", justificativaPosicionamento: "Apoio formal, sem condições (exemplo).",
+      grauConfianca: "alto", justificativaConfianca: "Documento oficial recente (exemplo).",
+      justificativa: "Avaliação fictícia: apoio formal de quem decide.", dataReferencia: "2026-10-20" } },
+  { projeto: "Corredor Logístico Exemplo", stakeholder: "Secretaria Exemplo de Desenvolvimento",
+    dados: { nivelPoder: "alto", justificativaPoder: "Coordena as autorizações do programa (exemplo).",
+      nivelInteresse: "alto", justificativaInteresse: "Prioridade do programa estadual (exemplo).",
+      posicionamento: "favoravel", naturezaPosicionamento: "informacao_informal",
+      validacaoInstitucional: "Conversa com o diretor responsável pelo programa (exemplo fictício).",
+      situacaoRessalvas: "nao_identificadas", justificativaPosicionamento: "O diretor relatou apoio da área; ainda sem posição oficial.",
+      grauConfianca: "medio", justificativaConfianca: "Informação informal, de fonte direta (exemplo).",
+      justificativa: "Avaliação preliminar fictícia, a confirmar com manifestação formal.", dataReferencia: "2026-10-21" } },
+  { projeto: "Corredor Logístico Exemplo", stakeholder: "Example Trade Agency",
+    dados: { nivelPoder: "alto", justificativaPoder: "Avaliação prospectiva: o aporte seria decisivo para a viabilidade (exemplo fictício).",
+      nivelInteresse: "baixo", justificativaInteresse: "O corredor é marginal na carteira da agência (exemplo).",
+      grauConfianca: "baixo", justificativaConfianca: "Sem precedente; avaliação prospectiva (exemplo).",
+      justificativa: "Posicionamento ainda não avaliado: sem manifestação.", dataReferencia: "2026-10-22" } },
+  { projeto: "Corredor Logístico Exemplo", stakeholder: "Federação Exemplo da Indústria",
+    dados: { nivelPoder: "alto", justificativaPoder: "As cartas de demanda que coordena condicionam o financiamento (exemplo).",
+      nivelInteresse: "medio", justificativaInteresse: "Tema relevante, mas não central no plano de trabalho (exemplo).",
+      posicionamento: "favoravel", naturezaPosicionamento: "manifestacao_formal", validacaoInstitucional: "Ofício fictício da diretoria.",
+      situacaoRessalvas: "ha_ressalvas", descricaoRessalvas: "Apoio condicionado a compromisso de contratação de fornecedores locais.",
+      justificativaPosicionamento: "Apoio condicionado, com orientação predominantemente favorável (D1).",
+      grauConfianca: "medio", justificativaConfianca: "Documento formal; condição ainda em negociação (exemplo).",
+      justificativa: "Avaliação fictícia de apoio condicionado.", dataReferencia: "2026-10-22" } },
+  { projeto: "Corredor Logístico Exemplo", stakeholder: "Prefeitura Municipal de Vila Exemplo", comEvidencia: true,
+    dados: { nivelPoder: "medio", justificativaPoder: "Emite licenças urbanísticas acessórias, sem veto (exemplo).",
+      nivelInteresse: "alto", justificativaInteresse: "O tráfego de caminhões afeta diretamente o município (estudo fictício).",
+      posicionamento: "contrario", naturezaPosicionamento: "manifestacao_formal", validacaoInstitucional: "Ofício fictício do prefeito.",
+      situacaoRessalvas: "ha_ressalvas", descricaoRessalvas: "Exige transferir o pátio de caminhões para fora da área urbana.",
+      justificativaPosicionamento: "Oposição declarada ao traçado atual (exemplo).",
+      grauConfianca: "alto", justificativaConfianca: "Manifestação formal e recente (exemplo).",
+      justificativa: "Avaliação fictícia: oposição com condição relevante.", dataReferencia: "2026-10-23" } },
+  { projeto: "Corredor Logístico Exemplo", stakeholder: "Universidade Fictícia do Sudeste", comEvidencia: true,
+    dados: { nivelPoder: "medio", justificativaPoder: "Integra o conselho consultivo do programa; suas notas técnicas são consideradas (exemplo).",
+      nivelInteresse: "medio", justificativaInteresse: "Benefício indireto a uma linha de pesquisa (exemplo).",
+      posicionamento: "neutro", naturezaPosicionamento: "manifestacao_formal",
+      validacaoInstitucional: "Nota oficial fictícia: não se posiciona sobre o projeto.",
+      situacaoRessalvas: "nao_identificadas", justificativaPosicionamento: "Declaração expressa de neutralidade (exemplo).",
+      grauConfianca: "alto", justificativaConfianca: "Nota oficial (exemplo).",
+      justificativa: "Avaliação fictícia com neutralidade declarada.", dataReferencia: "2026-10-23" } },
+  { projeto: "Corredor Logístico Exemplo", stakeholder: "Jornal Diário Exemplo",
+    dados: { nivelPoder: "medio", justificativaPoder: "A cobertura pode influenciar a percepção pública do projeto (exemplo).",
+      nivelInteresse: "baixo", justificativaInteresse: "O tema é pontual na pauta do jornal (exemplo).",
+      grauConfianca: "baixo", justificativaConfianca: "Avaliação indireta (exemplo).",
+      justificativa: "Sem manifestação sobre o projeto.", dataReferencia: "2026-10-24" } },
+  { projeto: "Corredor Logístico Exemplo", stakeholder: "Terminal de Cargas do Porto Modelo",
+    dados: { nivelPoder: "baixo", justificativaPoder: "Sem competência nem recurso relevante para o corredor (verificação fictícia).",
+      nivelInteresse: "alto", justificativaInteresse: "O corredor muda o acesso às suas operações (exemplo).",
+      posicionamento: "favoravel", naturezaPosicionamento: "manifestacao_formal", validacaoInstitucional: "Carta fictícia da direção.",
+      situacaoRessalvas: "nao_identificadas", justificativaPosicionamento: "Apoio formal (exemplo).",
+      justificativa: "Avaliação fictícia.", dataReferencia: "2026-10-24" } },
+  { projeto: "Corredor Logístico Exemplo", stakeholder: "Isabela Teste Nunes",
+    dados: { nivelPoder: "baixo", justificativaPoder: "Influência indireta, pela federação (exemplo).",
+      nivelInteresse: "medio", justificativaInteresse: "Acompanha o tema pela gerência de infraestrutura (exemplo).",
+      posicionamento: "favoravel", naturezaPosicionamento: "informacao_informal", validacaoInstitucional: "Declaração em reunião de trabalho (exemplo fictício).",
+      situacaoRessalvas: "nao_identificadas", justificativaPosicionamento: "Apoio declarado em reunião (exemplo).",
+      grauConfianca: "medio", justificativaConfianca: ORIGEM_FICTICIA,
+      justificativa: "Avaliação preliminar fictícia de pessoa.", dataReferencia: "2026-10-25" } },
+  { projeto: "Corredor Logístico Exemplo", stakeholder: "Agência Exemplo de Inovação",
+    dados: { nivelPoder: "baixo", justificativaPoder: "Sem papel nas decisões do corredor (exemplo).",
+      nivelInteresse: "baixo", justificativaInteresse: "O corredor é remoto em relação à sua missão (exemplo).",
+      posicionamento: "neutro", naturezaPosicionamento: "percepcao_consultor",
+      justificativaPosicionamento: "Percepção do consultor: a agência tende a se manter equidistante. Mantido Neutro, com confiança baixa, apesar do alerta.",
+      grauConfianca: "baixo", justificativaConfianca: "Percepção, sem manifestação (exemplo).",
+      justificativa: "Avaliação fictícia com alerta mantido pelo consultor.", dataReferencia: "2026-10-25" } },
+  { projeto: "Corredor Logístico Exemplo", stakeholder: "Daniel Exemplo Rocha",
+    dados: { nivelInteresse: "medio", justificativaInteresse: "Representa um setor parcialmente afetado (exemplo).",
+      situacaoRessalvas: "informacao_insuficiente",
+      justificativaPosicionamento: "Manifestação inconclusiva em reunião: apoio a parte do traçado e objeções a outra, com peso equivalente.",
+      justificativa: "Poder ainda não avaliado: informações insuficientes.", dataReferencia: "2026-10-26" } },
+  // Reavaliações na V2.2 de quem tinha avaliação de demonstração: tendência "não comparável" (T-6).
+  { projeto: "Ampliação do Porto Modelo", stakeholder: "Prefeitura Municipal de Vila Exemplo",
+    dados: { nivelPoder: "medio", justificativaPoder: "Licenças urbanísticas acessórias, sem veto (exemplo).",
+      nivelInteresse: "alto", justificativaInteresse: "A obra altera o tráfego urbano do município (estudo fictício).",
+      posicionamento: "favoravel", naturezaPosicionamento: "manifestacao_formal",
+      validacaoInstitucional: "Ofício fictício: o município apoiará se houver plano de mobilidade.",
+      situacaoRessalvas: "ha_ressalvas", descricaoRessalvas: "Plano de mobilidade urbana para o entorno.",
+      justificativaPosicionamento: "Apoio condicionado a medida compatível com a proposta: Favorável com ressalva (D1).",
+      grauConfianca: "medio", justificativaConfianca: ORIGEM_FICTICIA,
+      justificativa: "Reavaliação fictícia na metodologia V2.2.", dataReferencia: "2026-10-28" } },
+  { projeto: "Ampliação do Porto Modelo", stakeholder: "Secretaria Exemplo de Desenvolvimento",
+    dados: { nivelPoder: "alto", justificativaPoder: "Coordena as autorizações estaduais (exemplo).",
+      nivelInteresse: "alto", justificativaInteresse: "Projeto prioritário do programa (exemplo).",
+      posicionamento: "favoravel", naturezaPosicionamento: "informacao_informal",
+      validacaoInstitucional: "Declaração do secretário em reunião (exemplo fictício).",
+      situacaoRessalvas: "nao_identificadas", justificativaPosicionamento: "Apoio declarado em reunião; sem ato formal (exemplo).",
+      grauConfianca: "alto", justificativaConfianca: "Fonte direta; alerta de confiança alta mantido (exemplo).",
+      justificativa: "Reavaliação fictícia na metodologia V2.2.", dataReferencia: "2026-10-28" } },
+];
+
 /** Carrega as metodologias e avaliações de demonstração (somente dados fictícios). */
 async function carregarAvaliacoes(tx: Executor) {
   const [projetos, pessoas, instituicoes] = await Promise.all([
@@ -420,6 +545,30 @@ async function carregarAvaliacoes(tx: Executor) {
   const atualId = await criarMetodologia(tx, atual);
   await alterarSituacaoMetodologia(tx, atualId, "vigente");
   await avaliar(AVALIACOES_ATUAIS, atualId);
+
+  // Metodologia V2.2 (Etapa 2B): substitui a de demonstração, por mudança substantiva (D-064).
+  await alterarSituacaoMetodologia(tx, atualId, "encerrada");
+  const v22Id = await criarMetodologia(tx, {
+    ...METODOLOGIA_V22,
+    metodologiaAnteriorId: atualId,
+    naturezaAlteracao: "substantiva",
+    justificativaNatureza:
+      "Mudança de escala (0 a 100 e cinco categorias para Baixo, Médio e Alto e três categorias) e adoção das rubricas da Q-66 1.0 (D-058, D-059, D-068).",
+  });
+  await alterarSituacaoMetodologia(tx, v22Id, "vigente");
+  for (const exemplo of AVALIACOES_V22) {
+    const projetoTemaId = idProjeto.get(exemplo.projeto);
+    const stakeholderId = idStakeholder.get(exemplo.stakeholder);
+    if (!projetoTemaId || !stakeholderId) {
+      ignoradas.push(`${exemplo.stakeholder} (${exemplo.projeto})`);
+      continue;
+    }
+    const versaoId = await iniciarRascunho(tx, projetoTemaId, stakeholderId);
+    await salvarRascunho(tx, { versaoId, ...exemplo.dados }, new Map());
+    if (exemplo.comEvidencia) await adicionarEvidencia(tx, { versaoId, ...EVIDENCIA_FICTICIA });
+    await publicarRascunho(tx, versaoId);
+    publicadas++;
+  }
   return { publicadas, ignoradas };
 }
 
@@ -464,7 +613,7 @@ async function principal() {
       if (metodologiasExistentes === 0) {
         const { publicadas, ignoradas } = await carregarAvaliacoes(tx);
         console.log(
-          `Carregadas: ${METODOLOGIAS_DEMONSTRACAO.length} metodologias de demonstração e ${publicadas} avaliações fictícias publicadas (resultados não homologados).`,
+          `Carregadas: ${METODOLOGIAS_DEMONSTRACAO.length} metodologias de demonstração (histórico), a metodologia V2.2 vigente e ${publicadas} avaliações fictícias publicadas.`,
         );
         if (ignoradas.length > 0) console.log(`Não encontrados, avaliação ignorada: ${ignoradas.join(", ")}.`);
       } else {
