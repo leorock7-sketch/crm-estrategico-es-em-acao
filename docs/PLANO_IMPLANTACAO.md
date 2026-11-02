@@ -10,6 +10,7 @@
 | 0.6 | 01/11/2026 | Correção da normalização (D-044), proteção da `main` (D-045) e inventário metodológico (D-046) |
 | 0.7 | 01/11/2026 | Homologação da Etapa 1.1 (D-047), providências concluídas (D-052) e relatório técnico de revisão metodológica (D-050) |
 | 0.8 | 01/11/2026 | Etapa 1.1 concluída e incorporada à `main` (D-053); Pull Request da Etapa 2A (D-054) |
+| 0.9 | 01/11/2026 | Etapa 2A homologada e incorporada à `main` (D-055); próxima atividade: decisões Q-65 (D-056) |
 
 Legenda: ✅ Aprovado · 🔧 Proposta técnica · ⏳ Pendente.
 
@@ -30,8 +31,8 @@ Legenda: ✅ Aprovado · 🔧 Proposta técnica · ⏳ Pendente.
 | 0 | Fundação técnica | Documentação, esqueleto da aplicação, testes básicos | ✅ Aprovada em 31/10/2026 |
 | 1 | Banco de dados de desenvolvimento e Cadastro Mestre | Banco PostgreSQL local, estrutura de comitês e projetos/temas, cadastro de pessoas, instituições e vínculos, com dados fictícios | ✅ **Homologada em 01/11/2026** para desenvolvimento e testes (D-027); pendências C6, C7 e C8 |
 | 1.1 | Projetos, temas e contextos | Telas de comitês, projetos e temas; comitês participantes (D-023); associação de stakeholders aos contextos, sem avaliação de poder × interesse | ✅ **Concluída**: homologada em 01/11/2026 para desenvolvimento com dados fictícios (D-031, D-047, incluindo a correção de normalização) e incorporada à `main` pelo Pull Request #1 (commit de merge `90c319c`, D-053) |
-| 2A | Metodologia e estrutura da avaliação estratégica | Fichas e versões, evidências, posicionamento, grau de confiança, permissões e matriz com metodologia de demonstração e dados fictícios | ✅ **Aprovada funcionalmente em 01/11/2026** para desenvolvimento e testes com dados fictícios, condicionada à revisão do Pull Request (D-035); branch `feature/avaliacao-stakeholders`, sincronizada com a `main`; Pull Request aguardando a validação do gestor (D-054) |
-| 2B | Metodologia institucional e cálculos definitivos | Critérios, escalas, pesos, fórmula e pontos de corte homologados. Depende de Q-01, Q-02, Q-05, Q-06 e Q-60 | ⏳ Relatório técnico de revisão metodológica entregue (D-046, D-050); cálculos definitivos aguardam a homologação das decisões Q-65 |
+| 2A | Metodologia e estrutura da avaliação estratégica | Fichas e versões, evidências, posicionamento, grau de confiança, permissões e matriz com metodologia de demonstração e dados fictícios | ✅ **Concluída**: homologada em 01/11/2026 para desenvolvimento e testes com dados fictícios (D-035, D-055) e incorporada à `main` pelo Pull Request #2 (commit de merge `81478af`) |
+| 2B | Metodologia institucional e cálculos definitivos | Critérios, escalas, pesos, fórmula e pontos de corte homologados. Depende de Q-01, Q-02, Q-05, Q-06 e Q-60 | ⏳ Próxima atividade: revisão e homologação das seis decisões Q-65 (D-056), a partir do relatório técnico (D-046, D-050); programação não autorizada |
 | 3 | Iniciativas, interações e compromissos | Matriz de iniciativas, registro único de reuniões, encaminhamentos e prazos | 🔧 |
 | 4 | Plano de ação e matriz de riscos | Versões e aprovação, acompanhamento, riscos, gatilhos e respostas | 🔧 |
 | 5 | Autenticação e permissões | Supabase Auth, perfis e permissões por projeto/tema, segurança no banco. Depende de Q-50 | 🔧 |
@@ -183,7 +184,7 @@ Construir a estrutura das avaliações de stakeholders — fichas, versões, evi
 
 | Entrega | Situação |
 |---|---|
-| Branch `feature/avaliacao-stakeholders`, a partir da branch da Etapa 1.1, sincronizada com a `main` após a incorporação da Etapa 1.1 (D-053) | Concluída |
+| Branch `feature/avaliacao-stakeholders`, a partir da branch da Etapa 1.1, sincronizada com a `main` após a incorporação da Etapa 1.1 (D-053) e incorporada à `main` pelo Pull Request #2 (D-055) | Concluída |
 | Inventário metodológico da planilha "Mapa de Stakeholders" (entregue ao gestor fora do repositório) | Concluído: a planilha não contém os seis critérios |
 | Script SQL `0005`: metodologias, critérios, fichas, versões, notas, evidências e permissões, com regras de publicação e imutabilidade | Concluída |
 | Ficha do stakeholder no contexto: avaliação vigente, tendência e histórico completo de versões | Concluída |
@@ -195,9 +196,11 @@ Construir a estrutura das avaliações de stakeholders — fichas, versões, evi
 | Proposta de critérios de apoio ao grau de confiança e análise de metodologias por comitê | Apresentadas para aprovação (Q-61, Q-62) |
 | Testes automatizados | Executados e aprovados em 01/11/2026: tipos, qualidade e compilação sem erros; 127 de 127 testes (91 anteriores e 36 novos) |
 | Verificação no navegador (versão compilada, dados fictícios) | Executada em 01/11/2026: matriz e listas, ficha, tendência, nova versão, recusa sem validação institucional, publicação, evidência (link inválido recusado, inclusão e retirada), salvar rascunho, metodologias e celular; corrigidos o formato dos números (87,5) e o tamanho do texto do gráfico no celular; sem erros no servidor |
-| Aprovação do gestor | Aprovada funcionalmente em 01/11/2026, para desenvolvimento e testes com dados fictícios, condicionada à revisão do Pull Request (D-035). Não abrange a metodologia quantitativa institucional, a autenticação multiusuário nem dados reais |
+| Aprovação do gestor | Aprovada funcionalmente em 01/11/2026, para desenvolvimento e testes com dados fictícios, condicionada à revisão do Pull Request (D-035); homologada e incorporada à `main` em 01/11/2026 (D-055). Não abrange a metodologia quantitativa institucional, a autenticação multiusuário nem dados reais |
 
 Ficaram de fora, conforme a D-034: critérios, pesos, fórmula e pontos de corte institucionais (Etapa 2B), classificação automática do grau de confiança, gestão de metodologias e de permissões pelas telas, autenticação, Matriz de Iniciativas, C6, C7, C8 e dados reais.
+
+**Homologação e incorporação (D-055):** Etapa 2A homologada em 01/11/2026 para desenvolvimento e testes com dados fictícios e incorporada manualmente à `main` pelo gestor (Pull Request #2, commit de merge `81478af`), com as verificações "Node.js 24" e "Node.js 26" aprovadas. O conteúdo da `main` é idêntico ao do commit revisado `0e5d589`; na `main`, 147 de 147 testes aprovados e telas da Etapa 2A verificadas na versão compilada.
 
 ### Critérios de aceite
 
@@ -219,11 +222,11 @@ Ficaram de fora, conforme a D-034: critérios, pesos, fórmula e pontos de corte
 | C7. Cópia de segurança e restauração | Etapas 7 e 8 (D-027) | Planejada |
 | C8. Portabilidade em PostgreSQL real | Etapas 7 e 8 (D-027) | Depende de autorização (Q-57) |
 | Autenticação e segurança multiusuário (inclusive regras de acesso no banco) | Uso por mais de uma pessoa; Etapas 7 e 8 | Etapa 5; estrutura de permissões preparada na 2A, não homologada |
-| Seis critérios originais, escalas, pesos, fórmula e pontos de corte | Etapa 2B (D-040) | Inventário e relatório técnico de revisão metodológica entregues fora do repositório (D-046, D-050); aguardando a manifestação do gestor sobre as seis decisões Q-65 |
+| Seis critérios originais, escalas, pesos, fórmula e pontos de corte | Etapa 2B (D-040) | Inventário e relatório técnico de revisão metodológica entregues fora do repositório (D-046, D-050); próxima atividade: deliberação individual das seis decisões Q-65 (D-056) |
 | Conduta do ES em Ação | Requisito futuro RF-28 | Categorias e regras de correspondência a definir (Q-64) |
 | Verificação automática no GitHub Actions | — | ✅ Implementada (D-041): Node.js 24 e 26, a cada Pull Request e atualização da `main` |
 | Proteção da `main` (verificações obrigatórias antes do merge) | — | ✅ Configurada pelo administrador e conferida (D-045, D-052) |
-| Revisão e incorporação dos Pull Requests das Etapas 1.1 e 2A | Base correta da Etapa 2A | Etapa 1.1 ✅ incorporada à `main` (D-053, commit de merge `90c319c`); Etapa 2A: Pull Request com base na `main` atualizada, aguardando a validação e a incorporação manual pelo gestor (D-054) |
+| Revisão e incorporação dos Pull Requests das Etapas 1.1 e 2A | Base correta da Etapa 2A | ✅ Concluída: Etapa 1.1 incorporada pelo Pull Request #1 (D-053, `90c319c`) e Etapa 2A pelo Pull Request #2 (D-055, `81478af`) |
 | Análise LGPD, retenção e anonimização | Etapa 8 | Q-13, Q-58 |
 
 ## 8. Local de trabalho ✅ (D-019)
