@@ -6,6 +6,7 @@
 | 0.2 | 01/11/2026 | Etapa 1.1: comitês participantes e associação de stakeholders aos contextos (D-023, D-030) |
 | 0.3 | 01/11/2026 | Etapa 2A: estrutura de avaliações com metodologia de demonstração (D-034) |
 | 0.4 | 01/11/2026 | Grau de confiança (D-036), metodologia comum (D-037) e Conduta do ES em Ação como requisito futuro (D-038) |
+| 0.5 | 01/11/2026 | Escalas V2.2 (D-057 a D-060): RF-21, RF-25, RF-27 e RF-28 atualizados; novos RF-29 e RF-30 |
 
 ## Como ler este documento
 
@@ -17,7 +18,7 @@ Cada item recebe uma das três classificações abaixo, usadas em toda a documen
 | 🔧 **Proposta técnica** | Sugestão da equipe técnica para atender a um requisito. Depende de validação antes de ser considerada definitiva. |
 | ⏳ **Pendente** | Decisão ainda não tomada. Não deve ser implementada até que seja deliberada. |
 
-> **Fonte dos requisitos.** Este documento foi elaborado a partir do README e das instruções da Etapa 0. O Manual de Especificação V2.0 e o Guia de Implantação, citados no README, não foram disponibilizados no repositório. Quando forem, este documento deverá ser conferido com eles; em caso de divergência, prevalecem o Manual e as decisões registradas em [REGISTRO_DECISOES.md](REGISTRO_DECISOES.md).
+> **Fonte dos requisitos.** Este documento foi elaborado a partir do README e das instruções da Etapa 0 e conferido, para a avaliação de stakeholders, com o Manual de Especificação e Operação V2.2, o Guia de Implantação V2.2 e a Nota de Decisões Metodológicas V2.2 (01/11/2026), mantidos fora do repositório (D-057). Em caso de divergência, prevalecem o Manual e as decisões registradas em [REGISTRO_DECISOES.md](REGISTRO_DECISOES.md).
 
 ## 1. Objetivo
 
@@ -70,14 +71,16 @@ Sistema próprio de gestão estratégica de relacionamentos institucionais (CRM)
 | ID | Requisito | Situação |
 |---|---|---|
 | RF-20 | Avaliação de stakeholders por projeto ou tema. | ✅ (estrutura na Etapa 2A, dados fictícios) |
-| RF-21 | Cada avaliação registra poder, interesse, posicionamento (cinco níveis e "não avaliado"), grau de confiança (alto, médio, baixo), justificativas e evidências; justificativa e evidência são obrigatórias para publicar. | ✅ (Manual V2.0, D-034) |
+| RF-21 | Cada avaliação registra poder e interesse (Baixo, Médio, Alto ou "não avaliado"), posicionamento (Favorável, Neutro, Contrário ou "não avaliado"), grau de confiança (Baixa, Média, Alta), justificativas e evidências; justificativa e evidência são obrigatórias para publicar. | ✅ (Manual V2.2, D-058 a D-060); hoje, demonstração com 0 a 100 e cinco posições — adaptação pendente (Q-67) |
 | RF-22 | Avaliações independentes: a avaliação de um stakeholder em um projeto não altera sua avaliação em outro. | ✅ |
 | RF-23 | Avaliações versionadas: uma reavaliação cria nova versão e preserva as anteriores, com suas metodologias, no histórico. | ✅ (implementado na Etapa 2A) |
 | RF-24 | Visibilidade das avaliações restrita ao contexto (projeto ou tema) a que pertencem. | ✅ (estrutura e testes na Etapa 2A; segurança multiusuário não homologada) |
-| RF-25 | Matriz de poder × interesse por projeto ou tema, distinguindo metodologia vigente, avaliações históricas e situações que exigem reavaliação. | ✅ (demonstração na Etapa 2A, sem pontos de corte) |
+| RF-25 | Matriz de poder × interesse por projeto ou tema, em grade ordinal 3 × 3, distinguindo metodologia vigente, avaliações históricas e situações que exigem reavaliação; a célula é leitura, sem conduta automática. | ✅ (D-058); hoje, demonstração com eixos de 0 a 100 na Etapa 2A — adaptação pendente (Q-67) |
 | RF-26 | Critérios de avaliação de poder e interesse configuráveis, associados a uma versão da metodologia. Inicialmente uma metodologia institucional comum; a arquitetura deve permitir metodologias específicas por comitê ou contexto, aprovadas e fundamentadas, sem comparabilidade automática. | ✅ (D-037; estrutura implementada na Etapa 2A) |
-| RF-27 | Os seis critérios históricos de poder e interesse, suas escalas e pesos. | ⏳ Em revisão — não definidos (Q-01, Q-60) |
-| RF-28 | Dimensão "Conduta do ES em Ação", registrada separadamente de poder, interesse e posicionamento, sem derivação automática dos quadrantes até a definição das regras de correspondência. | ⏳ Requisito futuro (D-038, Q-64) |
+| RF-27 | Rubricas observáveis dos níveis de poder, interesse e posicionamento, a partir da revisão dos critérios históricos; sem pesos, fórmulas ou pontos de corte não homologados. | ⏳ Minuta não homologada (Q-66); escala definida (D-058) |
+| RF-28 | Dimensão "Conduta do ES em Ação", registrada separadamente de poder, interesse e posicionamento, sem derivação automática da matriz. | ⏳ Requisito futuro (D-038, Q-64) |
+| RF-29 | Preservação do histórico: avaliações publicadas em escalas anteriores (Alto/Baixo; cinco categorias de posicionamento; demonstração de 0 a 100) permanecem intactas e identificadas pela metodologia, sem conversão automática nem recálculo. | ✅ (D-058, D-059) |
+| RF-30 | "Neutro" é posição avaliada, com justificativa e evidência; "não avaliado" é ausência de classificação, nunca neutralidade. Engajamento e conhecimento do projeto são dimensões distintas, com forma de registro a definir. | ✅ (D-059, D-060); registro de engajamento ⏳ (Q-65.3) |
 
 Detalhes em [METODOLOGIA_STAKEHOLDERS.md](METODOLOGIA_STAKEHOLDERS.md).
 

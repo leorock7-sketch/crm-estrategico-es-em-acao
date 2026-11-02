@@ -7,6 +7,7 @@
 | 0.3 | 01/11/2026 | Revisão de homologação: contatos em tabela própria (D-025), país e CNPJ sem unicidade (D-024), comitês participantes previstos (D-023). |
 | 0.4 | 01/11/2026 | Etapa 1.1: tabelas `projeto_tema_comite` (D-023) e `stakeholder_contexto` (D-030) criadas; nome normalizado em `projeto_tema`. |
 | 0.5 | 01/11/2026 | Etapa 2A: tabelas de avaliação (seção 6.3) e `permissao_contexto` criadas, com metodologias de demonstração (D-034). |
+| 0.6 | 01/11/2026 | Escalas V2.2 (D-058 a D-060): adaptação prevista na seção 6.3.1, não implementada (Q-67). |
 
 Legenda: ✅ Aprovado · 🔧 Proposta técnica · ⏳ Pendente (ver [REQUISITOS.md](REQUISITOS.md#como-ler-este-documento)).
 
@@ -371,9 +372,9 @@ Regras: UK (`stakeholder_id`, `projeto_tema_id`); só é criada para stakeholder
 | `numero_versao` | número inteiro | | Sim | 1, 2, 3… |
 | `situacao` | lista: `rascunho`, `vigente`, `substituida` | | Sim | |
 | `metodologia_versao_id` | UUID | FK → `metodologia_versao.id` | Não | Vazia quando não há metodologia vigente (sem pontuação) |
-| `poder`, `interesse` | número decimal | | Não | Resultado gravado na publicação, escala técnica de 0 a 100 (P-032); vazio = sem pontuação, nunca zero |
-| `posicionamento` | lista de cinco níveis | | Não | Vazio = "não avaliado" ✅ |
-| `grau_confianca` | lista: `alto`, `medio`, `baixo` | | Não | ✅ (D-034) |
+| `poder`, `interesse` | número decimal | | Não | Resultado gravado na publicação, escala técnica de 0 a 100 (P-032); vazio = sem pontuação, nunca zero. Usado só pelas metodologias de demonstração; não aprovado para uso institucional (D-058) |
+| `posicionamento` | lista de cinco níveis (escala do Manual V2.0) | | Não | Vazio = "não avaliado" ✅. Novas avaliações: só Favorável, Neutro e Contrário (D-059); as categorias parciais ficam no histórico (seção 6.3.1) |
+| `grau_confianca` | lista: `alto`, `medio`, `baixo` | | Não | ✅ (D-034); exibidos como Alta, Média e Baixa (D-060) |
 | `justificativa_confianca` | texto | | Não | Obrigatória na publicação se houver grau de confiança |
 | `justificativa` | texto longo | | Não | Obrigatória na publicação ✅ |
 | `validacao_institucional` | texto | | Não | Obrigatória para publicar posicionamento de instituição ✅ |
@@ -409,6 +410,24 @@ Regras: UK (`avaliacao_versao_id`, `criterio_avaliacao_id`); o critério deve se
 Regra: só muda enquanto a versão é rascunho; retirar uma evidência do rascunho é arquivá-la (gatilho).
 
 `metodologia_versao`, `criterio_avaliacao`, `avaliacao`, `avaliacao_versao`, `avaliacao_nota_criterio` e `evidencia` têm os campos de controle, a trilha de auditoria e a proibição de exclusão comuns às demais tabelas.
+
+#### 6.3.1 Adaptação prevista às escalas V2.2 🔧 (não implementada — Q-67)
+
+As escalas V2.2 (D-058 a D-060) pedem os ajustes abaixo, propostos para homologação. Nenhum deles foi feito. A mudança seria feita por migração **somente aditiva**: nada é excluído, convertido ou recalculado.
+
+| Tabela | Mudança proposta | Finalidade |
+|---|---|---|
+| `metodologia_versao` | `escala_poder_interesse`: lista `demonstracao_numerica`, `binaria_historica`, `ordinal_tres_niveis`. `escala_posicionamento`: lista `cinco_categorias`, `tres_categorias`. | Saber em que escala cada versão foi registrada, sem converter nada. |
+| `rubrica_nivel` (nova) | Metodologia, dimensão (poder, interesse, posicionamento), nível, descrição, evidência mínima e ordem. | Rubricas versionadas com a metodologia e travadas quando ela entra em vigor. |
+| `avaliacao_versao` | `nivel_poder` e `nivel_interesse`: lista `baixo`, `medio`, `alto`; vazio = "não avaliado". | Classificação direta da V2.2. |
+
+Regras propostas no banco:
+- Escala de três categorias: posicionamento só `favoravel`, `neutro`, `contrario` ou vazio.
+- Escala ordinal: só os níveis; colunas numéricas e notas por critério ficam vazias.
+- Escala binária histórica: sem `medio`.
+- Novas versões exigem metodologia.
+
+Linhas existentes: as metodologias de demonstração já registradas recebem `demonstracao_numerica` e `cinco_categorias` como valor padrão ao criar as colunas, sem alterar versões publicadas. Versões sem metodologia são tratadas como da escala anterior. O tipo `posicionamento`, com os cinco valores, é mantido por causa do histórico.
 
 ### 6.4 Iniciativas ✅ (cadastro manual; vários stakeholders e projetos)
 
@@ -710,14 +729,14 @@ Enquanto houver um único administrador, ele vê tudo; as regras acima passam a 
 
 ## 8. Questões de modelagem pendentes ⏳
 
-1. Escalas de poder e interesse, os seis critérios, seus pesos, a fórmula e os pontos de corte da matriz.
-2. Categorias da "Conduta do ES em Ação" e regras de correspondência com os quadrantes (Q-64, requisito futuro RF-28).
+1. Rubricas dos níveis de poder, interesse e posicionamento (Q-66) e estrutura da adaptação às escalas V2.2 (Q-67, seção 6.3.1). Escalas definidas (D-058, D-059); pesos, fórmula e pontos de corte não aprovados.
+2. Categorias da "Conduta do ES em Ação" e regras de relação com a matriz 3 × 3, sem derivação automática (Q-64, requisito futuro RF-28).
 3. Um único plano de ação por projeto/tema ou vários?
 4. Escalas de probabilidade e impacto e fórmula de criticidade.
 5. Visibilidade do Cadastro Mestre para todos os usuários.
 6. Análise LGPD dos dados pessoais registrados.
 
-Resolvidas na Etapa 1: hierarquia entre temas e projetos (D-020); dados mínimos de pessoas (D-021). Na revisão de homologação: comitês participantes (D-023), CNPJ e país (D-024), contatos (D-025). Na Etapa 1.1: tipos de relação dos stakeholders com os contextos (D-030). Na Etapa 2A: posicionamento em cinco níveis, grau de confiança em três níveis e regras de versionamento (Manual V2.0, D-034). As decisões são acompanhadas em [REGISTRO_DECISOES.md](REGISTRO_DECISOES.md).
+Resolvidas na Etapa 1: hierarquia entre temas e projetos (D-020); dados mínimos de pessoas (D-021). Na revisão de homologação: comitês participantes (D-023), CNPJ e país (D-024), contatos (D-025). Na Etapa 1.1: tipos de relação dos stakeholders com os contextos (D-030). Na Etapa 2A: posicionamento em cinco níveis (superado para novas avaliações pela D-059), grau de confiança em três níveis e regras de versionamento (Manual V2.0, D-034). Na revisão V2.2: escalas de poder, interesse, posicionamento e confiança (D-058 a D-060). As decisões são acompanhadas em [REGISTRO_DECISOES.md](REGISTRO_DECISOES.md).
 
 ## 9. Situação da implementação
 
