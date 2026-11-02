@@ -11,11 +11,13 @@ import { formatarData, formatarNumero, hojeEmBrasilia } from "@/lib/formatacao";
 import { esquemaIdentificador } from "@/lib/validacao/comuns";
 import { permissaoNoContexto } from "@/modulos/acesso/permissoes";
 import { obterUsuarioAtual } from "@/modulos/acesso/usuario-atual";
-import { AvisoNaoHomologado, AvisoSeguranca } from "@/modulos/avaliacoes/componentes/avisos";
+import { AvisoDaMetodologia, AvisoSeguranca } from "@/modulos/avaliacoes/componentes/avisos";
 import { MatrizPoderInteresse } from "@/modulos/avaliacoes/componentes/matriz-poder-interesse";
+import { MatrizTresPorTres } from "@/modulos/avaliacoes/componentes/matriz-tres-por-tres";
 import { SeloPosicionamento } from "@/modulos/avaliacoes/componentes/selo-posicionamento";
 import { fichasDoContexto, metodologiaVigente } from "@/modulos/avaliacoes/consultas";
-import { classificarParaMatriz, type FichaParaMatriz } from "@/modulos/avaliacoes/matriz";
+import { classificarParaMatriz, type FichaAvaliada, type FichaParaMatriz } from "@/modulos/avaliacoes/matriz";
+import { ROTULOS_NIVEL } from "@/modulos/avaliacoes/rotulos";
 import { obterProjetoTema } from "@/modulos/projetos-temas/consultas";
 
 export const metadata: Metadata = { title: "Matriz de poder × interesse" };
@@ -43,6 +45,7 @@ async function Matriz({ params }: Pick<PageProps<"/projetos-temas/[id]/matriz">,
   const [fichas, vigente] = await Promise.all([fichasDoContexto(banco, id), metodologiaVigente(banco)]);
   const matriz = classificarParaMatriz(fichas, vigente?.id ?? null, hojeEmBrasilia());
   const associados = fichas.filter((f) => f.associado).length;
+  const ordinal = vigente?.escalaPoderInteresse === "ordinal_tres_niveis";
   const caminhoFicha = (stakeholderId: string) => `/projetos-temas/${id}/avaliacoes/${stakeholderId}`;
 
   return (
@@ -53,20 +56,22 @@ async function Matriz({ params }: Pick<PageProps<"/projetos-temas/[id]/matriz">,
         descricao={`Somente as avaliações deste ${projeto.tipo === "tema" ? "tema" : "projeto"}, na versão vigente de cada ficha.`}
       />
 
-      {(!vigente || !vigente.homologada) && <AvisoNaoHomologado metodologia={vigente} />}
+      <AvisoDaMetodologia metodologia={vigente} />
 
       <section aria-labelledby="titulo-grafico" className={classeCartao}>
         <h2 id="titulo-grafico" className="mb-1 text-lg font-semibold">
           {vigente ? `Metodologia vigente: ${vigente.nome}` : "Sem metodologia vigente"}
         </h2>
         <p className="mb-4 text-sm text-texto-secundario" role="status">
-          {matriz.noGrafico.length} de {associados} stakeholders associados estão no gráfico (avaliação publicada na
-          metodologia vigente, com poder e interesse).
+          {matriz.noGrafico.length} de {associados} stakeholders associados estão {ordinal ? "na grade" : "no gráfico"}{" "}
+          (avaliação publicada na metodologia vigente, com poder e interesse classificados).
         </p>
         {matriz.noGrafico.length === 0 ? (
           <p className="rounded-lg border border-dashed border-borda p-8 text-center text-texto-secundario">
-            Nenhuma avaliação da metodologia vigente com poder e interesse.
+            Nenhuma avaliação da metodologia vigente com poder e interesse classificados.
           </p>
+        ) : ordinal ? (
+          <MatrizTresPorTres fichas={matriz.noGrafico} caminhoFicha={caminhoFicha} />
         ) : (
           <MatrizPoderInteresse pontos={matriz.noGrafico} caminhoFicha={caminhoFicha} />
         )}
@@ -104,7 +109,7 @@ async function Matriz({ params }: Pick<PageProps<"/projetos-temas/[id]/matriz">,
           Avaliações históricas — metodologia anterior ({matriz.metodologiaAnterior.length})
         </h2>
         <p className="mb-4 text-sm text-texto-secundario">
-          Preservadas e visíveis, mas fora do gráfico: suas pontuações seguem outra metodologia e não são comparadas
+          Preservadas e visíveis, mas fora da matriz: seguem outra metodologia ou escala e não são comparadas
           automaticamente com as da metodologia vigente.
         </p>
         {matriz.metodologiaAnterior.length === 0 ? (
@@ -130,10 +135,10 @@ async function Matriz({ params }: Pick<PageProps<"/projetos-temas/[id]/matriz">,
                       </Link>
                     </td>
                     <td className={classeCelula}>{f.vigente.metodologiaNome}</td>
-                    <td className={`${classeCelula} text-right tabular-nums`}>{f.vigente.poder === null ? "—" : formatarNumero(f.vigente.poder)}</td>
-                    <td className={`${classeCelula} text-right tabular-nums`}>{f.vigente.interesse === null ? "—" : formatarNumero(f.vigente.interesse)}</td>
+                    <td className={`${classeCelula} text-right tabular-nums`}>{eixo(f, "poder")}</td>
+                    <td className={`${classeCelula} text-right tabular-nums`}>{eixo(f, "interesse")}</td>
                     <td className={classeCelula}>
-                      <SeloPosicionamento posicionamento={f.vigente.posicionamento} />
+                      <SeloPosicionamento posicionamento={f.vigente.posicionamento} natureza={f.vigente.naturezaPosicionamento} />
                     </td>
                   </tr>
                 ))}
@@ -145,8 +150,12 @@ async function Matriz({ params }: Pick<PageProps<"/projetos-temas/[id]/matriz">,
 
       <div className="grid gap-6 md:grid-cols-3">
         <ListaSimples
-          titulo="Sem pontuação"
-          descricao="Publicadas sem todas as notas de poder e interesse."
+          titulo={ordinal ? "Não avaliado em algum eixo" : "Sem pontuação"}
+          descricao={
+            ordinal
+              ? "Publicadas na metodologia vigente com poder ou interesse “não avaliado”: ficam fora da grade."
+              : "Publicadas sem todas as notas de poder e interesse."
+          }
           fichas={matriz.semPontuacao}
           caminhoFicha={caminhoFicha}
         />
@@ -167,6 +176,14 @@ async function Matriz({ params }: Pick<PageProps<"/projetos-temas/[id]/matriz">,
       <AvisoSeguranca />
     </div>
   );
+}
+
+/** Valor de um eixo da avaliação histórica: nível (V2.2) ou pontuação (demonstração). */
+function eixo(f: FichaAvaliada, dimensao: "poder" | "interesse") {
+  const nivel = dimensao === "poder" ? f.vigente.nivelPoder : f.vigente.nivelInteresse;
+  if (nivel) return ROTULOS_NIVEL[nivel];
+  const valor = dimensao === "poder" ? f.vigente.poder : f.vigente.interesse;
+  return valor === null ? "—" : formatarNumero(valor);
 }
 
 function ListaSimples({

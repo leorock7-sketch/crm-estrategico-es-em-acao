@@ -7,9 +7,8 @@ import { classeCelula, classeCelulaCabecalho, classeLink, classeTabela } from "@
 import { SeloSituacao } from "@/componentes/selo-situacao";
 import { bancoDaRequisicao } from "@/lib/banco/requisicao";
 import { formatarData } from "@/lib/formatacao";
-import { AvisoNaoHomologado } from "@/modulos/avaliacoes/componentes/avisos";
 import { listarMetodologias } from "@/modulos/avaliacoes/consultas";
-import { ROTULOS_SITUACAO_METODOLOGIA } from "@/modulos/avaliacoes/rotulos";
+import { ROTULOS_ESCALA_PODER_INTERESSE, ROTULOS_SITUACAO_METODOLOGIA } from "@/modulos/avaliacoes/rotulos";
 
 export const metadata: Metadata = { title: "Metodologias de avaliação" };
 
@@ -32,7 +31,10 @@ async function ListaMetodologias() {
   const metodologias = await listarMetodologias(banco);
   return (
     <div className="flex flex-col gap-4">
-      <AvisoNaoHomologado />
+      <p className="text-sm text-texto-secundario">
+        A metodologia V2.2 usa rubricas de níveis como orientação do julgamento (Q-66 1.0). As metodologias de
+        demonstração, com notas de 0 a 100, ficam só para o histórico e não são homologadas.
+      </p>
       {metodologias.length === 0 ? (
         <p className="rounded-lg border border-dashed border-borda p-8 text-center text-texto-secundario">
           Nenhuma metodologia cadastrada. Os critérios institucionais aguardam revisão e homologação.
@@ -45,7 +47,8 @@ async function ListaMetodologias() {
                 <th scope="col" className={classeCelulaCabecalho}>Nome</th>
                 <th scope="col" className={classeCelulaCabecalho}>Situação</th>
                 <th scope="col" className={classeCelulaCabecalho}>Vigência</th>
-                <th scope="col" className={`${classeCelulaCabecalho} text-right`}>Critérios</th>
+                <th scope="col" className={classeCelulaCabecalho}>Escala</th>
+                <th scope="col" className={`${classeCelulaCabecalho} text-right`}>Critérios ou rubricas</th>
               </tr>
             </thead>
             <tbody>
@@ -65,7 +68,10 @@ async function ListaMetodologias() {
                   <td className={classeCelula}>
                     {m.vigenteDesde ? `${formatarData(m.vigenteDesde)} a ${m.vigenteAte ? formatarData(m.vigenteAte) : "hoje"}` : "—"}
                   </td>
-                  <td className={`${classeCelula} text-right tabular-nums`}>{m.criterios}</td>
+                  <td className={classeCelula}>{ROTULOS_ESCALA_PODER_INTERESSE[m.escalaPoderInteresse]}</td>
+                  <td className={`${classeCelula} text-right tabular-nums`}>
+                    {m.escalaPoderInteresse === "demonstracao_numerica" ? `${m.criterios} critérios` : `${m.rubricas} rubricas`}
+                  </td>
                 </tr>
               ))}
             </tbody>

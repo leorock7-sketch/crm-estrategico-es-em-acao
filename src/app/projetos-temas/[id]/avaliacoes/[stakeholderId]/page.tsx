@@ -12,10 +12,10 @@ import { esquemaIdentificador } from "@/lib/validacao/comuns";
 import { permissaoNoContexto } from "@/modulos/acesso/permissoes";
 import { obterUsuarioAtual } from "@/modulos/acesso/usuario-atual";
 import { iniciarAvaliacao } from "@/modulos/avaliacoes/acoes";
-import { tendenciaDoPosicionamento } from "@/modulos/avaliacoes/calculo";
-import { AvisoNaoHomologado, AvisoSeguranca } from "@/modulos/avaliacoes/componentes/avisos";
+import { metodologiasComparaveis, tendenciaDoPosicionamento } from "@/modulos/avaliacoes/calculo";
+import { AvisoDaMetodologia, AvisoSeguranca } from "@/modulos/avaliacoes/componentes/avisos";
 import { ResumoVersao } from "@/modulos/avaliacoes/componentes/resumo-versao";
-import { obterFicha } from "@/modulos/avaliacoes/consultas";
+import { ligacoesDasMetodologias, obterFicha } from "@/modulos/avaliacoes/consultas";
 import { obterProjetoTema } from "@/modulos/projetos-temas/consultas";
 
 export const metadata: Metadata = { title: "Ficha de avaliação" };
@@ -40,7 +40,7 @@ async function Ficha({ params }: Pick<PageProps<"/projetos-temas/[id]/avaliacoes
   if (!permissao.ver) {
     return <Alerta tom="erro">Você não tem permissão para ver as avaliações deste projeto ou tema.</Alerta>;
   }
-  const ficha = await obterFicha(banco, id, stakeholderId);
+  const [ficha, ligacoes] = await Promise.all([obterFicha(banco, id, stakeholderId), ligacoesDasMetodologias(banco)]);
   if (!ficha) notFound();
 
   const hoje = hojeEmBrasilia();
@@ -86,8 +86,12 @@ async function Ficha({ params }: Pick<PageProps<"/projetos-temas/[id]/avaliacoes
         }
       />
 
-      <AvisoNaoHomologado
-        metodologia={vigente?.metodologiaId ? { id: vigente.metodologiaId, nome: vigente.metodologiaNome ?? "" } : null}
+      <AvisoDaMetodologia
+        metodologia={
+          vigente?.metodologiaId
+            ? { id: vigente.metodologiaId, nome: vigente.metodologiaNome ?? "", homologada: Boolean(vigente.metodologiaHomologada) }
+            : null
+        }
       />
 
       {!ficha.associado && (
@@ -105,7 +109,11 @@ async function Ficha({ params }: Pick<PageProps<"/projetos-temas/[id]/avaliacoes
           <ResumoVersao
             versao={vigente}
             hoje={hoje}
-            tendencia={tendenciaDoPosicionamento(vigente.posicionamento, anterior?.posicionamento ?? null)}
+            tendencia={tendenciaDoPosicionamento(
+              vigente.posicionamento,
+              anterior?.posicionamento ?? null,
+              anterior ? metodologiasComparaveis(vigente.metodologiaId, anterior.metodologiaId, ligacoes) : true,
+            )}
           />
         ) : (
           <p className="text-sm text-texto-secundario">
@@ -119,8 +127,8 @@ async function Ficha({ params }: Pick<PageProps<"/projetos-temas/[id]/avaliacoes
           Histórico de versões
         </h2>
         <p className="mb-4 text-sm text-texto-secundario">
-          Todas as versões ficam preservadas, inclusive as feitas com metodologias anteriores. Pontuações de metodologias
-          diferentes não são comparadas automaticamente.
+          Todas as versões ficam preservadas, inclusive as feitas com metodologias e escalas anteriores. Avaliações de
+          metodologias diferentes só são comparadas com equivalência declarada.
         </p>
         {ficha.versoes.length === 0 ? (
           <p className="text-sm text-texto-secundario">Nenhuma versão registrada.</p>

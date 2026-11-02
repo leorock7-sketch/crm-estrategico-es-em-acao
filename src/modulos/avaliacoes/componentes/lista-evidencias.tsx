@@ -4,7 +4,10 @@ import { removerEvidenciaAcao } from "../acoes";
 import type { VersaoDaFicha } from "../consultas";
 import { ROTULOS_TIPO_EVIDENCIA } from "../rotulos";
 
-/** Evidências de uma versão; no rascunho, cada uma pode ser retirada (arquivada). */
+/**
+ * Evidências de uma versão (opcionais na V2.2, D-067); no rascunho, cada uma
+ * pode ser retirada (arquivada). As trazidas de versão anterior são marcadas (T-4).
+ */
 export function ListaEvidencias({
   evidencias,
   editavel = false,
@@ -23,6 +26,9 @@ export function ListaEvidencias({
             <span className="text-xs font-semibold uppercase tracking-wide text-texto-secundario">
               {ROTULOS_TIPO_EVIDENCIA[e.tipo]}
             </span>
+            {e.origemId && (
+              <span className="ml-2 text-xs text-texto-secundario">· trazida da versão anterior, como referência</span>
+            )}
             <p className="whitespace-pre-line break-words">{e.descricao}</p>
             <p className="text-xs text-texto-secundario">
               {[e.fonte && `Fonte: ${e.fonte}`, e.dataEvidencia && formatarData(e.dataEvidencia)].filter(Boolean).join(" · ")}
