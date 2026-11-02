@@ -14,10 +14,11 @@
 | 0.10 | 02/11/2026 | Calibração com avaliador único e registro das limitações (D-065, seção 10.5). |
 | 0.11 | 02/11/2026 | Rodada 2 com casos inéditos; gabaritos registrados antes da aplicação, sem alteração retrospectiva (D-066, seção 10.5). |
 | 0.12 | 02/11/2026 | Discricionariedade fundamentada e ajustes D1 a D4 (D-067): rubricas orientam o julgamento; alertas no lugar de bloqueios interpretativos; H3 revista; pessoa × instituição com origem e natureza da informação; rodada 1 encerrada (seções 2, 3, 9 e 10). |
+| 0.13 | 02/11/2026 | Versão final das rubricas (Q-66 1.0, D-068): calibração H6 concluída; conselhos consultivos (F1); influência relevante × decisiva (F2); tratamentos das ressalvas (F3); condição já prevista no projeto (F4); distinção entre avaliação preliminar e manifestação confirmada; ajustes da Q-67 1.0 (seções 3, 7, 9 e 10). |
 
 Legenda: ✅ Aprovado · 🔧 Proposta técnica · ⏳ Pendente.
 
-> **Importante.** As escalas institucionais foram definidas em 01/11/2026 pelo Manual de Especificação e Operação V2.2, pelo Guia de Implantação V2.2 e pela Nota de Decisões Metodológicas V2.2 ✅ (D-057 a D-060). As **rubricas** tiveram as diretrizes homologadas com ajustes (D-063), mas a versão final depende da calibração (H6, Q-66), e **o sistema ainda não foi adaptado** às novas escalas (Q-67): a Etapa 2A continua operando a metodologia de **demonstração** (pontuação de 0 a 100 e posicionamento em cinco níveis), com dados fictícios e resultados marcados como **não homologados**. Não há aprovação de pesos, fórmulas, pontos de corte, notas de 0 a 100 nem da pontuação Poder × Interesse × Engajamento. ✅ (D-034, D-058)
+> **Importante.** As escalas institucionais foram definidas em 01/11/2026 pelo Manual de Especificação e Operação V2.2, pelo Guia de Implantação V2.2 e pela Nota de Decisões Metodológicas V2.2 ✅ (D-057 a D-060). As **rubricas** estão homologadas na versão final da Q-66 (1.0, D-068), depois da calibração H6, mas **o sistema ainda não foi adaptado** às novas escalas (Etapa 2B, Q-67 1.0): a Etapa 2A continua operando a metodologia de **demonstração** (pontuação de 0 a 100 e posicionamento em cinco níveis), com dados fictícios e resultados marcados como **não homologados**. Não há aprovação de pesos, fórmulas, pontos de corte, notas de 0 a 100 nem da pontuação Poder × Interesse × Engajamento. ✅ (D-034, D-058)
 
 ## 1. Conceitos
 
@@ -54,7 +55,7 @@ Legenda: ✅ Aprovado · 🔧 Proposta técnica · ⏳ Pendente.
 | **Justificativa** | Síntese geral obrigatória para publicar e justificativa curta por dimensão classificada, sem tamanho mínimo e sem duplicação. | ✅ (Manual V2.2, D-063) / ⏳ por dimensão na implementação (Q-67) |
 | **Evidências** | Opcionais (D-067): documentos, links e observações reforçam a fundamentação e a confiança, mas não são condição para registrar; uma evidência pode fundamentar mais de uma dimensão, com vínculo explícito. A justificativa de cada dimensão indica a natureza da informação (formal ou documental, informal ou percepção profissional) e se ela ainda não está confirmada. A demonstração atual ainda exige evidência para publicar (P-033), a rever na Etapa 2B. | ✅ (Manual V2.2, D-063, revista pela D-067) / ⏳ implementação (Q-67) |
 | **Validação institucional** | Registro da origem e da natureza da informação que sustenta o posicionamento de uma instituição (manifestação formal, de representante diretamente envolvido ou percepção fundamentada), sem exigir confirmação formal (D-067). A demonstração atual ainda exige o campo preenchido para publicar (P-033), a rever na Etapa 2B. | ✅ (Manual V2.2, ajustado pela D-067) / ⏳ (Etapa 2B) |
-| **Ressalvas relevantes** | Campo próprio vinculado ao posicionamento; com manifestação documentada, registra: há ressalvas (com descrição), não identificadas ou informação insuficiente. Não é categoria. | ✅ diretriz (D-063) / ⏳ implementação (Q-67) |
+| **Ressalvas relevantes** | Campo próprio vinculado ao posicionamento, com tratamentos preferenciais: sem manifestação identificada, não se aplica; manifestação sem condições identificadas, não identificadas; manifestação com informações insuficientes sobre condições, informação insuficiente; condição materialmente relevante, há ressalvas (com descrição). Percepções ainda não manifestadas ficam nas observações. Condição já prevista no projeto conforme a materialidade. Não é categoria. | ✅ (D-063, D-068) / ⏳ implementação (Q-67 1.0) |
 | **Data de referência e próxima revisão** | A próxima revisão é marcada para um ano após a data de referência, sem prejuízo de reavaliação por evento relevante. | ✅ (Manual V2.2) |
 | **Tendência** | Comparação de versões ou justificação explícita (Manual V2.2). Comparação automática só entre avaliações metodologicamente comparáveis: mesma versão de metodologia, alteração apenas editorial aprovada ou equivalência de definições declarada. A mesma escala não basta se as rubricas mudaram substantivamente; caso contrário, "Não comparável", com justificativa. | ✅ (T-6, D-063, D-064) / ⏳ implementação (Q-67) |
 
@@ -215,7 +216,7 @@ O modelo de quatro quadrantes de Mendelow foi referência de estudo e **não foi
 4. "Publicar" grava e publica: o banco confere justificativa, data de referência, evidência, justificativa da confiança e validação institucional. A anterior passa a "substituída".
 5. A matriz do contexto passa a refletir a nova versão.
 
-Na adaptação às escalas V2.2 (Q-67), o passo 3 passa a registrar diretamente os níveis de poder e interesse. Na mudança metodológica **substantiva** (escala, critérios, rubricas, definições dos níveis ou regras de interpretação), o novo rascunho não recebe poder, interesse, posicionamento, grau de confiança nem validação institucional como válidos; as informações e evidências anteriores podem ser reaproveitadas como referência, com confirmação de pertinência pelo responsável. Nas mudanças **exclusivamente editoriais** aprovadas, não há reclassificação (T-4, D-063, D-064). As versões anteriores ficam intactas.
+Na adaptação às escalas V2.2 (Q-67), o passo 3 passa a registrar diretamente os níveis de poder e interesse. Na mudança metodológica **substantiva** (escala, critérios, rubricas, definições dos níveis ou regras de interpretação), o novo rascunho não recebe poder, interesse, posicionamento, grau de confiança nem validação institucional como válidos; as evidências anteriores chegam como referência identificada pela origem, sem fluxo de confirmação (D-068). Na metodologia V2.2, o banco confere só os requisitos técnicos e de rastreabilidade (justificativas por dimensão, síntese, data de referência e natureza da informação do posicionamento classificado); evidência e validação institucional deixam de ser exigidas, e as regras de interpretação passam a alertas (Q-67 1.0). Nas mudanças **exclusivamente editoriais** aprovadas, não há reclassificação (T-4, D-063, D-064). As versões anteriores ficam intactas.
 
 ## 8. Acesso ✅ / 🔧
 
@@ -233,7 +234,7 @@ Valem para a adaptação (Q-67); ainda não implementados.
 | T20 | O histórico binário Alto/Baixo permanece intacto e identificado pela metodologia original; sem conversão automática. |
 | T21 | Cálculos de 0 a 100, pesos e rubricas não homologados ficam indisponíveis na operação institucional. |
 | T22 | Novas avaliações aceitam Favorável, Neutro, Contrário ou Não avaliado; sem opção parcial nas novas versões, que continua exibível no histórico. |
-| T23 | "Neutro" exige justificativa e evidência; nunca é atribuído pela falta de resposta ou pelo desconhecimento. |
+| T23 | "Neutro" exige justificativa e evidência; nunca é atribuído pela falta de resposta ou pelo desconhecimento. **Adaptado pela D-068:** justificativa e natureza da informação; sem manifestação indicada, alerta; nunca atribuído automaticamente. |
 | T24 | Registros antigos com cinco posições permanecem idênticos e rastreáveis à metodologia histórica; nenhum mapeamento automático para três categorias. |
 
 Testes complementares 🔧 (a implementar junto com a adaptação):
@@ -246,46 +247,53 @@ Testes complementares 🔧 (a implementar junto com a adaptação):
 6. Tendência não é calculada entre versões de escalas diferentes.
 7. Manifestação efetivamente inconclusiva fica sem classificação conclusiva ("Não avaliado"), com a manifestação, as condições e a razão registradas; o sistema nunca a converte automaticamente em Neutro (D-061, D-067).
 8. Com manifestação, formal ou informal, a situação das ressalvas é registrada; "há ressalvas relevantes" sem descrição gera alerta (D-063, D-067).
-9. Cada dimensão classificada tem justificativa, com a natureza da informação; evidências são opcionais e podem estar vinculadas a mais de uma dimensão (D-061, D-063, D-067).
+9. Cada dimensão classificada tem justificativa, com a natureza da informação; evidências são opcionais (D-061, D-063, D-067, D-068).
 10. Poder Baixo sem indicação do que foi examinado ou considerado gera alerta; o consultor pode manter a classificação, com justificativa (D-063, D-067).
-11. Na mudança metodológica substantiva, nenhuma classificação é copiada como válida e as evidências históricas só contam depois de confirmadas; na mudança editorial aprovada, a cópia é permitida (T-4, D-064).
+11. Na mudança metodológica substantiva, nenhuma classificação é copiada como válida e as evidências anteriores chegam como referência identificada pela origem; na mudança editorial aprovada, a cópia é permitida (T-4, D-064, D-068).
 12. Tendência "Não comparável" entre metodologias diferentes sem equivalência declarada, mesmo com os mesmos três níveis (T-6).
 13. Cópia de segurança antes da migração e preservação verificada campo a campo (T-1).
 14. Toda nova versão da metodologia registra a natureza da alteração (substantiva ou editorial), a justificativa e a aprovação; alterações estruturais não podem ser classificadas como editoriais (D-064).
 15. Alertas orientativos não impedem gravar, publicar nem continuar iniciativas; a classificação mantida diante de alerta exige justificativa; só bloqueios técnicos de integridade (valores fora da escala, avaliação sem stakeholder, contexto, responsável ou data, histórico imutável) impedem a gravação (D-067).
+16. Posicionamento classificado exige a natureza da informação (manifestação formal, informação informal ou percepção do consultor); o selo "preliminar" aparece quando não for formal; os alertas mantidos ficam gravados na versão publicada (D-068).
 
-## 10. Rubricas — versão 0.4, em calibração 🔧 (Q-66, D-061, D-063, D-067)
+## 10. Rubricas — versão final 1.0 ✅ (Q-66, D-063, D-067, D-068)
 
-Diretrizes homologadas pelo gestor em 02/11/2026 (D-063) e ajustadas depois da rodada 1 da calibração (D-067). **Continuam em calibração até a conclusão da rodada 2**: a metodologia não está em uso no sistema. O documento completo da Q-66 (versão 0.4), com exemplos fictícios e situações limítrofes, e o material da calibração foram entregues ao gestor fora deste repositório.
+Rubricas homologadas pelo gestor em 02/11/2026, na versão final da Q-66 (1.0, D-068), depois da calibração H6. **O sistema ainda não foi adaptado** (Etapa 2B, Q-67 1.0). O documento completo da Q-66, com exemplos fictícios e situações limítrofes, e o material da calibração foram entregues ao gestor fora deste repositório.
 
 ### 10.1 Diretriz geral e regras gerais
 
-**Discricionariedade fundamentada (D-067):**
+**Discricionariedade fundamentada (D-067, reiterada na D-068):**
 - As classificações são **avaliações profissionais do consultor**, não declarações de fatos oficialmente certificados. O CRM apoia a inteligência institucional, o relacionamento, as aproximações, as iniciativas e os encaminhamentos; não é sistema de certificação de manifestações institucionais.
-- As rubricas **orientam** o julgamento profissional, sem substituí-lo por regras rígidas ou bloqueios automáticos. Avaliações flexíveis, discricionárias e, quando necessário, subjetivas são admitidas, com fundamentação proporcional e transparência quanto ao grau de confiança.
+- As rubricas são **orientativas**: orientam o julgamento profissional, sem impor uma única interpretação.
 - Regras de natureza interpretativa geram **alertas orientativos**; o consultor pode manter a classificação, com justificativa. Só os **bloqueios técnicos** de integridade permanecem.
+- Preservam-se a rastreabilidade, a identificação das fontes, o grau de confiança e a **distinção entre avaliações preliminares e manifestações institucionais confirmadas**.
+- Não se exige comprovação documental formal para registrar avaliações ou dar andamento a iniciativas.
+- Não se criam campos, fluxos de aprovação ou procedimentos que aumentem desnecessariamente a burocracia.
 - Orientação final: rigor na rastreabilidade, flexibilidade no julgamento e simplicidade operacional.
 
 **Regras gerais:**
 1. **Independência:** cada dimensão é classificada sozinha; nenhuma é deduzida de outra. Interesse alto não é apoio; presença ou ausência não determina o interesse; silêncio não é Neutro; competência formal não é a única forma de poder.
 2. **Contexto e data:** vale para o projeto ou tema avaliado, na data de referência, no horizonte do ciclo previsto até a próxima revisão anual.
-3. **Fundamentação por dimensão (H3, revista pela D-067):** cada dimensão classificada tem justificativa curta que indica em que o avaliador se apoia — informação formal ou documental, informação informal ou percepção profissional, identificada como tal — e se a informação ainda não está confirmada. **Documento comprobatório não é obrigatório.** A ausência de sinais de um nível não prova o nível oposto. Sem informação suficiente para formar um julgamento, "Não avaliado".
+3. **Fundamentação por dimensão (H3, revista pela D-067):** cada dimensão classificada tem justificativa curta que indica em que o avaliador se apoia — informação formal ou documental, informação informal ou percepção profissional, identificada como tal. **Documento comprobatório não é obrigatório.** A ausência de sinais de um nível não prova o nível oposto. Sem informação suficiente para formar um julgamento, "Não avaliado".
 4. **Justificativa por dimensão (H4):** curta, sem tamanho mínimo e sem repetir os mesmos textos; síntese geral da avaliação.
-5. **Nível × confiança:** a rubrica orienta o nível; a confiança expressa a segurança da avaliação. Na dúvida entre níveis vizinhos, vale o que a avaliação fundamentada sustenta, com confiança menor.
+5. **Nível × confiança:** a rubrica orienta o nível; a confiança expressa a segurança da avaliação.
 6. **Pessoa × instituição (D-059, ajustada pela D-067):** cadastros e avaliações separados. A manifestação de representante diretamente envolvido, ou a percepção fundamentada do consultor, pode sustentar avaliação preliminar do posicionamento institucional, com origem e natureza registradas, sem exigir confirmação formal e sem apresentá-la como posição oficial.
 
-### 10.2 Poder / influência (H1, ajustada pela D-067)
+### 10.2 Poder / influência (H1, ajustada pelas D-067 e D-068)
 
 Pergunta-chave: *o stakeholder tem capacidade — formal, demonstrada ou plausível — de influenciar, dificultar, atrasar ou modificar a aprovação, a viabilidade, a estratégia, o cronograma, os custos ou a legitimidade do projeto? Em que grau?* A análise é também prospectiva.
 
 | Nível | Critério orientador | Bases típicas |
 |---|---|---|
-| **Alto** | Autoridade formal para aprovar, negar, vetar, suspender ou condicionar decisão essencial ou recurso indispensável; **ou** influência **decisiva demonstrada** sobre decisões e condições relevantes do projeto. | Norma, ato, parecer vinculante, contrato ou titularidade; precedente de efeito decisivo em projeto igual ou análogo; condição de financiador ou licenciador que dependa da sua anuência. |
+| **Alto** | Autoridade formal para aprovar, negar, vetar, suspender ou condicionar decisão essencial ou recurso indispensável; **ou** influência **decisiva** sobre decisões e condições relevantes do projeto, identificada por fatos específicos ou por avaliação prospectiva fundamentada, com o grau de confiança (D-068, F2). | Norma, ato, parecer vinculante, contrato ou titularidade; precedente de efeito decisivo; condição de financiador ou licenciador que dependa da sua anuência; base específica para a avaliação prospectiva. |
 | **Médio** | **Capacidade relevante de influenciar, dificultar, atrasar ou modificar decisões relativas ao projeto, identificada a partir de competências, recursos, relacionamentos, circunstâncias ou indícios específicos, segundo avaliação fundamentada do consultor** (D-067). Não exige que o efeito já tenha ocorrido. | Voto em colegiado sem veto; parecer não vinculante; recurso substituível; legitimidade específica e possibilidade concreta de questionar ou atrasar; relacionamento com quem decide. |
 | **Baixo** | Influência indireta, eventual ou restrita a aspectos acessórios, sem capacidade relevante identificada. | Indicação do que foi examinado ou considerado; verificação documental, quando houver. A falta de sinais de Poder Alto **não** prova Poder Baixo (alerta). |
 | **Não avaliado** | Informação insuficiente para formar um julgamento. | — |
 
-Hipótese **meramente abstrata** — algo que qualquer ator poderia, em tese, fazer — não é poder; capacidade plausível, com base específica, conta.
+**Orientações (D-068):**
+- **Influência relevante × decisiva (F2):** decisiva é a que, sozinha ou como fator determinante, muda o resultado; relevante é a que pesa sem determinar. Atrasos, alterações de projeto, suspensão de iniciativas e precedentes são referências, sem limites rígidos de duração ou magnitude e sem exigência de acontecimento anterior.
+- **Conselho ou instância consultiva (F1):** a participação não determina automaticamente Baixo ou Médio. O consultor avalia a capacidade efetiva ou potencial plausível de influência da instância — contexto, relevância das manifestações e relações institucionais —, sem depender de voto ou veto.
+- Hipótese **meramente abstrata** — algo que qualquer ator poderia, em tese, fazer — não é poder.
 
 ### 10.3 Interesse (H1)
 
@@ -298,7 +306,7 @@ Pergunta-chave: *quão relevante é o projeto para os objetivos, competências, 
 | **Baixo** | Relevância marginal ou remota. | Comparação entre o escopo do projeto e os objetivos ou competências. |
 | **Não avaliado** | Informação insuficiente. | — |
 
-### 10.4 Posicionamento e ressalvas (H1, H2, H5, ajustadas pela D-067)
+### 10.4 Posicionamento e ressalvas (H1, H2, H5, ajustadas pelas D-067 e D-068)
 
 | Classificação | Critério orientador |
 |---|---|
@@ -307,56 +315,66 @@ Pergunta-chave: *quão relevante é o projeto para os objetivos, competências, 
 | **Contrário** | Orientação **predominante** de oposição à proposta, inclusive condição que descaracteriza a proposta. |
 | **Não avaliado** (estado, não categoria) | **(a)** Sem manifestação nem informação suficiente para formar um julgamento; **ou (b)** manifestação efetivamente inconclusiva, com a manifestação, as condições e a razão da indefinição registradas. **Não existe quarta categoria.** |
 
-Expressões como "apoiará se" ou "desde que" **não determinam automaticamente** a classificação: o consultor considera o contexto e a natureza da condição (D1).
+Expressões como "apoiará se" ou "desde que" **não determinam automaticamente** a classificação: o consultor considera o contexto e a natureza da condição (D1). A natureza da informação do posicionamento distingue a **manifestação confirmada** (formal) da **avaliação preliminar** (informal ou percepção).
 
-**Ressalvas relevantes (H2, opção C com ajuste):** campo próprio, vinculado à avaliação do posicionamento. **Sempre que houver manifestação, formal ou informal**, registra-se uma de três situações:
-- **há ressalvas relevantes**, com descrição;
-- **não foram identificadas** ressalvas relevantes;
-- **informação insuficiente** para avaliá-las (não se presume que não existam).
+**Ressalvas relevantes (H2, ajustada pela D-068, F3):** campo próprio, vinculado à avaliação do posicionamento, com tratamentos preferenciais:
 
-Sem manifestação, o campo não se aplica. O campo não cria categoria de posicionamento.
+| Situação | Tratamento |
+|---|---|
+| Sem manifestação identificada | Não se aplica |
+| Manifestação sem condições identificadas | Não identificadas |
+| Manifestação com informações insuficientes sobre condições | Informação insuficiente |
+| Manifestação com condição materialmente relevante | Há ressalvas relevantes, com descrição |
+
+- Percepções de objeções, riscos ou preocupações ainda não manifestadas ficam nas observações ou na avaliação do consultor, **sem serem apresentadas como ressalvas manifestadas**.
+- **Condição já prevista no projeto (F4):** pode ser ressalva relevante quando for material para a manutenção do apoio, da oposição ou do compromisso; não é automaticamente relevante; interpretações distintas são admitidas, se fundamentadas.
+- O sistema pode sugerir o preenchimento, sem bloquear o registro fundamentado.
+- O campo não cria categoria de posicionamento.
 
 **Painéis futuros (H5):** mostrar à parte, como informação complementar e não como quarta categoria, quantos "Não avaliado" no posicionamento têm manifestação registrada.
 
-### 10.5 Calibração (H6 — em execução, com avaliador único)
+### 10.5 Calibração (H6 — concluída, com avaliador único)
 
-**Configuração (D-065):** o exercício é feito por **um único avaliador**, o gestor.
-- **Rodada 1 — encerrada em 02/11/2026 (D-067):** dez casos fictícios (11 linhas); 38 de 44 classificações coincidentes com o gabarito (86,4%) — poder 10 de 11, interesse 8 de 11, posicionamento 9 de 11, ressalvas 11 de 11. Resultado exploratório: não prova a correção absoluta do gabarito nem obriga a reproduzir as avaliações esperadas; as divergências foram usadas como subsídio para a versão 0.4.
-- **Rodada 2 — casos inéditos (D-066):** seis casos fictícios novos, em projeto distinto, aplicados com o resumo da rubrica 0.4 e campo de confiança. O gabarito, registrado antes da aplicação, foi revisado também antes da aplicação para a versão 0.4 (revisão 1, com o original preservado e as impressões digitais no Registro de Decisões). Leituras alternativas defensáveis foram registradas antes da aplicação e são tratadas como discricionariedade legítima.
-- **Gabaritos:** separados dos formulários e não alterados retrospectivamente. Revisões só em arquivo novo, com justificativa. Nas divergências, as duas fundamentações são examinadas, sem presumir que o gabarito esteja correto.
-- **Encerramento:** concluída a rodada 2, consolidam-se as versões finais da Q-66 e da Q-67 e prepara-se a autorização da Etapa 2B, sem novas rodadas, salvo necessidade concreta demonstrada (D-067).
+**Finalidade:** identificar ambiguidades e verificar a aplicabilidade operacional das rubricas, não demonstrar concordância absoluta com o gabarito técnico (D-068).
+
+| Rodada | Casos | Coincidência com o gabarito | Resultado |
+|---|---|---|---|
+| 1 — diagnóstico (rubrica 0.3) | 10 casos fictícios, 11 linhas | 38 de 44 (86,4%) | Ajustes da versão 0.4 (D-067) |
+| 2 — casos inéditos (rubrica 0.4) | 6 casos fictícios, 7 linhas | 18 de 28 (64,3%); 20 de 28 (71,4%) com as leituras alternativas registradas antes da aplicação | Ajustes F1 a F4 da versão final (D-068) |
+
+- **Gabaritos:** registrados antes da aplicação, com impressão digital no Registro de Decisões; não alterados retrospectivamente; revisões só em arquivo novo, com justificativa.
+- **Conclusão:** calibração encerrada, sem terceira rodada (D-068).
 
 **Limitações registradas:**
 - avaliador único;
+- amostra reduzida;
 - **não foi medida a confiabilidade entre avaliadores**;
-- a comparação com o gabarito **não constitui validação estatística independente**;
-- a referência de 80% é apenas exploratória, não requisito estatístico;
-- a homologação da metodologia será **decisão gerencial fundamentada**, com essas limitações documentadas;
-- na rodada 1, o avaliador declarou não ter consultado previamente os gabaritos, até onde se recorda; permanece registrada a exposição prévia às discussões metodológicas.
+- **não há validação estatística independente**;
+- a referência de 80% foi apenas exploratória;
+- a homologação é **decisão gerencial fundamentada**, com essas limitações documentadas;
+- na rodada 1, o avaliador declarou não ter consultado previamente os gabaritos, até onde se recorda; permaneceu registrada a exposição prévia às discussões metodológicas.
 
-### 10.6 Situação da homologação (D-063, ajustada pela D-067)
+### 10.6 Situação da homologação (versão final — D-068)
 
 | ID | Situação |
 |---|---|
-| H1 | ✅ Aprovada; ajustada pela D-067 (Poder Médio com capacidade plausível; presença e ausência sem determinar o interesse; apoio condicionado) |
-| H2 | ✅ Aprovada (opção C), com ajuste: três situações para as ressalvas, sempre que houver manifestação, formal ou informal |
-| H3 | ✅ **Revista pela D-067:** fundamentação proporcional, com a natureza da informação; documento não obrigatório; falta de sinais de Alto não prova Baixo (alerta) |
-| H4 | ✅ Aprovada |
-| H5 | ✅ Aprovada, aplicada com alertas (D-067), com informação complementar nos painéis |
-| H6 | ✅ Em execução: rodada 1 encerrada (86,4%); rodada 2 com casos inéditos e rubrica 0.4; avaliador único, sem medida de confiabilidade entre avaliadores (D-065) |
+| H1 | ✅ Homologada; ajustada pelas D-067 e D-068 (Poder Médio com capacidade plausível; influência relevante × decisiva; conselhos consultivos; presença e ausência sem determinar o interesse; apoio condicionado) |
+| H2 | ✅ Homologada; ajustada pela D-068 (tratamentos preferenciais; percepções nas observações; condição já prevista conforme a materialidade) |
+| H3 | ✅ Revista pela D-067 (fundamentação proporcional; documento não obrigatório) |
+| H4 | ✅ Homologada |
+| H5 | ✅ Homologada, aplicada com alertas |
+| H6 | ✅ **Concluída** (D-068) |
 
-As versões finais da Q-66 e da Q-67 serão consolidadas depois da rodada 2. A programação da Etapa 2B depende dessa consolidação e de autorização.
+Alterações futuras das rubricas seguem a T-4 e a D-064 (substantiva × editorial). A programação da Etapa 2B depende de autorização específica.
 
 ## 11. Questões pendentes ⏳
 
 | ID | Questão |
 |---|---|
-| Q-01 | Critérios de poder e de interesse: com a escala definida (D-058), passam a ser as rubricas de cada nível (Q-66). |
-| Q-06 | Pesos e fórmula institucional: **nenhum aprovado**; a escala V2.2 é de classificação direta (D-058). |
 | Q-60 | Planilhas originais de qualificação de stakeholders dos demais comitês, se existirem. |
 | Q-64 | Categorias da "Conduta do ES em Ação" e regras de relação com a matriz, sem derivação automática. |
 | Q-65 | Decisões da revisão metodológica: Q-65.2 resolvida (D-058); Q-65.3 resolvida em parte (engajamento e conhecimento do projeto separados — D-060; categorias pendentes); Q-65.5 resolvida em parte (sem pontuação Poder × Interesse × Engajamento; célula da matriz como leitura — D-058); pendentes Q-65.1, Q-65.4 e Q-65.6. |
-| Q-66 | Rubricas observáveis de Baixo/Médio/Alto (poder e interesse) e de Favorável/Neutro/Contrário, evidências mínimas, confiabilidade entre avaliadores e tratamento de registros insuficientes. Diretrizes H1 a H6 homologadas com ajustes (D-063); calibração H6 pendente de execução; versão final após a calibração (seção 10). |
-| Q-67 | Plano de adaptação técnica da Etapa 2A às escalas V2.2 ([Plano de Implantação](PLANO_IMPLANTACAO.md), seção 7). Decisões T-1 a T-7 homologadas com ajustes (D-063); T-4 precisada pela D-064; versão final após a calibração. |
+
+Resolvidas na D-068: Q-01 (rubricas finais — Q-66 1.0), Q-06 (sem pesos nem fórmula: classificação direta — D-058), Q-66 (versão final 1.0, depois da calibração H6) e Q-67 (versão final 1.0 do plano técnico).
 
 Resolvidas: Q-02 (escala de poder e interesse — D-058), Q-03 (grau de confiança: robustez da evidência, três níveis — D-034), Q-04 (posicionamento: cinco níveis no Manual V2.0, **substituídos por três categorias para novas avaliações** — D-059), Q-05 (matriz: grade ordinal 3 × 3 com células nomeadas, sem pontos de corte — D-058), Q-07 (estrutura com metodologia de demonstração e dados fictícios antes da homologação — D-034) e Q-08 (revisão anual e por evento relevante — Manual V2.0); Q-61 (grau de confiança — D-036) e Q-62 (metodologia comum, com arquitetura para metodologias específicas — D-037). Consolidação em [REGISTRO_DECISOES.md](REGISTRO_DECISOES.md).

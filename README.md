@@ -37,7 +37,7 @@ A arquitetura tecnológica inicialmente proposta utiliza Next.js, TypeScript, Po
 
 ## Situação atual
 
-Projeto em fase inicial de desenvolvimento. As Etapas 1, 1.1 e 2A foram homologadas para desenvolvimento com dados fictícios e incorporadas à `main`. As escalas de avaliação foram redefinidas pela deliberação V2.2 (poder e interesse: Baixo, Médio e Alto; posicionamento: Favorável, Neutro e Contrário; "Não avaliado" à parte), mas o sistema ainda não foi adaptado: a Etapa 2B aguarda a homologação das rubricas e do plano de adaptação técnica.
+Projeto em fase inicial de desenvolvimento. As Etapas 1, 1.1 e 2A foram homologadas para desenvolvimento com dados fictícios e incorporadas à `main`. As escalas de avaliação foram redefinidas pela deliberação V2.2 (poder e interesse: Baixo, Médio e Alto; posicionamento: Favorável, Neutro e Contrário; "Não avaliado" à parte), mas o sistema ainda não foi adaptado. As rubricas e o plano de adaptação técnica estão em versão final (D-068), e a Etapa 2B aguarda autorização.
 
 Já existem a documentação, um banco de dados local de desenvolvimento, as telas do Cadastro Mestre (pessoas, instituições, vínculos, contatos e histórico de alterações) e as telas de comitês (somente consulta), projetos e temas, com comitês participantes e stakeholders associados, além da estrutura de avaliação de stakeholders (fichas, versões, evidências e matriz de poder × interesse) com uma metodologia de **demonstração**: os resultados exibidos são fictícios e **não homologados**. Ainda não há a metodologia institucional, autenticação, hospedagem nem os demais módulos.
 

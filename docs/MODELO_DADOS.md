@@ -12,6 +12,7 @@
 | 0.8 | 02/11/2026 | Seção 6.3.1 conforme a D-063: ressalvas em três situações, verificação documental, evidência reaproveitada com confirmação e equivalência entre metodologias. Não implementado. |
 | 0.9 | 02/11/2026 | Seção 6.3.1: natureza das alterações da metodologia (substantiva ou editorial), conforme a D-064. Não implementado. |
 | 0.10 | 02/11/2026 | Seção 6.3.1 e campo `validacao_institucional` conforme a D-067: evidências opcionais, natureza da informação e indicação de não confirmada; regras interpretativas como alertas; bloqueios só técnicos. Não implementado. |
+| 0.11 | 02/11/2026 | Seção 6.3.1 conforme a versão final da Q-67 (D-068): natureza da informação do posicionamento e alertas mantidos; retirados a tabela de evidência por dimensão, o tipo "verificação documental" e a confirmação de pertinência. Não implementado. |
 
 Legenda: ✅ Aprovado · 🔧 Proposta técnica · ⏳ Pendente (ver [REQUISITOS.md](REQUISITOS.md#como-ler-este-documento)).
 
@@ -415,20 +416,20 @@ Regra: só muda enquanto a versão é rascunho; retirar uma evidência do rascun
 
 `metodologia_versao`, `criterio_avaliacao`, `avaliacao`, `avaliacao_versao`, `avaliacao_nota_criterio` e `evidencia` têm os campos de controle, a trilha de auditoria e a proibição de exclusão comuns às demais tabelas.
 
-#### 6.3.1 Adaptação prevista às escalas V2.2 🔧 (não implementada — Q-67)
+#### 6.3.1 Adaptação prevista às escalas V2.2 🔧 (plano final, não implementado — Q-67 1.0, D-068)
 
-As escalas V2.2 (D-058 a D-060) pedem os ajustes abaixo, propostos para homologação. Nenhum deles foi feito. A mudança seria feita por migração **somente aditiva**: nada é excluído, convertido ou recalculado.
+As escalas V2.2 (D-058 a D-060) pedem os ajustes abaixo, consolidados na versão final da Q-67 (D-068). Nenhum deles foi feito; dependem da autorização da Etapa 2B. A mudança seria feita por migração **somente aditiva**: nada é excluído, convertido ou recalculado.
 
 | Tabela | Mudança proposta | Finalidade |
 |---|---|---|
 | `metodologia_versao` | `escala_poder_interesse`: lista `demonstracao_numerica`, `binaria_historica`, `ordinal_tres_niveis`. `escala_posicionamento`: lista `cinco_categorias`, `tres_categorias`. | Saber em que escala cada versão foi registrada, sem converter nada. |
 | `rubrica_nivel` (nova) | Metodologia, dimensão (poder, interesse, posicionamento), nível, descrição, evidência mínima e ordem. | Rubricas versionadas com a metodologia e travadas quando ela entra em vigor. |
 | `avaliacao_versao` | `nivel_poder` e `nivel_interesse`: lista `baixo`, `medio`, `alto`; vazio = "não avaliado". | Classificação direta da V2.2. |
-| `avaliacao_versao` | `situacao_ressalvas`: lista `ha_ressalvas`, `nao_identificadas`, `informacao_insuficiente` (vazio = não se aplica, sem manifestação) e `descricao_ressalvas` (obrigatória com `ha_ressalvas`) — H2 (D-063). | Registrar as ressalvas do posicionamento separadamente da categoria, sem presumir que não existam. |
+| `avaliacao_versao` | `situacao_ressalvas`: lista `ha_ressalvas`, `nao_identificadas`, `informacao_insuficiente` (vazio = não se aplica, sem manifestação identificada) e `descricao_ressalvas` (esperada com `ha_ressalvas`; a falta gera alerta) — H2 (D-063, D-068). | Registrar as ressalvas do posicionamento separadamente da categoria, com os tratamentos preferenciais da D-068. |
+| `avaliacao_versao` | `natureza_posicionamento`: lista `manifestacao_formal`, `informacao_informal`, `percepcao_consultor`; exigida quando o posicionamento é classificado (D-067, D-068). | Natureza da informação e distinção entre manifestação confirmada e avaliação preliminar (selo "preliminar"), sem campo adicional de confirmação. |
+| `avaliacao_versao` | `alertas_reconhecidos`: lista de textos gravada automaticamente na publicação (D-068). | Rastrear os alertas que o consultor decidiu manter; o usuário não preenche nada. |
 | `avaliacao_versao` | `justificativa_poder`, `justificativa_interesse` e `justificativa_posicionamento` (D-061). | Justificativa por dimensão; no posicionamento sem classificação conclusiva, a razão da indefinição. |
-| `evidencia_dimensao` (nova) | Evidência e dimensão (poder, interesse, posicionamento); uma evidência pode estar ligada a várias dimensões (D-061, D-063). | Evidência por dimensão, com vínculo explícito. |
-| `evidencia` | Novo tipo `verificacao_documental`, com `fontes_consultadas`, `elementos_examinados` e `data_analise` (obrigatórios nesse tipo) — H3 (D-063). | Fundamentar Poder Baixo sem usar a falta de evidência de Alto como prova. |
-| `evidencia` | `evidencia_origem_id`, `pertinencia_confirmada_em` e `pertinencia_confirmada_por` — T-4 (D-063). | Reaproveitar evidência histórica como referência, só válida depois de confirmada. |
+| `evidencia` | `evidencia_origem_id` — T-4 (D-063, simplificada pela D-068). | Evidência trazida de versão anterior como referência identificada pela origem. A tabela de evidência por dimensão, o tipo `verificacao_documental` e a confirmação de pertinência foram retirados do plano (D-068), porque a evidência passou a ser opcional. |
 | `metodologia_versao` | `equivalente_posicionamento_a` e `justificativa_equivalencia` — T-6 (D-063). | Permitir a tendência entre metodologias diferentes só com equivalência declarada. |
 | `metodologia_versao` | `metodologia_anterior_id`, `natureza_alteracao` (`substantiva`, `editorial`), `justificativa_natureza`, `natureza_aprovada_por` e `natureza_aprovada_em` — D-064. | Classificar cada alteração metodológica: a substantiva exige revalidação; a editorial não. |
 
@@ -437,7 +438,7 @@ Regras propostas no banco:
 - Escala ordinal: só os níveis; colunas numéricas e notas por critério ficam vazias.
 - Escala binária histórica: sem `medio`.
 - Novas versões exigem metodologia.
-- Cada dimensão classificada exige justificativa própria, com a natureza da informação (formal ou documental, informal ou percepção profissional) e a indicação de não confirmada, quando for o caso; evidências são opcionais (com pertinência confirmada, se reaproveitadas); posicionamento vazio com manifestação registrada exige a justificativa do posicionamento. Regras interpretativas — Neutro sem manifestação, Poder Baixo sem indicação do que foi examinado, "há ressalvas" sem descrição, posição institucional fundamentada em manifestação de pessoa — geram alertas, não bloqueios; a classificação mantida exige justificativa. Bloqueios técnicos: valores fora da escala (não há valor de quarta categoria), vínculos obrigatórios e histórico imutável. A forma dos campos de natureza da informação fica para a versão final da Q-67 (D-061, D-063, D-067).
+- Cada dimensão classificada exige justificativa própria, com a natureza da informação (formal ou documental, informal ou percepção profissional) e a indicação de não confirmada, quando for o caso; evidências são opcionais (com pertinência confirmada, se reaproveitadas); posicionamento vazio com manifestação registrada exige a justificativa do posicionamento. Regras interpretativas — Neutro sem manifestação, Poder Baixo sem indicação do que foi examinado, "há ressalvas" sem descrição, posição institucional fundamentada em manifestação de pessoa — geram alertas, não bloqueios; a classificação mantida exige justificativa. Bloqueios técnicos: valores fora da escala (não há valor de quarta categoria), vínculos obrigatórios e histórico imutável. A natureza da informação de poder e interesse é indicada na justificativa; a do posicionamento, em `natureza_posicionamento` (D-061, D-063, D-067, D-068).
 - Na mudança metodológica substantiva, o novo rascunho não recebe classificações como válidas (T-4); na editorial aprovada, a cópia é permitida. Alterações estruturais (escala, níveis, critérios, regras de evidência ou de interpretação) são sempre substantivas. A tendência só compara avaliações metodologicamente comparáveis (T-6, D-064).
 
 Linhas existentes: as metodologias de demonstração já registradas recebem `demonstracao_numerica` e `cinco_categorias` como valor padrão ao criar as colunas, sem alterar versões publicadas. Versões sem metodologia são tratadas como da escala anterior. O tipo `posicionamento`, com os cinco valores, é mantido por causa do histórico.
