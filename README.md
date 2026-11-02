@@ -37,9 +37,9 @@ A arquitetura tecnológica inicialmente proposta utiliza Next.js, TypeScript, Po
 
 ## Situação atual
 
-Projeto em fase inicial de desenvolvimento — **Etapa 1: Banco de dados de desenvolvimento e Cadastro Mestre**.
+Projeto em fase inicial de desenvolvimento — **Etapa 1.1: Projetos, temas e contextos** (a Etapa 1, Banco de dados de desenvolvimento e Cadastro Mestre, foi homologada para desenvolvimento e testes).
 
-Já existem a documentação, um banco de dados local de desenvolvimento e as telas do Cadastro Mestre (pessoas, instituições, vínculos e histórico de alterações). Ainda não há autenticação, hospedagem nem os demais módulos.
+Já existem a documentação, um banco de dados local de desenvolvimento, as telas do Cadastro Mestre (pessoas, instituições, vínculos, contatos e histórico de alterações) e as telas de comitês (somente consulta), projetos e temas, com comitês participantes e stakeholders associados. Ainda não há avaliação de poder × interesse, autenticação, hospedagem nem os demais módulos.
 
 O ambiente de testes utilizará exclusivamente dados fictícios até que o tratamento de dados institucionais reais seja devidamente autorizado.
 
@@ -53,7 +53,9 @@ A titularidade definitiva do código, os direitos de uso e as responsabilidades 
 
 ## Segurança
 
-O repositório deverá permanecer privado.
+Por decisão do gestor do projeto (D-033, de 01/11/2026), este repositório é mantido **público** por enquanto, com ciência dos riscos dessa escolha. A visibilidade pública do código **não** autoriza divulgar informações reais de stakeholders, documentos internos, planilhas institucionais, senhas, tokens, credenciais, dados de produção ou informações confidenciais. Antes de cada envio ao GitHub, os arquivos adicionados ou modificados e o histórico relevante são verificados quanto a dados pessoais, informações institucionais restritas e segredos.
+
+O repositório ser público não significa que o futuro banco de dados do CRM será público: os dados ficarão em banco próprio, com acesso restrito.
 
 É proibido armazenar senhas, tokens, chaves de acesso ou outras credenciais no código-fonte.
 
@@ -120,7 +122,7 @@ O banco local aceita um programa por vez. Se você tentar usá-lo com a aplicaç
 
 | Comando | O que faz |
 |---|---|
-| `npm run banco:exemplos` | Carrega pessoas e instituições fictícias para testar as telas |
+| `npm run banco:exemplos` | Carrega pessoas, instituições, projetos e temas fictícios para testar as telas (cada grupo só entra se ainda estiver vazio) |
 | `npm run banco:reiniciar` | Apaga o banco local; um banco novo e vazio é criado na próxima execução |
 
 Para fazer uma cópia de segurança, pare a aplicação e copie a pasta `.dados/pglite` para outro lugar. Para restaurar, coloque a cópia de volta no mesmo lugar.

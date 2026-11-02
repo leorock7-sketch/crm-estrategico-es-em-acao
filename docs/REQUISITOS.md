@@ -3,6 +3,7 @@
 | Versão | Data | Situação |
 |---|---|---|
 | 0.1 | 31/10/2026 | Rascunho para revisão do gestor do projeto |
+| 0.2 | 01/11/2026 | Etapa 1.1: comitês participantes e associação de stakeholders aos contextos (D-023, D-030) |
 
 ## Como ler este documento
 
@@ -57,8 +58,10 @@ Sistema próprio de gestão estratégica de relacionamentos institucionais (CRM)
 |---|---|---|
 | RF-10 | Cadastro de projetos e temas estratégicos. | ✅ |
 | RF-11 | Cada projeto ou tema vinculado a um comitê responsável. | 🔧 |
-| RF-12 | Um projeto ou tema tem um comitê principal e pode ter comitês participantes. | ✅ (D-023; implementação na Etapa 1.1) |
+| RF-12 | Um projeto ou tema tem um comitê principal e pode ter comitês participantes. | ✅ (D-023; implementado na Etapa 1.1) |
 | RF-13 | Possibilidade de agrupar projetos dentro de temas (hierarquia). | Não adotado (D-020) |
+| RF-14 | Associação de pessoas e instituições a projetos e temas, com tipo de relação de uma lista neutra e descrição livre, sem avaliação de poder ou interesse. | ✅ (D-030; implementado na Etapa 1.1) |
+| RF-15 | Consulta dos comitês, com a hierarquia e os projetos e temas em que cada um é principal ou participante. Alteração de comitês fora do escopo atual. | ✅ (D-030) |
 
 ### 4.3 Avaliação de stakeholders
 
@@ -152,7 +155,7 @@ Detalhes em [MATRIZ_RISCOS.md](MATRIZ_RISCOS.md).
 
 | ID | Requisito | Situação |
 |---|---|---|
-| RNF-01 | Repositório privado. | ✅ |
+| RNF-01 | Repositório público por decisão do gestor (D-033, que substitui a exigência de repositório privado), sem publicar dados reais, documentos internos, planilhas institucionais ou credenciais; verificação antes de cada envio ao GitHub. | ✅ |
 | RNF-02 | Proibido armazenar senhas, tokens, chaves ou credenciais no código-fonte. | ✅ |
 | RNF-03 | Alterações documentadas e testadas antes da implantação. | ✅ |
 | RNF-04 | Somente dados fictícios em ambiente de testes até autorização formal para uso de dados reais. | ✅ |

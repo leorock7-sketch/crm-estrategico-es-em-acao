@@ -5,6 +5,7 @@
 | 0.1 | 31/10/2026 | Arquitetura da Etapa 0 para revisão |
 | 0.2 | 31/10/2026 | Etapa 1: banco de desenvolvimento (PGlite), acesso a dados (Drizzle ORM) e Cadastro Mestre |
 | 0.3 | 01/11/2026 | Revisão de homologação: trava do banco local, proteção de produção e contatos |
+| 0.4 | 01/11/2026 | Etapa 1.1: telas de comitês, projetos e temas (módulo `projetos-temas`) |
 
 Legenda: ✅ Aprovado · 🔧 Proposta técnica · ⏳ Pendente.
 
@@ -95,6 +96,8 @@ crm-estrategico-es-em-acao/
 │   ├── app/                  Interface: telas (rotas) da aplicação
 │   │   ├── layout.tsx        Moldura comum: cabeçalho, menu e rodapé
 │   │   ├── page.tsx          Página inicial
+│   │   ├── comites/          Lista e detalhe dos comitês (somente consulta)
+│   │   ├── projetos-temas/   Lista com filtros, inclusão, detalhe e edição de projetos e temas
 │   │   ├── pessoas/          Lista, inclusão, detalhe e edição de pessoas
 │   │   ├── instituicoes/     Lista, inclusão, detalhe e edição de instituições
 │   │   ├── not-found.tsx     Página "não encontrado"
@@ -104,6 +107,7 @@ crm-estrategico-es-em-acao/
 │   ├── componentes/          Componentes visuais reutilizáveis (campos, alertas, selos…)
 │   ├── modulos/
 │   │   ├── acesso/           Usuário atual (provisório até a autenticação)
+│   │   ├── projetos-temas/   Comitês, projetos, temas e contextos: validações, consultas, ações e componentes
 │   │   └── stakeholders/     Cadastro Mestre: validações, consultas, ações e componentes
 │   └── lib/
 │       ├── banco/            Conexão, estrutura das tabelas e scripts SQL (migracoes/)

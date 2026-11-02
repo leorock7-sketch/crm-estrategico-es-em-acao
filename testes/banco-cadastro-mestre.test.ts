@@ -9,7 +9,7 @@ import { abrirBanco, type Banco, comoUsuario, type Transacao } from "@/lib/banco
 import { comite, pessoa, registroAuditoria, stakeholder } from "@/lib/banco/esquema";
 import { obterUsuarioAtual } from "@/modulos/acesso/usuario-atual";
 import * as consultas from "@/modulos/stakeholders/consultas";
-import { mensagemDeErro } from "@/modulos/stakeholders/mensagens-erro";
+import { mensagemDeErro } from "@/lib/banco/mensagens-erro";
 
 let banco: Banco;
 let usuarioId: string;
@@ -376,7 +376,7 @@ describe("Vínculos", () => {
     const historicoInstituicao = await consultas.historicoDoStakeholder(banco, instituicaoId);
     expect(historicoInstituicao.map((r) => r.tabela).sort()).toEqual(["instituicao", "vinculo_pessoa_instituicao"]);
 
-    const nomes = await consultas.nomesDosStakeholders(banco, consultas.idsCitadosNoHistorico(historicoPessoa));
+    const nomes = await consultas.nomesDosRegistros(banco, consultas.idsCitadosNoHistorico(historicoPessoa));
     expect(nomes.get(instituicaoId)).toBe("Empresa Eta Exemplo");
   });
 

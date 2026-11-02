@@ -1,6 +1,7 @@
 import { formatarDataHora } from "@/lib/formatacao";
 import type { RegistroHistorico } from "../consultas";
 import { alteracoesEntre } from "../historico";
+import { ROTULOS_TIPO_RELACAO } from "@/modulos/projetos-temas/rotulos";
 import { ROTULOS_OPERACAO, ROTULOS_TIPO_CONTATO } from "../rotulos";
 
 type Dados = Record<string, unknown> | null;
@@ -9,7 +10,7 @@ type PropriedadesHistorico = {
   registros: RegistroHistorico[];
   nomes: Map<string, string>;
   /** Do ponto de vista de quem é o histórico: define como os vínculos são descritos. */
-  perspectiva: "pessoa" | "instituicao";
+  perspectiva: "pessoa" | "instituicao" | "projeto";
 };
 
 function descreverRegistro(
@@ -22,7 +23,18 @@ function descreverRegistro(
     const tipo = ROTULOS_TIPO_CONTATO[String(dados?.tipo) as keyof typeof ROTULOS_TIPO_CONTATO];
     return `Contato (${tipo ?? "contato"}): ${String(dados?.valor ?? "")}`;
   }
-  if (registro.tabela !== "vinculo_pessoa_instituicao") return "Cadastro";
+  if (registro.tabela === "projeto_tema_comite") {
+    return `Comitê participante: ${nomes.get(String(dados?.comite_id ?? "")) ?? "registro não identificado"}`;
+  }
+  if (registro.tabela === "stakeholder_contexto") {
+    const tipo = ROTULOS_TIPO_RELACAO[String(dados?.tipo_relacao) as keyof typeof ROTULOS_TIPO_RELACAO];
+    const campo = perspectiva === "projeto" ? "stakeholder_id" : "projeto_tema_id";
+    const nome = nomes.get(String(dados?.[campo] ?? "")) ?? "registro não identificado";
+    return perspectiva === "projeto"
+      ? `Stakeholder: ${nome} (${tipo ?? "relação"})`
+      : `Relação com ${nome} (${tipo ?? "relação"})`;
+  }
+  if (registro.tabela !== "vinculo_pessoa_instituicao" || perspectiva === "projeto") return "Cadastro";
   const outroId = String(dados?.[perspectiva === "pessoa" ? "instituicao_id" : "pessoa_id"] ?? "");
   const nome = nomes.get(outroId) ?? "registro não identificado";
   return perspectiva === "pessoa" ? `Vínculo com ${nome}` : `Vínculo de ${nome}`;
@@ -75,6 +87,12 @@ export function ListaHistorico({ registros, nomes, perspectiva }: PropriedadesHi
                   </div>
                 ))}
               </dl>
+            )}
+            {registro.operacao === "alteracao" && alteracoes.length === 0 && (
+              <p className="mt-1 text-xs text-texto-secundario">
+                Ajuste técnico, sem mudança nos dados exibidos (por exemplo, a forma do nome usada na
+                busca).
+              </p>
             )}
           </li>
         );

@@ -3,6 +3,7 @@
 | Versão | Data | Situação |
 |---|---|---|
 | 0.1 | 31/10/2026 | Proposta de sequência de etapas para aprovação |
+| 0.2 | 01/11/2026 | Homologação da Etapa 1 (D-027), incorporação à `main` (D-028) e Etapa 1.1 (D-029, D-030) |
 
 Legenda: ✅ Aprovado · 🔧 Proposta técnica · ⏳ Pendente.
 
@@ -22,8 +23,8 @@ Legenda: ✅ Aprovado · 🔧 Proposta técnica · ⏳ Pendente.
 |---|---|---|---|
 | 0 | Fundação técnica | Documentação, esqueleto da aplicação, testes básicos | ✅ Aprovada em 31/10/2026 |
 | 1 | Banco de dados de desenvolvimento e Cadastro Mestre | Banco PostgreSQL local, estrutura de comitês e projetos/temas, cadastro de pessoas, instituições e vínculos, com dados fictícios | ✅ **Homologada em 01/11/2026** para desenvolvimento e testes (D-027); pendências C6, C7 e C8 |
-| 1.1 | Projetos, temas e contextos | Telas de comitês, projetos e temas; comitês participantes (D-023); associação de stakeholders aos contextos, sem avaliação de poder × interesse | ✅ Autorizada para planejamento (D-029); implementação depende da aprovação do plano |
-| 2 | Avaliações e matriz de poder × interesse | Fichas e versões de avaliação, evidências, matriz por contexto. Depende de Q-01 a Q-07 | 🔧 |
+| 1.1 | Projetos, temas e contextos | Telas de comitês, projetos e temas; comitês participantes (D-023); associação de stakeholders aos contextos, sem avaliação de poder × interesse | ✅ **Homologada em 01/11/2026** para desenvolvimento com dados fictícios (D-031); Pull Request #1 |
+| 2 | Avaliações e matriz de poder × interesse | Fichas e versões de avaliação, evidências, matriz por contexto. Depende de Q-01 a Q-07 e Q-60 | ✅ Etapa 2A (metodologia) autorizada para planejamento (D-032); implementação depende da aprovação do plano |
 | 3 | Iniciativas, interações e compromissos | Matriz de iniciativas, registro único de reuniões, encaminhamentos e prazos | 🔧 |
 | 4 | Plano de ação e matriz de riscos | Versões e aprovação, acompanhamento, riscos, gatilhos e respostas | 🔧 |
 | 5 | Autenticação e permissões | Supabase Auth, perfis e permissões por projeto/tema, segurança no banco. Depende de Q-50 | 🔧 |
@@ -115,6 +116,47 @@ Ficaram de fora, conforme o plano: login real, telas de projetos e temas, avalia
 
 **Incorporação à `main` (D-028):** após a revisão dos Pull Requests, primeiro a Etapa 0 e depois a Etapa 1, com "Create a merge commit", preservando históricos e resultados dos testes.
 
-## 5. Local de trabalho ✅ (D-019)
+## 5. Etapa 1.1 — Projetos, temas e contextos ✅ (D-029, D-030)
+
+### Objetivo
+
+Dar telas aos comitês, projetos e temas e registrar quem se relaciona com cada contexto, **sem** avaliação de poder × interesse, cujos critérios e pesos estão em revisão.
+
+### Decisões tomadas para a etapa
+
+| ID | Decisão |
+|---|---|
+| D-023 | Comitê principal e comitês participantes |
+| D-030 | Comitês somente consulta; lista neutra de tipos de relação com descrição livre |
+
+### Entregas
+
+| Entrega | Situação |
+|---|---|
+| Branch `feature/projetos-temas`, criada após a incorporação das Etapas 0 e 1 (`f2fc7c9`) | Concluída |
+| Script SQL `0004`: comitês participantes, stakeholders dos contextos e nome normalizado | Concluída |
+| Comitês: lista com a hierarquia e página de cada comitê, com seus projetos e temas (somente consulta) | Concluída |
+| Projetos e temas: lista com filtros (texto, tipo, situação e comitê), inclusão, edição, arquivamento e reativação | Concluída |
+| Comitês participantes: inclusão e encerramento; o principal não pode ser participante | Concluída |
+| Stakeholders associados: inclusão e encerramento, com tipo de relação e descrição | Concluída |
+| Seção "Projetos e temas" nas páginas de pessoas e instituições; histórico de alterações | Concluída |
+| Dados fictícios: 2 projetos e 2 temas (comando `npm run banco:exemplos`) | Concluída; em banco novo, 16 associações de stakeholders |
+| Testes automatizados | Executados e aprovados em 01/11/2026: tipos, qualidade e compilação sem erros; 91 de 91 testes (67 anteriores e 24 novos) |
+| Verificação no navegador (versão compilada, dados fictícios) | Executada em 01/11/2026. Encontrou um erro na lista de comitês (consulta com coluna ambígua), corrigido e coberto por teste; depois, todas as telas e regras verificadas, sem erros no servidor |
+| Aprovação do gestor | Homologada em 01/11/2026, para desenvolvimento com dados fictícios (D-031) |
+
+Ficaram de fora, conforme o plano: matriz de poder × interesse, avaliações, alteração de comitês, C6, C7 e C8, hospedagem e dados reais.
+
+**Homologação (D-031):** Etapa 1.1 homologada em 01/11/2026 (commit `9c030e8`, Pull Request #1), para o ambiente de desenvolvimento com dados fictícios. Antes da incorporação à `main`: Pull Request correspondente ao commit homologado, sem conflitos e com as verificações aprovadas; merge não automático. C6, C7 e C8 continuam pendentes (D-027).
+
+### Critérios de aceite
+
+1. Tipos, qualidade, testes e compilação sem erros.
+2. Cadastro, edição, arquivamento e reativação de projetos e temas funcionando no navegador.
+3. Comitês participantes e stakeholders associados podem ser incluídos e encerrados, com histórico.
+4. Nenhum campo de poder, interesse ou posicionamento.
+5. Somente dados fictícios; nenhum serviço externo conectado.
+
+## 6. Local de trabalho ✅ (D-019)
 
 A cópia de trabalho do projeto fica em `C:\Projetos\crm-estrategico-es-em-acao`, obtida pelo GitHub, fora do Google Drive. O GitHub cumpre o papel de cópia de segurança e histórico. A pasta antiga no Google Drive não foi apagada.

@@ -11,6 +11,8 @@ import { bancoDaRequisicao } from "@/lib/banco/requisicao";
 import { descreverPeriodo, formatarDataHora } from "@/lib/formatacao";
 import { formatarCnpj } from "@/lib/validacao/cnpj";
 import { esquemaIdentificador } from "@/lib/validacao/comuns";
+import { ListaContextos } from "@/modulos/projetos-temas/componentes/lista-contextos";
+import { contextosDoStakeholder } from "@/modulos/projetos-temas/consultas";
 import { alterarArquivamentoInstituicao } from "@/modulos/stakeholders/acoes";
 import { BotaoArquivamento } from "@/modulos/stakeholders/componentes/botao-arquivamento";
 import { FormularioContato } from "@/modulos/stakeholders/componentes/formulario-contato";
@@ -22,7 +24,7 @@ import {
   listarContatos,
   listarSubordinadas,
   listarVinculosDaInstituicao,
-  nomesDosStakeholders,
+  nomesDosRegistros,
   obterInstituicao,
 } from "@/modulos/stakeholders/consultas";
 import { nomePais } from "@/modulos/stakeholders/paises";
@@ -46,13 +48,14 @@ async function DetalheInstituicao({ params }: Pick<PageProps<"/instituicoes/[id]
   const instituicao = await obterInstituicao(banco, id);
   if (!instituicao) notFound();
 
-  const [vinculos, subordinadas, contatos, historico] = await Promise.all([
+  const [vinculos, subordinadas, contatos, historico, contextos] = await Promise.all([
     listarVinculosDaInstituicao(banco, id),
     listarSubordinadas(banco, id),
     listarContatos(banco, id),
     historicoDoStakeholder(banco, id),
+    contextosDoStakeholder(banco, id),
   ]);
-  const nomes = await nomesDosStakeholders(banco, idsCitadosNoHistorico(historico));
+  const nomes = await nomesDosRegistros(banco, idsCitadosNoHistorico(historico));
   const arquivada = instituicao.arquivadoEm !== null;
   const vigentes = vinculos.filter((v) => v.dataFim === null);
   const encerrados = vinculos.filter((v) => v.dataFim !== null);
@@ -178,6 +181,16 @@ async function DetalheInstituicao({ params }: Pick<PageProps<"/instituicoes/[id]
             </div>
           </details>
         )}
+      </section>
+
+      <section aria-labelledby="titulo-contextos" className={classeCartao}>
+        <h2 id="titulo-contextos" className="mb-1 text-lg font-semibold">
+          Projetos e temas
+        </h2>
+        <p className="mb-4 text-sm text-texto-secundario">
+          As associações são registradas na página de cada projeto ou tema.
+        </p>
+        <ListaContextos contextos={contextos} />
       </section>
 
       <section aria-labelledby="titulo-historico" className={classeCartao}>

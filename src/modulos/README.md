@@ -5,8 +5,8 @@ Cada módulo do CRM tem sua própria pasta, reunindo regras de negócio, valida�
 | Pasta | Módulo | Situação | Documentação |
 |---|---|---|---|
 | `acesso/` | Usuários e permissões por projeto ou tema | Provisório: usuário fictício de desenvolvimento | [GOVERNANCA.md](../../docs/GOVERNANCA.md) |
-| `stakeholders/` | Cadastro Mestre: pessoas, instituições e vínculos | Implementado na Etapa 1 | [MODELO_DADOS.md](../../docs/MODELO_DADOS.md) |
-| `projetos-temas/` | Comitês, projetos e temas estratégicos | Tabelas criadas; telas previstas | [MODELO_DADOS.md](../../docs/MODELO_DADOS.md) |
+| `stakeholders/` | Cadastro Mestre: pessoas, instituições, vínculos e contatos | Implementado na Etapa 1 | [MODELO_DADOS.md](../../docs/MODELO_DADOS.md) |
+| `projetos-temas/` | Comitês (consulta), projetos e temas, comitês participantes e stakeholders dos contextos | Implementado na Etapa 1.1 | [MODELO_DADOS.md](../../docs/MODELO_DADOS.md) |
 | `avaliacoes/` | Avaliações de stakeholders e matriz de poder × interesse | Previsto | [METODOLOGIA_STAKEHOLDERS.md](../../docs/METODOLOGIA_STAKEHOLDERS.md) |
 | `iniciativas/` | Matriz de Iniciativas | Previsto | [MATRIZ_INICIATIVAS.md](../../docs/MATRIZ_INICIATIVAS.md) |
 | `interacoes/` | Interações, agenda e compromissos | Previsto | [MODELO_DADOS.md](../../docs/MODELO_DADOS.md) |

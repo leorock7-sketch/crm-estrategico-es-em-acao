@@ -39,7 +39,7 @@ import {
   esquemaVinculo,
 } from "./esquemas";
 import { identificacaoInstituicaoMudou, identificacaoPessoaMudou } from "./duplicidade";
-import { mensagemDeErro } from "./mensagens-erro";
+import { mensagemDeErro } from "@/lib/banco/mensagens-erro";
 
 export type EstadoFormulario = {
   /** Mensagens de erro por campo. */

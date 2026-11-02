@@ -93,4 +93,10 @@ export const ROTULOS_CAMPOS: Record<string, string> = {
   valor: "Contato",
   vinculo_id: "Vínculo",
   observacao: "Observação",
+  descricao: "Descrição",
+  comite_id: "Comitê",
+  projeto_tema_id: "Projeto ou tema",
+  situacao: "Situação",
+  tipo_relacao: "Tipo de relação",
+  responsavel_id: "Responsável",
 };

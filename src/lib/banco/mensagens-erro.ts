@@ -1,4 +1,4 @@
-import { erroDoBanco } from "@/lib/banco/erros";
+import { erroDoBanco } from "./erros";
 
 /** Mensagens para as regras de integridade do banco (nomes definidos em esquema.ts). */
 const MENSAGENS_POR_REGRA: Record<string, string> = {
@@ -11,6 +11,13 @@ const MENSAGENS_POR_REGRA: Record<string, string> = {
   contato_principal_vigente_unico:
     "Já existe um contato principal vigente deste tipo. Encerre-o antes ou desmarque a opção “principal”.",
   contato_datas: "A data de término não pode ser anterior à data de início.",
+  projeto_tema_nome_unico: "Já existe um projeto ou tema com este nome e tipo neste comitê.",
+  projeto_tema_datas: "A data de término não pode ser anterior à data de início.",
+  projeto_tema_comite_vigente_unico: "Este comitê já é participante vigente deste projeto ou tema.",
+  projeto_tema_comite_datas: "A data de término não pode ser anterior à data de início.",
+  stakeholder_contexto_vigente_unico:
+    "Este stakeholder já está associado a este projeto ou tema com o mesmo tipo de relação.",
+  stakeholder_contexto_datas: "A data de término não pode ser anterior à data de início.",
 };
 
 /** Traduz um erro de gravação em mensagem compreensível para o usuário. */

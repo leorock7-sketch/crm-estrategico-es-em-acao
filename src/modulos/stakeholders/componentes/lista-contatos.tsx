@@ -1,10 +1,10 @@
 import { classeLink } from "@/componentes/estilos";
 import { SeloSituacao } from "@/componentes/selo-situacao";
 import { descreverPeriodo } from "@/lib/formatacao";
-import { arquivarContatoAcao } from "../acoes";
+import { arquivarContatoAcao, encerrarContatoAcao } from "../acoes";
 import type { ContatoListado } from "../consultas";
 import { ROTULOS_NATUREZA_CONTATO, ROTULOS_TIPO_CONTATO } from "../rotulos";
-import { FormularioEncerramento } from "./formulario-encerramento";
+import { FormularioEncerramento } from "@/componentes/formulario-encerramento";
 
 /** Endereço de link para o contato (e-mail, telefone ou site); null para os demais. */
 function enderecoDoContato(contato: ContatoListado): string | null {
@@ -76,7 +76,7 @@ export function ListaContatos({
                     <summary className="cursor-pointer text-texto-secundario hover:underline">
                       Encerrar contato
                     </summary>
-                    <FormularioEncerramento alvo="contato" id={contato.id} />
+                    <FormularioEncerramento acao={encerrarContatoAcao} campo="contatoId" id={contato.id} />
                   </details>
                 )}
                 <form action={arquivarContatoAcao.bind(null, contato.id)}>
