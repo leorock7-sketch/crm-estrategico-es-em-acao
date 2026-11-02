@@ -9,6 +9,7 @@
 | 0.5 | 01/11/2026 | Etapa 2A: avaliações estratégicas (módulo `avaliacoes`) e permissões por contexto, ainda não homologadas |
 | 0.6 | 01/11/2026 | Repositório público com e-mail *noreply* nos commits (D-039) e proposta de testes no GitHub Actions (P-039) |
 | 0.7 | 01/11/2026 | Verificação automática no GitHub Actions implementada (D-041) |
+| 0.8 | 01/11/2026 | Escalas V2.2 (D-057 a D-060): adaptação do módulo `avaliacoes` e do banco planejada, não implementada (Q-67) |
 
 Legenda: ✅ Aprovado · 🔧 Proposta técnica · ⏳ Pendente.
 
@@ -228,6 +229,7 @@ Passo posterior, dependente de Q-57: um segundo teste em PostgreSQL real, para a
 | Q-51 | Região de hospedagem dos dados. O Supabase oferece região em São Paulo. |
 | Q-52 | Transferência dos serviços e do repositório para contas institucionais. |
 | Q-57 | Teste de portabilidade em PostgreSQL real (C8). |
+| Q-67 | Adaptação do módulo `avaliacoes` e do banco às escalas V2.2 (níveis Baixo/Médio/Alto, três categorias de posicionamento, matriz 3 × 3), por migração somente aditiva. Plano no [Plano de Implantação](PLANO_IMPLANTACAO.md), seção 7. |
 | — | Abordagem das integrações com Microsoft 365 (Microsoft Graph) e de IA assistiva. |
 
 Resolvidas na Etapa 1: local da cópia de trabalho (D-019) e ferramenta de banco local (D-018).
