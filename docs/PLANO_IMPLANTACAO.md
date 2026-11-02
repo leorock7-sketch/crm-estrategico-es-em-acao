@@ -9,6 +9,7 @@
 | 0.5 | 01/11/2026 | Verificação automática no GitHub Actions (D-041), plano de revisão metodológica (D-042) e fluxo dos Pull Requests (D-043) |
 | 0.6 | 01/11/2026 | Correção da normalização (D-044), proteção da `main` (D-045) e inventário metodológico (D-046) |
 | 0.7 | 01/11/2026 | Homologação da Etapa 1.1 (D-047), providências concluídas (D-052) e relatório técnico de revisão metodológica (D-050) |
+| 0.8 | 01/11/2026 | Etapa 1.1 concluída e incorporada à `main` (D-053); Pull Request da Etapa 2A (D-054) |
 
 Legenda: ✅ Aprovado · 🔧 Proposta técnica · ⏳ Pendente.
 
@@ -28,8 +29,8 @@ Legenda: ✅ Aprovado · 🔧 Proposta técnica · ⏳ Pendente.
 |---|---|---|---|
 | 0 | Fundação técnica | Documentação, esqueleto da aplicação, testes básicos | ✅ Aprovada em 31/10/2026 |
 | 1 | Banco de dados de desenvolvimento e Cadastro Mestre | Banco PostgreSQL local, estrutura de comitês e projetos/temas, cadastro de pessoas, instituições e vínculos, com dados fictícios | ✅ **Homologada em 01/11/2026** para desenvolvimento e testes (D-027); pendências C6, C7 e C8 |
-| 1.1 | Projetos, temas e contextos | Telas de comitês, projetos e temas; comitês participantes (D-023); associação de stakeholders aos contextos, sem avaliação de poder × interesse | ✅ **Homologada em 01/11/2026** para desenvolvimento com dados fictícios (D-031, D-047, incluindo a correção de normalização); Pull Request #1 com incorporação manual autorizada |
-| 2A | Metodologia e estrutura da avaliação estratégica | Fichas e versões, evidências, posicionamento, grau de confiança, permissões e matriz com metodologia de demonstração e dados fictícios | ✅ **Aprovada funcionalmente em 01/11/2026** para desenvolvimento e testes com dados fictícios, condicionada à revisão do Pull Request (D-035); branch `feature/avaliacao-stakeholders` |
+| 1.1 | Projetos, temas e contextos | Telas de comitês, projetos e temas; comitês participantes (D-023); associação de stakeholders aos contextos, sem avaliação de poder × interesse | ✅ **Concluída**: homologada em 01/11/2026 para desenvolvimento com dados fictícios (D-031, D-047, incluindo a correção de normalização) e incorporada à `main` pelo Pull Request #1 (commit de merge `90c319c`, D-053) |
+| 2A | Metodologia e estrutura da avaliação estratégica | Fichas e versões, evidências, posicionamento, grau de confiança, permissões e matriz com metodologia de demonstração e dados fictícios | ✅ **Aprovada funcionalmente em 01/11/2026** para desenvolvimento e testes com dados fictícios, condicionada à revisão do Pull Request (D-035); branch `feature/avaliacao-stakeholders`, sincronizada com a `main`; Pull Request aguardando a validação do gestor (D-054) |
 | 2B | Metodologia institucional e cálculos definitivos | Critérios, escalas, pesos, fórmula e pontos de corte homologados. Depende de Q-01, Q-02, Q-05, Q-06 e Q-60 | ⏳ Relatório técnico de revisão metodológica entregue (D-046, D-050); cálculos definitivos aguardam a homologação das decisões Q-65 |
 | 3 | Iniciativas, interações e compromissos | Matriz de iniciativas, registro único de reuniões, encaminhamentos e prazos | 🔧 |
 | 4 | Plano de ação e matriz de riscos | Versões e aprovação, acompanhamento, riscos, gatilhos e respostas | 🔧 |
@@ -155,6 +156,8 @@ Ficaram de fora, conforme o plano: matriz de poder × interesse, avaliações, a
 
 **Homologação (D-031):** Etapa 1.1 homologada em 01/11/2026 (commit `9c030e8`, Pull Request #1), para o ambiente de desenvolvimento com dados fictícios. Antes da incorporação à `main`: Pull Request correspondente ao commit homologado, sem conflitos e com as verificações aprovadas; merge não automático. C6, C7 e C8 continuam pendentes (D-027).
 
+**Incorporação (D-053):** Pull Request #1 incorporado manualmente à `main` pelo gestor em 01/11/2026 (commit de merge `90c319c`), com as verificações "Node.js 24" e "Node.js 26" aprovadas. O conteúdo da `main` é idêntico ao do commit homologado `e7d4154`.
+
 ### Critérios de aceite
 
 1. Tipos, qualidade, testes e compilação sem erros.
@@ -180,7 +183,7 @@ Construir a estrutura das avaliações de stakeholders — fichas, versões, evi
 
 | Entrega | Situação |
 |---|---|
-| Branch `feature/avaliacao-stakeholders`, a partir da branch da Etapa 1.1 (ainda não incorporada à `main`) | Concluída |
+| Branch `feature/avaliacao-stakeholders`, a partir da branch da Etapa 1.1, sincronizada com a `main` após a incorporação da Etapa 1.1 (D-053) | Concluída |
 | Inventário metodológico da planilha "Mapa de Stakeholders" (entregue ao gestor fora do repositório) | Concluído: a planilha não contém os seis critérios |
 | Script SQL `0005`: metodologias, critérios, fichas, versões, notas, evidências e permissões, com regras de publicação e imutabilidade | Concluída |
 | Ficha do stakeholder no contexto: avaliação vigente, tendência e histórico completo de versões | Concluída |
@@ -220,7 +223,7 @@ Ficaram de fora, conforme a D-034: critérios, pesos, fórmula e pontos de corte
 | Conduta do ES em Ação | Requisito futuro RF-28 | Categorias e regras de correspondência a definir (Q-64) |
 | Verificação automática no GitHub Actions | — | ✅ Implementada (D-041): Node.js 24 e 26, a cada Pull Request e atualização da `main` |
 | Proteção da `main` (verificações obrigatórias antes do merge) | — | ✅ Configurada pelo administrador e conferida (D-045, D-052) |
-| Revisão e incorporação dos Pull Requests das Etapas 1.1 e 2A | Base correta da Etapa 2A | Etapa 1.1 homologada (D-047): PR #1 sem conflitos e com verificações aprovadas, aguardando a incorporação manual pelo gestor; Etapa 2A: PR a abrir com base na `main` atualizada após a confirmação (D-043, D-047) |
+| Revisão e incorporação dos Pull Requests das Etapas 1.1 e 2A | Base correta da Etapa 2A | Etapa 1.1 ✅ incorporada à `main` (D-053, commit de merge `90c319c`); Etapa 2A: Pull Request com base na `main` atualizada, aguardando a validação e a incorporação manual pelo gestor (D-054) |
 | Análise LGPD, retenção e anonimização | Etapa 8 | Q-13, Q-58 |
 
 ## 8. Local de trabalho ✅ (D-019)

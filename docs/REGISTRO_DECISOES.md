@@ -9,6 +9,7 @@
 | 0.5 | 01/11/2026 | D-041 (GitHub Actions implementado; Q-63 resolvida), D-042 (plano de revisão metodológica) e D-043 (Pull Requests) |
 | 0.6 | 01/11/2026 | D-044 (normalização de nomes), D-045 (proteção da `main`) e D-046 (revisão metodológica); nova questão Q-65 |
 | 0.7 | 01/11/2026 | D-047 a D-052 (homologação da Etapa 1.1, posicionamento, dimensões, estudo de escalas, matriz em quatro camadas e providências concluídas); Q-65 reorganizada em seis decisões |
+| 0.8 | 01/11/2026 | D-053 (incorporação da Etapa 1.1 à `main`) e D-054 (Pull Request da Etapa 2A; Etapa 2B suspensa) |
 
 Este documento consolida o que já foi decidido, o que é sugestão técnica e o que ainda precisa de decisão. Ao decidir uma questão pendente, ela deve ser movida para a seção 1, com data e origem.
 
@@ -70,6 +71,8 @@ Legenda: ✅ Aprovado · 🔧 Proposta técnica · ⏳ Pendente.
 | D-050 | 01/11/2026 | **Estudo de escalas para poder e interesse** autorizado: comparar o modelo binário (A), o ordinal de cinco níveis (B) e o quantitativo normalizado (C, sendo a escala 0–100 apenas alternativa de estudo), quanto a vantagens, limitações, informação exigida, complexidade, subjetividade e comparabilidade, preservando a apresentação em quadrantes. O histórico binário é preservado sem conversão artificial para escalas mais precisas. Implementação dos cálculos definitivos da Etapa 2B não autorizada. | Deliberação do gestor |
 | D-051 | 01/11/2026 | **Estrutura da matriz estratégica em quatro camadas** como base da proposta: (1) poder × interesse, com posição contínua e quadrantes; (2) posicionamento; (3) engajamento e confiança; (4) conduta institucional, com as categorias históricas em revisão e sem resultado automaticamente obrigatório. | Deliberação do gestor |
 | D-052 | 01/11/2026 | **Providências administrativas concluídas** (não voltar a solicitá-las): pastas temporárias locais excluídas; proteção da `main` configurada pelo administrador e conferida — Pull Request obrigatório sem aprovação de outro revisor, verificações "Node.js 24" e "Node.js 26" obrigatórias, bloqueio de exclusão e de reescrita do histórico. | Deliberação do gestor |
+| D-053 | 01/11/2026 | **Etapa 1.1 incorporada à `main`** pelo gestor, manualmente, com "Create a merge commit" (Pull Request #1 encerrado como *Merged*; commit de merge `90c319c`). Conferido: conteúdo da `main` idêntico ao do commit homologado `e7d4154`, incluindo a correção de normalização (D-044) e a verificação automática (D-041); verificações "Node.js 24" e "Node.js 26" aprovadas no próprio commit de merge. A branch da Etapa 2A foi sincronizada com a `main` por merge, preservando o histórico. | Confirmação do gestor e conferência no GitHub |
+| D-054 | 01/11/2026 | **Pull Request da Etapa 2A autorizado**, com base na `main` atualizada, contendo somente as alterações da Etapa 2A; incorporação manual após a validação do gestor, sem merge automático. A Etapa 2B continua suspensa até a homologação da metodologia de poder e interesse; as seis decisões Q-65 permanecem para deliberação, sem implementação antecipada de critérios, pesos ou pontos de corte. Preservadas as decisões D-048 a D-051 e as avaliações independentes por projeto ou tema, com histórico e evidências. | Deliberação do gestor |
 
 ## 2. Propostas técnicas 🔧
 
