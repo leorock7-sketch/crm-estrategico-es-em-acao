@@ -16,6 +16,7 @@
 | 0.12 | 02/11/2026 | Fase documental V2.2 concluída (D-062); próxima atividade: homologação da Q-66 e da Q-67 |
 | 0.13 | 02/11/2026 | Diretrizes da Q-66 e da Q-67 homologadas com ajustes (D-063); seção 7 atualizada (T-1, T-4, T-6); calibração H6 pendente |
 | 0.14 | 02/11/2026 | T-4 precisada (D-064); preparação operacional do H6 autorizada |
+| 0.15 | 02/11/2026 | Calibração H6 com avaliador único (D-065) |
 
 Legenda: ✅ Aprovado · 🔧 Proposta técnica · ⏳ Pendente.
 
@@ -279,7 +280,7 @@ Decisões T-1 a T-7 homologadas com ajustes em 02/11/2026 (D-063). **Nada desta 
 | C7. Cópia de segurança e restauração | Etapas 7 e 8 (D-027) | Planejada |
 | C8. Portabilidade em PostgreSQL real | Etapas 7 e 8 (D-027) | Depende de autorização (Q-57) |
 | Autenticação e segurança multiusuário (inclusive regras de acesso no banco) | Uso por mais de uma pessoa; Etapas 7 e 8 | Etapa 5; estrutura de permissões preparada na 2A, não homologada |
-| Rubricas das escalas V2.2 e plano de adaptação técnica | Etapa 2B (D-060, D-063) | Diretrizes da Q-66 e da Q-67 homologadas com ajustes (D-063) e T-4 precisada (D-064); **calibração H6 em preparação operacional (D-064), pendente de execução**; versões finais após a calibração; decisões Q-65.1, Q-65.4 e Q-65.6 pendentes |
+| Rubricas das escalas V2.2 e plano de adaptação técnica | Etapa 2B (D-060, D-063) | Diretrizes da Q-66 e da Q-67 homologadas com ajustes (D-063) e T-4 precisada (D-064); **calibração H6 com avaliador único (D-065), pendente de execução**; homologação final como decisão gerencial fundamentada, sem medida de confiabilidade entre avaliadores; versões finais após a calibração; decisões Q-65.1, Q-65.4 e Q-65.6 pendentes |
 | Documentos de referência V2.3 | — | Roteiro preparado fora do repositório (D-063); emissão depois da calibração |
 | Arquivos `MANUAL_OPERACIONAL.md` e `PLANO_TRANSFERENCIA_INSTITUCIONAL.md`, previstos no Guia | — | Ainda não existem no repositório; criação a autorizar |
 | Conduta do ES em Ação | Requisito futuro RF-28 | Categorias e regras de correspondência a definir (Q-64) |

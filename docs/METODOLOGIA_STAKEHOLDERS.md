@@ -11,6 +11,7 @@
 | 0.7 | 01/11/2026 | Rubricas da Q-66 revisadas conforme a D-061 (proposta não homologada): interesse sem exigência de participação; Neutro só por manifestação neutra ou equidistante; ressalvas relevantes em campo próprio (H2-C); manifestação sem posição predominante fica sem classificação conclusiva, sem quarta categoria; Poder Alto inclui influência decisiva demonstrada; evidência e justificativa por dimensão; calibração como meta exploratória. |
 | 0.8 | 02/11/2026 | Diretrizes da Q-66 homologadas com ajustes (D-063): ressalvas em três situações, verificação documental para Poder Baixo, justificativa sem duplicação, informação complementar nos painéis; calibração pendente de execução. Ajustes técnicos T-1, T-4 e T-6 refletidos (seções 3, 7 e 9). |
 | 0.9 | 02/11/2026 | T-4 precisada (D-064): revalidação só em mudança metodológica substantiva; mudanças editoriais aprovadas não exigem reclassificação; natureza de cada alteração registrada com justificativa e aprovação (seções 1, 3, 7 e 9). |
+| 0.10 | 02/11/2026 | Calibração com avaliador único e registro das limitações (D-065, seção 10.5). |
 
 Legenda: ✅ Aprovado · 🔧 Proposta técnica · ⏳ Pendente.
 
@@ -302,13 +303,25 @@ Sem manifestação, o campo não se aplica. O campo não cria categoria de posic
 
 **Painéis futuros (H5):** mostrar à parte, como informação complementar e não como quarta categoria, quantos "Não avaliado" no posicionamento têm manifestação registrada.
 
-### 10.5 Calibração (H6 — aprovada, pendente de execução)
+### 10.5 Calibração (H6 — aprovada, pendente de execução, com avaliador único)
 
-- **Primeira rodada:** dez casos fictícios, respondidos em formulário de avaliação independente por pelo menos dois avaliadores, quando disponíveis.
-- **Comparação:** com gabarito fundamentado e registro das divergências por dimensão, especialmente as extremas.
-- **Meta exploratória:** concordância próxima de 80%, sem caráter de validação científica.
-- **Revisão:** depois da revisão da rubrica, segunda rodada com casos fictícios adicionais, não usados antes.
-- **Validação:** a metodologia **não** será declarada validada antes da execução e da análise do exercício.
+**Configuração (D-065):** o exercício é feito por **um único avaliador**, o gestor.
+- **Rodada 1:** dez casos fictícios, em formulário sem gabarito. Registra Poder, Interesse, Posicionamento, Ressalvas e observações sobre dúvidas, evidências insuficientes e dificuldades de interpretação.
+- **Comparação com o gabarito técnico, por dimensão:**
+  - percentual de coincidência;
+  - divergências extremas e adjacentes;
+  - divergências entre classificação e "Não avaliado";
+  - ambiguidades da rubrica;
+  - casos em que o próprio gabarito deva ser reconsiderado.
+- **Rodada 2:** seis casos adicionais, depois da análise e dos ajustes, sem revelar antes o gabarito.
+
+**Limitações registradas:**
+- avaliador único;
+- **não foi medida a confiabilidade entre avaliadores**;
+- a comparação com o gabarito **não constitui validação estatística independente**;
+- a referência de 80% é apenas exploratória, não requisito estatístico;
+- a homologação da metodologia será **decisão gerencial fundamentada**, com essas limitações documentadas;
+- a metodologia não será declarada validada antes da execução e da análise do exercício.
 
 ### 10.6 Situação da homologação (D-063, 02/11/2026)
 
@@ -319,7 +332,7 @@ Sem manifestação, o campo não se aplica. O campo não cria categoria de posic
 | H3 | ✅ Aprovada, com ajuste: verificação documental para Poder Baixo; ausência de evidência de Alto não prova Baixo |
 | H4 | ✅ Aprovada |
 | H5 | ✅ Aprovada, com informação complementar nos painéis |
-| H6 | ✅ Aprovada, **pendente de execução** |
+| H6 | ✅ Aprovada, **pendente de execução**; avaliador único, sem medida de confiabilidade entre avaliadores (D-065) |
 
 As versões finais da Q-66 e da Q-67 serão confirmadas depois da calibração. A programação da Etapa 2B depende dessa confirmação.
 
