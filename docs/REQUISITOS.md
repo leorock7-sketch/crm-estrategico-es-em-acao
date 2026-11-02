@@ -8,6 +8,7 @@
 | 0.4 | 01/11/2026 | Grau de confiança (D-036), metodologia comum (D-037) e Conduta do ES em Ação como requisito futuro (D-038) |
 | 0.5 | 01/11/2026 | Escalas V2.2 (D-057 a D-060): RF-21, RF-25, RF-27 e RF-28 atualizados; novos RF-29 e RF-30 |
 | 0.6 | 01/11/2026 | Diretrizes das rubricas (D-061): RF-27 e RF-30 atualizados; novo RF-31 |
+| 0.7 | 02/11/2026 | **Correção de numeração:** os requisitos RF-30 e RF-31 criados na seção 4.3 nas versões 0.5 e 0.6 repetiam números da seção 4.4 (Matriz de Iniciativas); passam a RF-29.1 e RF-29.2. RF-27 e RF-29.2 atualizados conforme a D-063. |
 
 ## Como ler este documento
 
@@ -78,11 +79,11 @@ Sistema próprio de gestão estratégica de relacionamentos institucionais (CRM)
 | RF-24 | Visibilidade das avaliações restrita ao contexto (projeto ou tema) a que pertencem. | ✅ (estrutura e testes na Etapa 2A; segurança multiusuário não homologada) |
 | RF-25 | Matriz de poder × interesse por projeto ou tema, em grade ordinal 3 × 3, distinguindo metodologia vigente, avaliações históricas e situações que exigem reavaliação; a célula é leitura, sem conduta automática. | ✅ (D-058); hoje, demonstração com eixos de 0 a 100 na Etapa 2A — adaptação pendente (Q-67) |
 | RF-26 | Critérios de avaliação de poder e interesse configuráveis, associados a uma versão da metodologia. Inicialmente uma metodologia institucional comum; a arquitetura deve permitir metodologias específicas por comitê ou contexto, aprovadas e fundamentadas, sem comparabilidade automática. | ✅ (D-037; estrutura implementada na Etapa 2A) |
-| RF-27 | Rubricas observáveis dos níveis de poder, interesse e posicionamento, a partir da revisão dos critérios históricos; sem pesos, fórmulas ou pontos de corte não homologados. | ⏳ Proposta revisada, não homologada (Q-66, D-061); escala definida (D-058) |
+| RF-27 | Rubricas observáveis dos níveis de poder, interesse e posicionamento, a partir da revisão dos critérios históricos; sem pesos, fórmulas ou pontos de corte não homologados. | ⏳ Diretrizes homologadas (D-063); versão final após a calibração (H6); escala definida (D-058) |
 | RF-28 | Dimensão "Conduta do ES em Ação", registrada separadamente de poder, interesse e posicionamento, sem derivação automática da matriz. | ⏳ Requisito futuro (D-038, Q-64) |
 | RF-29 | Preservação do histórico: avaliações publicadas em escalas anteriores (Alto/Baixo; cinco categorias de posicionamento; demonstração de 0 a 100) permanecem intactas e identificadas pela metodologia, sem conversão automática nem recálculo. | ✅ (D-058, D-059) |
-| RF-30 | "Neutro" exige manifestação efetivamente neutra ou equidistante, com justificativa e evidência; "não avaliado" é ausência de classificação — inclusive quando a manifestação não permite determinar posição predominante —, nunca neutralidade, e não há quarta categoria. O interesse independe de participação; engajamento e conhecimento do projeto são dimensões distintas, com forma de registro a definir. | ✅ (D-059, D-060, D-061); registro de engajamento ⏳ (Q-65.3) |
-| RF-31 | Ressalvas relevantes do posicionamento em campo próprio, com descrição; justificativa e evidência por dimensão classificada, podendo uma evidência fundamentar mais de uma dimensão. | 🔧 Proposta (D-061), sujeita à homologação da Q-66 |
+| RF-29.1 | "Neutro" exige manifestação efetivamente neutra ou equidistante, com justificativa e evidência; "não avaliado" é ausência de classificação — inclusive quando a manifestação não permite determinar posição predominante —, nunca neutralidade, e não há quarta categoria. O interesse independe de participação; engajamento e conhecimento do projeto são dimensões distintas, com forma de registro a definir. | ✅ (D-059, D-060, D-061); registro de engajamento ⏳ (Q-65.3) |
+| RF-29.2 | Ressalvas relevantes do posicionamento em campo próprio (há ressalvas, com descrição; não identificadas; informação insuficiente), obrigatório quando houver manifestação; justificativa e evidência por dimensão classificada, podendo uma evidência fundamentar mais de uma dimensão; Poder Baixo fundamentado por verificação documental ou outra evidência. | ✅ diretriz (D-063); implementação ⏳ (Q-67), após a calibração |
 
 Detalhes em [METODOLOGIA_STAKEHOLDERS.md](METODOLOGIA_STAKEHOLDERS.md).
 

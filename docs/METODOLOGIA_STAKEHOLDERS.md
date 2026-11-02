@@ -9,10 +9,11 @@
 | 0.5 | 01/11/2026 | Posicionamento preservado (D-048), dimensões distintas (D-049), estudo de escalas (D-050) e matriz em quatro camadas (D-051). |
 | 0.6 | 01/11/2026 | **Escalas V2.2** (D-057 a D-060): poder e interesse em Baixo, Médio e Alto; posicionamento em Favorável, Neutro e Contrário; confiança em Baixa, Média e Alta; "Não avaliado" à parte; matriz 3 × 3; histórico preservado sem conversão. Superadas para novas avaliações: posicionamento em cinco níveis (D-048) e estudo de escalas (D-050). Rubricas propostas, não homologadas (seção 10). |
 | 0.7 | 01/11/2026 | Rubricas da Q-66 revisadas conforme a D-061 (proposta não homologada): interesse sem exigência de participação; Neutro só por manifestação neutra ou equidistante; ressalvas relevantes em campo próprio (H2-C); manifestação sem posição predominante fica sem classificação conclusiva, sem quarta categoria; Poder Alto inclui influência decisiva demonstrada; evidência e justificativa por dimensão; calibração como meta exploratória. |
+| 0.8 | 02/11/2026 | Diretrizes da Q-66 homologadas com ajustes (D-063): ressalvas em três situações, verificação documental para Poder Baixo, justificativa sem duplicação, informação complementar nos painéis; calibração pendente de execução. Ajustes técnicos T-1, T-4 e T-6 refletidos (seções 3, 7 e 9). |
 
 Legenda: ✅ Aprovado · 🔧 Proposta técnica · ⏳ Pendente.
 
-> **Importante.** As escalas institucionais foram definidas em 01/11/2026 pelo Manual de Especificação e Operação V2.2, pelo Guia de Implantação V2.2 e pela Nota de Decisões Metodológicas V2.2 ✅ (D-057 a D-060). As **rubricas observáveis** de cada nível ainda dependem de homologação (Q-66), e **o sistema ainda não foi adaptado** às novas escalas (Q-67): a Etapa 2A continua operando a metodologia de **demonstração** (pontuação de 0 a 100 e posicionamento em cinco níveis), com dados fictícios e resultados marcados como **não homologados**. Não há aprovação de pesos, fórmulas, pontos de corte, notas de 0 a 100 nem da pontuação Poder × Interesse × Engajamento. ✅ (D-034, D-058)
+> **Importante.** As escalas institucionais foram definidas em 01/11/2026 pelo Manual de Especificação e Operação V2.2, pelo Guia de Implantação V2.2 e pela Nota de Decisões Metodológicas V2.2 ✅ (D-057 a D-060). As **rubricas** tiveram as diretrizes homologadas com ajustes (D-063), mas a versão final depende da calibração (H6, Q-66), e **o sistema ainda não foi adaptado** às novas escalas (Q-67): a Etapa 2A continua operando a metodologia de **demonstração** (pontuação de 0 a 100 e posicionamento em cinco níveis), com dados fictícios e resultados marcados como **não homologados**. Não há aprovação de pesos, fórmulas, pontos de corte, notas de 0 a 100 nem da pontuação Poder × Interesse × Engajamento. ✅ (D-034, D-058)
 
 ## 1. Conceitos
 
@@ -45,12 +46,12 @@ Legenda: ✅ Aprovado · 🔧 Proposta técnica · ⏳ Pendente.
 | **Poder** e **interesse** | Escala vigente: Baixo, Médio ou Alto, ou "Não avaliado", classificados diretamente pelo avaliador conforme rubrica, com justificativa e evidência. Médio é categoria ordinal: não vale 50 e não é Alto nem Baixo. | ✅ (D-058); rubricas ⏳ (Q-66); sistema ainda na demonstração de 0 a 100 ⏳ (Q-67) |
 | **Posicionamento** | Escala vigente: Favorável, Neutro ou Contrário, ou "Não avaliado". As categorias "Parcialmente favorável" e "Parcialmente contrário" existem só no histórico. | ✅ (D-059); sistema ainda com cinco níveis ⏳ (Q-67) |
 | **Grau de confiança** | Baixa, Média ou Alta, informado e justificado pelo responsável, sem classificação automática. | ✅ (D-036, D-060, seção 4) |
-| **Justificativa** | Obrigatória para publicar. Proposta: também uma justificativa por dimensão classificada. | ✅ (Manual V2.2) / 🔧 por dimensão (D-061, Q-66) |
-| **Evidências** | Pelo menos uma, obrigatória para publicar: documento, link ou observação, com fonte e data. Proposta: vinculadas às dimensões que fundamentam; uma evidência pode fundamentar mais de uma. | ✅ (Manual V2.2) / 🔧 por dimensão (D-061, Q-66) |
+| **Justificativa** | Síntese geral obrigatória para publicar e justificativa curta por dimensão classificada, sem tamanho mínimo e sem duplicação. | ✅ (Manual V2.2, D-063) / ⏳ por dimensão na implementação (Q-67) |
+| **Evidências** | Pelo menos uma por dimensão classificada, pertinente e identificável (documento, link, observação ou verificação documental, com fonte e data); uma evidência pode fundamentar mais de uma dimensão, com vínculo explícito. | ✅ (Manual V2.2, D-063) / ⏳ por dimensão na implementação (Q-67) |
 | **Validação institucional** | Obrigatória para publicar posicionamento de uma instituição. | ✅ (Manual V2.2) |
-| **Ressalvas relevantes** | Proposta: campo próprio (sim ou não, com descrição), separado da categoria de posicionamento. | 🔧 H2-C (D-061, Q-66) |
+| **Ressalvas relevantes** | Campo próprio vinculado ao posicionamento; com manifestação documentada, registra: há ressalvas (com descrição), não identificadas ou informação insuficiente. Não é categoria. | ✅ diretriz (D-063) / ⏳ implementação (Q-67) |
 | **Data de referência e próxima revisão** | A próxima revisão é marcada para um ano após a data de referência, sem prejuízo de reavaliação por evento relevante. | ✅ (Manual V2.2) |
-| **Tendência** | Comparação de versões ou justificação explícita (Manual V2.2). Proposta: comparar automaticamente só versões registradas na **mesma escala** de posicionamento; entre escalas diferentes (cinco → três categorias), não calcular, e exibir a justificativa. | ✅ regra / 🔧 forma (Q-67) |
+| **Tendência** | Comparação de versões ou justificação explícita (Manual V2.2). Comparação automática só entre avaliações metodologicamente comparáveis: mesma escala **e** mesmas rubricas, ou equivalência de definições declarada; caso contrário, "Não comparável", com justificativa. | ✅ (T-6, D-063) / ⏳ implementação (Q-67) |
 
 ### 3.1 Dimensões distintas da avaliação ✅ (D-049, atualizada pela D-060)
 
@@ -209,7 +210,7 @@ O modelo de quatro quadrantes de Mendelow foi referência de estudo e **não foi
 4. "Publicar" grava e publica: o banco confere justificativa, data de referência, evidência, justificativa da confiança e validação institucional. A anterior passa a "substituída".
 5. A matriz do contexto passa a refletir a nova versão.
 
-Na adaptação às escalas V2.2 (Q-67), o passo 3 passa a registrar diretamente os níveis de poder e interesse; e, na nova versão, um posicionamento parcial da versão anterior **não é copiado**: o campo começa como "Não avaliado" e exige nova classificação, com justificativa e evidência (proposta 🔧).
+Na adaptação às escalas V2.2 (Q-67), o passo 3 passa a registrar diretamente os níveis de poder e interesse. Na mudança de metodologia, o novo rascunho não recebe posicionamento, níveis, notas, grau de confiança nem validação institucional como válidos; as evidências anteriores podem ser reaproveitadas como referência, com confirmação de pertinência pelo responsável (T-4, D-063). As versões anteriores ficam intactas.
 
 ## 8. Acesso ✅ / 🔧
 
@@ -239,90 +240,86 @@ Testes complementares 🔧 (a implementar junto com a adaptação):
 5. Histórico imutável e evidência e justificativa obrigatórias, inclusive para "Neutro" e para níveis Médio (P-033).
 6. Tendência não é calculada entre versões de escalas diferentes.
 7. Manifestação sem posição predominante fica sem classificação conclusiva ("Não avaliado"), com a manifestação, as condições e a razão registradas; nunca vira Neutro (D-061).
-8. Ressalvas relevantes marcadas exigem descrição (D-061).
-9. Cada dimensão classificada tem evidência vinculada e justificativa; uma evidência pode estar vinculada a mais de uma dimensão (D-061).
+8. Com manifestação documentada, a situação das ressalvas é obrigatória; "há ressalvas relevantes" exige descrição (D-063).
+9. Cada dimensão classificada tem evidência vinculada e justificativa; uma evidência pode estar vinculada a mais de uma dimensão (D-061, D-063).
+10. Poder Baixo exige evidência (verificação documental com fontes, elementos examinados e data, ou outra evidência); sem ela, não publica (D-063).
+11. Na mudança de metodologia, nenhuma classificação é copiada como válida; evidências históricas só contam depois de confirmadas (T-4).
+12. Tendência "Não comparável" entre metodologias diferentes sem equivalência declarada, mesmo com os mesmos três níveis (T-6).
+13. Cópia de segurança antes da migração e preservação verificada campo a campo (T-1).
 
-## 10. Rubricas propostas 🔧 — não homologadas (Q-66, D-061)
+## 10. Rubricas — diretrizes homologadas, em calibração 🔧 (Q-66, D-061, D-063)
 
-Proposta revisada conforme as diretrizes do gestor (D-061). **Não está em uso no sistema** e não deve ser aplicada antes da homologação. O documento completo da Q-66 (versão 0.2), com exemplos fictícios, situações limítrofes e casos de calibração, foi entregue ao gestor fora deste repositório. Esta seção resume as regras.
+Diretrizes homologadas pelo gestor em 02/11/2026, com ajustes (D-063). **Continuam como proposta até a execução e a análise da calibração (H6)**: a metodologia não está validada e não está em uso no sistema. O documento completo da Q-66 (versão 0.3), com exemplos fictícios e situações limítrofes, e o material da calibração foram entregues ao gestor fora deste repositório.
 
 ### 10.1 Regras gerais
 
 1. **Independência:** cada dimensão é classificada sozinha; nenhuma é inferida de outra. Interesse alto não é apoio; participação não é interesse; silêncio não é Neutro; competência formal não é a única forma de poder.
 2. **Contexto e data:** vale para o projeto ou tema avaliado, na data de referência, no horizonte do ciclo previsto até a próxima revisão anual.
-3. **Evidência e justificativa por dimensão:** cada dimensão classificada exige ao menos uma evidência pertinente vinculada a ela e uma justificativa própria. **Uma evidência pode fundamentar mais de uma dimensão, desde que o vínculo seja explícito e pertinente.**
-4. **Nível × confiança:** a rubrica define o nível; a qualidade das evidências define a confiança. Na dúvida entre níveis vizinhos, vale o que as evidências **demonstram**, com a dúvida registrada.
-5. **Pessoa × instituição:** manifestação do representante não se transfere à instituição sem validação (D-059).
-6. **Informação insuficiente:** "Não avaliado" na dimensão afetada, com a lacuna registrada; as demais podem ser classificadas.
+3. **Evidência por dimensão (H3):** cada dimensão classificada exige ao menos uma evidência pertinente e identificável, vinculada a ela. Uma evidência pode fundamentar mais de uma dimensão, desde que o vínculo seja explícito. **A ausência de evidência de um nível não prova o nível oposto.** Sem informação suficiente, "Não avaliado".
+4. **Justificativa por dimensão (H4):** justificativa curta por dimensão classificada e síntese geral da avaliação, sem tamanho mínimo e sem repetir os mesmos textos.
+5. **Nível × confiança:** a rubrica define o nível; a qualidade das evidências define a confiança. Na dúvida entre níveis vizinhos, vale o que as evidências **demonstram**.
+6. **Pessoa × instituição:** manifestação do representante não se transfere à instituição sem validação (D-059).
 
-### 10.2 Poder / influência
+### 10.2 Poder / influência (H1, H3)
 
 Pergunta-chave: *o stakeholder pode, comprovadamente, mudar de forma decisiva a aprovação, a viabilidade, a estratégia, o cronograma, os custos ou a legitimidade do projeto?*
 
-Duas vias, ambas com evidência:
-- **Poder formal:** competência ou posição para aprovar, negar, vetar, suspender ou condicionar.
-- **Influência demonstrável:** capacidade comprovada por fatos de influenciar decisivamente viabilidade, decisões estratégicas, cronograma, custos ou legitimidade institucional e social, mesmo sem competência regulatória.
+| Nível | Critério | Evidências observáveis |
+|---|---|---|
+| **Alto** | Autoridade formal para aprovar, negar, vetar, suspender ou condicionar decisão essencial ou recurso indispensável; **ou** influência **decisiva demonstrada** sobre decisões e condições relevantes do projeto. Capacidade meramente hipotética ou sem fundamentação **não** conta. | Norma, ato, parecer vinculante, contrato ou titularidade; precedente documentado de efeito decisivo em projeto igual ou análogo; condição de financiador ou licenciador que dependa da sua anuência. |
+| **Médio** | Influência relevante, **mas não decisiva**. | Voto em colegiado sem veto; parecer não vinculante; recurso substituível; influência registrada sem efeito determinante. |
+| **Baixo** | Influência indireta ou eventual, sem efeito registrado. | **Verificação documental fundamentada**, com as fontes consultadas, os elementos examinados e a data da análise, ou outra evidência pertinente. A simples falta de evidência de Poder Alto **não** prova Poder Baixo. |
+| **Não avaliado** | Informação insuficiente. | — |
+
+### 10.3 Interesse (H1)
+
+Pergunta-chave: *quão relevante é o projeto para os objetivos, competências, operações, responsabilidades ou prioridades do stakeholder?* O interesse independe do engajamento: **não há exigência de acompanhamento ou participação ativa para Interesse Alto**.
 
 | Nível | Critério | Evidências observáveis |
 |---|---|---|
-| **Alto** | Poder formal de aprovar, negar, vetar, suspender ou condicionar decisão essencial ou recurso indispensável; **ou** influência **decisiva demonstrada**: sua atuação, sozinha ou como fator determinante, muda o resultado. | Norma, ato, parecer vinculante, contrato ou titularidade; precedente documentado de efeito decisivo (suspensão, mudança de traçado, revisão de custos, perda de apoio institucional) em projeto igual ou análogo; condição de financiador ou licenciador que dependa da sua anuência. |
-| **Médio** | Influência relevante, **mas não decisiva**: participa sem determinar, pode atrasar ou encarecer de forma moderada, ou afeta aspectos parciais. | Voto em colegiado sem veto; parecer não vinculante; recurso substituível; registro de influência sem efeito determinante. |
-| **Baixo** | Influência indireta ou eventual, **sem efeito registrado**. | Verificação de que não há competência, recurso relevante nem precedente de influência. |
-| **Não avaliado** | Não se conhecem competências, recursos, precedentes ou relações com as decisões. | — |
+| **Alto** | Projeto muito relevante: afeta de forma direta e significativa objetivos centrais, competências, operações, responsabilidades ou prioridades, ou o tema é prioridade formal. | Lei, estatuto ou mandato coincidente; documento de impacto direto; plano ou agenda oficial; manifestação formal de prioridade. |
+| **Médio** | Relevância parcial, indireta ou condicionada. | Relação secundária no mandato; efeitos indiretos em estudo; menção pontual. |
+| **Baixo** | Relevância marginal ou remota. | Comparação documentada entre escopo e objetivos. |
+| **Não avaliado** | Informação insuficiente. | — |
 
-**Poder apenas hipotético não conta.** Por exemplo, "pode parar a obra", sem precedente, base formal ou efeito registrado. Entidades representativas e associações são avaliadas pela influência demonstrável. Um exemplo fictício: a mesma associação de pescadores é **Alto** quando há precedente de suspensão de projeto análogo e exigência de negociação no licenciamento, e **Médio** quando há só legitimidade para representar.
-
-### 10.3 Interesse
-
-Pergunta-chave: *quão relevante é o projeto para os objetivos, competências, operações, responsabilidades ou prioridades do stakeholder?*
-
-**Não há exigência de acompanhamento ou participação ativa para Interesse Alto.** Participação é engajamento, outra dimensão: sua ausência não reduz o interesse, e sua presença, sozinha, não o eleva.
-
-| Nível | Critério | Evidências observáveis |
-|---|---|---|
-| **Alto** | Projeto muito relevante para objetivos centrais, competências, operações, responsabilidades ou prioridades: afeta-os de forma direta e significativa, ou o tema é prioridade formal. | Lei, estatuto ou mandato coincidente; documento de impacto direto (território, operações, receitas, custos, obrigações); plano ou agenda oficial; manifestação formal de prioridade. |
-| **Médio** | Relevância parcial, indireta ou condicionada. | Relação secundária no mandato; efeitos indiretos em estudo; menção pontual em documentos. |
-| **Baixo** | Relevância marginal ou remota. | Comparação documentada entre escopo e objetivos, mostrando pouca sobreposição. |
-| **Não avaliado** | Informação insuficiente sobre a relevância. | — |
-
-Exemplo fictício: uma prefeitura com a obra no seu território tem Interesse **Alto**, mesmo sem ir às reuniões. Uma consultoria presente em todos os eventos, sem nada relevante em jogo, tem Interesse **Baixo** e engajamento alto.
-
-### 10.4 Posicionamento
+### 10.4 Posicionamento e ressalvas (H1, H2, H5)
 
 | Classificação | Critério |
 |---|---|
-| **Favorável** | Posição **predominante** de apoio à proposta atual, manifestada ou demonstrada. |
-| **Neutro** | Manifestação **efetivamente neutra ou equidistante** (declara que não apoia nem se opõe, que se mantém imparcial ou que não tomará posição). Nunca inferido de silêncio ou de manifestação ambígua. |
-| **Contrário** | Posição **predominante** de oposição à proposta atual, manifestada ou demonstrada. |
-| **Não avaliado** (estado, não categoria) | **(a)** Sem manifestação, sem resposta a consulta ou desconhecimento do projeto; **ou (b)** manifestação que **não permite determinar uma posição predominante** — "sem classificação conclusiva" —, com a manifestação, as condições e a razão da indefinição registradas. **Não existe quarta categoria.** |
+| **Favorável** | Orientação **predominante** documentada de apoio à proposta atual. |
+| **Neutro** | Manifestação **efetivamente neutra ou equidistante**. Nunca por silêncio, falta de resposta, desconhecimento ou ambiguidade. |
+| **Contrário** | Orientação **predominante** documentada de oposição à proposta atual. |
+| **Não avaliado** (estado, não categoria) | **(a)** Sem manifestação, sem resposta a consulta ou desconhecimento; **ou (b)** manifestação sem posição predominante, com justificativa e evidências registradas. **Não existe quarta categoria.** |
 
-**Ressalvas relevantes (proposta H2-C):** campo próprio, sim ou não, com descrição, separado da categoria. Apoio com ressalvas **não** é automaticamente Favorável, e apoio condicionado **não** é automaticamente Neutro.
+**Ressalvas relevantes (H2, opção C com ajuste):** campo próprio, vinculado à avaliação do posicionamento. **Sempre que houver manifestação documentada**, registra-se uma de três situações:
+- **há ressalvas relevantes**, com descrição;
+- **não foram identificadas** ressalvas relevantes;
+- **informação insuficiente** para avaliá-las (não se presume que não existam).
 
-| Passo | Pergunta | Resultado |
-|---|---|---|
-| 1 | Há manifestação ou ação documentada sobre a proposta atual? | Não → Não avaliado (a). |
-| 2 | É efetivamente neutra ou equidistante? | Sim → Neutro. |
-| 3 | Há posição predominante? | Apoio → Favorável; oposição → Contrário. Com condições ou objeções substanciais, marcar ressalvas relevantes e descrevê-las. |
-| 4 | Não é possível determinar a predominância? | Não avaliado (b), sem classificação conclusiva, com registro; reavaliar quando a condição se resolver. |
+Sem manifestação, o campo não se aplica. O campo não cria categoria de posicionamento.
 
-Exemplo fictício:
-- "Apoiamos a ampliação e solicitamos plano de mobilidade" → **Favorável**, com ressalvas relevantes.
-- "Apoiaremos se houver plano de mobilidade" → **Não avaliado (b)**: o apoio é só futuro e condicionado, sem posição atual predominante. **Não é Neutro.**
+**Painéis futuros (H5):** mostrar à parte, como informação complementar e não como quarta categoria, quantos "Não avaliado" no posicionamento têm manifestação registrada.
 
-### 10.5 Calibração
+### 10.5 Calibração (H6 — aprovada, pendente de execução)
 
-Os casos fictícios da Q-66 serão classificados de forma independente por pelo menos duas pessoas. A concordância de cerca de **80%** por dimensão, sem divergências extremas, é uma **meta exploratória de consistência entre avaliadores**: serve para aperfeiçoar a redação da rubrica e **não** é validação científica definitiva da metodologia.
+- **Primeira rodada:** dez casos fictícios, respondidos em formulário de avaliação independente por pelo menos dois avaliadores, quando disponíveis.
+- **Comparação:** com gabarito fundamentado e registro das divergências por dimensão, especialmente as extremas.
+- **Meta exploratória:** concordância próxima de 80%, sem caráter de validação científica.
+- **Revisão:** depois da revisão da rubrica, segunda rodada com casos fictícios adicionais, não usados antes.
+- **Validação:** a metodologia **não** será declarada validada antes da execução e da análise do exercício.
 
-### 10.6 Decisões para homologação
+### 10.6 Situação da homologação (D-063, 02/11/2026)
 
-| ID | Proposta |
+| ID | Situação |
 |---|---|
-| H1 | Definições e níveis das seções 10.2 a 10.4. |
-| H2 | Campo de ressalvas relevantes (H2-C), com a categoria seguindo a posição predominante. |
-| H3 | Evidência por dimensão; uma evidência pode sustentar várias, com vínculo explícito e pertinente. |
-| H4 | Justificativa por dimensão, além da geral; no posicionamento sem classificação conclusiva, a razão da indefinição. |
-| H5 | Neutro só com manifestação neutra ou equidistante; silêncio e manifestação sem predominância resultam em "Não avaliado"; sem quarta categoria. |
-| H6 | Calibração com casos fictícios, meta exploratória de cerca de 80%. |
+| H1 | ✅ Aprovada |
+| H2 | ✅ Aprovada (opção C), com ajuste: três situações para as ressalvas |
+| H3 | ✅ Aprovada, com ajuste: verificação documental para Poder Baixo; ausência de evidência de Alto não prova Baixo |
+| H4 | ✅ Aprovada |
+| H5 | ✅ Aprovada, com informação complementar nos painéis |
+| H6 | ✅ Aprovada, **pendente de execução** |
+
+As versões finais da Q-66 e da Q-67 serão confirmadas depois da calibração. A programação da Etapa 2B depende dessa confirmação.
 
 ## 11. Questões pendentes ⏳
 
@@ -333,7 +330,7 @@ Os casos fictícios da Q-66 serão classificados de forma independente por pelo 
 | Q-60 | Planilhas originais de qualificação de stakeholders dos demais comitês, se existirem. |
 | Q-64 | Categorias da "Conduta do ES em Ação" e regras de relação com a matriz, sem derivação automática. |
 | Q-65 | Decisões da revisão metodológica: Q-65.2 resolvida (D-058); Q-65.3 resolvida em parte (engajamento e conhecimento do projeto separados — D-060; categorias pendentes); Q-65.5 resolvida em parte (sem pontuação Poder × Interesse × Engajamento; célula da matriz como leitura — D-058); pendentes Q-65.1, Q-65.4 e Q-65.6. |
-| Q-66 | Rubricas observáveis de Baixo/Médio/Alto (poder e interesse) e de Favorável/Neutro/Contrário, evidências mínimas, confiabilidade entre avaliadores e tratamento de registros insuficientes. Proposta revisada conforme a D-061 (seção 10); decisões H1 a H6 pendentes de homologação. |
-| Q-67 | Plano de adaptação técnica da Etapa 2A às escalas V2.2 ([Plano de Implantação](PLANO_IMPLANTACAO.md), seção 7). |
+| Q-66 | Rubricas observáveis de Baixo/Médio/Alto (poder e interesse) e de Favorável/Neutro/Contrário, evidências mínimas, confiabilidade entre avaliadores e tratamento de registros insuficientes. Diretrizes H1 a H6 homologadas com ajustes (D-063); calibração H6 pendente de execução; versão final após a calibração (seção 10). |
+| Q-67 | Plano de adaptação técnica da Etapa 2A às escalas V2.2 ([Plano de Implantação](PLANO_IMPLANTACAO.md), seção 7). Decisões T-1 a T-7 homologadas com ajustes (D-063); versão final após a calibração. |
 
 Resolvidas: Q-02 (escala de poder e interesse — D-058), Q-03 (grau de confiança: robustez da evidência, três níveis — D-034), Q-04 (posicionamento: cinco níveis no Manual V2.0, **substituídos por três categorias para novas avaliações** — D-059), Q-05 (matriz: grade ordinal 3 × 3 com células nomeadas, sem pontos de corte — D-058), Q-07 (estrutura com metodologia de demonstração e dados fictícios antes da homologação — D-034) e Q-08 (revisão anual e por evento relevante — Manual V2.0); Q-61 (grau de confiança — D-036) e Q-62 (metodologia comum, com arquitetura para metodologias específicas — D-037). Consolidação em [REGISTRO_DECISOES.md](REGISTRO_DECISOES.md).

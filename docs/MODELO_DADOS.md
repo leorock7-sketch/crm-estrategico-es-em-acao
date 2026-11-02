@@ -9,6 +9,7 @@
 | 0.5 | 01/11/2026 | Etapa 2A: tabelas de avaliação (seção 6.3) e `permissao_contexto` criadas, com metodologias de demonstração (D-034). |
 | 0.6 | 01/11/2026 | Escalas V2.2 (D-058 a D-060): adaptação prevista na seção 6.3.1, não implementada (Q-67). |
 | 0.7 | 01/11/2026 | Seção 6.3.1: ressalvas relevantes, justificativas e evidências por dimensão (D-061), previstas e não implementadas. |
+| 0.8 | 02/11/2026 | Seção 6.3.1 conforme a D-063: ressalvas em três situações, verificação documental, evidência reaproveitada com confirmação e equivalência entre metodologias. Não implementado. |
 
 Legenda: ✅ Aprovado · 🔧 Proposta técnica · ⏳ Pendente (ver [REQUISITOS.md](REQUISITOS.md#como-ler-este-documento)).
 
@@ -421,16 +422,20 @@ As escalas V2.2 (D-058 a D-060) pedem os ajustes abaixo, propostos para homologa
 | `metodologia_versao` | `escala_poder_interesse`: lista `demonstracao_numerica`, `binaria_historica`, `ordinal_tres_niveis`. `escala_posicionamento`: lista `cinco_categorias`, `tres_categorias`. | Saber em que escala cada versão foi registrada, sem converter nada. |
 | `rubrica_nivel` (nova) | Metodologia, dimensão (poder, interesse, posicionamento), nível, descrição, evidência mínima e ordem. | Rubricas versionadas com a metodologia e travadas quando ela entra em vigor. |
 | `avaliacao_versao` | `nivel_poder` e `nivel_interesse`: lista `baixo`, `medio`, `alto`; vazio = "não avaliado". | Classificação direta da V2.2. |
-| `avaliacao_versao` | `ressalvas_relevantes` (sim ou não) e `descricao_ressalvas` (texto, obrigatório quando "sim") — proposta H2-C (D-061). | Registrar ressalvas e condições do posicionamento separadamente da categoria. |
+| `avaliacao_versao` | `situacao_ressalvas`: lista `ha_ressalvas`, `nao_identificadas`, `informacao_insuficiente` (vazio = não se aplica, sem manifestação) e `descricao_ressalvas` (obrigatória com `ha_ressalvas`) — H2 (D-063). | Registrar as ressalvas do posicionamento separadamente da categoria, sem presumir que não existam. |
 | `avaliacao_versao` | `justificativa_poder`, `justificativa_interesse` e `justificativa_posicionamento` (D-061). | Justificativa por dimensão; no posicionamento sem classificação conclusiva, a razão da indefinição. |
-| `evidencia_dimensao` (nova) | Evidência e dimensão (poder, interesse, posicionamento); uma evidência pode estar ligada a várias dimensões (D-061). | Evidência por dimensão, com vínculo explícito. |
+| `evidencia_dimensao` (nova) | Evidência e dimensão (poder, interesse, posicionamento); uma evidência pode estar ligada a várias dimensões (D-061, D-063). | Evidência por dimensão, com vínculo explícito. |
+| `evidencia` | Novo tipo `verificacao_documental`, com `fontes_consultadas`, `elementos_examinados` e `data_analise` (obrigatórios nesse tipo) — H3 (D-063). | Fundamentar Poder Baixo sem usar a falta de evidência de Alto como prova. |
+| `evidencia` | `evidencia_origem_id`, `pertinencia_confirmada_em` e `pertinencia_confirmada_por` — T-4 (D-063). | Reaproveitar evidência histórica como referência, só válida depois de confirmada. |
+| `metodologia_versao` | `equivalente_posicionamento_a` e `justificativa_equivalencia` — T-6 (D-063). | Permitir a tendência entre metodologias diferentes só com equivalência declarada. |
 
 Regras propostas no banco:
 - Escala de três categorias: posicionamento só `favoravel`, `neutro`, `contrario` ou vazio.
 - Escala ordinal: só os níveis; colunas numéricas e notas por critério ficam vazias.
 - Escala binária histórica: sem `medio`.
 - Novas versões exigem metodologia.
-- Cada dimensão classificada exige evidência vinculada e justificativa própria; ressalvas relevantes marcadas exigem descrição; posicionamento vazio com manifestação registrada ("sem classificação conclusiva") exige a justificativa do posicionamento. Não há valor de quarta categoria (D-061).
+- Cada dimensão classificada exige evidência pertinente vinculada (com pertinência confirmada, se reaproveitada) e justificativa própria; a verificação documental exige fontes, elementos examinados e data; com manifestação documentada, a situação das ressalvas é obrigatória, e "há ressalvas" exige descrição; posicionamento vazio com manifestação registrada exige a justificativa do posicionamento. Não há valor de quarta categoria (D-061, D-063).
+- Na mudança de metodologia, o novo rascunho não recebe classificações como válidas (T-4); a tendência só compara avaliações metodologicamente comparáveis (T-6).
 
 Linhas existentes: as metodologias de demonstração já registradas recebem `demonstracao_numerica` e `cinco_categorias` como valor padrão ao criar as colunas, sem alterar versões publicadas. Versões sem metodologia são tratadas como da escala anterior. O tipo `posicionamento`, com os cinco valores, é mantido por causa do histórico.
 
