@@ -13,6 +13,7 @@
 | 0.9 | 01/11/2026 | Etapa 2A homologada e incorporada à `main` (D-055); próxima atividade: decisões Q-65 (D-056) |
 | 0.10 | 01/11/2026 | Escalas V2.2 (D-057 a D-060): Etapa 2B redefinida; plano de adaptação técnica proposto (seção 7, Q-67) |
 | 0.11 | 01/11/2026 | Seção 7: ressalvas relevantes, justificativas e evidências por dimensão (D-061) |
+| 0.12 | 02/11/2026 | Fase documental V2.2 concluída (D-062); próxima atividade: homologação da Q-66 e da Q-67 |
 
 Legenda: ✅ Aprovado · 🔧 Proposta técnica · ⏳ Pendente.
 
@@ -34,7 +35,7 @@ Legenda: ✅ Aprovado · 🔧 Proposta técnica · ⏳ Pendente.
 | 1 | Banco de dados de desenvolvimento e Cadastro Mestre | Banco PostgreSQL local, estrutura de comitês e projetos/temas, cadastro de pessoas, instituições e vínculos, com dados fictícios | ✅ **Homologada em 01/11/2026** para desenvolvimento e testes (D-027); pendências C6, C7 e C8 |
 | 1.1 | Projetos, temas e contextos | Telas de comitês, projetos e temas; comitês participantes (D-023); associação de stakeholders aos contextos, sem avaliação de poder × interesse | ✅ **Concluída**: homologada em 01/11/2026 para desenvolvimento com dados fictícios (D-031, D-047, incluindo a correção de normalização) e incorporada à `main` pelo Pull Request #1 (commit de merge `90c319c`, D-053) |
 | 2A | Metodologia e estrutura da avaliação estratégica | Fichas e versões, evidências, posicionamento, grau de confiança, permissões e matriz com metodologia de demonstração e dados fictícios | ✅ **Concluída**: homologada em 01/11/2026 para desenvolvimento e testes com dados fictícios (D-035, D-055) e incorporada à `main` pelo Pull Request #2 (commit de merge `81478af`); adaptação às escalas V2.2 pendente (seção 7) |
-| 2B | Metodologia institucional V2.2 e adaptação técnica | Escalas aprovadas (D-058 a D-060); rubricas homologadas e adaptação do sistema às novas escalas (seção 7). Depende de Q-66 e Q-67 | ⏳ Suspensa até a homologação das rubricas (Q-66) e do plano de adaptação técnica (Q-67) (D-060); programação não autorizada |
+| 2B | Metodologia institucional V2.2 e adaptação técnica | Escalas aprovadas (D-058 a D-060); rubricas homologadas e adaptação do sistema às novas escalas (seção 7). Depende de Q-66 e Q-67 | ⏳ Suspensa até a homologação das rubricas (Q-66) e do plano de adaptação técnica (Q-67) (D-060); fase documental concluída (D-062); programação não autorizada |
 | 3 | Iniciativas, interações e compromissos | Matriz de iniciativas, registro único de reuniões, encaminhamentos e prazos | 🔧 |
 | 4 | Plano de ação e matriz de riscos | Versões e aprovação, acompanhamento, riscos, gatilhos e respostas | 🔧 |
 | 5 | Autenticação e permissões | Supabase Auth, perfis e permissões por projeto/tema, segurança no banco. Depende de Q-50 | 🔧 |
@@ -280,6 +281,7 @@ Proposta para homologação. **Nada desta seção foi implementado.** A execuç�
 | Verificação automática no GitHub Actions | — | ✅ Implementada (D-041): Node.js 24 e 26, a cada Pull Request e atualização da `main` |
 | Proteção da `main` (verificações obrigatórias antes do merge) | — | ✅ Configurada pelo administrador e conferida (D-045, D-052) |
 | Revisão e incorporação dos Pull Requests das Etapas 1.1 e 2A | Base correta da Etapa 2A | ✅ Concluída: Etapa 1.1 incorporada pelo Pull Request #1 (D-053, `90c319c`) e Etapa 2A pelo Pull Request #2 (D-055, `81478af`) |
+| Fase documental V2.2 (registro da Etapa 2A e escalas V2.2) | Homologação da Q-66 e da Q-67 | ✅ Concluída (D-062): Pull Requests #3 (`9084a74`) e #4 (`a254b40`) incorporados; próxima atividade: homologação da Q-66 e da Q-67 |
 | Análise LGPD, retenção e anonimização | Etapa 8 | Q-13, Q-58 |
 
 ## 9. Local de trabalho ✅ (D-019)
