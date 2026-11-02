@@ -10,6 +10,7 @@
 | 0.6 | 01/11/2026 | Repositório público com e-mail *noreply* nos commits (D-039) e proposta de testes no GitHub Actions (P-039) |
 | 0.7 | 01/11/2026 | Verificação automática no GitHub Actions implementada (D-041) |
 | 0.8 | 01/11/2026 | Escalas V2.2 (D-057 a D-060): adaptação do módulo `avaliacoes` e do banco planejada, não implementada (Q-67) |
+| 0.9 | 02/11/2026 | Etapa 2B (D-069): módulo `avaliacoes` adaptado às escalas V2.2 (rubricas, alertas orientativos, matriz 3 × 3) e cópia de segurança automática do banco local antes de atualizações pendentes; aguardando homologação |
 
 Legenda: ✅ Aprovado · 🔧 Proposta técnica · ⏳ Pendente.
 
@@ -112,11 +113,11 @@ crm-estrategico-es-em-acao/
 │   ├── componentes/          Componentes visuais reutilizáveis (campos, alertas, selos…)
 │   ├── modulos/
 │   │   ├── acesso/           Usuário atual (provisório até a autenticação)
-│   │   ├── avaliacoes/       Avaliação estratégica: cálculo de demonstração, matriz, consultas, ações e telas
+│   │   ├── avaliacoes/       Avaliação estratégica: escalas V2.2, rubricas, alertas orientativos, matriz 3 × 3, cálculo de demonstração (histórico), consultas, ações e telas
 │   │   ├── projetos-temas/   Comitês, projetos, temas e contextos: validações, consultas, ações e componentes
 │   │   └── stakeholders/     Cadastro Mestre: validações, consultas, ações e componentes
 │   └── lib/
-│       ├── banco/            Conexão, estrutura das tabelas e scripts SQL (migracoes/)
+│       ├── banco/            Conexão (com cópia de segurança antes de atualizações pendentes), estrutura das tabelas e scripts SQL (migracoes/)
 │       ├── validacao/        Regras genéricas de validação (inclusive CNPJ)
 │       ├── formatacao.ts     Datas no padrão brasileiro
 │       └── texto.ts          Normalização de textos para busca
@@ -176,6 +177,7 @@ Regras de organização:
 | Proteção da branch `main` no GitHub: Pull Request obrigatório, verificações automáticas obrigatórias antes do merge, sem exigir outro revisor, bloqueio de exclusão e de reescrita do histórico (D-045, D-052). | ✅ Configurada e conferida |
 | Repositório público (D-033): verificação de dados pessoais, informações restritas e segredos antes de cada envio; e-mail *noreply* do GitHub nos commits a partir de 01/11/2026 (D-039). O histórico anterior não é reescrito sem aprovação. | ✅ |
 | Controle de acesso por projeto ou tema nas consultas do servidor, com testes (Etapa 2A). Sem autenticação real nem regras no banco: **segurança multiusuário não homologada**. | 🔧 (D-034) |
+| Cópia de segurança automática da pasta do banco local antes de aplicar atualizações pendentes; se a cópia falhar, nada é aplicado (T-1). Não substitui a política de cópias e restauração (C7). | 🔧 (implementada na Etapa 2B) |
 | Verificação automática no GitHub Actions a cada Pull Request e atualização da `main`, com permissões mínimas e sem credenciais (seção 6.1). | ✅ (D-041) |
 
 ## 6. Comandos do projeto
@@ -229,7 +231,6 @@ Passo posterior, dependente de Q-57: um segundo teste em PostgreSQL real, para a
 | Q-51 | Região de hospedagem dos dados. O Supabase oferece região em São Paulo. |
 | Q-52 | Transferência dos serviços e do repositório para contas institucionais. |
 | Q-57 | Teste de portabilidade em PostgreSQL real (C8). |
-| Q-67 | Adaptação do módulo `avaliacoes` e do banco às escalas V2.2 (níveis Baixo/Médio/Alto, três categorias de posicionamento, matriz 3 × 3), por migração somente aditiva. Plano no [Plano de Implantação](PLANO_IMPLANTACAO.md), seção 7. |
 | — | Abordagem das integrações com Microsoft 365 (Microsoft Graph) e de IA assistiva. |
 
-Resolvidas na Etapa 1: local da cópia de trabalho (D-019) e ferramenta de banco local (D-018).
+Resolvidas na Etapa 1: local da cópia de trabalho (D-019) e ferramenta de banco local (D-018). Resolvida na D-068 e implementada na Etapa 2B (D-069): Q-67, adaptação do módulo `avaliacoes` e do banco às escalas V2.2 ([Plano de Implantação](PLANO_IMPLANTACAO.md), seção 7).

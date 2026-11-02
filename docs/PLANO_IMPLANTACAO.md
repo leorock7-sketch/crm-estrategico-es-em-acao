@@ -20,6 +20,7 @@
 | 0.16 | 02/11/2026 | Rodada 2 com casos inéditos e gabaritos registrados antes da aplicação (D-066) |
 | 0.17 | 02/11/2026 | Discricionariedade fundamentada e ajustes D1 a D4 (D-067): diretriz para a Etapa 2B; rodada 1 encerrada; rodada 2 liberada com rubrica 0.4 |
 | 0.18 | 02/11/2026 | Calibração H6 concluída e versões finais da Q-66 e da Q-67 (D-068); Etapa 2B pronta para autorização; seção 7 conforme a Q-67 1.0 |
+| 0.19 | 02/11/2026 | Etapa 2B autorizada (D-069) e implementada na branch `feature/escalas-v2-2`: escalas V2.2, rubricas da Q-66 1.0, alertas orientativos, matriz 3 × 3 e atualização segura do banco (seção 7.5); aguarda a revisão do Pull Request e a homologação |
 
 Legenda: ✅ Aprovado · 🔧 Proposta técnica · ⏳ Pendente.
 
@@ -40,8 +41,8 @@ Legenda: ✅ Aprovado · 🔧 Proposta técnica · ⏳ Pendente.
 | 0 | Fundação técnica | Documentação, esqueleto da aplicação, testes básicos | ✅ Aprovada em 31/10/2026 |
 | 1 | Banco de dados de desenvolvimento e Cadastro Mestre | Banco PostgreSQL local, estrutura de comitês e projetos/temas, cadastro de pessoas, instituições e vínculos, com dados fictícios | ✅ **Homologada em 01/11/2026** para desenvolvimento e testes (D-027); pendências C6, C7 e C8 |
 | 1.1 | Projetos, temas e contextos | Telas de comitês, projetos e temas; comitês participantes (D-023); associação de stakeholders aos contextos, sem avaliação de poder × interesse | ✅ **Concluída**: homologada em 01/11/2026 para desenvolvimento com dados fictícios (D-031, D-047, incluindo a correção de normalização) e incorporada à `main` pelo Pull Request #1 (commit de merge `90c319c`, D-053) |
-| 2A | Metodologia e estrutura da avaliação estratégica | Fichas e versões, evidências, posicionamento, grau de confiança, permissões e matriz com metodologia de demonstração e dados fictícios | ✅ **Concluída**: homologada em 01/11/2026 para desenvolvimento e testes com dados fictícios (D-035, D-055) e incorporada à `main` pelo Pull Request #2 (commit de merge `81478af`); adaptação às escalas V2.2 pendente (seção 7) |
-| 2B | Metodologia institucional V2.2 e adaptação técnica | Escalas aprovadas (D-058 a D-060); rubricas da Q-66 1.0 e adaptação do sistema conforme a Q-67 1.0 (seção 7) | ⏳ **Pronta para autorização:** Q-66 e Q-67 em versão final e calibração H6 concluída (D-068); documento de autorização entregue ao gestor; programação só após a revisão final e o merge da branch documental e a autorização específica |
+| 2A | Metodologia e estrutura da avaliação estratégica | Fichas e versões, evidências, posicionamento, grau de confiança, permissões e matriz com metodologia de demonstração e dados fictícios | ✅ **Concluída**: homologada em 01/11/2026 para desenvolvimento e testes com dados fictícios (D-035, D-055) e incorporada à `main` pelo Pull Request #2 (commit de merge `81478af`); adaptação às escalas V2.2 feita na Etapa 2B (seção 7) |
+| 2B | Metodologia institucional V2.2 e adaptação técnica | Escalas aprovadas (D-058 a D-060); rubricas da Q-66 1.0 e adaptação do sistema conforme a Q-67 1.0 (seção 7) | 🔧 **Implementada, aguardando homologação:** autorizada em 02/11/2026 (D-069) e desenvolvida na branch `feature/escalas-v2-2`, com dados fictícios; entrega por Pull Request único, sem merge automático (seção 7.5) |
 | 3 | Iniciativas, interações e compromissos | Matriz de iniciativas, registro único de reuniões, encaminhamentos e prazos | 🔧 |
 | 4 | Plano de ação e matriz de riscos | Versões e aprovação, acompanhamento, riscos, gatilhos e respostas | 🔧 |
 | 5 | Autenticação e permissões | Supabase Auth, perfis e permissões por projeto/tema, segurança no banco. Depende de Q-50 | 🔧 |
@@ -223,9 +224,9 @@ Ficaram de fora, conforme a D-034: critérios, pesos, fórmula e pontos de corte
 8. Todo resultado de demonstração marcado como não homologado; nenhum critério institucional no sistema.
 9. Funciona em celular e computador.
 
-## 7. Adaptação às escalas V2.2 — plano final 🔧 (Q-67 1.0, D-068)
+## 7. Adaptação às escalas V2.2 — implementada na Etapa 2B 🔧 (Q-67 1.0, D-068, D-069)
 
-Decisões T-1 a T-7 homologadas com ajustes em 02/11/2026 (D-063), com a T-4 precisada (D-064) e o plano consolidado na versão final da Q-67 (1.0, D-068). **Nada desta seção foi implementado.** A execução depende da autorização da Etapa 2B. Referências: D-058 a D-060; [Metodologia](METODOLOGIA_STAKEHOLDERS.md), seções 3.2, 6, 9 e 10; [Modelo de Dados](MODELO_DADOS.md), seção 6.3.1.
+Decisões T-1 a T-7 homologadas com ajustes em 02/11/2026 (D-063), com a T-4 precisada (D-064) e o plano consolidado na versão final da Q-67 (1.0, D-068). **Implementada na Etapa 2B** (autorização D-069, 02/11/2026), na branch `feature/escalas-v2-2`, com dados fictícios; aguarda a revisão do Pull Request e a homologação do gestor. O registro da execução está na seção 7.5. Referências: D-058 a D-060; [Metodologia](METODOLOGIA_STAKEHOLDERS.md), seções 3.2, 6, 9 e 10; [Modelo de Dados](MODELO_DADOS.md), seção 6.3.1.
 
 ### 7.1 Inventário de impactos
 
@@ -247,9 +248,9 @@ Decisões T-1 a T-7 homologadas com ajustes em 02/11/2026 (D-063), com a T-4 pre
 
 **Diretriz para a adaptação (D-067):** rigor na rastreabilidade, flexibilidade no julgamento e simplicidade operacional. As regras de natureza interpretativa hoje garantidas pelo banco ou pelo servidor (P-033, T04) passam a **alertas orientativos** na tela e no servidor; o consultor pode manter a classificação, com justificativa. No banco ficam só os **bloqueios técnicos** de integridade (valores das escalas, vínculos obrigatórios, responsável, data e histórico imutável). O campo de validação institucional passa a registrar a origem e a natureza da informação, sem exigir confirmação formal. Sem fluxos adicionais de aprovação, campos excessivos ou novas categorias.
 
-### 7.2 Sequência, após a autorização da Etapa 2B
+### 7.2 Sequência (executada na Etapa 2B)
 
-Antes de começar: revisão final da branch documental, Pull Request documental e merge feito pelo gestor; depois, a branch da Etapa 2B parte da `main` atualizada.
+Pré-requisito cumprido: Pull Request documental #5 incorporado pelo gestor (`2ef64eb`); a branch da Etapa 2B partiu da `main` atualizada.
 
 1. **Cópia de segurança obrigatória** do banco local antes da migração (`.dados/copias/antes-escalas-v2-2`), com proposta de cópia automática antes de aplicar migrações pendentes (T-1).
 2. Migração `0006`, **somente aditiva**: novos tipos, colunas e a tabela de rubricas. Sem excluir colunas e sem alterar ou recalcular versões publicadas. As metodologias já registradas recebem, como valor padrão das colunas novas, a escala em que foram feitas.
@@ -280,6 +281,28 @@ Antes de começar: revisão final da branch documental, Pull Request documental 
 5. Funciona em celular e computador.
 6. Regras interpretativas aparecem como alertas, sem impedir gravar, publicar ou continuar iniciativas; a classificação mantida diante de alerta exige justificativa; a ausência de documento não impede o registro (D-067).
 
+### 7.5 Execução na Etapa 2B (02/11/2026, D-069) 🔧
+
+| Item | Situação |
+|---|---|
+| Branch `feature/escalas-v2-2`, a partir da `main` atualizada (`2ef64eb`) | Concluída; entrega por Pull Request único, sem merge automático |
+| Cópia de segurança automática antes de aplicar atualizações pendentes do banco (T-1) | Concluída: a pasta de dados é copiada para `.dados/copias/antes-migracao-<data e hora>`; se a cópia falhar, nenhuma atualização é aplicada; banco novo não gera cópia. Não substitui a C7 |
+| Migração `0006`, somente aditiva | Concluída: tipos, colunas e tabela `rubrica_nivel`; as metodologias existentes recebem a escala em que foram feitas; nenhuma versão publicada é alterada ou recalculada |
+| Regras técnicas no banco | Concluídas: valores das escalas; categorias parciais recusadas nas novas versões; níveis sem pontuação; sem Médio na escala binária histórica; nova versão só com metodologia vigente; rubricas travadas na metodologia vigente; natureza da alteração da metodologia (D-064); na publicação, justificativa de cada dimensão classificada e natureza da informação do posicionamento |
+| Evidência e validação institucional | Opcionais na metodologia V2.2 (D-067); o campo de validação institucional aparece como "Origem da informação". As metodologias de demonstração anteriores mantêm as regras da Etapa 2A |
+| Alertas orientativos (D-067, D-068) | Concluídos: aparecem durante o preenchimento e não impedem salvar nem publicar; os alertas mantidos ficam gravados na versão publicada e aparecem na ficha. Orientações que dependem da leitura do texto (por exemplo, Poder Baixo) ficam como lembretes fixos no formulário |
+| Formulário, ficha, histórico e tendência | Concluídos: níveis com "Não avaliado"; três posições; natureza da informação, com selo "preliminar"; ressalvas; justificativas por dimensão; rubricas como texto de apoio; histórico com a escala de cada versão; tendência "Não comparável" entre metodologias não comparáveis (T-6) |
+| Nova versão (T-4, D-064) | Na mesma metodologia ou depois de alteração editorial aprovada, as classificações chegam como ponto de partida, com as justificativas em branco; na mudança substantiva, nada de classificação é herdado; as evidências anteriores chegam como referência identificada pela origem |
+| Matriz 3 × 3 | Concluída: células nomeadas, quantidade e nomes, posicionamento por cor e símbolo, selo "preliminar" e tabela equivalente; no celular, a grade mostra a quantidade e os marcadores, e os nomes ficam na tabela. A grade 2 × 2 do histórico binário não foi construída, porque não há registros binários no sistema; se forem importados, ficam preservados na lista de avaliações históricas |
+| Tela de metodologias | Mostra a escala, as rubricas e a natureza da alteração |
+| Dados de demonstração | Metodologia fictícia "V2.2 — rubricas Q-66 1.0", não homologada para uso institucional; projeto fictício com as nove células, Neutro, "Não avaliado", avaliações preliminares e alertas mantidos; as metodologias de demonstração anteriores ficam como histórico |
+| Testes automatizados | Executados e aprovados em 02/11/2026: tipos, qualidade e compilação sem erros; 175 de 175 testes (147 anteriores, com dois ajustes intencionais, e 28 novos), inclusive a atualização de um banco da Etapa 2A com preservação campo a campo |
+| Verificação no navegador (dados fictícios) | Executada em 02/11/2026, no computador e no celular (375 px, sem rolagem horizontal da página): matriz, publicação com alertas mantidos e sem evidência, tendência "Não comparável", histórico da escala anterior e nova versão na mesma metodologia. Telas entregues ao gestor fora do repositório |
+| Banco local de desenvolvimento | O banco anterior foi atualizado com a cópia automática, conferido e guardado em `.dados/copias/`; a demonstração usa um banco novo, com os dados fictícios |
+| Homologação do gestor | ⏳ Pendente |
+
+Ajustes intencionais em testes anteriores: (1) na nova versão depois de uma mudança de metodologia, o posicionamento deixou de ser copiado (T-4); (2) a publicação passou a devolver os alertas mantidos, em vez do resultado numérico (D-067).
+
 ## 8. Pendências efetivas (01/11/2026)
 
 | Pendência | Bloqueia | Situação |
@@ -296,6 +319,7 @@ Antes de começar: revisão final da branch documental, Pull Request documental 
 | Proteção da `main` (verificações obrigatórias antes do merge) | — | ✅ Configurada pelo administrador e conferida (D-045, D-052) |
 | Revisão e incorporação dos Pull Requests das Etapas 1.1 e 2A | Base correta da Etapa 2A | ✅ Concluída: Etapa 1.1 incorporada pelo Pull Request #1 (D-053, `90c319c`) e Etapa 2A pelo Pull Request #2 (D-055, `81478af`) |
 | Fase documental V2.2 (registro da Etapa 2A e escalas V2.2) | Homologação da Q-66 e da Q-67 | ✅ Concluída (D-062): Pull Requests #3 (`9084a74`) e #4 (`a254b40`) incorporados; próxima atividade: homologação da Q-66 e da Q-67 |
+| Homologação da Etapa 2B | Etapa 3 | Implementada (D-069); aguarda a revisão do Pull Request e a homologação do gestor |
 | Análise LGPD, retenção e anonimização | Etapa 8 | Q-13, Q-58 |
 
 ## 9. Local de trabalho ✅ (D-019)

@@ -13,6 +13,7 @@
 | 0.9 | 02/11/2026 | Seção 6.3.1: natureza das alterações da metodologia (substantiva ou editorial), conforme a D-064. Não implementado. |
 | 0.10 | 02/11/2026 | Seção 6.3.1 e campo `validacao_institucional` conforme a D-067: evidências opcionais, natureza da informação e indicação de não confirmada; regras interpretativas como alertas; bloqueios só técnicos. Não implementado. |
 | 0.11 | 02/11/2026 | Seção 6.3.1 conforme a versão final da Q-67 (D-068): natureza da informação do posicionamento e alertas mantidos; retirados a tabela de evidência por dimensão, o tipo "verificação documental" e a confirmação de pertinência. Não implementado. |
+| 0.12 | 02/11/2026 | Etapa 2B (D-069): seção 6.3.1 implementada pela migração `0006`, aguardando homologação; `rubrica_nivel` com critério orientador e bases típicas; cópia de segurança antes de atualizações pendentes. |
 
 Legenda: ✅ Aprovado · 🔧 Proposta técnica · ⏳ Pendente (ver [REQUISITOS.md](REQUISITOS.md#como-ler-este-documento)).
 
@@ -376,13 +377,13 @@ Regras: UK (`stakeholder_id`, `projeto_tema_id`); só é criada para stakeholder
 | `avaliacao_id` | UUID | FK → `avaliacao.id` | Sim | |
 | `numero_versao` | número inteiro | | Sim | 1, 2, 3… |
 | `situacao` | lista: `rascunho`, `vigente`, `substituida` | | Sim | |
-| `metodologia_versao_id` | UUID | FK → `metodologia_versao.id` | Não | Vazia quando não há metodologia vigente (sem pontuação) |
+| `metodologia_versao_id` | UUID | FK → `metodologia_versao.id` | Não | Vazia nas versões antigas criadas sem metodologia vigente (sem pontuação), tratadas como escala anterior; desde a Etapa 2B, toda nova versão exige metodologia vigente |
 | `poder`, `interesse` | número decimal | | Não | Resultado gravado na publicação, escala técnica de 0 a 100 (P-032); vazio = sem pontuação, nunca zero. Usado só pelas metodologias de demonstração; não aprovado para uso institucional (D-058) |
 | `posicionamento` | lista de cinco níveis (escala do Manual V2.0) | | Não | Vazio = "não avaliado" ✅. Novas avaliações: só Favorável, Neutro e Contrário (D-059); as categorias parciais ficam no histórico (seção 6.3.1) |
 | `grau_confianca` | lista: `alto`, `medio`, `baixo` | | Não | ✅ (D-034); exibidos como Alta, Média e Baixa (D-060) |
 | `justificativa_confianca` | texto | | Não | Obrigatória na publicação se houver grau de confiança |
 | `justificativa` | texto longo | | Não | Obrigatória na publicação ✅ |
-| `validacao_institucional` | texto | | Não | Obrigatória para publicar posicionamento de instituição na demonstração atual ✅; na Etapa 2B, passa a registrar a origem e a natureza da informação, sem exigir confirmação formal (D-067) ⏳ |
+| `validacao_institucional` | texto | | Não | Nas metodologias de demonstração, obrigatória para publicar posicionamento de instituição ✅; na metodologia V2.2, registra a origem da informação (na tela, "Origem da informação"), opcional e sem exigir confirmação formal (D-067, D-069) |
 | `data_referencia` | data | | Não | Obrigatória na publicação |
 | `proxima_revisao` | data | | Não | Data de referência + 1 ano, calculada na publicação ✅ |
 | `avaliador_id` | UUID | FK → `usuario.id` | Não | Quem publicou |
@@ -416,14 +417,14 @@ Regra: só muda enquanto a versão é rascunho; retirar uma evidência do rascun
 
 `metodologia_versao`, `criterio_avaliacao`, `avaliacao`, `avaliacao_versao`, `avaliacao_nota_criterio` e `evidencia` têm os campos de controle, a trilha de auditoria e a proibição de exclusão comuns às demais tabelas.
 
-#### 6.3.1 Adaptação prevista às escalas V2.2 🔧 (plano final, não implementado — Q-67 1.0, D-068)
+#### 6.3.1 Adaptação às escalas V2.2 🔧 (implementada na Etapa 2B — Q-67 1.0, D-068, D-069)
 
-As escalas V2.2 (D-058 a D-060) pedem os ajustes abaixo, consolidados na versão final da Q-67 (D-068). Nenhum deles foi feito; dependem da autorização da Etapa 2B. A mudança seria feita por migração **somente aditiva**: nada é excluído, convertido ou recalculado.
+As escalas V2.2 (D-058 a D-060) pedem os ajustes abaixo, consolidados na versão final da Q-67 (D-068) e implementados na Etapa 2B (D-069) pela migração `0006_escalas_v2_2`, **somente aditiva**: nada é excluído, convertido ou recalculado. Aguardam a homologação do gestor.
 
-| Tabela | Mudança proposta | Finalidade |
+| Tabela | Mudança | Finalidade |
 |---|---|---|
 | `metodologia_versao` | `escala_poder_interesse`: lista `demonstracao_numerica`, `binaria_historica`, `ordinal_tres_niveis`. `escala_posicionamento`: lista `cinco_categorias`, `tres_categorias`. | Saber em que escala cada versão foi registrada, sem converter nada. |
-| `rubrica_nivel` (nova) | Metodologia, dimensão (poder, interesse, posicionamento), nível, descrição, evidência mínima e ordem. | Rubricas versionadas com a metodologia e travadas quando ela entra em vigor. |
+| `rubrica_nivel` (nova) | Metodologia, dimensão (poder, interesse, posicionamento), nível (inclusive "não avaliado"), critério orientador, bases típicas e ordem. | Rubricas versionadas com a metodologia e travadas quando ela entra em vigor. |
 | `avaliacao_versao` | `nivel_poder` e `nivel_interesse`: lista `baixo`, `medio`, `alto`; vazio = "não avaliado". | Classificação direta da V2.2. |
 | `avaliacao_versao` | `situacao_ressalvas`: lista `ha_ressalvas`, `nao_identificadas`, `informacao_insuficiente` (vazio = não se aplica, sem manifestação identificada) e `descricao_ressalvas` (esperada com `ha_ressalvas`; a falta gera alerta) — H2 (D-063, D-068). | Registrar as ressalvas do posicionamento separadamente da categoria, com os tratamentos preferenciais da D-068. |
 | `avaliacao_versao` | `natureza_posicionamento`: lista `manifestacao_formal`, `informacao_informal`, `percepcao_consultor`; exigida quando o posicionamento é classificado (D-067, D-068). | Natureza da informação e distinção entre manifestação confirmada e avaliação preliminar (selo "preliminar"), sem campo adicional de confirmação. |
@@ -433,15 +434,17 @@ As escalas V2.2 (D-058 a D-060) pedem os ajustes abaixo, consolidados na versão
 | `metodologia_versao` | `equivalente_posicionamento_a` e `justificativa_equivalencia` — T-6 (D-063). | Permitir a tendência entre metodologias diferentes só com equivalência declarada. |
 | `metodologia_versao` | `metodologia_anterior_id`, `natureza_alteracao` (`substantiva`, `editorial`), `justificativa_natureza`, `natureza_aprovada_por` e `natureza_aprovada_em` — D-064. | Classificar cada alteração metodológica: a substantiva exige revalidação; a editorial não. |
 
-Regras propostas no banco:
+Regras no banco (implementadas):
 - Escala de três categorias: posicionamento só `favoravel`, `neutro`, `contrario` ou vazio.
 - Escala ordinal: só os níveis; colunas numéricas e notas por critério ficam vazias.
 - Escala binária histórica: sem `medio`.
 - Novas versões exigem metodologia.
-- Cada dimensão classificada exige justificativa própria, com a natureza da informação (formal ou documental, informal ou percepção profissional) e a indicação de não confirmada, quando for o caso; evidências são opcionais (com pertinência confirmada, se reaproveitadas); posicionamento vazio com manifestação registrada exige a justificativa do posicionamento. Regras interpretativas — Neutro sem manifestação, Poder Baixo sem indicação do que foi examinado, "há ressalvas" sem descrição, posição institucional fundamentada em manifestação de pessoa — geram alertas, não bloqueios; a classificação mantida exige justificativa. Bloqueios técnicos: valores fora da escala (não há valor de quarta categoria), vínculos obrigatórios e histórico imutável. A natureza da informação de poder e interesse é indicada na justificativa; a do posicionamento, em `natureza_posicionamento` (D-061, D-063, D-067, D-068).
+- Cada dimensão classificada exige justificativa própria, com a natureza da informação (formal ou documental, informal ou percepção profissional) e a indicação de não confirmada, quando for o caso; evidências são opcionais (as reaproveitadas chegam como referência identificada pela origem, sem confirmação); posicionamento vazio com manifestação registrada sem justificativa gera alerta. Regras interpretativas — Neutro sem manifestação, Poder Baixo sem indicação do que foi examinado, "há ressalvas" sem descrição, posição institucional fundamentada em manifestação de pessoa — geram alertas, não bloqueios; a classificação mantida exige justificativa. Bloqueios técnicos: valores fora da escala (não há valor de quarta categoria), vínculos obrigatórios e histórico imutável. A natureza da informação de poder e interesse é indicada na justificativa; a do posicionamento, em `natureza_posicionamento` (D-061, D-063, D-067, D-068).
 - Na mudança metodológica substantiva, o novo rascunho não recebe classificações como válidas (T-4); na editorial aprovada, a cópia é permitida. Alterações estruturais (escala, níveis, critérios, regras de evidência ou de interpretação) são sempre substantivas. A tendência só compara avaliações metodologicamente comparáveis (T-6, D-064).
 
 Linhas existentes: as metodologias de demonstração já registradas recebem `demonstracao_numerica` e `cinco_categorias` como valor padrão ao criar as colunas, sem alterar versões publicadas. Versões sem metodologia são tratadas como da escala anterior. O tipo `posicionamento`, com os cinco valores, é mantido por causa do histórico.
+
+Implementação (D-069): os alertas detectados por regra são Neutro por percepção do consultor, origem da informação não registrada, situação das ressalvas não indicada diante de manifestação, "há ressalvas" sem descrição, indefinição sem justificativa e confiança alta com informação não confirmada; as orientações que dependem da leitura do texto (Poder Baixo, manifestação de pessoa usada para a instituição) ficam como lembretes fixos no formulário. Cópia de segurança (T-1): ao abrir um banco existente com atualizações pendentes, a pasta de dados é copiada para `.dados/copias/antes-migracao-<data e hora>` antes de aplicá-las; se a cópia falhar, nada é aplicado. A preservação campo a campo é verificada em `testes/migracao-escalas-v2-2.test.ts`.
 
 ### 6.4 Iniciativas ✅ (cadastro manual; vários stakeholders e projetos)
 
