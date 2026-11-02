@@ -8,6 +8,7 @@
 | 0.4 | 01/11/2026 | Etapa 1.1: tabelas `projeto_tema_comite` (D-023) e `stakeholder_contexto` (D-030) criadas; nome normalizado em `projeto_tema`. |
 | 0.5 | 01/11/2026 | Etapa 2A: tabelas de avaliação (seção 6.3) e `permissao_contexto` criadas, com metodologias de demonstração (D-034). |
 | 0.6 | 01/11/2026 | Escalas V2.2 (D-058 a D-060): adaptação prevista na seção 6.3.1, não implementada (Q-67). |
+| 0.7 | 01/11/2026 | Seção 6.3.1: ressalvas relevantes, justificativas e evidências por dimensão (D-061), previstas e não implementadas. |
 
 Legenda: ✅ Aprovado · 🔧 Proposta técnica · ⏳ Pendente (ver [REQUISITOS.md](REQUISITOS.md#como-ler-este-documento)).
 
@@ -420,12 +421,16 @@ As escalas V2.2 (D-058 a D-060) pedem os ajustes abaixo, propostos para homologa
 | `metodologia_versao` | `escala_poder_interesse`: lista `demonstracao_numerica`, `binaria_historica`, `ordinal_tres_niveis`. `escala_posicionamento`: lista `cinco_categorias`, `tres_categorias`. | Saber em que escala cada versão foi registrada, sem converter nada. |
 | `rubrica_nivel` (nova) | Metodologia, dimensão (poder, interesse, posicionamento), nível, descrição, evidência mínima e ordem. | Rubricas versionadas com a metodologia e travadas quando ela entra em vigor. |
 | `avaliacao_versao` | `nivel_poder` e `nivel_interesse`: lista `baixo`, `medio`, `alto`; vazio = "não avaliado". | Classificação direta da V2.2. |
+| `avaliacao_versao` | `ressalvas_relevantes` (sim ou não) e `descricao_ressalvas` (texto, obrigatório quando "sim") — proposta H2-C (D-061). | Registrar ressalvas e condições do posicionamento separadamente da categoria. |
+| `avaliacao_versao` | `justificativa_poder`, `justificativa_interesse` e `justificativa_posicionamento` (D-061). | Justificativa por dimensão; no posicionamento sem classificação conclusiva, a razão da indefinição. |
+| `evidencia_dimensao` (nova) | Evidência e dimensão (poder, interesse, posicionamento); uma evidência pode estar ligada a várias dimensões (D-061). | Evidência por dimensão, com vínculo explícito. |
 
 Regras propostas no banco:
 - Escala de três categorias: posicionamento só `favoravel`, `neutro`, `contrario` ou vazio.
 - Escala ordinal: só os níveis; colunas numéricas e notas por critério ficam vazias.
 - Escala binária histórica: sem `medio`.
 - Novas versões exigem metodologia.
+- Cada dimensão classificada exige evidência vinculada e justificativa própria; ressalvas relevantes marcadas exigem descrição; posicionamento vazio com manifestação registrada ("sem classificação conclusiva") exige a justificativa do posicionamento. Não há valor de quarta categoria (D-061).
 
 Linhas existentes: as metodologias de demonstração já registradas recebem `demonstracao_numerica` e `cinco_categorias` como valor padrão ao criar as colunas, sem alterar versões publicadas. Versões sem metodologia são tratadas como da escala anterior. O tipo `posicionamento`, com os cinco valores, é mantido por causa do histórico.
 

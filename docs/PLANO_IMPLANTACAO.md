@@ -12,6 +12,7 @@
 | 0.8 | 01/11/2026 | Etapa 1.1 concluída e incorporada à `main` (D-053); Pull Request da Etapa 2A (D-054) |
 | 0.9 | 01/11/2026 | Etapa 2A homologada e incorporada à `main` (D-055); próxima atividade: decisões Q-65 (D-056) |
 | 0.10 | 01/11/2026 | Escalas V2.2 (D-057 a D-060): Etapa 2B redefinida; plano de adaptação técnica proposto (seção 7, Q-67) |
+| 0.11 | 01/11/2026 | Seção 7: ressalvas relevantes, justificativas e evidências por dimensão (D-061) |
 
 Legenda: ✅ Aprovado · 🔧 Proposta técnica · ⏳ Pendente.
 
@@ -226,9 +227,10 @@ Proposta para homologação. **Nada desta seção foi implementado.** A execuç�
 | Banco — posicionamento | Lista de cinco valores (tipo `posicionamento`, migração 0005) | Três categorias e "Não avaliado" nas novas versões | Alto | Manter a lista, por causa do histórico; a metodologia passa a indicar sua escala de posicionamento; regra no banco recusa as categorias parciais em metodologia de três categorias. Versões existentes não são tocadas. |
 | Banco — poder e interesse | Número de 0 a 100 calculado das notas (`avaliacao_versao.poder` e `.interesse`) | Baixo, Médio, Alto ou "Não avaliado", classificados diretamente | Alto | Novas colunas de nível; as numéricas ficam só para as versões de demonstração já publicadas; regra impede misturar os dois tipos e impede Médio em metodologia binária histórica. |
 | Banco — metodologia | Critérios com escala numérica e peso; só entra em vigor com critérios | Escala e rubricas por versão, sem pesos | Médio | Tipo de escala na metodologia e rubricas por nível em tabela própria, travadas quando a metodologia entra em vigor. |
+| Banco — ressalvas, justificativas e evidências (D-061) | Uma justificativa geral; evidências ligadas só à versão | Ressalvas relevantes com descrição; justificativa e evidência por dimensão | Médio | Campos de ressalvas e de justificativa por dimensão; tabela que liga evidências às dimensões (uma evidência pode sustentar várias); regras de publicação correspondentes, sem quarta categoria de posicionamento. |
 | Cálculo (`calculo.ts`) | Média ponderada convertida para 0 a 100 | Nenhum cálculo | Médio | Restrito às metodologias de demonstração; nenhum cálculo na metodologia V2.2 (T21). |
 | Tendência (`tendenciaDoPosicionamento`) | Compara a posição na lista de cinco | Comparação de versões ou justificativa explícita | Médio | Comparar só versões da mesma escala; entre escalas diferentes, não calcular e exibir a justificativa. |
-| Formulário de rascunho | Notas por critério; cinco posições; confiança "Alto, Médio, Baixo" | Níveis diretos; três posições; "Baixa, Média, Alta" | Alto | Campos de nível com "Não avaliado"; três posições; rubrica como texto de ajuda; a nova versão não copia posição parcial. |
+| Formulário de rascunho | Notas por critério; cinco posições; confiança "Alto, Médio, Baixo" | Níveis diretos; três posições; "Baixa, Média, Alta" | Alto | Campos de nível com "Não avaliado"; três posições; rubrica como texto de ajuda; ressalvas relevantes e justificativas por dimensão; a nova versão não copia posição parcial. |
 | Ficha e histórico (`resumo-versao`, `selo-posicionamento`) | Notas com escala de 1 a 5; cores de cinco posições | Níveis; três categorias; parciais só no histórico | Médio | Exibir a escala de cada versão; parciais com a indicação "escala anterior". |
 | Matriz (`matriz-poder-interesse`, `matriz.ts`) | Gráfico contínuo de 0 a 100, sem quadrantes | Grade 3 × 3; histórico binário em 2 × 2 | Alto | Novo componente de grade com células nomeadas; posição por cor ou ícone, com legenda; listas de não avaliados e de outras metodologias; nenhuma conduta. |
 | Consultas, ações e validação (`consultas.ts`, `acoes.ts`, `esquemas.ts`) | Leem e validam notas e cinco posições | Novos campos e regras por escala | Médio | Validação conforme a escala da metodologia, no servidor e no banco. |
