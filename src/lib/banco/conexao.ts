@@ -9,7 +9,7 @@
  * hospedagem, esta conexão será substituída pela do Supabase, reaproveitando
  * os mesmos scripts de criação.
  */
-import { mkdirSync } from "node:fs";
+import { cpSync, mkdirSync, readFileSync } from "node:fs";
 import path from "node:path";
 import { PGlite } from "@electric-sql/pglite";
 import { sql } from "drizzle-orm";
@@ -53,28 +53,83 @@ export function verificarUsoDoBancoLocal(ambiente: NodeJS.ProcessEnv = process.e
 const pastasAbertas = new WeakMap<Banco, string>();
 
 /** Aplica os scripts pendentes e realinha os valores normalizados (ver normalizacao.ts). */
-async function prepararBanco(banco: Banco) {
-  await migrate(banco, { migrationsFolder: PASTA_MIGRACOES });
+async function prepararBanco(banco: Banco, pastaMigracoes: string) {
+  await migrate(banco, { migrationsFolder: pastaMigracoes });
   await alinharValoresNormalizados(banco);
 }
+
+/** Copia a pasta de dados; usada antes de aplicar atualizações pendentes (T-1). */
+export type Copiadora = (origem: string, destino: string) => void;
+
+const copiarPasta: Copiadora = (origem, destino) => cpSync(origem, destino, { recursive: true, errorOnExist: true, force: false });
+
+/** Pasta da cópia de segurança, ao lado dos dados: por exemplo, .dados/copias/antes-migracao-<data e hora>. */
+export function pastaDaCopiaAntesDeMigrar(diretorio: string, agora = new Date()): string {
+  return path.join(path.dirname(diretorio), "copias", `antes-migracao-${agora.toISOString().replace(/[:.]/g, "-")}`);
+}
+
+/**
+ * Quantas atualizações do diário já foram aplicadas e quantas estão pendentes.
+ * O migrador do Drizzle aplica as que têm data posterior à última registrada.
+ */
+async function situacaoDasMigracoes(cliente: PGlite, pastaMigracoes: string) {
+  const diario = JSON.parse(readFileSync(path.join(pastaMigracoes, "meta", "_journal.json"), "utf8")) as {
+    entries: { when: number }[];
+  };
+  const tabela = await cliente.query<{ existe: boolean }>(
+    "select to_regclass('drizzle.__drizzle_migrations') is not null as existe",
+  );
+  if (!tabela.rows[0]?.existe) return { aplicadas: 0, pendentes: diario.entries.length };
+  const ultima = await cliente.query<{ quando: string | null; total: number }>(
+    "select max(created_at)::text as quando, count(*)::int as total from drizzle.__drizzle_migrations",
+  );
+  const quando = Number(ultima.rows[0]?.quando ?? 0);
+  return { aplicadas: ultima.rows[0]?.total ?? 0, pendentes: diario.entries.filter((e) => e.when > quando).length };
+}
+
+export type OpcoesAbertura = {
+  /** Pasta dos scripts (os testes de atualização usam uma pasta parcial). */
+  pastaMigracoes?: string;
+  /** Substitui a cópia da pasta de dados (usado nos testes). */
+  copiar?: Copiadora;
+};
 
 /**
  * Abre um banco e aplica os scripts pendentes. Sem diretório, o banco fica
  * apenas na memória (usado nos testes automatizados). Com diretório, obtém
- * antes a trava exclusiva da pasta (ver trava.ts).
+ * antes a trava exclusiva da pasta (ver trava.ts) e, se um banco já existente
+ * tiver atualizações pendentes, copia a pasta de dados antes de aplicá-las;
+ * se a cópia falhar, nada é aplicado (T-1).
  */
-export async function abrirBanco(diretorio?: string): Promise<Banco> {
+export async function abrirBanco(diretorio?: string, opcoes: OpcoesAbertura = {}): Promise<Banco> {
+  const pastaMigracoes = opcoes.pastaMigracoes ?? PASTA_MIGRACOES;
   if (!diretorio) {
     const banco = criarBanco(new PGlite());
-    await prepararBanco(banco);
+    await prepararBanco(banco, pastaMigracoes);
     return banco;
   }
 
   mkdirSync(diretorio, { recursive: true });
   adquirirTrava(diretorio);
   try {
-    const banco = criarBanco(new PGlite(diretorio));
-    await prepararBanco(banco);
+    let cliente = new PGlite(diretorio);
+    const { aplicadas, pendentes } = await situacaoDasMigracoes(cliente, pastaMigracoes);
+    if (aplicadas > 0 && pendentes > 0) {
+      await cliente.close();
+      const destino = pastaDaCopiaAntesDeMigrar(diretorio);
+      try {
+        (opcoes.copiar ?? copiarPasta)(diretorio, destino);
+      } catch (erro) {
+        throw new Error(
+          `Há ${pendentes} atualização(ões) pendente(s) do banco local, mas a cópia de segurança em ${destino} ` +
+            "falhou. Nenhuma atualização foi aplicada: resolva o problema (por exemplo, espaço em disco) e tente novamente.",
+          { cause: erro },
+        );
+      }
+      cliente = new PGlite(diretorio);
+    }
+    const banco = criarBanco(cliente);
+    await prepararBanco(banco, pastaMigracoes);
     pastasAbertas.set(banco, diretorio);
     return banco;
   } catch (erro) {

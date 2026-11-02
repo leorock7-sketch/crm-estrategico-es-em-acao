@@ -43,6 +43,13 @@
       "when": 1793564819710,
       "tag": "0005_avaliacao_estrategica",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1793655127913,
+      "tag": "0006_escalas_v2_2",
+      "breakpoints": true
     }
   ]
 }
