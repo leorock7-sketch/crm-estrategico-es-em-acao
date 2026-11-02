@@ -18,6 +18,17 @@ const MENSAGENS_POR_REGRA: Record<string, string> = {
   stakeholder_contexto_vigente_unico:
     "Este stakeholder já está associado a este projeto ou tema com o mesmo tipo de relação.",
   stakeholder_contexto_datas: "A data de término não pode ser anterior à data de início.",
+  metodologia_versao_nome_unico: "Já existe uma metodologia com este nome.",
+  metodologia_vigente_unica: "Já existe uma metodologia vigente. Encerre-a antes de colocar outra em vigor.",
+  criterio_avaliacao_nome_unico: "Já existe um critério com este nome nesta dimensão da metodologia.",
+  criterio_avaliacao_escala: "O valor máximo da escala deve ser maior que o mínimo.",
+  avaliacao_stakeholder_contexto_unica: "Este stakeholder já tem uma ficha de avaliação neste projeto ou tema.",
+  avaliacao_versao_rascunho_unico: "Já existe um rascunho em andamento para esta avaliação.",
+  avaliacao_versao_vigente_unica: "Esta avaliação já tem uma versão vigente.",
+  avaliacao_versao_numero_unico: "Outra versão foi registrada ao mesmo tempo. Recarregue a página e tente novamente.",
+  avaliacao_nota_criterio_unica: "Este critério já tem nota nesta versão.",
+  evidencia_descricao_preenchida: "Descreva a evidência.",
+  permissao_contexto_unica: "Este usuário já tem permissão neste projeto ou tema.",
 };
 
 /** Traduz um erro de gravação em mensagem compreensível para o usuário. */

@@ -6,6 +6,14 @@
   --texto: #0f172a;
   --texto-secundario: #475569;
   --borda: #e2e8f0;
+  /* Posicionamento (escala divergente: azul favorável, cinza neutro, vermelho contrário).
+     Cores conferidas para daltonismo; os tons claros sempre vêm com número e tabela. */
+  --posicao-favoravel: #1c5cab;
+  --posicao-parcialmente-favoravel: #86b6ef;
+  --posicao-neutro: #d4d3ce;
+  --posicao-parcialmente-contrario: #f0938a;
+  --posicao-contrario: #b42828;
+  --alerta-revisao: #b45309;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -15,6 +23,12 @@
     --texto: #e2e8f0;
     --texto-secundario: #94a3b8;
     --borda: #1e293b;
+    --posicao-favoravel: #5598e7;
+    --posicao-parcialmente-favoravel: #9ec5f4;
+    --posicao-neutro: #6b6a65;
+    --posicao-parcialmente-contrario: #f4a9a1;
+    --posicao-contrario: #e05252;
+    --alerta-revisao: #fab219;
   }
 }
 

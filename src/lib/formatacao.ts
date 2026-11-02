@@ -15,6 +15,18 @@ export function descreverPeriodo(inicio: string | null, fim: string | null): str
   return "Período não informado";
 }
 
+const FORMATO_NUMERO = new Intl.NumberFormat("pt-BR", { maximumFractionDigits: 2 });
+
+/** Número no padrão brasileiro, com até duas casas decimais: 87.5 → "87,5". */
+export function formatarNumero(valor: number): string {
+  return FORMATO_NUMERO.format(valor);
+}
+
+/** Data de hoje no fuso de Brasília, no formato AAAA-MM-DD. */
+export function hojeEmBrasilia(agora: Date = new Date()): string {
+  return new Intl.DateTimeFormat("en-CA", { timeZone: FUSO_HORARIO }).format(agora);
+}
+
 /** Data e hora no fuso de Brasília, por exemplo "31/10/2026 21:45". */
 export function formatarDataHora(valor: Date | string | null | undefined): string {
   if (!valor) return "—";

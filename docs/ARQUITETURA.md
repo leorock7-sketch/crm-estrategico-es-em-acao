@@ -6,6 +6,9 @@
 | 0.2 | 31/10/2026 | Etapa 1: banco de desenvolvimento (PGlite), acesso a dados (Drizzle ORM) e Cadastro Mestre |
 | 0.3 | 01/11/2026 | Revisão de homologação: trava do banco local, proteção de produção e contatos |
 | 0.4 | 01/11/2026 | Etapa 1.1: telas de comitês, projetos e temas (módulo `projetos-temas`) |
+| 0.5 | 01/11/2026 | Etapa 2A: avaliações estratégicas (módulo `avaliacoes`) e permissões por contexto, ainda não homologadas |
+| 0.6 | 01/11/2026 | Repositório público com e-mail *noreply* nos commits (D-039) e proposta de testes no GitHub Actions (P-039) |
+| 0.7 | 01/11/2026 | Verificação automática no GitHub Actions implementada (D-041) |
 
 Legenda: ✅ Aprovado · 🔧 Proposta técnica · ⏳ Pendente.
 
@@ -97,7 +100,8 @@ crm-estrategico-es-em-acao/
 │   │   ├── layout.tsx        Moldura comum: cabeçalho, menu e rodapé
 │   │   ├── page.tsx          Página inicial
 │   │   ├── comites/          Lista e detalhe dos comitês (somente consulta)
-│   │   ├── projetos-temas/   Lista com filtros, inclusão, detalhe e edição de projetos e temas
+│   │   ├── projetos-temas/   Projetos e temas; [id]/avaliacoes (fichas e rascunhos) e [id]/matriz
+│   │   ├── metodologias/     Consulta das metodologias de avaliação
 │   │   ├── pessoas/          Lista, inclusão, detalhe e edição de pessoas
 │   │   ├── instituicoes/     Lista, inclusão, detalhe e edição de instituições
 │   │   ├── not-found.tsx     Página "não encontrado"
@@ -107,6 +111,7 @@ crm-estrategico-es-em-acao/
 │   ├── componentes/          Componentes visuais reutilizáveis (campos, alertas, selos…)
 │   ├── modulos/
 │   │   ├── acesso/           Usuário atual (provisório até a autenticação)
+│   │   ├── avaliacoes/       Avaliação estratégica: cálculo de demonstração, matriz, consultas, ações e telas
 │   │   ├── projetos-temas/   Comitês, projetos, temas e contextos: validações, consultas, ações e componentes
 │   │   └── stakeholders/     Cadastro Mestre: validações, consultas, ações e componentes
 │   └── lib/
@@ -167,7 +172,10 @@ Regras de organização:
 | Limites conhecidos da auditoria: responsável informado pela aplicação; `TRUNCATE` não bloqueado; o dono do banco pode desativar gatilhos; cópias integrais de dados pessoais. | ⏳ Reforço planejado (C6) e identificação real na etapa de autenticação |
 | Validação de todos os dados no servidor, inclusive endereços de site (somente http e https). | 🔧 (implementado na Etapa 1) |
 | Princípio do menor privilégio: cada usuário acessa apenas os contextos de que precisa. | 🔧 |
-| Proteção da branch `main` no GitHub. | 🔧 |
+| Proteção da branch `main` no GitHub: Pull Request obrigatório, verificações automáticas obrigatórias antes do merge, sem exigir outro revisor, bloqueio de exclusão e de reescrita do histórico (D-045, D-052). | ✅ Configurada e conferida |
+| Repositório público (D-033): verificação de dados pessoais, informações restritas e segredos antes de cada envio; e-mail *noreply* do GitHub nos commits a partir de 01/11/2026 (D-039). O histórico anterior não é reescrito sem aprovação. | ✅ |
+| Controle de acesso por projeto ou tema nas consultas do servidor, com testes (Etapa 2A). Sem autenticação real nem regras no banco: **segurança multiusuário não homologada**. | 🔧 (D-034) |
+| Verificação automática no GitHub Actions a cada Pull Request e atualização da `main`, com permissões mínimas e sem credenciais (seção 6.1). | ✅ (D-041) |
 
 ## 6. Comandos do projeto
 
@@ -182,9 +190,35 @@ Regras de organização:
 | `npm run build` | Compila a aplicação para produção |
 | `npm start` | Executa a versão compilada |
 | `npm run verificar` | Executa tipos, qualidade, testes e compilação, em sequência |
-| `npm run banco:exemplos` | Carrega pessoas e instituições fictícias no banco local (com a aplicação parada) |
+| `npm run banco:exemplos` | Carrega pessoas, instituições, projetos, temas e avaliações de demonstração fictícios no banco local (com a aplicação parada) |
 | `npm run banco:reiniciar` | Apaga o banco local, que é recriado vazio na próxima execução (com a aplicação parada) |
 | `npm run banco:gerar` | Gera um novo script SQL após alterar `src/lib/banco/esquema.ts` (uso técnico) |
+
+### 6.1 Verificação automática no GitHub Actions ✅ (D-041)
+
+Arquivo: `.github/workflows/verificacao.yml`. A cada Pull Request e a cada atualização da `main`, o GitHub executa a mesma verificação feita no computador, e o resultado aparece no próprio Pull Request (aba "Checks" e resumo de cada execução):
+
+1. Baixa o código da branch.
+2. Instala o Node.js — em duas execuções paralelas, **24 e 26**, as versões LTS aceitas pelo projeto (o desenvolvimento usa a 26).
+3. Instala as bibliotecas exatas do `package-lock.json` (`npm ci`, instalação reproduzível).
+4. Executa `npm run verificar`: tipos, qualidade (ESLint), testes (Vitest, com banco PGlite na memória e só dados fictícios) e compilação (Next.js).
+5. Registra um resumo com o resultado e as versões usadas.
+
+Segurança, conforme o guia oficial do GitHub Actions:
+
+| Prática | Como foi aplicada |
+|---|---|
+| Permissões mínimas | `contents: read` (somente leitura) |
+| Pull Requests de terceiros | Evento `pull_request`, que roda sem segredos e sem permissão de escrita; o `pull_request_target` não é usado |
+| Credenciais | Nenhum segredo ou credencial; o checkout não guarda o token no disco (`persist-credentials: false`) |
+| Ações de terceiros | Somente ações oficiais (`actions/checkout` v7.0.1 e `actions/setup-node` v7.1.0), fixadas pelo código completo do commit |
+| Injeção de comandos | Nenhum dado do evento (título, nome da branch etc.) é usado dentro de comandos |
+| Limites | Tempo máximo de 20 minutos; nova atualização do mesmo PR cancela a verificação anterior |
+| Publicação e merge | O fluxo não publica a aplicação e não faz merge |
+
+Recomendação ao administrador da conta 🔧: em Settings → Actions → General, exigir aprovação para executar fluxos de Pull Requests de colaboradores externos e, se desejado, proteger a `main` exigindo que a verificação passe antes do merge.
+
+Passo posterior, dependente de Q-57: um segundo teste em PostgreSQL real, para a portabilidade (C8).
 
 ## 7. Decisões de arquitetura pendentes ⏳
 
@@ -193,6 +227,7 @@ Regras de organização:
 | Q-50 | Login por e-mail e senha (Supabase Auth) ou por contas Microsoft 365 institucionais (Microsoft Entra ID, também suportado pelo Supabase Auth). |
 | Q-51 | Região de hospedagem dos dados. O Supabase oferece região em São Paulo. |
 | Q-52 | Transferência dos serviços e do repositório para contas institucionais. |
+| Q-57 | Teste de portabilidade em PostgreSQL real (C8). |
 | — | Abordagem das integrações com Microsoft 365 (Microsoft Graph) e de IA assistiva. |
 
 Resolvidas na Etapa 1: local da cópia de trabalho (D-019) e ferramenta de banco local (D-018).

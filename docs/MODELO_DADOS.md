@@ -6,6 +6,7 @@
 | 0.2 | 31/10/2026 | Etapa 1: decisões D-020 e D-021 incorporadas; as 8 tabelas da seção 9 foram criadas no banco de desenvolvimento. |
 | 0.3 | 01/11/2026 | Revisão de homologação: contatos em tabela própria (D-025), país e CNPJ sem unicidade (D-024), comitês participantes previstos (D-023). |
 | 0.4 | 01/11/2026 | Etapa 1.1: tabelas `projeto_tema_comite` (D-023) e `stakeholder_contexto` (D-030) criadas; nome normalizado em `projeto_tema`. |
+| 0.5 | 01/11/2026 | Etapa 2A: tabelas de avaliação (seção 6.3) e `permissao_contexto` criadas, com metodologias de demonstração (D-034). |
 
 Legenda: ✅ Aprovado · 🔧 Proposta técnica · ⏳ Pendente (ver [REQUISITOS.md](REQUISITOS.md#como-ler-este-documento)).
 
@@ -323,77 +324,67 @@ Regras de integridade:
 
 ### 6.3 Avaliações de stakeholders ✅ (independentes, versionadas, com visibilidade por contexto)
 
-#### `metodologia_versao` 🔧
+Estrutura criada na Etapa 2A (D-034). **Nenhum critério, escala, peso, fórmula ou ponto de corte institucional foi cadastrado**: só existem metodologias de demonstração, com dados fictícios e resultados não homologados. Regras detalhadas em [METODOLOGIA_STAKEHOLDERS.md](METODOLOGIA_STAKEHOLDERS.md).
 
-Registra cada versão da metodologia de avaliação. Permite revisar critérios no futuro sem invalidar avaliações antigas: cada versão de avaliação guarda a metodologia com que foi feita.
+#### `metodologia_versao`
 
 | Campo | Tipo | Chave | Obr. | Observação |
 |---|---|---|---|---|
-| `nome` | texto | UK | Sim | Ex.: "Metodologia provisória 0.1" |
+| `nome` | texto | UK | Sim | Ex.: "Demonstração 0.2 (fictícia)" |
 | `descricao` | texto longo | | Não | |
-| `vigente_desde`, `vigente_ate` | data | | Não | |
-| `situacao` | lista: `rascunho`, `vigente`, `encerrada` | | Sim | |
+| `situacao` | lista: `rascunho`, `vigente`, `encerrada` | | Sim | Nasce como rascunho |
+| `homologada` | sim/não | | Sim | Falso nas metodologias de demonstração; resultados exibidos como não homologados |
+| `vigente_desde`, `vigente_ate` | data | | Não | Preenchidas pelo banco ao entrar em vigor e ao encerrar |
 
-Regra: no máximo uma metodologia `vigente` por vez. 🔧
+Regras (gatilhos): no máximo uma `vigente`; só entra em vigor com ao menos um critério de poder e um de interesse; vigente, só pode ser encerrada; encerrada, não muda mais. 🔧
 
-#### `criterio_avaliacao` 🔧 (estrutura) / ⏳ (conteúdo)
+Metodologia institucional comum, por ora (D-037). Se uma metodologia específica por comitê ou contexto for aprovada, esta tabela receberá a indicação do escopo, com uma metodologia vigente por escopo; pontuações de metodologias diferentes continuam sem comparação automática.
 
-Critérios de poder e de interesse. **A tabela nasce vazia**: os seis critérios históricos estão em revisão e nenhum critério, escala ou peso será definido antes da deliberação. ✅
+#### `criterio_avaliacao`
 
 | Campo | Tipo | Chave | Obr. | Observação |
 |---|---|---|---|---|
 | `metodologia_versao_id` | UUID | FK → `metodologia_versao.id` | Sim | |
 | `dimensao` | lista: `poder`, `interesse` | | Sim | |
 | `nome` | texto | | Sim | |
-| `descricao` | texto longo | | Não | Orientação para o avaliador |
-| `escala_minima`, `escala_maxima` | número inteiro | | Sim | ⏳ |
-| `peso` | número decimal | | Não | ⏳ |
+| `descricao` | texto longo | | Não | Orientação ao avaliador |
+| `escala_minima`, `escala_maxima` | número inteiro | | Sim | Máximo > mínimo |
+| `peso` | número decimal | | Não | ≥ 0; vazio conta como 1 no cálculo de demonstração |
 | `ordem` | número inteiro | | Sim | Ordem de exibição |
 
-Regras: UK (`metodologia_versao_id`, `dimensao`, `nome`); `escala_maxima` > `escala_minima`; critérios de metodologia `vigente` ou `encerrada` não podem ser alterados. 🔧
+Regras: UK (`metodologia_versao_id`, `dimensao`, `nome`); critérios só são incluídos ou alterados enquanto a metodologia é rascunho (gatilho). 🔧
 
-#### `avaliacao`
-
-"Ficha" que reúne o histórico de avaliações de **um** stakeholder em **um** projeto ou tema.
+#### `avaliacao` (ficha)
 
 | Campo | Tipo | Chave | Obr. | Observação |
 |---|---|---|---|---|
 | `stakeholder_id` | UUID | FK → `stakeholder.id` | Sim | |
 | `projeto_tema_id` | UUID | FK → `projeto_tema.id` | Sim | Define a visibilidade ✅ |
 
-Cardinalidades: stakeholder 1:N avaliação; projeto_tema 1:N avaliação; avaliação 1:N versões (pelo menos uma).
-
-Regras de integridade:
-- UK (`stakeholder_id`, `projeto_tema_id`): um stakeholder tem uma única ficha por contexto; as reavaliações entram como versões. 🔧
-- A avaliação de um contexto não lê nem altera dados de outro contexto. ✅
+Regras: UK (`stakeholder_id`, `projeto_tema_id`); só é criada para stakeholder com associação vigente ao contexto (`stakeholder_contexto`, Etapa 1.1); não muda de stakeholder nem de contexto (gatilho).
 
 #### `avaliacao_versao`
-
-Cada linha é uma avaliação completa feita em determinada data. Não é editada depois de registrada.
 
 | Campo | Tipo | Chave | Obr. | Observação |
 |---|---|---|---|---|
 | `avaliacao_id` | UUID | FK → `avaliacao.id` | Sim | |
 | `numero_versao` | número inteiro | | Sim | 1, 2, 3… |
-| `metodologia_versao_id` | UUID | FK → `metodologia_versao.id` | Não | Nulo enquanto não houver metodologia aprovada |
-| `poder` | número decimal | | Não | Resultado consolidado; escala ⏳ |
-| `interesse` | número decimal | | Não | Resultado consolidado; escala ⏳ |
-| `posicionamento` | lista | | Não | Categorias ⏳ (ver [METODOLOGIA_STAKEHOLDERS.md](METODOLOGIA_STAKEHOLDERS.md)) |
-| `grau_confianca` | lista | | Não | Significado e categorias ⏳ |
-| `justificativa` | texto longo | | Sim | ✅ |
-| `data_referencia` | data | | Sim | Data a que a avaliação se refere |
-| `situacao` | lista: `vigente`, `substituida` | | Sim | |
-| `avaliador_id` | UUID | FK → `usuario.id` | Sim | |
+| `situacao` | lista: `rascunho`, `vigente`, `substituida` | | Sim | |
+| `metodologia_versao_id` | UUID | FK → `metodologia_versao.id` | Não | Vazia quando não há metodologia vigente (sem pontuação) |
+| `poder`, `interesse` | número decimal | | Não | Resultado gravado na publicação, escala técnica de 0 a 100 (P-032); vazio = sem pontuação, nunca zero |
+| `posicionamento` | lista de cinco níveis | | Não | Vazio = "não avaliado" ✅ |
+| `grau_confianca` | lista: `alto`, `medio`, `baixo` | | Não | ✅ (D-034) |
+| `justificativa_confianca` | texto | | Não | Obrigatória na publicação se houver grau de confiança |
+| `justificativa` | texto longo | | Não | Obrigatória na publicação ✅ |
+| `validacao_institucional` | texto | | Não | Obrigatória para publicar posicionamento de instituição ✅ |
+| `data_referencia` | data | | Não | Obrigatória na publicação |
+| `proxima_revisao` | data | | Não | Data de referência + 1 ano, calculada na publicação ✅ |
+| `avaliador_id` | UUID | FK → `usuario.id` | Não | Quem publicou |
+| `publicada_em` | data e hora | | Não | |
 
-Regras de integridade:
-- UK (`avaliacao_id`, `numero_versao`). 🔧
-- Exatamente uma versão `vigente` por avaliação; ao registrar nova versão, a anterior passa a `substituida` na mesma operação. 🔧
-- Versões registradas não podem ser alteradas nem excluídas. 🔧
-- Se `metodologia_versao_id` estiver preenchido, `poder` e `interesse` devem respeitar as escalas daquela metodologia. 🔧
+Regras (gatilhos e índices): UK (`avaliacao_id`, `numero_versao`); no máximo uma `vigente` e um rascunho ativo por ficha; toda versão nasce como rascunho e só com a metodologia vigente; publicada, não pode ser alterada, arquivada nem excluída — só passar de `vigente` a `substituida`; rascunho de metodologia que deixou de ser vigente não pode ser publicado. 🔧
 
-#### `avaliacao_nota_criterio` 🔧
-
-Nota atribuída a cada critério numa versão de avaliação. Só será usada depois que os critérios forem aprovados.
+#### `avaliacao_nota_criterio`
 
 | Campo | Tipo | Chave | Obr. | Observação |
 |---|---|---|---|---|
@@ -402,20 +393,22 @@ Nota atribuída a cada critério numa versão de avaliação. Só será usada de
 | `nota` | número decimal | | Sim | Dentro da escala do critério |
 | `justificativa` | texto longo | | Não | |
 
-Regras: PK composta (`avaliacao_versao_id`, `criterio_avaliacao_id`); o critério deve pertencer à mesma metodologia da versão de avaliação.
+Regras: UK (`avaliacao_versao_id`, `criterio_avaliacao_id`); o critério deve ser da mesma metodologia da versão; só muda enquanto a versão é rascunho (gatilhos).
 
 #### `evidencia`
-
-Fundamentos de uma versão de avaliação. Uma evidência pode apontar para uma interação já registrada, em vez de repetir seu conteúdo. ✅ (evidências) / 🔧 (estrutura)
 
 | Campo | Tipo | Chave | Obr. | Observação |
 |---|---|---|---|---|
 | `avaliacao_versao_id` | UUID | FK → `avaliacao_versao.id` | Sim | |
-| `tipo` | lista: `documento`, `link`, `interacao`, `observacao` | | Sim | |
+| `tipo` | lista: `documento`, `link`, `observacao` | | Sim | Interações entram na Etapa 3 |
 | `descricao` | texto longo | | Sim | |
-| `url` | texto | | Não | Link externo (futuramente SharePoint/OneDrive) |
-| `interacao_id` | UUID | FK → `interacao.id` | Não | Obrigatório quando `tipo` = `interacao` |
+| `fonte` | texto | | Não | |
+| `url` | texto | | Não | Somente http ou https; obrigatório para `link` |
 | `data_evidencia` | data | | Não | |
+
+Regra: só muda enquanto a versão é rascunho; retirar uma evidência do rascunho é arquivá-la (gatilho).
+
+`metodologia_versao`, `criterio_avaliacao`, `avaliacao`, `avaliacao_versao`, `avaliacao_nota_criterio` e `evidencia` têm os campos de controle, a trilha de auditoria e a proibição de exclusão comuns às demais tabelas.
 
 ### 6.4 Iniciativas ✅ (cadastro manual; vários stakeholders e projetos)
 
@@ -681,11 +674,10 @@ Histórico de avaliações do risco; a mais recente é a vigente. Não é editad
 |---|---|---|---|---|
 | `usuario_id` | UUID | FK → `usuario.id` | Sim | |
 | `projeto_tema_id` | UUID | FK → `projeto_tema.id` | Sim | |
-| `perfil` | lista: `gestor`, `colaborador`, `leitor` | | Sim | 🔧 ⏳ |
-| `concedida_por` | UUID | FK → `usuario.id` | Sim | |
-| `valida_ate` | data | | Não | |
+| `perfil` | lista: `gestor`, `colaborador`, `leitor` | | Sim | Gestor e colaborador veem e alteram; leitor só vê (P-038) 🔧 |
+| `valida_ate` | data | | Não | Vencida, a permissão deixa de valer |
 
-Regra: UK (`usuario_id`, `projeto_tema_id`).
+Quem concedeu fica em `criado_por` (campos de controle). Regras: no máximo uma permissão ativa por usuário e contexto; administrador ativo vê tudo. Criada na Etapa 2A, com testes de autorização; **a segurança multiusuário ainda não foi homologada** — não há autenticação real nem regras de segurança no banco (D-034).
 
 #### `registro_auditoria` 🔧
 
@@ -718,14 +710,14 @@ Enquanto houver um único administrador, ele vê tudo; as regras acima passam a 
 
 ## 8. Questões de modelagem pendentes ⏳
 
-1. Escalas de poder e interesse, os seis critérios e seus pesos.
-2. Categorias de posicionamento e significado de "grau de confiança".
+1. Escalas de poder e interesse, os seis critérios, seus pesos, a fórmula e os pontos de corte da matriz.
+2. Categorias da "Conduta do ES em Ação" e regras de correspondência com os quadrantes (Q-64, requisito futuro RF-28).
 3. Um único plano de ação por projeto/tema ou vários?
 4. Escalas de probabilidade e impacto e fórmula de criticidade.
 5. Visibilidade do Cadastro Mestre para todos os usuários.
 6. Análise LGPD dos dados pessoais registrados.
 
-Resolvidas na Etapa 1: hierarquia entre temas e projetos (D-020); dados mínimos de pessoas (D-021). Na revisão de homologação: comitês participantes (D-023), CNPJ e país (D-024), contatos (D-025). Na Etapa 1.1: tipos de relação dos stakeholders com os contextos (D-030). As decisões são acompanhadas em [REGISTRO_DECISOES.md](REGISTRO_DECISOES.md).
+Resolvidas na Etapa 1: hierarquia entre temas e projetos (D-020); dados mínimos de pessoas (D-021). Na revisão de homologação: comitês participantes (D-023), CNPJ e país (D-024), contatos (D-025). Na Etapa 1.1: tipos de relação dos stakeholders com os contextos (D-030). Na Etapa 2A: posicionamento em cinco níveis, grau de confiança em três níveis e regras de versionamento (Manual V2.0, D-034). As decisões são acompanhadas em [REGISTRO_DECISOES.md](REGISTRO_DECISOES.md).
 
 ## 9. Situação da implementação
 
@@ -736,7 +728,9 @@ Resolvidas na Etapa 1: hierarquia entre temas e projetos (D-020); dados mínimos
 | `stakeholder`, `pessoa`, `instituicao`, `vinculo_pessoa_instituicao` | 1 | Criadas, com telas do Cadastro Mestre |
 | `contato` | 1 (revisão) | Criada, com telas; e-mails e telefones antigos migrados |
 | `projeto_tema_comite`, `stakeholder_contexto` | 1.1 | Criadas, com telas |
-| Demais tabelas | 2 a 4 | Não criadas |
+| `metodologia_versao`, `criterio_avaliacao`, `avaliacao`, `avaliacao_versao`, `avaliacao_nota_criterio`, `evidencia` | 2A | Criadas, com telas; somente metodologias de demonstração e dados fictícios |
+| `permissao_contexto` | 2A | Criada, com testes; sem tela de gestão (segurança não homologada) |
+| Demais tabelas | 3 e 4 | Não criadas |
 
 Onde está cada parte:
 
@@ -746,13 +740,16 @@ Onde está cada parte:
   - `0001`: gatilhos de auditoria, de preenchimento automático e de proteção;
   - `0002`: carga dos 4 comitês;
   - `0003`: revisão de homologação — tabela de contatos (com migração dos dados), país e CNPJ sem unicidade;
-  - `0004`: Etapa 1.1 — comitês participantes, stakeholders dos contextos e nome normalizado dos projetos e temas (preenchido também nos registros existentes).
+  - `0004`: Etapa 1.1 — comitês participantes, stakeholders dos contextos e nome normalizado dos projetos e temas (preenchido também nos registros existentes);
+  - `0005`: Etapa 2A — metodologias, critérios, fichas, versões, notas, evidências e permissões por contexto, com as regras de publicação e imutabilidade.
 - **Regras garantidas por gatilhos** 🔧:
   - preenchimento automático de quem criou ou alterou cada registro, e quando;
   - trilha de auditoria a cada inclusão, alteração, arquivamento e reativação, sem registrar alterações que não mudam nenhum dado;
   - proibição de excluir registros (somente arquivar) e de alterar a auditoria;
   - comitê temático subordinado apenas ao comitê de desenvolvimento;
   - comitê principal de um projeto ou tema que não é, ao mesmo tempo, participante;
+  - metodologia: rascunho → vigente → encerrada, com critérios travados fora do rascunho;
+  - avaliação: ficha só para stakeholder associado; publicação com justificativa, data de referência e evidência; versões publicadas imutáveis; notas dentro da escala e da mesma metodologia;
   - hierarquia de instituições sem ciclos;
   - tipo do stakeholder imutável.
 - **Valores normalizados** (nomes de pessoas, instituições, projetos e temas; contatos), usados na busca e na identificação de duplicidades: seguem uma regra única da aplicação (`src/lib/texto.ts` e `src/modulos/stakeholders/contatos.ts`) — sem acentos, em minúsculas, com qualquer sinal trocado por espaço. Ao abrir o banco, depois das migrações, valores gravados com outra regra são realinhados automaticamente (`src/lib/banco/normalizacao.ts`), o que corrige o preenchimento simplificado feito pelas migrações 0003 e 0004 em bancos que já tinham registros.

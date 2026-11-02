@@ -37,9 +37,9 @@ A arquitetura tecnológica inicialmente proposta utiliza Next.js, TypeScript, Po
 
 ## Situação atual
 
-Projeto em fase inicial de desenvolvimento — **Etapa 1.1: Projetos, temas e contextos** (a Etapa 1, Banco de dados de desenvolvimento e Cadastro Mestre, foi homologada para desenvolvimento e testes).
+Projeto em fase inicial de desenvolvimento — **Etapa 2A: Metodologia e estrutura da avaliação estratégica de stakeholders**. As Etapas 1 e 1.1 foram homologadas para desenvolvimento com dados fictícios.
 
-Já existem a documentação, um banco de dados local de desenvolvimento, as telas do Cadastro Mestre (pessoas, instituições, vínculos, contatos e histórico de alterações) e as telas de comitês (somente consulta), projetos e temas, com comitês participantes e stakeholders associados. Ainda não há avaliação de poder × interesse, autenticação, hospedagem nem os demais módulos.
+Já existem a documentação, um banco de dados local de desenvolvimento, as telas do Cadastro Mestre (pessoas, instituições, vínculos, contatos e histórico de alterações) e as telas de comitês (somente consulta), projetos e temas, com comitês participantes e stakeholders associados, além da estrutura de avaliação de stakeholders (fichas, versões, evidências e matriz de poder × interesse) com uma metodologia de **demonstração**: os resultados exibidos são fictícios e **não homologados**. Ainda não há a metodologia institucional, autenticação, hospedagem nem os demais módulos.
 
 O ambiente de testes utilizará exclusivamente dados fictícios até que o tratamento de dados institucionais reais seja devidamente autorizado.
 
@@ -138,3 +138,5 @@ A versão compilada (`npm run build` e depois `npm start`) recusa o banco local,
 | `npm test` | Testes automatizados |
 | `npm run build` | Se a aplicação compila para publicação |
 | `npm run verificar` | Executa todas as verificações acima, em sequência |
+
+A mesma verificação roda automaticamente no GitHub Actions a cada Pull Request e a cada atualização da `main`, no Node.js 24 e 26 (arquivo `.github/workflows/verificacao.yml`). O resultado aparece no próprio Pull Request. O fluxo usa somente leitura, não usa credenciais e não publica a aplicação nem faz merge.
