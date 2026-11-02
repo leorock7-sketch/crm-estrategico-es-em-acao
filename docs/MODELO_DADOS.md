@@ -11,6 +11,7 @@
 | 0.7 | 01/11/2026 | Seção 6.3.1: ressalvas relevantes, justificativas e evidências por dimensão (D-061), previstas e não implementadas. |
 | 0.8 | 02/11/2026 | Seção 6.3.1 conforme a D-063: ressalvas em três situações, verificação documental, evidência reaproveitada com confirmação e equivalência entre metodologias. Não implementado. |
 | 0.9 | 02/11/2026 | Seção 6.3.1: natureza das alterações da metodologia (substantiva ou editorial), conforme a D-064. Não implementado. |
+| 0.10 | 02/11/2026 | Seção 6.3.1 e campo `validacao_institucional` conforme a D-067: evidências opcionais, natureza da informação e indicação de não confirmada; regras interpretativas como alertas; bloqueios só técnicos. Não implementado. |
 
 Legenda: ✅ Aprovado · 🔧 Proposta técnica · ⏳ Pendente (ver [REQUISITOS.md](REQUISITOS.md#como-ler-este-documento)).
 
@@ -380,7 +381,7 @@ Regras: UK (`stakeholder_id`, `projeto_tema_id`); só é criada para stakeholder
 | `grau_confianca` | lista: `alto`, `medio`, `baixo` | | Não | ✅ (D-034); exibidos como Alta, Média e Baixa (D-060) |
 | `justificativa_confianca` | texto | | Não | Obrigatória na publicação se houver grau de confiança |
 | `justificativa` | texto longo | | Não | Obrigatória na publicação ✅ |
-| `validacao_institucional` | texto | | Não | Obrigatória para publicar posicionamento de instituição ✅ |
+| `validacao_institucional` | texto | | Não | Obrigatória para publicar posicionamento de instituição na demonstração atual ✅; na Etapa 2B, passa a registrar a origem e a natureza da informação, sem exigir confirmação formal (D-067) ⏳ |
 | `data_referencia` | data | | Não | Obrigatória na publicação |
 | `proxima_revisao` | data | | Não | Data de referência + 1 ano, calculada na publicação ✅ |
 | `avaliador_id` | UUID | FK → `usuario.id` | Não | Quem publicou |
@@ -436,7 +437,7 @@ Regras propostas no banco:
 - Escala ordinal: só os níveis; colunas numéricas e notas por critério ficam vazias.
 - Escala binária histórica: sem `medio`.
 - Novas versões exigem metodologia.
-- Cada dimensão classificada exige evidência pertinente vinculada (com pertinência confirmada, se reaproveitada) e justificativa própria; a verificação documental exige fontes, elementos examinados e data; com manifestação documentada, a situação das ressalvas é obrigatória, e "há ressalvas" exige descrição; posicionamento vazio com manifestação registrada exige a justificativa do posicionamento. Não há valor de quarta categoria (D-061, D-063).
+- Cada dimensão classificada exige justificativa própria, com a natureza da informação (formal ou documental, informal ou percepção profissional) e a indicação de não confirmada, quando for o caso; evidências são opcionais (com pertinência confirmada, se reaproveitadas); posicionamento vazio com manifestação registrada exige a justificativa do posicionamento. Regras interpretativas — Neutro sem manifestação, Poder Baixo sem indicação do que foi examinado, "há ressalvas" sem descrição, posição institucional fundamentada em manifestação de pessoa — geram alertas, não bloqueios; a classificação mantida exige justificativa. Bloqueios técnicos: valores fora da escala (não há valor de quarta categoria), vínculos obrigatórios e histórico imutável. A forma dos campos de natureza da informação fica para a versão final da Q-67 (D-061, D-063, D-067).
 - Na mudança metodológica substantiva, o novo rascunho não recebe classificações como válidas (T-4); na editorial aprovada, a cópia é permitida. Alterações estruturais (escala, níveis, critérios, regras de evidência ou de interpretação) são sempre substantivas. A tendência só compara avaliações metodologicamente comparáveis (T-6, D-064).
 
 Linhas existentes: as metodologias de demonstração já registradas recebem `demonstracao_numerica` e `cinco_categorias` como valor padrão ao criar as colunas, sem alterar versões publicadas. Versões sem metodologia são tratadas como da escala anterior. O tipo `posicionamento`, com os cinco valores, é mantido por causa do histórico.
