@@ -13,6 +13,13 @@
 | 0.9 | 01/11/2026 | Etapa 2A homologada e incorporada à `main` (D-055); próxima atividade: decisões Q-65 (D-056) |
 | 0.10 | 01/11/2026 | Escalas V2.2 (D-057 a D-060): Etapa 2B redefinida; plano de adaptação técnica proposto (seção 7, Q-67) |
 | 0.11 | 01/11/2026 | Seção 7: ressalvas relevantes, justificativas e evidências por dimensão (D-061) |
+| 0.12 | 02/11/2026 | Fase documental V2.2 concluída (D-062); próxima atividade: homologação da Q-66 e da Q-67 |
+| 0.13 | 02/11/2026 | Diretrizes da Q-66 e da Q-67 homologadas com ajustes (D-063); seção 7 atualizada (T-1, T-4, T-6); calibração H6 pendente |
+| 0.14 | 02/11/2026 | T-4 precisada (D-064); preparação operacional do H6 autorizada |
+| 0.15 | 02/11/2026 | Calibração H6 com avaliador único (D-065) |
+| 0.16 | 02/11/2026 | Rodada 2 com casos inéditos e gabaritos registrados antes da aplicação (D-066) |
+| 0.17 | 02/11/2026 | Discricionariedade fundamentada e ajustes D1 a D4 (D-067): diretriz para a Etapa 2B; rodada 1 encerrada; rodada 2 liberada com rubrica 0.4 |
+| 0.18 | 02/11/2026 | Calibração H6 concluída e versões finais da Q-66 e da Q-67 (D-068); Etapa 2B pronta para autorização; seção 7 conforme a Q-67 1.0 |
 
 Legenda: ✅ Aprovado · 🔧 Proposta técnica · ⏳ Pendente.
 
@@ -34,7 +41,7 @@ Legenda: ✅ Aprovado · 🔧 Proposta técnica · ⏳ Pendente.
 | 1 | Banco de dados de desenvolvimento e Cadastro Mestre | Banco PostgreSQL local, estrutura de comitês e projetos/temas, cadastro de pessoas, instituições e vínculos, com dados fictícios | ✅ **Homologada em 01/11/2026** para desenvolvimento e testes (D-027); pendências C6, C7 e C8 |
 | 1.1 | Projetos, temas e contextos | Telas de comitês, projetos e temas; comitês participantes (D-023); associação de stakeholders aos contextos, sem avaliação de poder × interesse | ✅ **Concluída**: homologada em 01/11/2026 para desenvolvimento com dados fictícios (D-031, D-047, incluindo a correção de normalização) e incorporada à `main` pelo Pull Request #1 (commit de merge `90c319c`, D-053) |
 | 2A | Metodologia e estrutura da avaliação estratégica | Fichas e versões, evidências, posicionamento, grau de confiança, permissões e matriz com metodologia de demonstração e dados fictícios | ✅ **Concluída**: homologada em 01/11/2026 para desenvolvimento e testes com dados fictícios (D-035, D-055) e incorporada à `main` pelo Pull Request #2 (commit de merge `81478af`); adaptação às escalas V2.2 pendente (seção 7) |
-| 2B | Metodologia institucional V2.2 e adaptação técnica | Escalas aprovadas (D-058 a D-060); rubricas homologadas e adaptação do sistema às novas escalas (seção 7). Depende de Q-66 e Q-67 | ⏳ Suspensa até a homologação das rubricas (Q-66) e do plano de adaptação técnica (Q-67) (D-060); programação não autorizada |
+| 2B | Metodologia institucional V2.2 e adaptação técnica | Escalas aprovadas (D-058 a D-060); rubricas da Q-66 1.0 e adaptação do sistema conforme a Q-67 1.0 (seção 7) | ⏳ **Pronta para autorização:** Q-66 e Q-67 em versão final e calibração H6 concluída (D-068); documento de autorização entregue ao gestor; programação só após a revisão final e o merge da branch documental e a autorização específica |
 | 3 | Iniciativas, interações e compromissos | Matriz de iniciativas, registro único de reuniões, encaminhamentos e prazos | 🔧 |
 | 4 | Plano de ação e matriz de riscos | Versões e aprovação, acompanhamento, riscos, gatilhos e respostas | 🔧 |
 | 5 | Autenticação e permissões | Supabase Auth, perfis e permissões por projeto/tema, segurança no banco. Depende de Q-50 | 🔧 |
@@ -216,9 +223,9 @@ Ficaram de fora, conforme a D-034: critérios, pesos, fórmula e pontos de corte
 8. Todo resultado de demonstração marcado como não homologado; nenhum critério institucional no sistema.
 9. Funciona em celular e computador.
 
-## 7. Adaptação às escalas V2.2 — plano proposto 🔧 (Q-67)
+## 7. Adaptação às escalas V2.2 — plano final 🔧 (Q-67 1.0, D-068)
 
-Proposta para homologação. **Nada desta seção foi implementado.** A execução depende da homologação deste plano (Q-67) e das rubricas (Q-66), e a Etapa 2B continua suspensa até lá (D-060). Referências: D-058 a D-060; [Metodologia](METODOLOGIA_STAKEHOLDERS.md), seções 3.2, 6, 9 e 10; [Modelo de Dados](MODELO_DADOS.md), seção 6.3.1.
+Decisões T-1 a T-7 homologadas com ajustes em 02/11/2026 (D-063), com a T-4 precisada (D-064) e o plano consolidado na versão final da Q-67 (1.0, D-068). **Nada desta seção foi implementado.** A execução depende da autorização da Etapa 2B. Referências: D-058 a D-060; [Metodologia](METODOLOGIA_STAKEHOLDERS.md), seções 3.2, 6, 9 e 10; [Modelo de Dados](MODELO_DADOS.md), seção 6.3.1.
 
 ### 7.1 Inventário de impactos
 
@@ -226,11 +233,11 @@ Proposta para homologação. **Nada desta seção foi implementado.** A execuç�
 |---|---|---|---|---|
 | Banco — posicionamento | Lista de cinco valores (tipo `posicionamento`, migração 0005) | Três categorias e "Não avaliado" nas novas versões | Alto | Manter a lista, por causa do histórico; a metodologia passa a indicar sua escala de posicionamento; regra no banco recusa as categorias parciais em metodologia de três categorias. Versões existentes não são tocadas. |
 | Banco — poder e interesse | Número de 0 a 100 calculado das notas (`avaliacao_versao.poder` e `.interesse`) | Baixo, Médio, Alto ou "Não avaliado", classificados diretamente | Alto | Novas colunas de nível; as numéricas ficam só para as versões de demonstração já publicadas; regra impede misturar os dois tipos e impede Médio em metodologia binária histórica. |
-| Banco — metodologia | Critérios com escala numérica e peso; só entra em vigor com critérios | Escala e rubricas por versão, sem pesos | Médio | Tipo de escala na metodologia e rubricas por nível em tabela própria, travadas quando a metodologia entra em vigor. |
-| Banco — ressalvas, justificativas e evidências (D-061) | Uma justificativa geral; evidências ligadas só à versão | Ressalvas relevantes com descrição; justificativa e evidência por dimensão | Médio | Campos de ressalvas e de justificativa por dimensão; tabela que liga evidências às dimensões (uma evidência pode sustentar várias); regras de publicação correspondentes, sem quarta categoria de posicionamento. |
+| Banco — metodologia | Critérios com escala numérica e peso; só entra em vigor com critérios | Escala e rubricas por versão, sem pesos | Médio | Tipo de escala na metodologia e rubricas por nível em tabela própria, travadas quando a metodologia entra em vigor. Cada nova versão registra a natureza da alteração (substantiva ou editorial), com justificativa e aprovação (D-064). |
+| Banco — ressalvas, justificativas e evidências (D-061, D-063, D-067, D-068) | Uma justificativa geral; evidências ligadas só à versão; publicação exige evidência e validação institucional | Ressalvas com os tratamentos da D-068; justificativa por dimensão; natureza da informação do posicionamento; evidências opcionais; alertas no lugar de regras de interpretação | Médio | Campo de situação das ressalvas e descrição; justificativas por dimensão e síntese; `natureza_posicionamento` e origem no campo existente de validação institucional; `alertas_reconhecidos` gravado na publicação; evidência anterior como referência identificada (`evidencia_origem_id`); sem tabela de evidência por dimensão, sem tipo "verificação documental" e sem confirmação de pertinência (D-068); regras técnicas no banco, sem quarta categoria. |
 | Cálculo (`calculo.ts`) | Média ponderada convertida para 0 a 100 | Nenhum cálculo | Médio | Restrito às metodologias de demonstração; nenhum cálculo na metodologia V2.2 (T21). |
-| Tendência (`tendenciaDoPosicionamento`) | Compara a posição na lista de cinco | Comparação de versões ou justificativa explícita | Médio | Comparar só versões da mesma escala; entre escalas diferentes, não calcular e exibir a justificativa. |
-| Formulário de rascunho | Notas por critério; cinco posições; confiança "Alto, Médio, Baixo" | Níveis diretos; três posições; "Baixa, Média, Alta" | Alto | Campos de nível com "Não avaliado"; três posições; rubrica como texto de ajuda; ressalvas relevantes e justificativas por dimensão; a nova versão não copia posição parcial. |
+| Tendência (`tendenciaDoPosicionamento`) | Compara a posição na lista de cinco | Comparação de versões ou justificativa explícita | Médio | Comparar só avaliações metodologicamente comparáveis (mesma versão, alteração apenas editorial aprovada ou equivalência declarada); senão, "Não comparável", com justificativa (T-6, D-064). |
+| Formulário de rascunho | Notas por critério; cinco posições; confiança "Alto, Médio, Baixo" | Níveis diretos; três posições; "Baixa, Média, Alta" | Alto | Campos de nível com "Não avaliado"; três posições; rubrica como texto de ajuda; ressalvas (três situações) e justificativas por dimensão; na mudança metodológica substantiva, nada de classificação é copiado como válido (T-4, D-064). |
 | Ficha e histórico (`resumo-versao`, `selo-posicionamento`) | Notas com escala de 1 a 5; cores de cinco posições | Níveis; três categorias; parciais só no histórico | Médio | Exibir a escala de cada versão; parciais com a indicação "escala anterior". |
 | Matriz (`matriz-poder-interesse`, `matriz.ts`) | Gráfico contínuo de 0 a 100, sem quadrantes | Grade 3 × 3; histórico binário em 2 × 2 | Alto | Novo componente de grade com células nomeadas; posição por cor ou ícone, com legenda; listas de não avaliados e de outras metodologias; nenhuma conduta. |
 | Consultas, ações e validação (`consultas.ts`, `acoes.ts`, `esquemas.ts`) | Leem e validam notas e cinco posições | Novos campos e regras por escala | Médio | Validação conforme a escala da metodologia, no servidor e no banco. |
@@ -238,16 +245,20 @@ Proposta para homologação. **Nada desta seção foi implementado.** A execuç�
 | Dados de demonstração (`carregar-exemplos.ts`) | Duas metodologias numéricas; versões com posições parciais | Exemplos na escala V2.2 | Baixo | Manter os exemplos atuais como histórico de demonstração; nova metodologia fictícia de três níveis, marcada como não homologada. |
 | Testes | 147 testes; o formulário espera cinco posições | T17 a T24 e testes complementares | Médio | Atualizar os testes afetados; acrescentar os novos e um teste de atualização de banco com dados da Etapa 2A. |
 
-### 7.2 Sequência proposta, após a homologação de Q-66 e Q-67
+**Diretriz para a adaptação (D-067):** rigor na rastreabilidade, flexibilidade no julgamento e simplicidade operacional. As regras de natureza interpretativa hoje garantidas pelo banco ou pelo servidor (P-033, T04) passam a **alertas orientativos** na tela e no servidor; o consultor pode manter a classificação, com justificativa. No banco ficam só os **bloqueios técnicos** de integridade (valores das escalas, vínculos obrigatórios, responsável, data e histórico imutável). O campo de validação institucional passa a registrar a origem e a natureza da informação, sem exigir confirmação formal. Sem fluxos adicionais de aprovação, campos excessivos ou novas categorias.
 
-1. Cópia de segurança do banco local (`.dados/copias/antes-escalas-v2-2`).
+### 7.2 Sequência, após a autorização da Etapa 2B
+
+Antes de começar: revisão final da branch documental, Pull Request documental e merge feito pelo gestor; depois, a branch da Etapa 2B parte da `main` atualizada.
+
+1. **Cópia de segurança obrigatória** do banco local antes da migração (`.dados/copias/antes-escalas-v2-2`), com proposta de cópia automática antes de aplicar migrações pendentes (T-1).
 2. Migração `0006`, **somente aditiva**: novos tipos, colunas e a tabela de rubricas. Sem excluir colunas e sem alterar ou recalcular versões publicadas. As metodologias já registradas recebem, como valor padrão das colunas novas, a escala em que foram feitas.
 3. Regras no banco para as escalas de cada metodologia; novas versões passam a exigir metodologia, para que a escala seja sempre conhecida.
-4. Rótulos, validação e formulário.
+4. Rótulos, validação, alertas orientativos e formulário.
 5. Ficha, histórico e tendência.
 6. Matriz 3 × 3 (e 2 × 2 para histórico binário).
 7. Dados de demonstração na escala V2.2.
-8. Testes T17 a T24, complementares e de regressão, inclusive a atualização de um banco com dados da Etapa 2A.
+8. Testes T17 a T24, complementares e de regressão, e **teste de preservação campo a campo** de um banco com dados da Etapa 2A (T-1).
 9. Verificação no navegador, no computador e no celular, com dados fictícios.
 10. Documentação e Pull Request, sem merge automático.
 
@@ -255,6 +266,7 @@ Proposta para homologação. **Nada desta seção foi implementado.** A execuç�
 
 - **Migração destrutiva:** proibida (Nota V2.2). Só acréscimos; nada é apagado ou convertido.
 - **Rascunhos abertos na troca de metodologia:** a regra atual já impede publicar rascunho de metodologia que deixou de vigorar. O avaliador descarta e recomeça, sem conversão.
+- **Cópia indevida entre metodologias:** na mudança metodológica substantiva, nada de classificação é copiado como válido; evidências só contam como referência depois de confirmadas; alterações estruturais não podem ser classificadas como editoriais (T-4, D-064).
 - **Versões sem metodologia** (posicionamento sem pontuação): tratadas como escala anterior.
 - **Rubricas não homologadas** não podem ser usadas em avaliação institucional (T21).
 - **Dados reais** continuam proibidos até autorização (D-005).
@@ -266,6 +278,7 @@ Proposta para homologação. **Nada desta seção foi implementado.** A execuç�
 3. Nenhuma opção parcial de posicionamento nem campo numérico de poder ou interesse nas novas avaliações (T17, T22).
 4. Matriz 3 × 3 correta, sem conduta automática (T18).
 5. Funciona em celular e computador.
+6. Regras interpretativas aparecem como alertas, sem impedir gravar, publicar ou continuar iniciativas; a classificação mantida diante de alerta exige justificativa; a ausência de documento não impede o registro (D-067).
 
 ## 8. Pendências efetivas (01/11/2026)
 
@@ -275,11 +288,14 @@ Proposta para homologação. **Nada desta seção foi implementado.** A execuç�
 | C7. Cópia de segurança e restauração | Etapas 7 e 8 (D-027) | Planejada |
 | C8. Portabilidade em PostgreSQL real | Etapas 7 e 8 (D-027) | Depende de autorização (Q-57) |
 | Autenticação e segurança multiusuário (inclusive regras de acesso no banco) | Uso por mais de uma pessoa; Etapas 7 e 8 | Etapa 5; estrutura de permissões preparada na 2A, não homologada |
-| Rubricas das escalas V2.2 e plano de adaptação técnica | Etapa 2B (D-060) | Escalas aprovadas (D-058 a D-060); rubricas propostas, não homologadas (Q-66); plano de adaptação na seção 7 (Q-67); decisões Q-65.1, Q-65.4 e Q-65.6 pendentes |
+| Rubricas das escalas V2.2 e plano de adaptação técnica | Etapa 2B (D-060, D-063) | ✅ **Resolvida (D-068):** Q-66 1.0 e Q-67 1.0; calibração H6 concluída, com limitações registradas; Etapa 2B pronta para autorização (documento entregue fora do repositório). Decisões Q-65.1, Q-65.4 e Q-65.6 continuam pendentes, sem bloquear a 2B |
+| Documentos de referência V2.3 | — | Roteiro preparado fora do repositório (D-063); emissão a programar, refletindo as D-067 e D-068 (inclusive a adaptação do teste T23) |
+| Arquivos `MANUAL_OPERACIONAL.md` e `PLANO_TRANSFERENCIA_INSTITUCIONAL.md`, previstos no Guia | — | Ainda não existem no repositório; criação a autorizar |
 | Conduta do ES em Ação | Requisito futuro RF-28 | Categorias e regras de correspondência a definir (Q-64) |
 | Verificação automática no GitHub Actions | — | ✅ Implementada (D-041): Node.js 24 e 26, a cada Pull Request e atualização da `main` |
 | Proteção da `main` (verificações obrigatórias antes do merge) | — | ✅ Configurada pelo administrador e conferida (D-045, D-052) |
 | Revisão e incorporação dos Pull Requests das Etapas 1.1 e 2A | Base correta da Etapa 2A | ✅ Concluída: Etapa 1.1 incorporada pelo Pull Request #1 (D-053, `90c319c`) e Etapa 2A pelo Pull Request #2 (D-055, `81478af`) |
+| Fase documental V2.2 (registro da Etapa 2A e escalas V2.2) | Homologação da Q-66 e da Q-67 | ✅ Concluída (D-062): Pull Requests #3 (`9084a74`) e #4 (`a254b40`) incorporados; próxima atividade: homologação da Q-66 e da Q-67 |
 | Análise LGPD, retenção e anonimização | Etapa 8 | Q-13, Q-58 |
 
 ## 9. Local de trabalho ✅ (D-019)
