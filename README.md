@@ -37,7 +37,7 @@ A arquitetura tecnológica inicialmente proposta utiliza Next.js, TypeScript, Po
 
 ## Situação atual
 
-Projeto em fase inicial de desenvolvimento — **Etapa 2A: Metodologia e estrutura da avaliação estratégica de stakeholders**. As Etapas 1 e 1.1 foram homologadas para desenvolvimento com dados fictícios.
+Projeto em fase inicial de desenvolvimento. As Etapas 1, 1.1 e 2A foram homologadas para desenvolvimento com dados fictícios e incorporadas à `main`. Próxima atividade: revisão e homologação das decisões metodológicas sobre poder e interesse (Q-65), antes da Etapa 2B.
 
 Já existem a documentação, um banco de dados local de desenvolvimento, as telas do Cadastro Mestre (pessoas, instituições, vínculos, contatos e histórico de alterações) e as telas de comitês (somente consulta), projetos e temas, com comitês participantes e stakeholders associados, além da estrutura de avaliação de stakeholders (fichas, versões, evidências e matriz de poder × interesse) com uma metodologia de **demonstração**: os resultados exibidos são fictícios e **não homologados**. Ainda não há a metodologia institucional, autenticação, hospedagem nem os demais módulos.
 
