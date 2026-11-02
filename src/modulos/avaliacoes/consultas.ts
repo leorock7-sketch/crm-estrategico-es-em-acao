@@ -1,8 +1,9 @@
 /**
- * Leitura e gravação das avaliações estratégicas (Etapa 2A). As gravações devem
- * ser feitas dentro de comoUsuario(), para a trilha de auditoria, e somente
- * depois de conferida a permissão no contexto (modulos/acesso/permissoes.ts).
- * As regras de publicação e de imutabilidade são garantidas pelo banco.
+ * Leitura e gravação das avaliações estratégicas (Etapas 2A e 2B). As gravações
+ * devem ser feitas dentro de comoUsuario(), para a trilha de auditoria, e
+ * somente depois de conferida a permissão no contexto (modulos/acesso/permissoes.ts).
+ * As regras técnicas (escalas, publicação e imutabilidade) são garantidas pelo
+ * banco; as regras de interpretação da V2.2 são alertas (alertas.ts).
  */
 import { and, asc, desc, eq, inArray, isNull, max, sql } from "drizzle-orm";
 import type { Executor } from "@/lib/banco/conexao";
@@ -15,14 +16,17 @@ import {
   instituicao,
   metodologiaVersao as metodologia,
   pessoa,
+  rubricaNivel as rubrica,
   stakeholder,
   stakeholderContexto as associacao,
   usuario,
 } from "@/lib/banco/esquema";
 import { hojeEmBrasilia } from "@/lib/formatacao";
-import { calcularResultado } from "./calculo";
+import { calcularAlertas } from "./alertas";
+import { calcularResultado, type LigacaoMetodologia, metodologiasComparaveis } from "./calculo";
 import type { DadosEvidencia, DadosRascunho } from "./esquemas";
 import type { FichaParaMatriz } from "./matriz";
+import type { DimensaoRubrica, EscalaPoderInteresse, EscalaPosicionamento } from "./rotulos";
 
 const nomeDoStakeholder = sql<string>`coalesce(${pessoa.nomeCompleto}, ${instituicao.nome})`;
 
@@ -37,11 +41,16 @@ export async function listarMetodologias(banco: Executor) {
       homologada: metodologia.homologada,
       vigenteDesde: metodologia.vigenteDesde,
       vigenteAte: metodologia.vigenteAte,
+      escalaPoderInteresse: metodologia.escalaPoderInteresse,
       // Consulta de uma só tabela: o Drizzle não qualifica as colunas, por isso
-      // a subconsulta usa nomes escritos por extenso (ver listarComites).
+      // as subconsultas usam nomes escritos por extenso (ver listarComites).
       criterios: sql<number>`(
         select count(*)::int from criterio_avaliacao c
         where c.metodologia_versao_id = metodologia_versao.id and c.arquivado_em is null
+      )`,
+      rubricas: sql<number>`(
+        select count(*)::int from rubrica_nivel r
+        where r.metodologia_versao_id = metodologia_versao.id and r.arquivado_em is null
       )`,
     })
     .from(metodologia)
@@ -67,23 +76,87 @@ export async function criteriosDaMetodologia(banco: Executor, metodologiaId: str
 
 export type CriterioDaMetodologia = Awaited<ReturnType<typeof criteriosDaMetodologia>>[number];
 
+/** Rubricas dos níveis da metodologia V2.2 (texto de ajuda, Q-66 1.0). */
+export async function rubricasDaMetodologia(banco: Executor, metodologiaId: string) {
+  return banco
+    .select({
+      id: rubrica.id,
+      dimensao: rubrica.dimensao,
+      nivel: rubrica.nivel,
+      criterioOrientador: rubrica.criterioOrientador,
+      basesTipicas: rubrica.basesTipicas,
+      ordem: rubrica.ordem,
+    })
+    .from(rubrica)
+    .where(and(eq(rubrica.metodologiaVersaoId, metodologiaId), isNull(rubrica.arquivadoEm)))
+    .orderBy(asc(rubrica.dimensao), asc(rubrica.ordem));
+}
+
+export type RubricaDaMetodologia = Awaited<ReturnType<typeof rubricasDaMetodologia>>[number];
+
 export async function obterMetodologia(banco: Executor, id: string) {
   const [encontrada] = await banco.select().from(metodologia).where(eq(metodologia.id, id));
   if (!encontrada) return null;
-  return { ...encontrada, criterios: await criteriosDaMetodologia(banco, id) };
+  const idsRelacionados = [encontrada.metodologiaAnteriorId, encontrada.equivalentePosicionamentoA].filter(
+    (valor): valor is string => valor !== null,
+  );
+  const [criterios, rubricas, relacionadas, aprovador] = await Promise.all([
+    criteriosDaMetodologia(banco, id),
+    rubricasDaMetodologia(banco, id),
+    idsRelacionados.length === 0
+      ? []
+      : banco.select({ id: metodologia.id, nome: metodologia.nome }).from(metodologia).where(inArray(metodologia.id, idsRelacionados)),
+    encontrada.naturezaAprovadaPor
+      ? banco.select({ nome: usuario.nome }).from(usuario).where(eq(usuario.id, encontrada.naturezaAprovadaPor))
+      : [],
+  ]);
+  const nomePorId = new Map(relacionadas.map((m) => [m.id, m.nome]));
+  return {
+    ...encontrada,
+    criterios,
+    rubricas,
+    anteriorNome: encontrada.metodologiaAnteriorId ? (nomePorId.get(encontrada.metodologiaAnteriorId) ?? null) : null,
+    equivalenteNome: encontrada.equivalentePosicionamentoA
+      ? (nomePorId.get(encontrada.equivalentePosicionamentoA) ?? null)
+      : null,
+    aprovadorNome: aprovador[0]?.nome ?? null,
+  };
 }
 
 export async function metodologiaVigente(banco: Executor) {
   const [vigente] = await banco
-    .select({ id: metodologia.id, nome: metodologia.nome, homologada: metodologia.homologada })
+    .select({
+      id: metodologia.id,
+      nome: metodologia.nome,
+      homologada: metodologia.homologada,
+      escalaPoderInteresse: metodologia.escalaPoderInteresse,
+      escalaPosicionamento: metodologia.escalaPosicionamento,
+    })
     .from(metodologia)
     .where(eq(metodologia.situacao, "vigente"));
   return vigente ?? null;
 }
 
+/** Ligações de cada metodologia com a anterior, para a tendência e a cópia na nova versão (T-4, T-6). */
+export async function ligacoesDasMetodologias(banco: Executor): Promise<Map<string, LigacaoMetodologia>> {
+  const linhas = await banco
+    .select({
+      id: metodologia.id,
+      anteriorId: metodologia.metodologiaAnteriorId,
+      naturezaAlteracao: metodologia.naturezaAlteracao,
+      equivalentePosicionamentoA: metodologia.equivalentePosicionamentoA,
+    })
+    .from(metodologia);
+  return new Map(linhas.map(({ id, ...ligacao }) => [id, ligacao]));
+}
+
 export type NovaMetodologia = {
   nome: string;
   descricao?: string;
+  /** Padrão: demonstração (cinco categorias) quando há critérios; senão, V2.2. */
+  escalaPoderInteresse?: EscalaPoderInteresse;
+  escalaPosicionamento?: EscalaPosicionamento;
+  homologada?: boolean;
   criterios: {
     dimensao: "poder" | "interesse";
     nome: string;
@@ -92,16 +165,37 @@ export type NovaMetodologia = {
     escalaMaxima: number;
     peso?: number;
   }[];
+  rubricas?: { dimensao: DimensaoRubrica; nivel: string; criterioOrientador: string; basesTipicas?: string }[];
+  /** Versão substituída; exige a natureza da alteração para entrar em vigor (D-064). */
+  metodologiaAnteriorId?: string;
+  naturezaAlteracao?: "substantiva" | "editorial";
+  justificativaNatureza?: string;
+  equivalentePosicionamentoA?: string;
+  justificativaEquivalencia?: string;
 };
 
 /**
- * Cria uma metodologia em rascunho com seus critérios. Não há tela para isso
- * nesta etapa: só a carga de demonstração e os testes a usam (D-034).
+ * Cria uma metodologia em rascunho com seus critérios ou rubricas. Não há tela
+ * para isso: só a carga de demonstração e os testes a usam (D-034).
  */
 export async function criarMetodologia(tx: Executor, dados: NovaMetodologia): Promise<string> {
+  const demonstracao = dados.criterios.length > 0;
+  const escalaPoderInteresse = dados.escalaPoderInteresse ?? (demonstracao ? "demonstracao_numerica" : "ordinal_tres_niveis");
   const [nova] = await tx
     .insert(metodologia)
-    .values({ nome: dados.nome, descricao: dados.descricao ?? null })
+    .values({
+      nome: dados.nome,
+      descricao: dados.descricao ?? null,
+      homologada: dados.homologada ?? false,
+      escalaPoderInteresse,
+      escalaPosicionamento:
+        dados.escalaPosicionamento ?? (escalaPoderInteresse === "demonstracao_numerica" ? "cinco_categorias" : "tres_categorias"),
+      metodologiaAnteriorId: dados.metodologiaAnteriorId ?? null,
+      naturezaAlteracao: dados.naturezaAlteracao ?? null,
+      justificativaNatureza: dados.justificativaNatureza ?? null,
+      equivalentePosicionamentoA: dados.equivalentePosicionamentoA ?? null,
+      justificativaEquivalencia: dados.justificativaEquivalencia ?? null,
+    })
     .returning({ id: metodologia.id });
   if (dados.criterios.length > 0) {
     await tx.insert(criterio).values(
@@ -113,6 +207,18 @@ export async function criarMetodologia(tx: Executor, dados: NovaMetodologia): Pr
         escalaMinima: c.escalaMinima,
         escalaMaxima: c.escalaMaxima,
         peso: c.peso ?? null,
+        ordem,
+      })),
+    );
+  }
+  if (dados.rubricas && dados.rubricas.length > 0) {
+    await tx.insert(rubrica).values(
+      dados.rubricas.map((r, ordem) => ({
+        metodologiaVersaoId: nova.id,
+        dimensao: r.dimensao,
+        nivel: r.nivel,
+        criterioOrientador: r.criterioOrientador,
+        basesTipicas: r.basesTipicas ?? null,
         ordem,
       })),
     );
@@ -171,7 +277,10 @@ export async function fichasDoContexto(banco: Executor, projetoTemaId: string): 
             metodologiaNome: metodologia.nome,
             poder: versao.poder,
             interesse: versao.interesse,
+            nivelPoder: versao.nivelPoder,
+            nivelInteresse: versao.nivelInteresse,
             posicionamento: versao.posicionamento,
+            naturezaPosicionamento: versao.naturezaPosicionamento,
             grauConfianca: versao.grauConfianca,
             dataReferencia: versao.dataReferencia,
             proximaRevisao: versao.proximaRevisao,
@@ -209,7 +318,10 @@ export async function fichasDoContexto(banco: Executor, projetoTemaId: string): 
               metodologiaNome: v.metodologiaNome,
               poder: v.poder,
               interesse: v.interesse,
+              nivelPoder: v.nivelPoder,
+              nivelInteresse: v.nivelInteresse,
               posicionamento: v.posicionamento,
+              naturezaPosicionamento: v.naturezaPosicionamento,
               grauConfianca: v.grauConfianca,
               // Versões publicadas sempre têm as duas datas (garantido pelo banco).
               dataReferencia: v.dataReferencia ?? "",
@@ -266,13 +378,24 @@ async function versoesDaFicha(banco: Executor, avaliacaoId: string) {
       metodologiaNome: metodologia.nome,
       metodologiaHomologada: metodologia.homologada,
       metodologiaSituacao: metodologia.situacao,
+      escalaPoderInteresse: metodologia.escalaPoderInteresse,
+      escalaPosicionamento: metodologia.escalaPosicionamento,
       poder: versao.poder,
       interesse: versao.interesse,
+      nivelPoder: versao.nivelPoder,
+      nivelInteresse: versao.nivelInteresse,
       posicionamento: versao.posicionamento,
+      naturezaPosicionamento: versao.naturezaPosicionamento,
       grauConfianca: versao.grauConfianca,
       justificativaConfianca: versao.justificativaConfianca,
       justificativa: versao.justificativa,
+      justificativaPoder: versao.justificativaPoder,
+      justificativaInteresse: versao.justificativaInteresse,
+      justificativaPosicionamento: versao.justificativaPosicionamento,
+      situacaoRessalvas: versao.situacaoRessalvas,
+      descricaoRessalvas: versao.descricaoRessalvas,
       validacaoInstitucional: versao.validacaoInstitucional,
+      alertasReconhecidos: versao.alertasReconhecidos,
       dataReferencia: versao.dataReferencia,
       proximaRevisao: versao.proximaRevisao,
       publicadaEm: versao.publicadaEm,
@@ -312,6 +435,7 @@ async function versoesDaFicha(banco: Executor, avaliacaoId: string) {
         fonte: evidencia.fonte,
         url: evidencia.url,
         dataEvidencia: evidencia.dataEvidencia,
+        origemId: evidencia.evidenciaOrigemId,
       })
       .from(evidencia)
       .where(and(inArray(evidencia.avaliacaoVersaoId, ids), isNull(evidencia.arquivadoEm)))
@@ -326,7 +450,7 @@ async function versoesDaFicha(banco: Executor, avaliacaoId: string) {
 
 export type VersaoDaFicha = Awaited<ReturnType<typeof versoesDaFicha>>[number];
 
-/** Contexto de uma versão, para conferir permissões antes de gravar. */
+/** Contexto de uma versão, para conferir permissões e a escala antes de gravar. */
 export async function contextoDaVersao(banco: Executor, versaoId: string) {
   const [encontrada] = await banco
     .select({
@@ -334,11 +458,14 @@ export async function contextoDaVersao(banco: Executor, versaoId: string) {
       situacao: versao.situacao,
       arquivadoEm: versao.arquivadoEm,
       metodologiaId: versao.metodologiaVersaoId,
+      escalaPoderInteresse: metodologia.escalaPoderInteresse,
+      escalaPosicionamento: metodologia.escalaPosicionamento,
       projetoTemaId: avaliacao.projetoTemaId,
       stakeholderId: avaliacao.stakeholderId,
     })
     .from(versao)
     .innerJoin(avaliacao, eq(avaliacao.id, versao.avaliacaoId))
+    .leftJoin(metodologia, eq(metodologia.id, versao.metodologiaVersaoId))
     .where(eq(versao.id, versaoId));
   return encontrada ?? null;
 }
@@ -355,9 +482,12 @@ export async function contextoDaEvidencia(banco: Executor, evidenciaId: string) 
 
 /**
  * Abre um rascunho (criando a ficha, se preciso) com a metodologia vigente.
- * Parte da versão vigente: copia posicionamento, grau de confiança, validação
- * institucional e evidências; as notas só são copiadas se a metodologia for a
- * mesma. Justificativas começam em branco, para serem revistas.
+ * Regra da T-4 (D-064, D-068): se a versão vigente é de metodologia comparável
+ * (a mesma, ou ligada só por alterações editoriais aprovadas), as classificações
+ * vêm como ponto de partida para revisão; numa mudança metodológica substantiva,
+ * nada de classificação é herdado. Em ambos os casos, as evidências vêm como
+ * referência, com a origem registrada, e as justificativas começam em branco.
+ * As notas só são copiadas se a metodologia for a mesma.
  */
 export async function iniciarRascunho(tx: Executor, projetoTemaId: string, stakeholderId: string): Promise<string> {
   let [ficha] = await tx
@@ -373,6 +503,10 @@ export async function iniciarRascunho(tx: Executor, projetoTemaId: string, stake
     tx.select({ numero: max(versao.numeroVersao) }).from(versao).where(eq(versao.avaliacaoId, ficha.id)),
     tx.select().from(versao).where(and(eq(versao.avaliacaoId, ficha.id), eq(versao.situacao, "vigente"))),
   ]);
+  const comparavel =
+    atual !== undefined &&
+    metodologiasComparaveis(vigenteMetodologia?.id ?? null, atual.metodologiaVersaoId, await ligacoesDasMetodologias(tx));
+  const herdado = comparavel && atual ? atual : null;
 
   const [nova] = await tx
     .insert(versao)
@@ -380,9 +514,14 @@ export async function iniciarRascunho(tx: Executor, projetoTemaId: string, stake
       avaliacaoId: ficha.id,
       numeroVersao: (ultima?.numero ?? 0) + 1,
       metodologiaVersaoId: vigenteMetodologia?.id ?? null,
-      posicionamento: atual?.posicionamento ?? null,
-      grauConfianca: atual?.grauConfianca ?? null,
-      validacaoInstitucional: atual?.validacaoInstitucional ?? null,
+      posicionamento: herdado?.posicionamento ?? null,
+      grauConfianca: herdado?.grauConfianca ?? null,
+      validacaoInstitucional: herdado?.validacaoInstitucional ?? null,
+      nivelPoder: herdado?.nivelPoder ?? null,
+      nivelInteresse: herdado?.nivelInteresse ?? null,
+      naturezaPosicionamento: herdado?.naturezaPosicionamento ?? null,
+      situacaoRessalvas: herdado?.situacaoRessalvas ?? null,
+      descricaoRessalvas: herdado?.descricaoRessalvas ?? null,
       dataReferencia: hojeEmBrasilia(),
     })
     .returning({ id: versao.id });
@@ -401,6 +540,7 @@ export async function iniciarRascunho(tx: Executor, projetoTemaId: string, stake
           fonte: e.fonte,
           url: e.url,
           dataEvidencia: e.dataEvidencia,
+          evidenciaOrigemId: e.id,
         })),
       );
     }
@@ -441,6 +581,14 @@ export async function salvarRascunho(tx: Executor, dados: DadosRascunho, notas: 
       justificativa: dados.justificativa ?? null,
       validacaoInstitucional: dados.validacaoInstitucional ?? null,
       dataReferencia: dados.dataReferencia ?? null,
+      nivelPoder: dados.nivelPoder ?? null,
+      nivelInteresse: dados.nivelInteresse ?? null,
+      justificativaPoder: dados.justificativaPoder ?? null,
+      justificativaInteresse: dados.justificativaInteresse ?? null,
+      justificativaPosicionamento: dados.justificativaPosicionamento ?? null,
+      naturezaPosicionamento: dados.naturezaPosicionamento ?? null,
+      situacaoRessalvas: dados.situacaoRessalvas ?? null,
+      descricaoRessalvas: dados.descricaoRessalvas ?? null,
     })
     .where(eq(versao.id, dados.versaoId));
 
@@ -491,19 +639,32 @@ export async function removerEvidencia(tx: Executor, evidenciaId: string) {
 }
 
 /**
- * Publica o rascunho: calcula poder e interesse com a metodologia da versão,
- * marca a vigente anterior como substituída e torna o rascunho a nova vigente.
- * O banco confere justificativa, data de referência, evidência e as demais regras.
+ * Publica o rascunho: na demonstração, calcula poder e interesse; na V2.2, não
+ * há cálculo. Grava os alertas orientativos ativos, que o consultor decidiu
+ * manter (D-067), marca a vigente anterior como substituída e torna o rascunho
+ * a nova vigente. As regras técnicas de publicação são conferidas pelo banco.
  */
 export async function publicarRascunho(tx: Executor, versaoId: string) {
   const [rascunho] = await tx
-    .select({ avaliacaoId: versao.avaliacaoId, metodologiaId: versao.metodologiaVersaoId })
+    .select({
+      avaliacaoId: versao.avaliacaoId,
+      metodologiaId: versao.metodologiaVersaoId,
+      escalaPoderInteresse: metodologia.escalaPoderInteresse,
+      posicionamento: versao.posicionamento,
+      naturezaPosicionamento: versao.naturezaPosicionamento,
+      validacaoInstitucional: versao.validacaoInstitucional,
+      situacaoRessalvas: versao.situacaoRessalvas,
+      descricaoRessalvas: versao.descricaoRessalvas,
+      justificativaPosicionamento: versao.justificativaPosicionamento,
+      grauConfianca: versao.grauConfianca,
+    })
     .from(versao)
+    .leftJoin(metodologia, eq(metodologia.id, versao.metodologiaVersaoId))
     .where(and(eq(versao.id, versaoId), eq(versao.situacao, "rascunho"), isNull(versao.arquivadoEm)));
   if (!rascunho) throw new Error("Rascunho não encontrado ou já publicado.");
 
   let resultado: { poder: number | null; interesse: number | null } = { poder: null, interesse: null };
-  if (rascunho.metodologiaId) {
+  if (rascunho.metodologiaId && rascunho.escalaPoderInteresse === "demonstracao_numerica") {
     const [criterios, notas] = await Promise.all([
       criteriosDaMetodologia(tx, rascunho.metodologiaId),
       tx
@@ -513,6 +674,15 @@ export async function publicarRascunho(tx: Executor, versaoId: string) {
     ]);
     resultado = calcularResultado(criterios, new Map(notas.map((n) => [n.criterioId, n.nota])));
   }
+  const alertas = calcularAlertas({
+    posicionamento: rascunho.posicionamento,
+    naturezaPosicionamento: rascunho.naturezaPosicionamento,
+    origemPosicionamento: rascunho.validacaoInstitucional,
+    situacaoRessalvas: rascunho.situacaoRessalvas,
+    descricaoRessalvas: rascunho.descricaoRessalvas,
+    justificativaPosicionamento: rascunho.justificativaPosicionamento,
+    grauConfianca: rascunho.grauConfianca,
+  }).map((a) => a.mensagem);
 
   await tx
     .update(versao)
@@ -520,9 +690,14 @@ export async function publicarRascunho(tx: Executor, versaoId: string) {
     .where(and(eq(versao.avaliacaoId, rascunho.avaliacaoId), eq(versao.situacao, "vigente")));
   await tx
     .update(versao)
-    .set({ situacao: "vigente", poder: resultado.poder, interesse: resultado.interesse })
+    .set({
+      situacao: "vigente",
+      poder: resultado.poder,
+      interesse: resultado.interesse,
+      alertasReconhecidos: alertas.length > 0 ? alertas : null,
+    })
     .where(eq(versao.id, versaoId));
-  return resultado;
+  return { ...resultado, alertas };
 }
 
 /** Descarta o rascunho (arquivamento; fica registrado no histórico). */

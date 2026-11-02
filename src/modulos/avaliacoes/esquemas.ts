@@ -6,7 +6,17 @@ import {
   textoOpcional,
   vazioParaAusente,
 } from "@/lib/validacao/comuns";
-import { GRAUS_CONFIANCA, POSICIONAMENTOS, TIPOS_EVIDENCIA } from "./rotulos";
+import {
+  type EscalaPoderInteresse,
+  type EscalaPosicionamento,
+  GRAUS_CONFIANCA,
+  NATUREZAS_POSICIONAMENTO,
+  NIVEIS,
+  POSICIONAMENTOS,
+  POSICIONAMENTOS_VIGENTES,
+  SITUACOES_RESSALVAS,
+  TIPOS_EVIDENCIA,
+} from "./rotulos";
 
 /** Campo de lista opcional: vazio significa "não informado" (no posicionamento, "não avaliado"). */
 function listaOpcional<const T extends readonly [string, ...string[]]>(valores: T, mensagem: string) {
@@ -14,9 +24,11 @@ function listaOpcional<const T extends readonly [string, ...string[]]>(valores: 
 }
 
 /**
- * Rascunho da avaliação. As notas chegam como campos "nota_<id do critério>";
- * vazio significa "sem nota" (nunca zero). Justificativa e evidência só são
- * exigidas na publicação, pelo próprio banco de dados.
+ * Rascunho da avaliação. As notas (metodologia de demonstração) chegam como
+ * campos "nota_<id do critério>"; vazio significa "sem nota" (nunca zero). Na
+ * escala V2.2, vazio nos níveis e no posicionamento significa "não avaliado",
+ * e vazio nas ressalvas, "não se aplica". O que é exigido para publicar é
+ * conferido pelo próprio banco de dados.
  */
 export const esquemaRascunho = z.object({
   versaoId: esquemaIdentificador,
@@ -24,11 +36,47 @@ export const esquemaRascunho = z.object({
   grauConfianca: listaOpcional(GRAUS_CONFIANCA, "Grau de confiança inválido."),
   justificativaConfianca: textoOpcional("Justificativa do grau de confiança", 1000),
   justificativa: textoOpcional("Justificativa", 4000),
-  validacaoInstitucional: textoOpcional("Validação institucional", 1000),
+  validacaoInstitucional: textoOpcional("Origem da informação", 1000),
   dataReferencia: esquemaDataOpcional,
+  nivelPoder: listaOpcional(NIVEIS, "Nível de poder inválido."),
+  nivelInteresse: listaOpcional(NIVEIS, "Nível de interesse inválido."),
+  justificativaPoder: textoOpcional("Justificativa do poder", 2000),
+  justificativaInteresse: textoOpcional("Justificativa do interesse", 2000),
+  justificativaPosicionamento: textoOpcional("Justificativa do posicionamento", 2000),
+  naturezaPosicionamento: listaOpcional(NATUREZAS_POSICIONAMENTO, "Natureza da informação inválida."),
+  situacaoRessalvas: listaOpcional(SITUACOES_RESSALVAS, "Situação das ressalvas inválida."),
+  descricaoRessalvas: textoOpcional("Descrição das ressalvas", 2000),
 });
 
 export type DadosRascunho = z.infer<typeof esquemaRascunho>;
+
+/**
+ * Confere os valores do rascunho com a escala da metodologia, antes de gravar
+ * (o banco repete a mesma conferência): categorias parciais só no histórico
+ * (T22); níveis só na escala ordinal; sem Médio na binária histórica.
+ */
+export function errosDaEscala(
+  dados: DadosRascunho,
+  escala: { poderInteresse: EscalaPoderInteresse; posicionamento: EscalaPosicionamento },
+): Record<string, string[]> {
+  const erros: Record<string, string[]> = {};
+  if (
+    escala.posicionamento === "tres_categorias" &&
+    dados.posicionamento &&
+    !(POSICIONAMENTOS_VIGENTES as readonly string[]).includes(dados.posicionamento)
+  ) {
+    erros.posicionamento = ["Use Favorável, Neutro, Contrário ou “Não avaliado”: as categorias parciais existem só no histórico."];
+  }
+  if (escala.poderInteresse === "demonstracao_numerica") {
+    if (dados.nivelPoder) erros.nivelPoder = ["Esta metodologia usa notas por critério, sem níveis."];
+    if (dados.nivelInteresse) erros.nivelInteresse = ["Esta metodologia usa notas por critério, sem níveis."];
+  }
+  if (escala.poderInteresse === "binaria_historica") {
+    if (dados.nivelPoder === "medio") erros.nivelPoder = ["A escala binária histórica não tem o nível Médio."];
+    if (dados.nivelInteresse === "medio") erros.nivelInteresse = ["A escala binária histórica não tem o nível Médio."];
+  }
+  return erros;
+}
 
 const PREFIXO_NOTA = "nota_";
 

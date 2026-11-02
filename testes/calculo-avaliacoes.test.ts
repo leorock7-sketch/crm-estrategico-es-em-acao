@@ -1,23 +1,52 @@
 import { describe, expect, test } from "vitest";
 import {
   dimensaoCriterio,
+  dimensaoRubrica,
+  escalaPoderInteresse,
+  escalaPosicionamento,
   grauConfianca,
+  naturezaAlteracao,
+  naturezaPosicionamento,
+  nivelAvaliacao,
   perfilContexto,
   posicionamento,
   situacaoMetodologia,
+  situacaoRessalvas,
   situacaoVersaoAvaliacao,
   tipoEvidencia,
 } from "@/lib/banco/esquema";
 import { formatarNumero, hojeEmBrasilia } from "@/lib/formatacao";
-import { calcularDimensao, calcularResultado, tendenciaDoPosicionamento } from "@/modulos/avaliacoes/calculo";
-import { esquemaEvidencia, esquemaRascunho, notasDoFormulario } from "@/modulos/avaliacoes/esquemas";
-import { classificarParaMatriz, type FichaParaMatriz } from "@/modulos/avaliacoes/matriz";
+import { calcularAlertas, type DadosParaAlertas } from "@/modulos/avaliacoes/alertas";
+import {
+  calcularDimensao,
+  calcularResultado,
+  type LigacaoMetodologia,
+  metodologiasComparaveis,
+  tendenciaDoPosicionamento,
+} from "@/modulos/avaliacoes/calculo";
+import { errosDaEscala, esquemaEvidencia, esquemaRascunho, notasDoFormulario } from "@/modulos/avaliacoes/esquemas";
+import {
+  agruparPorCelula,
+  classificarParaMatriz,
+  type FichaAvaliada,
+  type FichaParaMatriz,
+  nomeDaCelula,
+} from "@/modulos/avaliacoes/matriz";
 import {
   DIMENSOES,
+  DIMENSOES_RUBRICA,
+  ESCALAS_PODER_INTERESSE,
+  ESCALAS_POSICIONAMENTO,
   GRAUS_CONFIANCA,
+  NATUREZAS_ALTERACAO,
+  NATUREZAS_POSICIONAMENTO,
+  NIVEIS,
   PERFIS_CONTEXTO,
   POSICIONAMENTOS,
+  POSICIONAMENTOS_VIGENTES,
+  posicionamentoPreliminar,
   SITUACOES_METODOLOGIA,
+  SITUACOES_RESSALVAS,
   SITUACOES_VERSAO,
   TIPOS_EVIDENCIA,
 } from "@/modulos/avaliacoes/rotulos";
@@ -57,24 +86,58 @@ describe("Cálculo de demonstração", () => {
     expect(tendenciaDoPosicionamento(null, "neutro")).toBeNull();
     expect(tendenciaDoPosicionamento("neutro", null)).toBeNull();
   });
+
+  test("entre metodologias não comparáveis, a tendência é “não comparável” (T-6)", () => {
+    expect(tendenciaDoPosicionamento("favoravel", "neutro", false)).toBe("nao_comparavel");
+    expect(tendenciaDoPosicionamento(null, "neutro", false)).toBeNull();
+  });
+
+  test("comparáveis: mesma metodologia, cadeia de alterações editoriais ou equivalência declarada; a mesma escala não basta", () => {
+    const ligacoes = new Map<string, LigacaoMetodologia>([
+      ["a", { anteriorId: null, naturezaAlteracao: null, equivalentePosicionamentoA: null }],
+      ["b", { anteriorId: "a", naturezaAlteracao: "editorial", equivalentePosicionamentoA: null }],
+      ["c", { anteriorId: "b", naturezaAlteracao: "editorial", equivalentePosicionamentoA: null }],
+      ["d", { anteriorId: "c", naturezaAlteracao: "substantiva", equivalentePosicionamentoA: null }],
+      ["e", { anteriorId: "d", naturezaAlteracao: "substantiva", equivalentePosicionamentoA: "d" }],
+      ["x", { anteriorId: null, naturezaAlteracao: null, equivalentePosicionamentoA: null }],
+    ]);
+    expect(metodologiasComparaveis("a", "a", ligacoes)).toBe(true);
+    expect(metodologiasComparaveis("c", "a", ligacoes)).toBe(true);
+    expect(metodologiasComparaveis("d", "c", ligacoes)).toBe(false);
+    expect(metodologiasComparaveis("d", "a", ligacoes)).toBe(false);
+    expect(metodologiasComparaveis("e", "d", ligacoes)).toBe(true);
+    expect(metodologiasComparaveis("x", "a", ligacoes)).toBe(false);
+    expect(metodologiasComparaveis(null, null, ligacoes)).toBe(true);
+    expect(metodologiasComparaveis("a", null, ligacoes)).toBe(false);
+  });
 });
 
 function ficha(parcial: Partial<FichaParaMatriz> & { stakeholderId: string }): FichaParaMatriz {
   return { nome: parcial.stakeholderId, tipoStakeholder: "pessoa", associado: true, temRascunho: false, vigente: null, ...parcial };
 }
 
-const vigente = (metodologiaId: string | null, extra: Partial<NonNullable<FichaParaMatriz["vigente"]>> = {}) => ({
+const vigente = (
+  metodologiaId: string | null,
+  extra: Partial<NonNullable<FichaParaMatriz["vigente"]>> = {},
+): NonNullable<FichaParaMatriz["vigente"]> => ({
   numeroVersao: 1,
   metodologiaId,
   metodologiaNome: metodologiaId,
   poder: 50,
   interesse: 50,
+  nivelPoder: null,
+  nivelInteresse: null,
   posicionamento: null,
+  naturezaPosicionamento: null,
   grauConfianca: null,
   dataReferencia: "2026-10-01",
   proximaRevisao: "2027-10-01",
   ...extra,
 });
+
+/** Avaliação na escala V2.2: níveis, sem pontuação. */
+const vigenteV22 = (extra: Partial<NonNullable<FichaParaMatriz["vigente"]>> = {}) =>
+  vigente("v22", { poder: null, interesse: null, nivelPoder: "alto", nivelInteresse: "alto", ...extra });
 
 describe("Classificação para a matriz", () => {
   test("separa metodologia vigente, anterior, sem pontuação, não avaliados e associação encerrada", () => {
@@ -118,6 +181,103 @@ describe("Classificação para a matriz", () => {
     expect(resultado.noGrafico).toHaveLength(0);
     expect(resultado.metodologiaAnterior).toHaveLength(1);
   });
+
+  test("V2.2: os dois níveis classificados vão para a grade; eixo “não avaliado” fica em lista própria; nunca vira Baixo (T17)", () => {
+    const resultado = classificarParaMatriz(
+      [
+        ficha({ stakeholderId: "classificado", vigente: vigenteV22() }),
+        ficha({ stakeholderId: "poder-nao-avaliado", vigente: vigenteV22({ nivelPoder: null }) }),
+        ficha({ stakeholderId: "demonstracao", vigente: vigente("m1") }),
+      ],
+      "v22",
+      "2026-11-01",
+    );
+    const ids = (lista: { stakeholderId: string }[]) => lista.map((f) => f.stakeholderId);
+    expect(ids(resultado.noGrafico)).toEqual(["classificado"]);
+    expect(ids(resultado.semPontuacao)).toEqual(["poder-nao-avaliado"]);
+    expect(resultado.semPontuacao[0].vigente.nivelPoder).toBeNull();
+    expect(ids(resultado.metodologiaAnterior)).toEqual(["demonstracao"]);
+  });
+
+  test("grade 3 × 3: quatro cantos nomeados, cinco células intermediárias e agrupamento por célula (T18)", () => {
+    const celulas = NIVEIS.flatMap((p) => NIVEIS.map((i) => nomeDaCelula(p, i)));
+    expect(celulas).toHaveLength(9);
+    expect(nomeDaCelula("alto", "alto")).toBe("Alto poder / alto interesse");
+    expect(nomeDaCelula("alto", "baixo")).toBe("Alto poder / baixo interesse");
+    expect(nomeDaCelula("baixo", "alto")).toBe("Baixo poder / alto interesse");
+    expect(nomeDaCelula("baixo", "baixo")).toBe("Baixo poder / baixo interesse");
+    expect(nomeDaCelula("medio", "medio")).toBe("Zona intermediária central");
+    expect(celulas.filter((c) => c === "Zona intermediária")).toHaveLength(4);
+
+    const fichas = [
+      ficha({ stakeholderId: "a", vigente: vigenteV22() }),
+      ficha({ stakeholderId: "b", vigente: vigenteV22({ posicionamento: "contrario" }) }),
+      ficha({ stakeholderId: "c", vigente: vigenteV22({ nivelPoder: "medio", nivelInteresse: "baixo" }) }),
+    ] as FichaAvaliada[];
+    const grupos = agruparPorCelula(fichas);
+    expect(grupos.get("alto|alto")?.map((f) => f.stakeholderId)).toEqual(["a", "b"]);
+    expect(grupos.get("medio|baixo")?.map((f) => f.stakeholderId)).toEqual(["c"]);
+  });
+
+  test("o posicionamento não altera os níveis de poder e interesse (T19)", () => {
+    const [favoravel, contrario] = [vigenteV22({ posicionamento: "favoravel" }), vigenteV22({ posicionamento: "contrario" })];
+    expect([favoravel.nivelPoder, favoravel.nivelInteresse]).toEqual([contrario.nivelPoder, contrario.nivelInteresse]);
+    const grupos = agruparPorCelula([
+      ficha({ stakeholderId: "f", vigente: favoravel }),
+      ficha({ stakeholderId: "c", vigente: contrario }),
+    ] as FichaAvaliada[]);
+    expect(grupos.get("alto|alto")).toHaveLength(2);
+  });
+});
+
+describe("Alertas orientativos (D-067)", () => {
+  const SEM_ALERTA: DadosParaAlertas = {
+    posicionamento: "favoravel",
+    naturezaPosicionamento: "manifestacao_formal",
+    origemPosicionamento: "Ofício fictício.",
+    situacaoRessalvas: "nao_identificadas",
+    descricaoRessalvas: null,
+    justificativaPosicionamento: "Apoio formal fictício.",
+    grauConfianca: "alto",
+  };
+  const codigos = (dados: Partial<DadosParaAlertas>) => calcularAlertas({ ...SEM_ALERTA, ...dados }).map((a) => a.codigo);
+
+  test("avaliação consistente não gera alerta", () => {
+    expect(codigos({})).toEqual([]);
+  });
+
+  test("cada condição detectável gera o alerta correspondente", () => {
+    expect(codigos({ posicionamento: "neutro", naturezaPosicionamento: "percepcao_consultor", grauConfianca: "baixo" })).toEqual([
+      "neutro_por_percepcao",
+    ]);
+    expect(codigos({ origemPosicionamento: " " })).toEqual(["origem_nao_informada"]);
+    expect(codigos({ situacaoRessalvas: null })).toEqual(["ressalvas_com_manifestacao"]);
+    expect(codigos({ situacaoRessalvas: "ha_ressalvas", descricaoRessalvas: null })).toEqual(["ressalvas_sem_descricao"]);
+    expect(
+      codigos({ posicionamento: null, naturezaPosicionamento: null, situacaoRessalvas: "informacao_insuficiente", justificativaPosicionamento: null }),
+    ).toEqual(["indefinicao_sem_justificativa"]);
+    expect(codigos({ naturezaPosicionamento: "informacao_informal" })).toEqual(["confianca_alta_nao_confirmada"]);
+  });
+
+  test("sem posicionamento nem ressalvas, não há alerta: “não avaliado” é escolha legítima", () => {
+    expect(
+      codigos({
+        posicionamento: null,
+        naturezaPosicionamento: null,
+        origemPosicionamento: null,
+        situacaoRessalvas: null,
+        justificativaPosicionamento: null,
+        grauConfianca: null,
+      }),
+    ).toEqual([]);
+  });
+
+  test("posicionamento sem manifestação formal é preliminar", () => {
+    expect(posicionamentoPreliminar("favoravel", "informacao_informal")).toBe(true);
+    expect(posicionamentoPreliminar("neutro", "percepcao_consultor")).toBe(true);
+    expect(posicionamentoPreliminar("favoravel", "manifestacao_formal")).toBe(false);
+    expect(posicionamentoPreliminar(null, "informacao_informal")).toBe(false);
+  });
 });
 
 describe("Validação dos formulários", () => {
@@ -134,6 +294,27 @@ describe("Validação dos formulários", () => {
       [C3, 2.5],
     ]);
     expect(() => notasDoFormulario({ nota_invalido: "3" })).toThrow();
+  });
+
+  test("campos da escala V2.2: vazio é “não avaliado” ou “não se aplica”; valores fora da lista são recusados", () => {
+    const vazio = esquemaRascunho.parse({ versaoId: ID_VERSAO, nivelPoder: "", situacaoRessalvas: "", naturezaPosicionamento: "" });
+    expect([vazio.nivelPoder, vazio.situacaoRessalvas, vazio.naturezaPosicionamento]).toEqual([undefined, undefined, undefined]);
+    expect(esquemaRascunho.safeParse({ versaoId: ID_VERSAO, nivelPoder: "altissimo" }).success).toBe(false);
+    expect(esquemaRascunho.safeParse({ versaoId: ID_VERSAO, naturezaPosicionamento: "boato" }).success).toBe(false);
+    expect(esquemaRascunho.safeParse({ versaoId: ID_VERSAO, situacaoRessalvas: "talvez" }).success).toBe(false);
+  });
+
+  test("validação no servidor conforme a escala: parciais recusadas na V2.2 (T22); níveis só na escala ordinal", () => {
+    const v22 = { poderInteresse: "ordinal_tres_niveis", posicionamento: "tres_categorias" } as const;
+    const demonstracao = { poderInteresse: "demonstracao_numerica", posicionamento: "cinco_categorias" } as const;
+    const dados = esquemaRascunho.parse({ versaoId: ID_VERSAO, posicionamento: "parcialmente_favoravel", nivelPoder: "medio" });
+    expect(Object.keys(errosDaEscala(dados, v22))).toEqual(["posicionamento"]);
+    expect(Object.keys(errosDaEscala(dados, demonstracao))).toEqual(["nivelPoder"]);
+    expect(Object.keys(errosDaEscala(dados, { ...v22, poderInteresse: "binaria_historica" }))).toEqual([
+      "posicionamento",
+      "nivelPoder",
+    ]);
+    expect(errosDaEscala(esquemaRascunho.parse({ versaoId: ID_VERSAO, posicionamento: "neutro" }), v22)).toEqual({});
   });
 
   test("evidência do tipo link exige endereço http ou https", () => {
@@ -162,4 +343,13 @@ test("as listas da tela coincidem com as do banco de dados", () => {
   expect([...SITUACOES_METODOLOGIA]).toEqual(situacaoMetodologia.enumValues);
   expect([...SITUACOES_VERSAO]).toEqual(situacaoVersaoAvaliacao.enumValues);
   expect([...PERFIS_CONTEXTO]).toEqual(perfilContexto.enumValues);
+  expect([...NIVEIS]).toEqual(nivelAvaliacao.enumValues);
+  expect([...SITUACOES_RESSALVAS]).toEqual(situacaoRessalvas.enumValues);
+  expect([...NATUREZAS_POSICIONAMENTO]).toEqual(naturezaPosicionamento.enumValues);
+  expect([...ESCALAS_PODER_INTERESSE]).toEqual(escalaPoderInteresse.enumValues);
+  expect([...ESCALAS_POSICIONAMENTO]).toEqual(escalaPosicionamento.enumValues);
+  expect([...NATUREZAS_ALTERACAO]).toEqual(naturezaAlteracao.enumValues);
+  expect([...DIMENSOES_RUBRICA]).toEqual(dimensaoRubrica.enumValues);
+  // As três categorias vigentes estão na lista do banco, que mantém as cinco por causa do histórico (T24).
+  expect(POSICIONAMENTOS_VIGENTES.every((p) => posicionamento.enumValues.includes(p))).toBe(true);
 });

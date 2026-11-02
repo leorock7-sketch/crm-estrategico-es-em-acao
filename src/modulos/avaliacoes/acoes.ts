@@ -3,7 +3,8 @@
 /**
  * Operações das telas de avaliação (Server Actions). Todas conferem a
  * permissão de edição no projeto ou tema antes de gravar (modulos/acesso).
- * Somente dados fictícios: a metodologia vigente é de demonstração (D-034).
+ * Somente dados fictícios (D-005). Os alertas orientativos não impedem salvar
+ * nem publicar (D-067); só as regras técnicas recusam a gravação.
  */
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
@@ -24,7 +25,7 @@ import {
   removerEvidencia,
   salvarRascunho,
 } from "./consultas";
-import { esquemaEvidencia, esquemaRascunho, notasDoFormulario } from "./esquemas";
+import { errosDaEscala, esquemaEvidencia, esquemaRascunho, notasDoFormulario } from "./esquemas";
 
 function valoresDoFormulario(formData: FormData): Record<string, string> {
   const valores: Record<string, string> = {};
@@ -92,6 +93,13 @@ export async function salvarRascunhoAcao(
   const editavel = await versaoEditavel(resultado.data.versaoId);
   if ("erro" in editavel) return { mensagem: editavel.erro, valores };
   const { banco, usuario, contexto } = editavel;
+  if (contexto.escalaPoderInteresse && contexto.escalaPosicionamento) {
+    const erros = errosDaEscala(resultado.data, {
+      poderInteresse: contexto.escalaPoderInteresse,
+      posicionamento: contexto.escalaPosicionamento,
+    });
+    if (Object.keys(erros).length > 0) return { erros, valores };
+  }
   const publicar = valores.intencao === "publicar";
   try {
     await comoUsuario(banco, usuario.id, async (tx) => {
