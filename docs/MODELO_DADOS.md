@@ -10,6 +10,7 @@
 | 0.6 | 01/11/2026 | Escalas V2.2 (D-058 a D-060): adaptação prevista na seção 6.3.1, não implementada (Q-67). |
 | 0.7 | 01/11/2026 | Seção 6.3.1: ressalvas relevantes, justificativas e evidências por dimensão (D-061), previstas e não implementadas. |
 | 0.8 | 02/11/2026 | Seção 6.3.1 conforme a D-063: ressalvas em três situações, verificação documental, evidência reaproveitada com confirmação e equivalência entre metodologias. Não implementado. |
+| 0.9 | 02/11/2026 | Seção 6.3.1: natureza das alterações da metodologia (substantiva ou editorial), conforme a D-064. Não implementado. |
 
 Legenda: ✅ Aprovado · 🔧 Proposta técnica · ⏳ Pendente (ver [REQUISITOS.md](REQUISITOS.md#como-ler-este-documento)).
 
@@ -428,6 +429,7 @@ As escalas V2.2 (D-058 a D-060) pedem os ajustes abaixo, propostos para homologa
 | `evidencia` | Novo tipo `verificacao_documental`, com `fontes_consultadas`, `elementos_examinados` e `data_analise` (obrigatórios nesse tipo) — H3 (D-063). | Fundamentar Poder Baixo sem usar a falta de evidência de Alto como prova. |
 | `evidencia` | `evidencia_origem_id`, `pertinencia_confirmada_em` e `pertinencia_confirmada_por` — T-4 (D-063). | Reaproveitar evidência histórica como referência, só válida depois de confirmada. |
 | `metodologia_versao` | `equivalente_posicionamento_a` e `justificativa_equivalencia` — T-6 (D-063). | Permitir a tendência entre metodologias diferentes só com equivalência declarada. |
+| `metodologia_versao` | `metodologia_anterior_id`, `natureza_alteracao` (`substantiva`, `editorial`), `justificativa_natureza`, `natureza_aprovada_por` e `natureza_aprovada_em` — D-064. | Classificar cada alteração metodológica: a substantiva exige revalidação; a editorial não. |
 
 Regras propostas no banco:
 - Escala de três categorias: posicionamento só `favoravel`, `neutro`, `contrario` ou vazio.
@@ -435,7 +437,7 @@ Regras propostas no banco:
 - Escala binária histórica: sem `medio`.
 - Novas versões exigem metodologia.
 - Cada dimensão classificada exige evidência pertinente vinculada (com pertinência confirmada, se reaproveitada) e justificativa própria; a verificação documental exige fontes, elementos examinados e data; com manifestação documentada, a situação das ressalvas é obrigatória, e "há ressalvas" exige descrição; posicionamento vazio com manifestação registrada exige a justificativa do posicionamento. Não há valor de quarta categoria (D-061, D-063).
-- Na mudança de metodologia, o novo rascunho não recebe classificações como válidas (T-4); a tendência só compara avaliações metodologicamente comparáveis (T-6).
+- Na mudança metodológica substantiva, o novo rascunho não recebe classificações como válidas (T-4); na editorial aprovada, a cópia é permitida. Alterações estruturais (escala, níveis, critérios, regras de evidência ou de interpretação) são sempre substantivas. A tendência só compara avaliações metodologicamente comparáveis (T-6, D-064).
 
 Linhas existentes: as metodologias de demonstração já registradas recebem `demonstracao_numerica` e `cinco_categorias` como valor padrão ao criar as colunas, sem alterar versões publicadas. Versões sem metodologia são tratadas como da escala anterior. O tipo `posicionamento`, com os cinco valores, é mantido por causa do histórico.
 

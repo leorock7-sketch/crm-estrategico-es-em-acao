@@ -10,6 +10,7 @@
 | 0.6 | 01/11/2026 | **Escalas V2.2** (D-057 a D-060): poder e interesse em Baixo, Médio e Alto; posicionamento em Favorável, Neutro e Contrário; confiança em Baixa, Média e Alta; "Não avaliado" à parte; matriz 3 × 3; histórico preservado sem conversão. Superadas para novas avaliações: posicionamento em cinco níveis (D-048) e estudo de escalas (D-050). Rubricas propostas, não homologadas (seção 10). |
 | 0.7 | 01/11/2026 | Rubricas da Q-66 revisadas conforme a D-061 (proposta não homologada): interesse sem exigência de participação; Neutro só por manifestação neutra ou equidistante; ressalvas relevantes em campo próprio (H2-C); manifestação sem posição predominante fica sem classificação conclusiva, sem quarta categoria; Poder Alto inclui influência decisiva demonstrada; evidência e justificativa por dimensão; calibração como meta exploratória. |
 | 0.8 | 02/11/2026 | Diretrizes da Q-66 homologadas com ajustes (D-063): ressalvas em três situações, verificação documental para Poder Baixo, justificativa sem duplicação, informação complementar nos painéis; calibração pendente de execução. Ajustes técnicos T-1, T-4 e T-6 refletidos (seções 3, 7 e 9). |
+| 0.9 | 02/11/2026 | T-4 precisada (D-064): revalidação só em mudança metodológica substantiva; mudanças editoriais aprovadas não exigem reclassificação; natureza de cada alteração registrada com justificativa e aprovação (seções 1, 3, 7 e 9). |
 
 Legenda: ✅ Aprovado · 🔧 Proposta técnica · ⏳ Pendente.
 
@@ -23,7 +24,7 @@ Legenda: ✅ Aprovado · 🔧 Proposta técnica · ⏳ Pendente.
 | **Contexto** | Projeto ou tema estratégico em que o stakeholder é avaliado. Só pode ser avaliado quem está associado ao contexto (Etapa 1.1). ✅ |
 | **Ficha** | Reúne todas as versões da avaliação de um stakeholder em um contexto. |
 | **Versão da avaliação** | Uma avaliação completa feita em determinada data. Nasce como rascunho; ao ser publicada, torna-se a vigente e não pode mais ser alterada. ✅ |
-| **Metodologia** | Conjunto versionado de escalas, rubricas e regras. Cada versão de avaliação guarda a metodologia com que foi feita, e é por ela que se sabe em que escala foi registrada. ✅ |
+| **Metodologia** | Conjunto versionado de escalas, rubricas e regras. Cada versão de avaliação guarda a metodologia com que foi feita, e é por ela que se sabe em que escala foi registrada. ✅ Cada nova versão da metodologia registra se a alteração é **substantiva** (muda o resultado possível) ou **editorial** (não muda o significado), com justificativa e aprovação (D-064). |
 | **Escala vigente** | Escala usada nas **novas** avaliações (seção 3.2). ✅ (D-058, D-059) |
 | **Escala histórica** | Escala de avaliações já publicadas (Alto/Baixo das planilhas; cinco categorias de posicionamento). Permanece como foi registrada, sem conversão nem recálculo. ✅ (D-058, D-059) |
 
@@ -51,7 +52,7 @@ Legenda: ✅ Aprovado · 🔧 Proposta técnica · ⏳ Pendente.
 | **Validação institucional** | Obrigatória para publicar posicionamento de uma instituição. | ✅ (Manual V2.2) |
 | **Ressalvas relevantes** | Campo próprio vinculado ao posicionamento; com manifestação documentada, registra: há ressalvas (com descrição), não identificadas ou informação insuficiente. Não é categoria. | ✅ diretriz (D-063) / ⏳ implementação (Q-67) |
 | **Data de referência e próxima revisão** | A próxima revisão é marcada para um ano após a data de referência, sem prejuízo de reavaliação por evento relevante. | ✅ (Manual V2.2) |
-| **Tendência** | Comparação de versões ou justificação explícita (Manual V2.2). Comparação automática só entre avaliações metodologicamente comparáveis: mesma escala **e** mesmas rubricas, ou equivalência de definições declarada; caso contrário, "Não comparável", com justificativa. | ✅ (T-6, D-063) / ⏳ implementação (Q-67) |
+| **Tendência** | Comparação de versões ou justificação explícita (Manual V2.2). Comparação automática só entre avaliações metodologicamente comparáveis: mesma versão de metodologia, alteração apenas editorial aprovada ou equivalência de definições declarada. A mesma escala não basta se as rubricas mudaram substantivamente; caso contrário, "Não comparável", com justificativa. | ✅ (T-6, D-063, D-064) / ⏳ implementação (Q-67) |
 
 ### 3.1 Dimensões distintas da avaliação ✅ (D-049, atualizada pela D-060)
 
@@ -210,7 +211,7 @@ O modelo de quatro quadrantes de Mendelow foi referência de estudo e **não foi
 4. "Publicar" grava e publica: o banco confere justificativa, data de referência, evidência, justificativa da confiança e validação institucional. A anterior passa a "substituída".
 5. A matriz do contexto passa a refletir a nova versão.
 
-Na adaptação às escalas V2.2 (Q-67), o passo 3 passa a registrar diretamente os níveis de poder e interesse. Na mudança de metodologia, o novo rascunho não recebe posicionamento, níveis, notas, grau de confiança nem validação institucional como válidos; as evidências anteriores podem ser reaproveitadas como referência, com confirmação de pertinência pelo responsável (T-4, D-063). As versões anteriores ficam intactas.
+Na adaptação às escalas V2.2 (Q-67), o passo 3 passa a registrar diretamente os níveis de poder e interesse. Na mudança metodológica **substantiva** (escala, critérios, rubricas, definições dos níveis ou regras de interpretação), o novo rascunho não recebe poder, interesse, posicionamento, grau de confiança nem validação institucional como válidos; as informações e evidências anteriores podem ser reaproveitadas como referência, com confirmação de pertinência pelo responsável. Nas mudanças **exclusivamente editoriais** aprovadas, não há reclassificação (T-4, D-063, D-064). As versões anteriores ficam intactas.
 
 ## 8. Acesso ✅ / 🔧
 
@@ -243,9 +244,10 @@ Testes complementares 🔧 (a implementar junto com a adaptação):
 8. Com manifestação documentada, a situação das ressalvas é obrigatória; "há ressalvas relevantes" exige descrição (D-063).
 9. Cada dimensão classificada tem evidência vinculada e justificativa; uma evidência pode estar vinculada a mais de uma dimensão (D-061, D-063).
 10. Poder Baixo exige evidência (verificação documental com fontes, elementos examinados e data, ou outra evidência); sem ela, não publica (D-063).
-11. Na mudança de metodologia, nenhuma classificação é copiada como válida; evidências históricas só contam depois de confirmadas (T-4).
+11. Na mudança metodológica substantiva, nenhuma classificação é copiada como válida e as evidências históricas só contam depois de confirmadas; na mudança editorial aprovada, a cópia é permitida (T-4, D-064).
 12. Tendência "Não comparável" entre metodologias diferentes sem equivalência declarada, mesmo com os mesmos três níveis (T-6).
 13. Cópia de segurança antes da migração e preservação verificada campo a campo (T-1).
+14. Toda nova versão da metodologia registra a natureza da alteração (substantiva ou editorial), a justificativa e a aprovação; alterações estruturais não podem ser classificadas como editoriais (D-064).
 
 ## 10. Rubricas — diretrizes homologadas, em calibração 🔧 (Q-66, D-061, D-063)
 
@@ -331,6 +333,6 @@ As versões finais da Q-66 e da Q-67 serão confirmadas depois da calibração. 
 | Q-64 | Categorias da "Conduta do ES em Ação" e regras de relação com a matriz, sem derivação automática. |
 | Q-65 | Decisões da revisão metodológica: Q-65.2 resolvida (D-058); Q-65.3 resolvida em parte (engajamento e conhecimento do projeto separados — D-060; categorias pendentes); Q-65.5 resolvida em parte (sem pontuação Poder × Interesse × Engajamento; célula da matriz como leitura — D-058); pendentes Q-65.1, Q-65.4 e Q-65.6. |
 | Q-66 | Rubricas observáveis de Baixo/Médio/Alto (poder e interesse) e de Favorável/Neutro/Contrário, evidências mínimas, confiabilidade entre avaliadores e tratamento de registros insuficientes. Diretrizes H1 a H6 homologadas com ajustes (D-063); calibração H6 pendente de execução; versão final após a calibração (seção 10). |
-| Q-67 | Plano de adaptação técnica da Etapa 2A às escalas V2.2 ([Plano de Implantação](PLANO_IMPLANTACAO.md), seção 7). Decisões T-1 a T-7 homologadas com ajustes (D-063); versão final após a calibração. |
+| Q-67 | Plano de adaptação técnica da Etapa 2A às escalas V2.2 ([Plano de Implantação](PLANO_IMPLANTACAO.md), seção 7). Decisões T-1 a T-7 homologadas com ajustes (D-063); T-4 precisada pela D-064; versão final após a calibração. |
 
 Resolvidas: Q-02 (escala de poder e interesse — D-058), Q-03 (grau de confiança: robustez da evidência, três níveis — D-034), Q-04 (posicionamento: cinco níveis no Manual V2.0, **substituídos por três categorias para novas avaliações** — D-059), Q-05 (matriz: grade ordinal 3 × 3 com células nomeadas, sem pontos de corte — D-058), Q-07 (estrutura com metodologia de demonstração e dados fictícios antes da homologação — D-034) e Q-08 (revisão anual e por evento relevante — Manual V2.0); Q-61 (grau de confiança — D-036) e Q-62 (metodologia comum, com arquitetura para metodologias específicas — D-037). Consolidação em [REGISTRO_DECISOES.md](REGISTRO_DECISOES.md).

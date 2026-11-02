@@ -9,6 +9,7 @@
 | 0.5 | 01/11/2026 | Escalas V2.2 (D-057 a D-060): RF-21, RF-25, RF-27 e RF-28 atualizados; novos RF-29 e RF-30 |
 | 0.6 | 01/11/2026 | Diretrizes das rubricas (D-061): RF-27 e RF-30 atualizados; novo RF-31 |
 | 0.7 | 02/11/2026 | **Correção de numeração:** os requisitos RF-30 e RF-31 criados na seção 4.3 nas versões 0.5 e 0.6 repetiam números da seção 4.4 (Matriz de Iniciativas); passam a RF-29.1 e RF-29.2. RF-27 e RF-29.2 atualizados conforme a D-063. |
+| 0.8 | 02/11/2026 | Correção RF-29.1/RF-29.2 aprovada pelo gestor (D-064); novo RF-29.3 (controle das alterações metodológicas). |
 
 ## Como ler este documento
 
@@ -84,6 +85,7 @@ Sistema próprio de gestão estratégica de relacionamentos institucionais (CRM)
 | RF-29 | Preservação do histórico: avaliações publicadas em escalas anteriores (Alto/Baixo; cinco categorias de posicionamento; demonstração de 0 a 100) permanecem intactas e identificadas pela metodologia, sem conversão automática nem recálculo. | ✅ (D-058, D-059) |
 | RF-29.1 | "Neutro" exige manifestação efetivamente neutra ou equidistante, com justificativa e evidência; "não avaliado" é ausência de classificação — inclusive quando a manifestação não permite determinar posição predominante —, nunca neutralidade, e não há quarta categoria. O interesse independe de participação; engajamento e conhecimento do projeto são dimensões distintas, com forma de registro a definir. | ✅ (D-059, D-060, D-061); registro de engajamento ⏳ (Q-65.3) |
 | RF-29.2 | Ressalvas relevantes do posicionamento em campo próprio (há ressalvas, com descrição; não identificadas; informação insuficiente), obrigatório quando houver manifestação; justificativa e evidência por dimensão classificada, podendo uma evidência fundamentar mais de uma dimensão; Poder Baixo fundamentado por verificação documental ou outra evidência. | ✅ diretriz (D-063); implementação ⏳ (Q-67), após a calibração |
+| RF-29.3 | Controle das alterações metodológicas: cada nova versão da metodologia é classificada como substantiva ou editorial, com justificativa e aprovação; a mudança substantiva exige revalidação (nenhuma classificação herdada como válida) e só admite tendência com equivalência demonstrada; alterações estruturais não podem ser classificadas como editoriais. | ✅ diretriz (D-064); implementação ⏳ (Q-67), após a calibração |
 
 Detalhes em [METODOLOGIA_STAKEHOLDERS.md](METODOLOGIA_STAKEHOLDERS.md).
 

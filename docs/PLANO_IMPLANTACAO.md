@@ -15,6 +15,7 @@
 | 0.11 | 01/11/2026 | Seção 7: ressalvas relevantes, justificativas e evidências por dimensão (D-061) |
 | 0.12 | 02/11/2026 | Fase documental V2.2 concluída (D-062); próxima atividade: homologação da Q-66 e da Q-67 |
 | 0.13 | 02/11/2026 | Diretrizes da Q-66 e da Q-67 homologadas com ajustes (D-063); seção 7 atualizada (T-1, T-4, T-6); calibração H6 pendente |
+| 0.14 | 02/11/2026 | T-4 precisada (D-064); preparação operacional do H6 autorizada |
 
 Legenda: ✅ Aprovado · 🔧 Proposta técnica · ⏳ Pendente.
 
@@ -228,11 +229,11 @@ Decisões T-1 a T-7 homologadas com ajustes em 02/11/2026 (D-063). **Nada desta 
 |---|---|---|---|---|
 | Banco — posicionamento | Lista de cinco valores (tipo `posicionamento`, migração 0005) | Três categorias e "Não avaliado" nas novas versões | Alto | Manter a lista, por causa do histórico; a metodologia passa a indicar sua escala de posicionamento; regra no banco recusa as categorias parciais em metodologia de três categorias. Versões existentes não são tocadas. |
 | Banco — poder e interesse | Número de 0 a 100 calculado das notas (`avaliacao_versao.poder` e `.interesse`) | Baixo, Médio, Alto ou "Não avaliado", classificados diretamente | Alto | Novas colunas de nível; as numéricas ficam só para as versões de demonstração já publicadas; regra impede misturar os dois tipos e impede Médio em metodologia binária histórica. |
-| Banco — metodologia | Critérios com escala numérica e peso; só entra em vigor com critérios | Escala e rubricas por versão, sem pesos | Médio | Tipo de escala na metodologia e rubricas por nível em tabela própria, travadas quando a metodologia entra em vigor. |
+| Banco — metodologia | Critérios com escala numérica e peso; só entra em vigor com critérios | Escala e rubricas por versão, sem pesos | Médio | Tipo de escala na metodologia e rubricas por nível em tabela própria, travadas quando a metodologia entra em vigor. Cada nova versão registra a natureza da alteração (substantiva ou editorial), com justificativa e aprovação (D-064). |
 | Banco — ressalvas, justificativas e evidências (D-061, D-063) | Uma justificativa geral; evidências ligadas só à versão | Ressalvas em três situações; justificativa e evidência por dimensão; verificação documental para Poder Baixo; evidências históricas só como referência confirmada | Médio | Campo de situação das ressalvas e descrição; justificativas por dimensão e síntese; tabela que liga evidências às dimensões; tipo "verificação documental" (fontes, elementos, data); confirmação de pertinência de evidências reaproveitadas; regras de publicação correspondentes, sem quarta categoria. |
 | Cálculo (`calculo.ts`) | Média ponderada convertida para 0 a 100 | Nenhum cálculo | Médio | Restrito às metodologias de demonstração; nenhum cálculo na metodologia V2.2 (T21). |
-| Tendência (`tendenciaDoPosicionamento`) | Compara a posição na lista de cinco | Comparação de versões ou justificativa explícita | Médio | Comparar só avaliações metodologicamente comparáveis (mesma escala e mesmas rubricas, ou equivalência declarada); senão, "Não comparável", com justificativa (T-6). |
-| Formulário de rascunho | Notas por critério; cinco posições; confiança "Alto, Médio, Baixo" | Níveis diretos; três posições; "Baixa, Média, Alta" | Alto | Campos de nível com "Não avaliado"; três posições; rubrica como texto de ajuda; ressalvas (três situações) e justificativas por dimensão; na mudança de metodologia, nada de classificação é copiado como válido (T-4). |
+| Tendência (`tendenciaDoPosicionamento`) | Compara a posição na lista de cinco | Comparação de versões ou justificativa explícita | Médio | Comparar só avaliações metodologicamente comparáveis (mesma versão, alteração apenas editorial aprovada ou equivalência declarada); senão, "Não comparável", com justificativa (T-6, D-064). |
+| Formulário de rascunho | Notas por critério; cinco posições; confiança "Alto, Médio, Baixo" | Níveis diretos; três posições; "Baixa, Média, Alta" | Alto | Campos de nível com "Não avaliado"; três posições; rubrica como texto de ajuda; ressalvas (três situações) e justificativas por dimensão; na mudança metodológica substantiva, nada de classificação é copiado como válido (T-4, D-064). |
 | Ficha e histórico (`resumo-versao`, `selo-posicionamento`) | Notas com escala de 1 a 5; cores de cinco posições | Níveis; três categorias; parciais só no histórico | Médio | Exibir a escala de cada versão; parciais com a indicação "escala anterior". |
 | Matriz (`matriz-poder-interesse`, `matriz.ts`) | Gráfico contínuo de 0 a 100, sem quadrantes | Grade 3 × 3; histórico binário em 2 × 2 | Alto | Novo componente de grade com células nomeadas; posição por cor ou ícone, com legenda; listas de não avaliados e de outras metodologias; nenhuma conduta. |
 | Consultas, ações e validação (`consultas.ts`, `acoes.ts`, `esquemas.ts`) | Leem e validam notas e cinco posições | Novos campos e regras por escala | Médio | Validação conforme a escala da metodologia, no servidor e no banco. |
@@ -257,7 +258,7 @@ Decisões T-1 a T-7 homologadas com ajustes em 02/11/2026 (D-063). **Nada desta 
 
 - **Migração destrutiva:** proibida (Nota V2.2). Só acréscimos; nada é apagado ou convertido.
 - **Rascunhos abertos na troca de metodologia:** a regra atual já impede publicar rascunho de metodologia que deixou de vigorar. O avaliador descarta e recomeça, sem conversão.
-- **Cópia indevida entre metodologias:** na mudança de metodologia, nada de classificação é copiado como válido; evidências só contam como referência depois de confirmadas (T-4).
+- **Cópia indevida entre metodologias:** na mudança metodológica substantiva, nada de classificação é copiado como válido; evidências só contam como referência depois de confirmadas; alterações estruturais não podem ser classificadas como editoriais (T-4, D-064).
 - **Versões sem metodologia** (posicionamento sem pontuação): tratadas como escala anterior.
 - **Rubricas não homologadas** não podem ser usadas em avaliação institucional (T21).
 - **Dados reais** continuam proibidos até autorização (D-005).
@@ -278,7 +279,7 @@ Decisões T-1 a T-7 homologadas com ajustes em 02/11/2026 (D-063). **Nada desta 
 | C7. Cópia de segurança e restauração | Etapas 7 e 8 (D-027) | Planejada |
 | C8. Portabilidade em PostgreSQL real | Etapas 7 e 8 (D-027) | Depende de autorização (Q-57) |
 | Autenticação e segurança multiusuário (inclusive regras de acesso no banco) | Uso por mais de uma pessoa; Etapas 7 e 8 | Etapa 5; estrutura de permissões preparada na 2A, não homologada |
-| Rubricas das escalas V2.2 e plano de adaptação técnica | Etapa 2B (D-060, D-063) | Diretrizes da Q-66 e da Q-67 homologadas com ajustes (D-063); **calibração H6 pendente de execução**; versões finais após a calibração; decisões Q-65.1, Q-65.4 e Q-65.6 pendentes |
+| Rubricas das escalas V2.2 e plano de adaptação técnica | Etapa 2B (D-060, D-063) | Diretrizes da Q-66 e da Q-67 homologadas com ajustes (D-063) e T-4 precisada (D-064); **calibração H6 em preparação operacional (D-064), pendente de execução**; versões finais após a calibração; decisões Q-65.1, Q-65.4 e Q-65.6 pendentes |
 | Documentos de referência V2.3 | — | Roteiro preparado fora do repositório (D-063); emissão depois da calibração |
 | Arquivos `MANUAL_OPERACIONAL.md` e `PLANO_TRANSFERENCIA_INSTITUCIONAL.md`, previstos no Guia | — | Ainda não existem no repositório; criação a autorizar |
 | Conduta do ES em Ação | Requisito futuro RF-28 | Categorias e regras de correspondência a definir (Q-64) |
