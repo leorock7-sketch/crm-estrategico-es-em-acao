@@ -15,10 +15,11 @@
 | 0.11 | 02/11/2026 | Rodada 2 com casos inéditos; gabaritos registrados antes da aplicação, sem alteração retrospectiva (D-066, seção 10.5). |
 | 0.12 | 02/11/2026 | Discricionariedade fundamentada e ajustes D1 a D4 (D-067): rubricas orientam o julgamento; alertas no lugar de bloqueios interpretativos; H3 revista; pessoa × instituição com origem e natureza da informação; rodada 1 encerrada (seções 2, 3, 9 e 10). |
 | 0.13 | 02/11/2026 | Versão final das rubricas (Q-66 1.0, D-068): calibração H6 concluída; conselhos consultivos (F1); influência relevante × decisiva (F2); tratamentos das ressalvas (F3); condição já prevista no projeto (F4); distinção entre avaliação preliminar e manifestação confirmada; ajustes da Q-67 1.0 (seções 3, 7, 9 e 10). |
+| 0.14 | 02/11/2026 | Etapa 2B implementada (D-069), aguardando homologação: escalas V2.2, rubricas, alertas orientativos e matriz 3 × 3 no sistema, com dados fictícios (seções 3 a 7, 9 e 10). |
 
 Legenda: ✅ Aprovado · 🔧 Proposta técnica · ⏳ Pendente.
 
-> **Importante.** As escalas institucionais foram definidas em 01/11/2026 pelo Manual de Especificação e Operação V2.2, pelo Guia de Implantação V2.2 e pela Nota de Decisões Metodológicas V2.2 ✅ (D-057 a D-060). As **rubricas** estão homologadas na versão final da Q-66 (1.0, D-068), depois da calibração H6, mas **o sistema ainda não foi adaptado** às novas escalas (Etapa 2B, Q-67 1.0): a Etapa 2A continua operando a metodologia de **demonstração** (pontuação de 0 a 100 e posicionamento em cinco níveis), com dados fictícios e resultados marcados como **não homologados**. Não há aprovação de pesos, fórmulas, pontos de corte, notas de 0 a 100 nem da pontuação Poder × Interesse × Engajamento. ✅ (D-034, D-058)
+> **Importante.** As escalas institucionais foram definidas em 01/11/2026 pelo Manual de Especificação e Operação V2.2, pelo Guia de Implantação V2.2 e pela Nota de Decisões Metodológicas V2.2 ✅ (D-057 a D-060). As **rubricas** estão homologadas na versão final da Q-66 (1.0, D-068), depois da calibração H6, e **o sistema foi adaptado** às novas escalas na Etapa 2B (Q-67 1.0, D-069), ainda **aguardando homologação**: a metodologia vigente da demonstração é a fictícia "V2.2 — rubricas Q-66 1.0", com dados fictícios; as metodologias de demonstração da Etapa 2A (pontuação de 0 a 100 e posicionamento em cinco níveis) ficam como histórico, sem conversão. Os resultados exibidos continuam marcados como **não homologados**. Não há aprovação de pesos, fórmulas, pontos de corte, notas de 0 a 100 nem da pontuação Poder × Interesse × Engajamento. ✅ (D-034, D-058)
 
 ## 1. Conceitos
 
@@ -49,15 +50,15 @@ Legenda: ✅ Aprovado · 🔧 Proposta técnica · ⏳ Pendente.
 
 | Elemento | Regra | Situação |
 |---|---|---|
-| **Poder** e **interesse** | Escala vigente: Baixo, Médio ou Alto, ou "Não avaliado", classificados diretamente pelo avaliador conforme rubrica, com justificativa (fundamentação proporcional; documento não obrigatório — D-067). Médio é categoria ordinal: não vale 50 e não é Alto nem Baixo. | ✅ (D-058); rubricas ⏳ (Q-66); sistema ainda na demonstração de 0 a 100 ⏳ (Q-67) |
-| **Posicionamento** | Escala vigente: Favorável, Neutro ou Contrário, ou "Não avaliado". As categorias "Parcialmente favorável" e "Parcialmente contrário" existem só no histórico. | ✅ (D-059); sistema ainda com cinco níveis ⏳ (Q-67) |
+| **Poder** e **interesse** | Escala vigente: Baixo, Médio ou Alto, ou "Não avaliado", classificados diretamente pelo avaliador conforme rubrica, com justificativa (fundamentação proporcional; documento não obrigatório — D-067). Médio é categoria ordinal: não vale 50 e não é Alto nem Baixo. | ✅ (D-058); rubricas ✅ (Q-66 1.0); implementado na Etapa 2B 🔧 (D-069, aguardando homologação) |
+| **Posicionamento** | Escala vigente: Favorável, Neutro ou Contrário, ou "Não avaliado". As categorias "Parcialmente favorável" e "Parcialmente contrário" existem só no histórico. | ✅ (D-059); implementado na Etapa 2B 🔧 (D-069) |
 | **Grau de confiança** | Baixa, Média ou Alta, informado e justificado pelo responsável, sem classificação automática. | ✅ (D-036, D-060, seção 4) |
-| **Justificativa** | Síntese geral obrigatória para publicar e justificativa curta por dimensão classificada, sem tamanho mínimo e sem duplicação. | ✅ (Manual V2.2, D-063) / ⏳ por dimensão na implementação (Q-67) |
-| **Evidências** | Opcionais (D-067): documentos, links e observações reforçam a fundamentação e a confiança, mas não são condição para registrar; uma evidência pode fundamentar mais de uma dimensão, com vínculo explícito. A justificativa de cada dimensão indica a natureza da informação (formal ou documental, informal ou percepção profissional) e se ela ainda não está confirmada. A demonstração atual ainda exige evidência para publicar (P-033), a rever na Etapa 2B. | ✅ (Manual V2.2, D-063, revista pela D-067) / ⏳ implementação (Q-67) |
-| **Validação institucional** | Registro da origem e da natureza da informação que sustenta o posicionamento de uma instituição (manifestação formal, de representante diretamente envolvido ou percepção fundamentada), sem exigir confirmação formal (D-067). A demonstração atual ainda exige o campo preenchido para publicar (P-033), a rever na Etapa 2B. | ✅ (Manual V2.2, ajustado pela D-067) / ⏳ (Etapa 2B) |
-| **Ressalvas relevantes** | Campo próprio vinculado ao posicionamento, com tratamentos preferenciais: sem manifestação identificada, não se aplica; manifestação sem condições identificadas, não identificadas; manifestação com informações insuficientes sobre condições, informação insuficiente; condição materialmente relevante, há ressalvas (com descrição). Percepções ainda não manifestadas ficam nas observações. Condição já prevista no projeto conforme a materialidade. Não é categoria. | ✅ (D-063, D-068) / ⏳ implementação (Q-67 1.0) |
+| **Justificativa** | Síntese geral obrigatória para publicar e justificativa curta por dimensão classificada, sem tamanho mínimo e sem duplicação. | ✅ (Manual V2.2, D-063); por dimensão, implementada na Etapa 2B 🔧 (D-069) |
+| **Evidências** | Opcionais (D-067): documentos, links e observações reforçam a fundamentação e a confiança, mas não são condição para registrar; uma evidência pode fundamentar mais de uma dimensão, com vínculo explícito. A justificativa de cada dimensão indica a natureza da informação (formal ou documental, informal ou percepção profissional) e se ela ainda não está confirmada. Na metodologia V2.2, a evidência é opcional; as metodologias de demonstração anteriores mantêm a exigência (P-033). | ✅ (Manual V2.2, D-063, revista pela D-067); implementado na Etapa 2B 🔧 (D-069) |
+| **Validação institucional** | Registro da origem e da natureza da informação que sustenta o posicionamento de uma instituição (manifestação formal, de representante diretamente envolvido ou percepção fundamentada), sem exigir confirmação formal (D-067). Na metodologia V2.2, o campo aparece na tela como "Origem da informação" e é opcional; as metodologias de demonstração anteriores mantêm a exigência (P-033). | ✅ (Manual V2.2, ajustado pela D-067); implementado na Etapa 2B 🔧 (D-069) |
+| **Ressalvas relevantes** | Campo próprio vinculado ao posicionamento, com tratamentos preferenciais: sem manifestação identificada, não se aplica; manifestação sem condições identificadas, não identificadas; manifestação com informações insuficientes sobre condições, informação insuficiente; condição materialmente relevante, há ressalvas (com descrição). Percepções ainda não manifestadas ficam nas observações. Condição já prevista no projeto conforme a materialidade. Não é categoria. | ✅ (D-063, D-068); implementado na Etapa 2B 🔧 (D-069) |
 | **Data de referência e próxima revisão** | A próxima revisão é marcada para um ano após a data de referência, sem prejuízo de reavaliação por evento relevante. | ✅ (Manual V2.2) |
-| **Tendência** | Comparação de versões ou justificação explícita (Manual V2.2). Comparação automática só entre avaliações metodologicamente comparáveis: mesma versão de metodologia, alteração apenas editorial aprovada ou equivalência de definições declarada. A mesma escala não basta se as rubricas mudaram substantivamente; caso contrário, "Não comparável", com justificativa. | ✅ (T-6, D-063, D-064) / ⏳ implementação (Q-67) |
+| **Tendência** | Comparação de versões ou justificação explícita (Manual V2.2). Comparação automática só entre avaliações metodologicamente comparáveis: mesma versão de metodologia, alteração apenas editorial aprovada ou equivalência de definições declarada. A mesma escala não basta se as rubricas mudaram substantivamente; caso contrário, "Não comparável", com justificativa. | ✅ (T-6, D-063, D-064); implementado na Etapa 2B 🔧 (D-069) |
 
 ### 3.1 Dimensões distintas da avaliação ✅ (D-049, atualizada pela D-060)
 
@@ -106,7 +107,7 @@ Orientação para cada nível 🔧 (texto de apoio ao avaliador, coerente com a 
 | **Média** | Ao menos uma fonte confiável e pertinente, mas com limitações: evidências de uma mesma origem, parcialmente desatualizadas, de pertinência parcial ou com divergências pontuais explicadas. |
 | **Baixa** | Apoio predominante em fontes de confiabilidade incerta ou pouco pertinentes, evidência antiga ou contradições não resolvidas. |
 
-Como funciona no sistema: o avaliador escolhe o nível e escreve a justificativa, obrigatória para publicar (regra do banco de dados). A tela lista os cinco aspectos como lembrete. Hoje a tela exibe os níveis como "Alto, Médio, Baixo"; a troca para "Alta, Média, Baixa" faz parte da adaptação (Q-67) e não altera os valores gravados.
+Como funciona no sistema: o avaliador escolhe o nível e escreve a justificativa, obrigatória para publicar (regra do banco de dados). A tela lista os cinco aspectos como lembrete. Desde a Etapa 2B, a tela exibe os níveis como "Alta, Média, Baixa", sem alterar os valores gravados (D-060, D-069).
 
 ## 5. Metodologia e cálculo
 
@@ -117,7 +118,7 @@ Como funciona no sistema: o avaliador escolhe o nível e escreve a justificativa
 3. **Notas por critério** em cada versão de avaliação. Critério sem nota fica "sem nota" — nunca vale zero.
 4. **Resultado gravado na versão**: poder e interesse calculados no momento da publicação, junto com a metodologia usada. Mudar a metodologia depois não altera resultados passados.
 
-Com as escalas V2.2, poder e interesse passam a ser **classificados diretamente** (Baixo, Médio, Alto), sem notas por critério nem cálculo. A estrutura acima continua valendo para as metodologias de demonstração já registradas; a adaptação proposta está no [Plano de Implantação](PLANO_IMPLANTACAO.md), seção 7, e no [Modelo de Dados](MODELO_DADOS.md), seção 6.3.1 (Q-67).
+Com as escalas V2.2, poder e interesse passam a ser **classificados diretamente** (Baixo, Médio, Alto), sem notas por critério nem cálculo. A estrutura acima continua valendo para as metodologias de demonstração já registradas. A adaptação foi implementada na Etapa 2B (D-069): a metodologia V2.2 tem rubricas por nível, travadas quando ela entra em vigor, sem notas nem cálculo ([Plano de Implantação](PLANO_IMPLANTACAO.md), seção 7; [Modelo de Dados](MODELO_DADOS.md), seção 6.3.1).
 
 ### 5.2 Metodologia de demonstração (D-034) 🔧
 
@@ -200,7 +201,7 @@ O posicionamento é mostrado como **cor, ícone ou legenda independente**, nunca
 | No gráfico, somente avaliações da **metodologia vigente**; metodologias diferentes não são comparadas automaticamente. | ✅ (D-034) |
 | Listas próprias, sem ocultar registros: avaliações históricas, que exigem reavaliação, sem classificação, não avaliados e associação encerrada. | ✅ (D-034) |
 | Total exibido com denominador ("X de Y associados"). | ✅ (Manual V2.2) |
-| Grade 3 × 3 com as células nomeadas acima. | ✅ decisão (D-058) / ⏳ implementação (Q-67): hoje a tela ainda mostra a demonstração com eixos de 0 a 100, sem quadrantes |
+| Grade 3 × 3 com as células nomeadas acima. | ✅ decisão (D-058); implementada na Etapa 2B 🔧 (D-069): quantidade, nomes, posicionamento por cor e símbolo e selo "preliminar"; no celular, quantidade e marcadores, com os nomes na tabela equivalente |
 | **Conduta do ES em Ação** — registrada **separadamente** de poder, interesse e posicionamento; nunca derivada da matriz. | ⏳ Requisito futuro (RF-28, D-038, Q-64) |
 | Filtros por comitê, período e responsável, em visão agregada. | ⏳ Etapa de painéis |
 
@@ -216,7 +217,7 @@ O modelo de quatro quadrantes de Mendelow foi referência de estudo e **não foi
 4. "Publicar" grava e publica: o banco confere justificativa, data de referência, evidência, justificativa da confiança e validação institucional. A anterior passa a "substituída".
 5. A matriz do contexto passa a refletir a nova versão.
 
-Na adaptação às escalas V2.2 (Q-67), o passo 3 passa a registrar diretamente os níveis de poder e interesse. Na mudança metodológica **substantiva** (escala, critérios, rubricas, definições dos níveis ou regras de interpretação), o novo rascunho não recebe poder, interesse, posicionamento, grau de confiança nem validação institucional como válidos; as evidências anteriores chegam como referência identificada pela origem, sem fluxo de confirmação (D-068). Na metodologia V2.2, o banco confere só os requisitos técnicos e de rastreabilidade (justificativas por dimensão, síntese, data de referência e natureza da informação do posicionamento classificado); evidência e validação institucional deixam de ser exigidas, e as regras de interpretação passam a alertas (Q-67 1.0). Nas mudanças **exclusivamente editoriais** aprovadas, não há reclassificação (T-4, D-063, D-064). As versões anteriores ficam intactas.
+Na metodologia V2.2, implementada na Etapa 2B (D-069), o passo 3 registra diretamente os níveis de poder e interesse; os alertas orientativos aparecem durante o preenchimento, e os alertas mantidos ficam gravados na publicação. A nova versão na mesma metodologia, ou depois de alteração editorial aprovada, traz as classificações como ponto de partida, com as justificativas em branco. Na mudança metodológica **substantiva** (escala, critérios, rubricas, definições dos níveis ou regras de interpretação), o novo rascunho não recebe poder, interesse, posicionamento, grau de confiança nem validação institucional como válidos; as evidências anteriores chegam como referência identificada pela origem, sem fluxo de confirmação (D-068). Na metodologia V2.2, o banco confere só os requisitos técnicos e de rastreabilidade (justificativas por dimensão, síntese, data de referência e natureza da informação do posicionamento classificado); evidência e validação institucional deixam de ser exigidas, e as regras de interpretação passam a alertas (Q-67 1.0). Nas mudanças **exclusivamente editoriais** aprovadas, não há reclassificação (T-4, D-063, D-064). As versões anteriores ficam intactas.
 
 ## 8. Acesso ✅ / 🔧
 
@@ -224,7 +225,7 @@ As avaliações só são visíveis a quem tem permissão no projeto ou tema: adm
 
 ## 9. Testes de aceitação das escalas ✅ (Manual V2.2, seção 16.1)
 
-Valem para a adaptação (Q-67); ainda não implementados.
+Implementados na Etapa 2B (D-069) e cobertos pelos testes automatizados (`testes/README.md`); aguardam a homologação do gestor.
 
 | ID | Condição de aprovação |
 |---|---|
@@ -237,7 +238,7 @@ Valem para a adaptação (Q-67); ainda não implementados.
 | T23 | "Neutro" exige justificativa e evidência; nunca é atribuído pela falta de resposta ou pelo desconhecimento. **Adaptado pela D-068:** justificativa e natureza da informação; sem manifestação indicada, alerta; nunca atribuído automaticamente. |
 | T24 | Registros antigos com cinco posições permanecem idênticos e rastreáveis à metodologia histórica; nenhum mapeamento automático para três categorias. |
 
-Testes complementares 🔧 (a implementar junto com a adaptação):
+Testes complementares 🔧 (implementados na Etapa 2B; o item 10 é um lembrete fixo no formulário, porque depende da leitura do texto):
 
 1. Novas avaliações só admitem as três posições e "Não avaliado" — no formulário, na validação do servidor e no banco (T22).
 2. Versões antigas de cinco categorias continuam visíveis e idênticas, antes e depois da migração (T24).
@@ -258,7 +259,7 @@ Testes complementares 🔧 (a implementar junto com a adaptação):
 
 ## 10. Rubricas — versão final 1.0 ✅ (Q-66, D-063, D-067, D-068)
 
-Rubricas homologadas pelo gestor em 02/11/2026, na versão final da Q-66 (1.0, D-068), depois da calibração H6. **O sistema ainda não foi adaptado** (Etapa 2B, Q-67 1.0). O documento completo da Q-66, com exemplos fictícios e situações limítrofes, e o material da calibração foram entregues ao gestor fora deste repositório.
+Rubricas homologadas pelo gestor em 02/11/2026, na versão final da Q-66 (1.0, D-068), depois da calibração H6. O sistema foi adaptado na Etapa 2B (Q-67 1.0, D-069), aguardando homologação: as rubricas aparecem no formulário, como texto de apoio, e na tela da metodologia. O documento completo da Q-66, com exemplos fictícios e situações limítrofes, e o material da calibração foram entregues ao gestor fora deste repositório.
 
 ### 10.1 Diretriz geral e regras gerais
 
@@ -365,7 +366,7 @@ Expressões como "apoiará se" ou "desde que" **não determinam automaticamente*
 | H5 | ✅ Homologada, aplicada com alertas |
 | H6 | ✅ **Concluída** (D-068) |
 
-Alterações futuras das rubricas seguem a T-4 e a D-064 (substantiva × editorial). A programação da Etapa 2B depende de autorização específica.
+Alterações futuras das rubricas seguem a T-4 e a D-064 (substantiva × editorial). A programação da Etapa 2B foi autorizada em 02/11/2026 (D-069).
 
 ## 11. Questões pendentes ⏳
 

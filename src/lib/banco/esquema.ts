@@ -114,6 +114,42 @@ export const tipoEvidencia = pgEnum("tipo_evidencia", ["documento", "link", "obs
 
 export const perfilContexto = pgEnum("perfil_contexto", ["gestor", "colaborador", "leitor"]);
 
+// Escalas V2.2 (Etapa 2B, Q-67 1.0). Cada metodologia declara as suas escalas;
+// nada é convertido de uma escala para outra (T-1, T-2).
+
+/** Escala de poder e interesse de uma metodologia. */
+export const escalaPoderInteresse = pgEnum("escala_poder_interesse", [
+  "demonstracao_numerica",
+  "binaria_historica",
+  "ordinal_tres_niveis",
+]);
+
+/** Escala de posicionamento de uma metodologia: as cinco categorias ficam só no histórico (D-059). */
+export const escalaPosicionamento = pgEnum("escala_posicionamento", ["cinco_categorias", "tres_categorias"]);
+
+/** Níveis da escala ordinal (D-058); "não avaliado" é a ausência de valor, nunca um nível. */
+export const nivelAvaliacao = pgEnum("nivel_avaliacao", ["alto", "medio", "baixo"]);
+
+/** Situação das ressalvas do posicionamento (H2); vazio = não se aplica (sem manifestação identificada). */
+export const situacaoRessalvas = pgEnum("situacao_ressalvas", [
+  "ha_ressalvas",
+  "nao_identificadas",
+  "informacao_insuficiente",
+]);
+
+/** Natureza da informação do posicionamento (D-067, D-068): só a formal é manifestação confirmada. */
+export const naturezaPosicionamento = pgEnum("natureza_posicionamento", [
+  "manifestacao_formal",
+  "informacao_informal",
+  "percepcao_consultor",
+]);
+
+/** Natureza da alteração entre versões da metodologia (D-064). */
+export const naturezaAlteracao = pgEnum("natureza_alteracao", ["substantiva", "editorial"]);
+
+/** Dimensões com rubrica de níveis na metodologia ordinal. */
+export const dimensaoRubrica = pgEnum("dimensao_rubrica", ["poder", "interesse", "posicionamento"]);
+
 // --- Acesso e auditoria ------------------------------------------------------
 
 export const usuario = pgTable(
@@ -446,6 +482,19 @@ export const metodologiaVersao = pgTable(
     homologada: boolean("homologada").notNull().default(false),
     vigenteDesde: date("vigente_desde"),
     vigenteAte: date("vigente_ate"),
+    // As metodologias anteriores à Etapa 2B recebem as escalas de demonstração
+    // na migração 0006; as novas nascem na escala V2.2.
+    escalaPoderInteresse: escalaPoderInteresse("escala_poder_interesse").notNull().default("ordinal_tres_niveis"),
+    escalaPosicionamento: escalaPosicionamento("escala_posicionamento").notNull().default("tres_categorias"),
+    /** Versão substituída por esta; com ela, a natureza da alteração é obrigatória (D-064). */
+    metodologiaAnteriorId: uuid("metodologia_anterior_id").references((): AnyPgColumn => metodologiaVersao.id),
+    naturezaAlteracao: naturezaAlteracao("natureza_alteracao"),
+    justificativaNatureza: text("justificativa_natureza"),
+    naturezaAprovadaPor: uuid("natureza_aprovada_por").references(() => usuario.id),
+    naturezaAprovadaEm: timestamp("natureza_aprovada_em", { withTimezone: true }),
+    /** Equivalência declarada das definições de posicionamento, para a tendência (T-6). */
+    equivalentePosicionamentoA: uuid("equivalente_posicionamento_a").references((): AnyPgColumn => metodologiaVersao.id),
+    justificativaEquivalencia: text("justificativa_equivalencia"),
     ...colunasControle(),
   },
   (t) => [
@@ -481,6 +530,36 @@ export const criterioAvaliacao = pgTable(
   ],
 );
 
+/**
+ * Rubrica de cada nível da metodologia ordinal (Q-66 1.0): texto de ajuda que
+ * orienta o julgamento, sem substituí-lo. Travada quando a metodologia entra em vigor.
+ */
+export const rubricaNivel = pgTable(
+  "rubrica_nivel",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    metodologiaVersaoId: uuid("metodologia_versao_id")
+      .notNull()
+      .references(() => metodologiaVersao.id),
+    dimensao: dimensaoRubrica("dimensao").notNull(),
+    /** Poder e interesse: alto, medio, baixo; posicionamento: favoravel, neutro, contrario; e nao_avaliado. */
+    nivel: text("nivel").notNull(),
+    criterioOrientador: text("criterio_orientador").notNull(),
+    basesTipicas: text("bases_tipicas"),
+    ordem: integer("ordem").notNull().default(0),
+    ...colunasControle(),
+  },
+  (t) => [
+    unique("rubrica_nivel_unica").on(t.metodologiaVersaoId, t.dimensao, t.nivel),
+    check(
+      "rubrica_nivel_valido",
+      sql`(${t.dimensao} in ('poder', 'interesse') and ${t.nivel} in ('alto', 'medio', 'baixo', 'nao_avaliado'))
+        or (${t.dimensao} = 'posicionamento' and ${t.nivel} in ('favoravel', 'neutro', 'contrario', 'nao_avaliado'))`,
+    ),
+    check("rubrica_nivel_criterio_preenchido", sql`length(trim(${t.criterioOrientador})) > 0`),
+  ],
+);
+
 /** Ficha: reúne as versões da avaliação de um stakeholder em um projeto ou tema. */
 export const avaliacao = pgTable(
   "avaliacao",
@@ -503,7 +582,8 @@ export const avaliacao = pgTable(
 /**
  * Cada versão é uma avaliação completa. Nasce como rascunho; ao ser publicada
  * torna-se a vigente e não pode mais ser alterada (só passar a "substituída").
- * Poder e interesse ficam gravados como resultado na escala de 0 a 100.
+ * Na metodologia de demonstração, poder e interesse ficam gravados como
+ * resultado na escala de 0 a 100; na V2.2, como níveis escolhidos pelo consultor.
  */
 export const avaliacaoVersao = pgTable(
   "avaliacao_versao",
@@ -526,6 +606,17 @@ export const avaliacaoVersao = pgTable(
     proximaRevisao: date("proxima_revisao"),
     avaliadorId: uuid("avaliador_id").references(() => usuario.id),
     publicadaEm: timestamp("publicada_em", { withTimezone: true }),
+    // Escala V2.2 (Etapa 2B). Vazio = "não avaliado"; nunca vira Baixo (T17).
+    nivelPoder: nivelAvaliacao("nivel_poder"),
+    nivelInteresse: nivelAvaliacao("nivel_interesse"),
+    justificativaPoder: text("justificativa_poder"),
+    justificativaInteresse: text("justificativa_interesse"),
+    justificativaPosicionamento: text("justificativa_posicionamento"),
+    naturezaPosicionamento: naturezaPosicionamento("natureza_posicionamento"),
+    situacaoRessalvas: situacaoRessalvas("situacao_ressalvas"),
+    descricaoRessalvas: text("descricao_ressalvas"),
+    /** Alertas orientativos mantidos pelo consultor na publicação; gravados automaticamente. */
+    alertasReconhecidos: text("alertas_reconhecidos").array(),
     ...colunasControle(),
   },
   (t) => [
@@ -562,7 +653,10 @@ export const avaliacaoNotaCriterio = pgTable(
   (t) => [unique("avaliacao_nota_criterio_unica").on(t.avaliacaoVersaoId, t.criterioAvaliacaoId)],
 );
 
-/** Fundamentos de uma versão de avaliação; exigidos para publicar (Manual V2.0). */
+/**
+ * Fundamentos de uma versão de avaliação. Exigidos para publicar só na
+ * metodologia de demonstração; na V2.2 são opcionais (D-067).
+ */
 export const evidencia = pgTable(
   "evidencia",
   {
@@ -575,6 +669,8 @@ export const evidencia = pgTable(
     fonte: text("fonte"),
     url: text("url"),
     dataEvidencia: date("data_evidencia"),
+    /** Evidência trazida de versão anterior, como referência (T-4). */
+    evidenciaOrigemId: uuid("evidencia_origem_id").references((): AnyPgColumn => evidencia.id),
     ...colunasControle(),
   },
   (t) => [

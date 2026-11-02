@@ -15,16 +15,18 @@ Os testes conferem, de forma automática e repetível, se o sistema se comporta 
 | `banco-projetos-temas.test.ts` | Regras do banco de projetos, temas e contextos: nome normalizado, nome repetido no mesmo comitê, datas, proibição de exclusão, comitê principal que não é participante (nos dois sentidos), participações e associações vigentes únicas, filtro por comitê, ausência de campos de poder ou interesse e histórico. |
 | `validacao-projetos-temas.test.ts` | Validações de projeto ou tema, participação e associação; nomes legíveis no histórico; listas da tela iguais às do banco. |
 | `normalizacao.test.ts` | Regra única de normalização (acentos, maiúsculas, pontuação, apóstrofos e acentos usados como apóstrofo); busca e duplicidade de projetos e temas com essas variações; realinhamento de valores gravados pela regra antiga, inclusive ao reabrir um banco existente, de forma idempotente e auditada. |
-| `banco-avaliacoes.test.ts` | Regras do banco da avaliação estratégica: ficha só para stakeholder associado, exigências da publicação, cálculo gravado, "não avaliado" nunca é zero, validação institucional, versões imutáveis, histórico e independência entre contextos, rascunho único, metodologias e notas. |
+| `banco-avaliacoes.test.ts` | Regras do banco da avaliação estratégica: ficha só para stakeholder associado, exigências da publicação, cálculo gravado, "não avaliado" nunca é zero, validação institucional, versões imutáveis, histórico e independência entre contextos, rascunho único, metodologias e notas. Na escala V2.2: rubricas para entrar em vigor, níveis sem cálculo, categorias parciais recusadas, "não avaliado", evidência e validação institucional opcionais, justificativas por dimensão e natureza do posicionamento, alertas mantidos gravados, metodologia vigente obrigatória, escala binária histórica, nova versão (T-4) e natureza da alteração da metodologia (D-064). |
 | `permissoes.test.ts` | Autorização por contexto com usuários fictícios: administrador, gestor, colaborador, leitor, sem permissão, permissão vencida ou arquivada e usuário inativo. |
-| `calculo-avaliacoes.test.ts` | Cálculo de demonstração, tendência, classificação da matriz (vigente, histórica, reavaliação, sem pontuação, não avaliados), validações e listas iguais às do banco. |
-| `formulario-rascunho.test.tsx` | Formulário de avaliação: "não avaliado" e "sem nota" como padrão, validação institucional para instituições e valores mantidos após recusa. |
+| `calculo-avaliacoes.test.ts` | Cálculo de demonstração, tendência, classificação da matriz (vigente, histórica, reavaliação, sem pontuação, não avaliados), validações e listas iguais às do banco; comparabilidade entre metodologias (T-6), grade 3 × 3 (T17 a T19), alertas orientativos e validação conforme a escala. |
+| `formulario-rascunho.test.tsx` | Formulário de avaliação: "não avaliado" e "sem nota" como padrão, validação institucional para instituições e valores mantidos após recusa; na escala V2.2, três posições, níveis e ressalvas começando como "não avaliado" e "não se aplica" e alertas que não impedem publicar. |
+| `matriz-tres-por-tres.test.tsx` | Grade 3 × 3: nove células nomeadas, quantidade e nomes por célula, posicionamento por símbolo, selo "preliminar", revisão vencida, tabela equivalente e nenhuma conduta (T18). |
+| `migracao-escalas-v2-2.test.ts` | Atualização de um banco da Etapa 2A para a escala V2.2: cópia de segurança antes de atualizar, todas as linhas anteriores preservadas campo a campo, valores das colunas novas, nenhuma atualização se a cópia falhar e nenhuma cópia em banco novo (T-1, T20, T24). |
 | `formulario-projeto-tema.test.tsx` | Formulário de projeto ou tema com alerta de nome parecido; formulário de associação com a lista neutra de tipos de relação. |
 
 Ferramentas: [Vitest](https://vitest.dev) e [Testing Library](https://testing-library.com).
 
 Regras:
 
-- Os testes usam **apenas dados fictícios** e um banco criado na memória, que não afeta o banco local.
+- Os testes usam **apenas dados fictícios** e um banco criado na memória ou em pasta temporária, que não afeta o banco local.
 - Cada nova funcionalidade deve vir acompanhada de seus testes.
 - Os nomes dos arquivos terminam em `.test.ts` ou `.test.tsx`.

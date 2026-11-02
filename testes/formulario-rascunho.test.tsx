@@ -1,5 +1,5 @@
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
-import { afterEach, expect, test, vi } from "vitest";
+import { afterEach, describe, expect, test, vi } from "vitest";
 
 // A ação do servidor é substituída por uma simulação que recusa a publicação.
 vi.mock("@/modulos/avaliacoes/acoes", () => ({
@@ -70,4 +70,43 @@ test("se a publicação for recusada, mostra o motivo e mantém o que foi preenc
   expect(screen.getByLabelText("Grau de confiança")).toHaveProperty("value", "medio");
   expect(screen.getByLabelText(/^Critério fictício/)).toHaveProperty("value", "4");
   expect(screen.getByLabelText(/^Justificativa da avaliação/)).toHaveProperty("value", "Texto fictício.");
+});
+
+describe("Escala V2.2", () => {
+  const RUBRICAS = [
+    { dimensao: "poder" as const, nivel: "alto", criterioOrientador: "Orientação fictícia de poder alto.", basesTipicas: null },
+  ];
+
+  test("três categorias e “não avaliado”; níveis e ressalvas começam como “não avaliado” e “não se aplica” (T17, T22)", () => {
+    render(
+      <FormularioRascunho versaoId={VERSAO} instituicao escala="ordinal" rubricas={RUBRICAS} criterios={[]} inicial={VAZIO} />,
+    );
+    const posicionamento = screen.getByLabelText("Posicionamento") as HTMLSelectElement;
+    expect([...posicionamento.options].map((o) => o.text)).toEqual(["Não avaliado", "Favorável", "Neutro", "Contrário"]);
+    const poder = screen.getByLabelText("Nível de poder") as HTMLSelectElement;
+    expect(poder.value).toBe("");
+    expect([...poder.options].map((o) => o.text)).toEqual(["Não avaliado", "Alto", "Médio", "Baixo"]);
+    expect((screen.getByLabelText("Ressalvas relevantes") as HTMLSelectElement).selectedOptions[0].text).toMatch(/^Não se aplica/);
+    expect([...(screen.getByLabelText("Grau de confiança") as HTMLSelectElement).options].map((o) => o.text)).toEqual([
+      "Não informado",
+      "Alta",
+      "Média",
+      "Baixa",
+    ]);
+    // Sem notas por critério e sem a exigência de validação institucional: a origem é só registrada.
+    expect(screen.queryByText(/Notas por critério/)).toBeNull();
+    expect(screen.getByLabelText(/^Origem da informação/)).toBeDefined();
+    expect(screen.getByText("Rubrica de poder (orientação)")).toBeDefined();
+  });
+
+  test("alertas orientativos aparecem ao preencher, sem impedir a publicação (D-067)", async () => {
+    render(<FormularioRascunho versaoId={VERSAO} instituicao={false} escala="ordinal" criterios={[]} inicial={VAZIO} />);
+    expect(screen.getByText("Alertas orientativos (0)")).toBeDefined();
+    fireEvent.change(screen.getByLabelText("Posicionamento"), { target: { value: "neutro" } });
+    fireEvent.change(screen.getByLabelText("Natureza da informação"), { target: { value: "percepcao_consultor" } });
+    expect(await screen.findByText("Alertas orientativos (1)")).toBeDefined();
+    expect(screen.getByText(/Neutro pressupõe manifestação neutra ou equidistante/)).toBeDefined();
+    const publicar = screen.getByRole("button", { name: "Publicar mesmo assim" }) as HTMLButtonElement;
+    expect(publicar.disabled).toBe(false);
+  });
 });

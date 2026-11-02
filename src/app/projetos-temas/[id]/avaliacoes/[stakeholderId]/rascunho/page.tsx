@@ -10,11 +10,11 @@ import { esquemaIdentificador } from "@/lib/validacao/comuns";
 import { permissaoNoContexto } from "@/modulos/acesso/permissoes";
 import { obterUsuarioAtual } from "@/modulos/acesso/usuario-atual";
 import { descartarRascunhoAcao } from "@/modulos/avaliacoes/acoes";
-import { AvisoNaoHomologado, AvisoSeguranca } from "@/modulos/avaliacoes/componentes/avisos";
+import { AvisoDaMetodologia, AvisoSeguranca } from "@/modulos/avaliacoes/componentes/avisos";
 import { FormularioEvidencia } from "@/modulos/avaliacoes/componentes/formulario-evidencia";
 import { FormularioRascunho } from "@/modulos/avaliacoes/componentes/formulario-rascunho";
 import { ListaEvidencias } from "@/modulos/avaliacoes/componentes/lista-evidencias";
-import { criteriosDaMetodologia, obterFicha } from "@/modulos/avaliacoes/consultas";
+import { criteriosDaMetodologia, obterFicha, rubricasDaMetodologia } from "@/modulos/avaliacoes/consultas";
 import { obterProjetoTema } from "@/modulos/projetos-temas/consultas";
 
 export const metadata: Metadata = { title: "Rascunho de avaliação" };
@@ -49,7 +49,13 @@ async function Rascunho({ params }: Pick<Props, "params">) {
   const rascunho = ficha.versoes.find((v) => v.situacao === "rascunho" && !v.arquivadoEm);
   if (!rascunho) redirect(caminhoFicha);
 
-  const criterios = rascunho.metodologiaId ? await criteriosDaMetodologia(banco, rascunho.metodologiaId) : [];
+  const ordinal = rascunho.escalaPoderInteresse === "ordinal_tres_niveis";
+  const [criterios, rubricas] = rascunho.metodologiaId
+    ? await Promise.all([
+        criteriosDaMetodologia(banco, rascunho.metodologiaId),
+        rubricasDaMetodologia(banco, rascunho.metodologiaId),
+      ])
+    : [[], []];
 
   return (
     <div className="flex flex-col gap-6">
@@ -66,22 +72,23 @@ async function Rascunho({ params }: Pick<Props, "params">) {
         }
       />
 
-      <AvisoNaoHomologado
-        metodologia={rascunho.metodologiaId ? { id: rascunho.metodologiaId, nome: rascunho.metodologiaNome ?? "" } : null}
+      <AvisoDaMetodologia
+        metodologia={
+          rascunho.metodologiaId
+            ? { id: rascunho.metodologiaId, nome: rascunho.metodologiaNome ?? "", homologada: Boolean(rascunho.metodologiaHomologada) }
+            : null
+        }
       />
-      {!rascunho.metodologiaId && (
-        <Alerta tom="aviso">
-          Não há metodologia vigente: esta versão terá posicionamento, confiança, justificativa e evidências, mas não
-          terá pontuação de poder e interesse.
-        </Alerta>
-      )}
 
       <section aria-labelledby="titulo-evidencias" className={classeCartao}>
         <h2 id="titulo-evidencias" className="mb-1 text-lg font-semibold">
           Evidências
         </h2>
         <p className="mb-4 text-sm text-texto-secundario">
-          Pelo menos uma evidência é obrigatória para publicar. Use somente informações fictícias nesta etapa.
+          {ordinal
+            ? "Opcionais: documentos, links e observações reforçam a fundamentação e a confiança, mas não são obrigatórios para publicar."
+            : "Pelo menos uma evidência é obrigatória para publicar nesta metodologia de demonstração."}{" "}
+          Use somente informações fictícias.
         </p>
         <ListaEvidencias evidencias={rascunho.evidencias} editavel />
         <details className="mt-4 rounded-lg border border-borda p-4" open={rascunho.evidencias.length === 0}>
@@ -96,6 +103,8 @@ async function Rascunho({ params }: Pick<Props, "params">) {
         versaoId={rascunho.id}
         instituicao={ficha.stakeholder.tipo === "instituicao"}
         criterios={criterios}
+        escala={ordinal ? "ordinal" : "demonstracao"}
+        rubricas={rubricas}
         inicial={{
           posicionamento: rascunho.posicionamento,
           grauConfianca: rascunho.grauConfianca,
@@ -104,6 +113,14 @@ async function Rascunho({ params }: Pick<Props, "params">) {
           validacaoInstitucional: rascunho.validacaoInstitucional,
           dataReferencia: rascunho.dataReferencia,
           notas: Object.fromEntries(rascunho.notas.map((n) => [n.criterioId, n.nota])),
+          nivelPoder: rascunho.nivelPoder,
+          nivelInteresse: rascunho.nivelInteresse,
+          justificativaPoder: rascunho.justificativaPoder,
+          justificativaInteresse: rascunho.justificativaInteresse,
+          justificativaPosicionamento: rascunho.justificativaPosicionamento,
+          naturezaPosicionamento: rascunho.naturezaPosicionamento,
+          situacaoRessalvas: rascunho.situacaoRessalvas,
+          descricaoRessalvas: rascunho.descricaoRessalvas,
         }}
       />
 

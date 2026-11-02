@@ -1,0 +1,3547 @@
+{
+  "id": "136c8a44-8c32-4994-bebd-e830729edec4",
+  "prevId": "bc8c4df8-cd1a-4da9-8a5b-05f317d1921a",
+  "version": "7",
+  "dialect": "postgresql",
+  "tables": {
+    "public.avaliacao": {
+      "name": "avaliacao",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "stakeholder_id": {
+          "name": "stakeholder_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "projeto_tema_id": {
+          "name": "projeto_tema_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "criado_em": {
+          "name": "criado_em",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "criado_por": {
+          "name": "criado_por",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "atualizado_em": {
+          "name": "atualizado_em",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "atualizado_por": {
+          "name": "atualizado_por",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "arquivado_em": {
+          "name": "arquivado_em",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {
+        "avaliacao_projeto_idx": {
+          "name": "avaliacao_projeto_idx",
+          "columns": [
+            {
+              "expression": "projeto_tema_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "avaliacao_stakeholder_id_stakeholder_id_fk": {
+          "name": "avaliacao_stakeholder_id_stakeholder_id_fk",
+          "tableFrom": "avaliacao",
+          "tableTo": "stakeholder",
+          "columnsFrom": [
+            "stakeholder_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "avaliacao_projeto_tema_id_projeto_tema_id_fk": {
+          "name": "avaliacao_projeto_tema_id_projeto_tema_id_fk",
+          "tableFrom": "avaliacao",
+          "tableTo": "projeto_tema",
+          "columnsFrom": [
+            "projeto_tema_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "avaliacao_criado_por_usuario_id_fk": {
+          "name": "avaliacao_criado_por_usuario_id_fk",
+          "tableFrom": "avaliacao",
+          "tableTo": "usuario",
+          "columnsFrom": [
+            "criado_por"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "avaliacao_atualizado_por_usuario_id_fk": {
+          "name": "avaliacao_atualizado_por_usuario_id_fk",
+          "tableFrom": "avaliacao",
+          "tableTo": "usuario",
+          "columnsFrom": [
+            "atualizado_por"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "avaliacao_stakeholder_contexto_unica": {
+          "name": "avaliacao_stakeholder_contexto_unica",
+          "nullsNotDistinct": false,
+          "columns": [
+            "stakeholder_id",
+            "projeto_tema_id"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.avaliacao_nota_criterio": {
+      "name": "avaliacao_nota_criterio",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "avaliacao_versao_id": {
+          "name": "avaliacao_versao_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "criterio_avaliacao_id": {
+          "name": "criterio_avaliacao_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "nota": {
+          "name": "nota",
+          "type": "numeric(6, 2)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "justificativa": {
+          "name": "justificativa",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "criado_em": {
+          "name": "criado_em",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "criado_por": {
+          "name": "criado_por",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "atualizado_em": {
+          "name": "atualizado_em",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "atualizado_por": {
+          "name": "atualizado_por",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "arquivado_em": {
+          "name": "arquivado_em",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "avaliacao_nota_criterio_avaliacao_versao_id_avaliacao_versao_id_fk": {
+          "name": "avaliacao_nota_criterio_avaliacao_versao_id_avaliacao_versao_id_fk",
+          "tableFrom": "avaliacao_nota_criterio",
+          "tableTo": "avaliacao_versao",
+          "columnsFrom": [
+            "avaliacao_versao_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "avaliacao_nota_criterio_criterio_avaliacao_id_criterio_avaliacao_id_fk": {
+          "name": "avaliacao_nota_criterio_criterio_avaliacao_id_criterio_avaliacao_id_fk",
+          "tableFrom": "avaliacao_nota_criterio",
+          "tableTo": "criterio_avaliacao",
+          "columnsFrom": [
+            "criterio_avaliacao_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "avaliacao_nota_criterio_criado_por_usuario_id_fk": {
+          "name": "avaliacao_nota_criterio_criado_por_usuario_id_fk",
+          "tableFrom": "avaliacao_nota_criterio",
+          "tableTo": "usuario",
+          "columnsFrom": [
+            "criado_por"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "avaliacao_nota_criterio_atualizado_por_usuario_id_fk": {
+          "name": "avaliacao_nota_criterio_atualizado_por_usuario_id_fk",
+          "tableFrom": "avaliacao_nota_criterio",
+          "tableTo": "usuario",
+          "columnsFrom": [
+            "atualizado_por"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "avaliacao_nota_criterio_unica": {
+          "name": "avaliacao_nota_criterio_unica",
+          "nullsNotDistinct": false,
+          "columns": [
+            "avaliacao_versao_id",
+            "criterio_avaliacao_id"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.avaliacao_versao": {
+      "name": "avaliacao_versao",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "avaliacao_id": {
+          "name": "avaliacao_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "numero_versao": {
+          "name": "numero_versao",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "situacao": {
+          "name": "situacao",
+          "type": "situacao_versao_avaliacao",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'rascunho'"
+        },
+        "metodologia_versao_id": {
+          "name": "metodologia_versao_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "poder": {
+          "name": "poder",
+          "type": "numeric(6, 2)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "interesse": {
+          "name": "interesse",
+          "type": "numeric(6, 2)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "posicionamento": {
+          "name": "posicionamento",
+          "type": "posicionamento",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "grau_confianca": {
+          "name": "grau_confianca",
+          "type": "grau_confianca",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "justificativa_confianca": {
+          "name": "justificativa_confianca",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "justificativa": {
+          "name": "justificativa",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "validacao_institucional": {
+          "name": "validacao_institucional",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "data_referencia": {
+          "name": "data_referencia",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "proxima_revisao": {
+          "name": "proxima_revisao",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "avaliador_id": {
+          "name": "avaliador_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "publicada_em": {
+          "name": "publicada_em",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "nivel_poder": {
+          "name": "nivel_poder",
+          "type": "nivel_avaliacao",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "nivel_interesse": {
+          "name": "nivel_interesse",
+          "type": "nivel_avaliacao",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "justificativa_poder": {
+          "name": "justificativa_poder",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "justificativa_interesse": {
+          "name": "justificativa_interesse",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "justificativa_posicionamento": {
+          "name": "justificativa_posicionamento",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "natureza_posicionamento": {
+          "name": "natureza_posicionamento",
+          "type": "natureza_posicionamento",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "situacao_ressalvas": {
+          "name": "situacao_ressalvas",
+          "type": "situacao_ressalvas",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "descricao_ressalvas": {
+          "name": "descricao_ressalvas",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "alertas_reconhecidos": {
+          "name": "alertas_reconhecidos",
+          "type": "text[]",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "criado_em": {
+          "name": "criado_em",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "criado_por": {
+          "name": "criado_por",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "atualizado_em": {
+          "name": "atualizado_em",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "atualizado_por": {
+          "name": "atualizado_por",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "arquivado_em": {
+          "name": "arquivado_em",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {
+        "avaliacao_versao_vigente_unica": {
+          "name": "avaliacao_versao_vigente_unica",
+          "columns": [
+            {
+              "expression": "avaliacao_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "where": "\"avaliacao_versao\".\"situacao\" = 'vigente'",
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "avaliacao_versao_rascunho_unico": {
+          "name": "avaliacao_versao_rascunho_unico",
+          "columns": [
+            {
+              "expression": "avaliacao_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "where": "\"avaliacao_versao\".\"situacao\" = 'rascunho' and \"avaliacao_versao\".\"arquivado_em\" is null",
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "avaliacao_versao_avaliacao_id_avaliacao_id_fk": {
+          "name": "avaliacao_versao_avaliacao_id_avaliacao_id_fk",
+          "tableFrom": "avaliacao_versao",
+          "tableTo": "avaliacao",
+          "columnsFrom": [
+            "avaliacao_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "avaliacao_versao_metodologia_versao_id_metodologia_versao_id_fk": {
+          "name": "avaliacao_versao_metodologia_versao_id_metodologia_versao_id_fk",
+          "tableFrom": "avaliacao_versao",
+          "tableTo": "metodologia_versao",
+          "columnsFrom": [
+            "metodologia_versao_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "avaliacao_versao_avaliador_id_usuario_id_fk": {
+          "name": "avaliacao_versao_avaliador_id_usuario_id_fk",
+          "tableFrom": "avaliacao_versao",
+          "tableTo": "usuario",
+          "columnsFrom": [
+            "avaliador_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "avaliacao_versao_criado_por_usuario_id_fk": {
+          "name": "avaliacao_versao_criado_por_usuario_id_fk",
+          "tableFrom": "avaliacao_versao",
+          "tableTo": "usuario",
+          "columnsFrom": [
+            "criado_por"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "avaliacao_versao_atualizado_por_usuario_id_fk": {
+          "name": "avaliacao_versao_atualizado_por_usuario_id_fk",
+          "tableFrom": "avaliacao_versao",
+          "tableTo": "usuario",
+          "columnsFrom": [
+            "atualizado_por"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "avaliacao_versao_numero_unico": {
+          "name": "avaliacao_versao_numero_unico",
+          "nullsNotDistinct": false,
+          "columns": [
+            "avaliacao_id",
+            "numero_versao"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {
+        "avaliacao_versao_poder": {
+          "name": "avaliacao_versao_poder",
+          "value": "\"avaliacao_versao\".\"poder\" is null or (\"avaliacao_versao\".\"poder\" >= 0 and \"avaliacao_versao\".\"poder\" <= 100)"
+        },
+        "avaliacao_versao_interesse": {
+          "name": "avaliacao_versao_interesse",
+          "value": "\"avaliacao_versao\".\"interesse\" is null or (\"avaliacao_versao\".\"interesse\" >= 0 and \"avaliacao_versao\".\"interesse\" <= 100)"
+        }
+      },
+      "isRLSEnabled": false
+    },
+    "public.comite": {
+      "name": "comite",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "nome": {
+          "name": "nome",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "sigla": {
+          "name": "sigla",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "tipo": {
+          "name": "tipo",
+          "type": "tipo_comite",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "comite_superior_id": {
+          "name": "comite_superior_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "criado_em": {
+          "name": "criado_em",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "criado_por": {
+          "name": "criado_por",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "atualizado_em": {
+          "name": "atualizado_em",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "atualizado_por": {
+          "name": "atualizado_por",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "arquivado_em": {
+          "name": "arquivado_em",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "comite_comite_superior_id_comite_id_fk": {
+          "name": "comite_comite_superior_id_comite_id_fk",
+          "tableFrom": "comite",
+          "tableTo": "comite",
+          "columnsFrom": [
+            "comite_superior_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "comite_criado_por_usuario_id_fk": {
+          "name": "comite_criado_por_usuario_id_fk",
+          "tableFrom": "comite",
+          "tableTo": "usuario",
+          "columnsFrom": [
+            "criado_por"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "comite_atualizado_por_usuario_id_fk": {
+          "name": "comite_atualizado_por_usuario_id_fk",
+          "tableFrom": "comite",
+          "tableTo": "usuario",
+          "columnsFrom": [
+            "atualizado_por"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "comite_nome_unico": {
+          "name": "comite_nome_unico",
+          "nullsNotDistinct": false,
+          "columns": [
+            "nome"
+          ]
+        },
+        "comite_sigla_unica": {
+          "name": "comite_sigla_unica",
+          "nullsNotDistinct": false,
+          "columns": [
+            "sigla"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {
+        "comite_superior_coerente": {
+          "name": "comite_superior_coerente",
+          "value": "(\"comite\".\"tipo\" = 'desenvolvimento' and \"comite\".\"comite_superior_id\" is null) or (\"comite\".\"tipo\" = 'tematico' and \"comite\".\"comite_superior_id\" is not null)"
+        },
+        "comite_nao_superior_de_si": {
+          "name": "comite_nao_superior_de_si",
+          "value": "\"comite\".\"comite_superior_id\" is distinct from \"comite\".\"id\""
+        }
+      },
+      "isRLSEnabled": false
+    },
+    "public.contato": {
+      "name": "contato",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "stakeholder_id": {
+          "name": "stakeholder_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "vinculo_id": {
+          "name": "vinculo_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "tipo": {
+          "name": "tipo",
+          "type": "tipo_contato",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "valor": {
+          "name": "valor",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "valor_normalizado": {
+          "name": "valor_normalizado",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "natureza": {
+          "name": "natureza",
+          "type": "natureza_contato",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "principal": {
+          "name": "principal",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": false
+        },
+        "data_inicio": {
+          "name": "data_inicio",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "data_fim": {
+          "name": "data_fim",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "observacao": {
+          "name": "observacao",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "criado_em": {
+          "name": "criado_em",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "criado_por": {
+          "name": "criado_por",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "atualizado_em": {
+          "name": "atualizado_em",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "atualizado_por": {
+          "name": "atualizado_por",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "arquivado_em": {
+          "name": "arquivado_em",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {
+        "contato_principal_vigente_unico": {
+          "name": "contato_principal_vigente_unico",
+          "columns": [
+            {
+              "expression": "stakeholder_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "tipo",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "where": "\"contato\".\"principal\" and \"contato\".\"data_fim\" is null and \"contato\".\"arquivado_em\" is null",
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "contato_stakeholder_idx": {
+          "name": "contato_stakeholder_idx",
+          "columns": [
+            {
+              "expression": "stakeholder_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "contato_valor_normalizado_idx": {
+          "name": "contato_valor_normalizado_idx",
+          "columns": [
+            {
+              "expression": "valor_normalizado",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "contato_stakeholder_id_stakeholder_id_fk": {
+          "name": "contato_stakeholder_id_stakeholder_id_fk",
+          "tableFrom": "contato",
+          "tableTo": "stakeholder",
+          "columnsFrom": [
+            "stakeholder_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "contato_vinculo_id_vinculo_pessoa_instituicao_id_fk": {
+          "name": "contato_vinculo_id_vinculo_pessoa_instituicao_id_fk",
+          "tableFrom": "contato",
+          "tableTo": "vinculo_pessoa_instituicao",
+          "columnsFrom": [
+            "vinculo_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "contato_criado_por_usuario_id_fk": {
+          "name": "contato_criado_por_usuario_id_fk",
+          "tableFrom": "contato",
+          "tableTo": "usuario",
+          "columnsFrom": [
+            "criado_por"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "contato_atualizado_por_usuario_id_fk": {
+          "name": "contato_atualizado_por_usuario_id_fk",
+          "tableFrom": "contato",
+          "tableTo": "usuario",
+          "columnsFrom": [
+            "atualizado_por"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {
+        "contato_valor_preenchido": {
+          "name": "contato_valor_preenchido",
+          "value": "length(trim(\"contato\".\"valor\")) > 0"
+        },
+        "contato_datas": {
+          "name": "contato_datas",
+          "value": "\"contato\".\"data_inicio\" is null or \"contato\".\"data_fim\" is null or \"contato\".\"data_fim\" >= \"contato\".\"data_inicio\""
+        }
+      },
+      "isRLSEnabled": false
+    },
+    "public.criterio_avaliacao": {
+      "name": "criterio_avaliacao",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "metodologia_versao_id": {
+          "name": "metodologia_versao_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "dimensao": {
+          "name": "dimensao",
+          "type": "dimensao_criterio",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "nome": {
+          "name": "nome",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "descricao": {
+          "name": "descricao",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "escala_minima": {
+          "name": "escala_minima",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "escala_maxima": {
+          "name": "escala_maxima",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "peso": {
+          "name": "peso",
+          "type": "numeric(8, 4)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "ordem": {
+          "name": "ordem",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "criado_em": {
+          "name": "criado_em",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "criado_por": {
+          "name": "criado_por",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "atualizado_em": {
+          "name": "atualizado_em",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "atualizado_por": {
+          "name": "atualizado_por",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "arquivado_em": {
+          "name": "arquivado_em",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "criterio_avaliacao_metodologia_versao_id_metodologia_versao_id_fk": {
+          "name": "criterio_avaliacao_metodologia_versao_id_metodologia_versao_id_fk",
+          "tableFrom": "criterio_avaliacao",
+          "tableTo": "metodologia_versao",
+          "columnsFrom": [
+            "metodologia_versao_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "criterio_avaliacao_criado_por_usuario_id_fk": {
+          "name": "criterio_avaliacao_criado_por_usuario_id_fk",
+          "tableFrom": "criterio_avaliacao",
+          "tableTo": "usuario",
+          "columnsFrom": [
+            "criado_por"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "criterio_avaliacao_atualizado_por_usuario_id_fk": {
+          "name": "criterio_avaliacao_atualizado_por_usuario_id_fk",
+          "tableFrom": "criterio_avaliacao",
+          "tableTo": "usuario",
+          "columnsFrom": [
+            "atualizado_por"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "criterio_avaliacao_nome_unico": {
+          "name": "criterio_avaliacao_nome_unico",
+          "nullsNotDistinct": false,
+          "columns": [
+            "metodologia_versao_id",
+            "dimensao",
+            "nome"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {
+        "criterio_avaliacao_escala": {
+          "name": "criterio_avaliacao_escala",
+          "value": "\"criterio_avaliacao\".\"escala_maxima\" > \"criterio_avaliacao\".\"escala_minima\""
+        },
+        "criterio_avaliacao_peso": {
+          "name": "criterio_avaliacao_peso",
+          "value": "\"criterio_avaliacao\".\"peso\" is null or \"criterio_avaliacao\".\"peso\" >= 0"
+        }
+      },
+      "isRLSEnabled": false
+    },
+    "public.evidencia": {
+      "name": "evidencia",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "avaliacao_versao_id": {
+          "name": "avaliacao_versao_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "tipo": {
+          "name": "tipo",
+          "type": "tipo_evidencia",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "descricao": {
+          "name": "descricao",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "fonte": {
+          "name": "fonte",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "url": {
+          "name": "url",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "data_evidencia": {
+          "name": "data_evidencia",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "evidencia_origem_id": {
+          "name": "evidencia_origem_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "criado_em": {
+          "name": "criado_em",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "criado_por": {
+          "name": "criado_por",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "atualizado_em": {
+          "name": "atualizado_em",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "atualizado_por": {
+          "name": "atualizado_por",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "arquivado_em": {
+          "name": "arquivado_em",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {
+        "evidencia_versao_idx": {
+          "name": "evidencia_versao_idx",
+          "columns": [
+            {
+              "expression": "avaliacao_versao_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "evidencia_avaliacao_versao_id_avaliacao_versao_id_fk": {
+          "name": "evidencia_avaliacao_versao_id_avaliacao_versao_id_fk",
+          "tableFrom": "evidencia",
+          "tableTo": "avaliacao_versao",
+          "columnsFrom": [
+            "avaliacao_versao_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "evidencia_evidencia_origem_id_evidencia_id_fk": {
+          "name": "evidencia_evidencia_origem_id_evidencia_id_fk",
+          "tableFrom": "evidencia",
+          "tableTo": "evidencia",
+          "columnsFrom": [
+            "evidencia_origem_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "evidencia_criado_por_usuario_id_fk": {
+          "name": "evidencia_criado_por_usuario_id_fk",
+          "tableFrom": "evidencia",
+          "tableTo": "usuario",
+          "columnsFrom": [
+            "criado_por"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "evidencia_atualizado_por_usuario_id_fk": {
+          "name": "evidencia_atualizado_por_usuario_id_fk",
+          "tableFrom": "evidencia",
+          "tableTo": "usuario",
+          "columnsFrom": [
+            "atualizado_por"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {
+        "evidencia_descricao_preenchida": {
+          "name": "evidencia_descricao_preenchida",
+          "value": "length(trim(\"evidencia\".\"descricao\")) > 0"
+        }
+      },
+      "isRLSEnabled": false
+    },
+    "public.instituicao": {
+      "name": "instituicao",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "tipo_stakeholder": {
+          "name": "tipo_stakeholder",
+          "type": "tipo_stakeholder",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'instituicao'"
+        },
+        "nome": {
+          "name": "nome",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "sigla": {
+          "name": "sigla",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "nome_normalizado": {
+          "name": "nome_normalizado",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "natureza": {
+          "name": "natureza",
+          "type": "natureza_instituicao",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "esfera": {
+          "name": "esfera",
+          "type": "esfera_instituicao",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "pais": {
+          "name": "pais",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'BR'"
+        },
+        "cnpj": {
+          "name": "cnpj",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "uf": {
+          "name": "uf",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "municipio": {
+          "name": "municipio",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "site": {
+          "name": "site",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "instituicao_superior_id": {
+          "name": "instituicao_superior_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "criado_em": {
+          "name": "criado_em",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "criado_por": {
+          "name": "criado_por",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "atualizado_em": {
+          "name": "atualizado_em",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "atualizado_por": {
+          "name": "atualizado_por",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "arquivado_em": {
+          "name": "arquivado_em",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {
+        "instituicao_cnpj_idx": {
+          "name": "instituicao_cnpj_idx",
+          "columns": [
+            {
+              "expression": "cnpj",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "instituicao_nome_normalizado_idx": {
+          "name": "instituicao_nome_normalizado_idx",
+          "columns": [
+            {
+              "expression": "nome_normalizado",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "instituicao_instituicao_superior_id_instituicao_id_fk": {
+          "name": "instituicao_instituicao_superior_id_instituicao_id_fk",
+          "tableFrom": "instituicao",
+          "tableTo": "instituicao",
+          "columnsFrom": [
+            "instituicao_superior_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "instituicao_criado_por_usuario_id_fk": {
+          "name": "instituicao_criado_por_usuario_id_fk",
+          "tableFrom": "instituicao",
+          "tableTo": "usuario",
+          "columnsFrom": [
+            "criado_por"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "instituicao_atualizado_por_usuario_id_fk": {
+          "name": "instituicao_atualizado_por_usuario_id_fk",
+          "tableFrom": "instituicao",
+          "tableTo": "usuario",
+          "columnsFrom": [
+            "atualizado_por"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "instituicao_stakeholder_fk": {
+          "name": "instituicao_stakeholder_fk",
+          "tableFrom": "instituicao",
+          "tableTo": "stakeholder",
+          "columnsFrom": [
+            "id",
+            "tipo_stakeholder"
+          ],
+          "columnsTo": [
+            "id",
+            "tipo"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {
+        "instituicao_tipo_stakeholder": {
+          "name": "instituicao_tipo_stakeholder",
+          "value": "\"instituicao\".\"tipo_stakeholder\" = 'instituicao'"
+        },
+        "instituicao_nome_preenchido": {
+          "name": "instituicao_nome_preenchido",
+          "value": "length(trim(\"instituicao\".\"nome\")) > 0"
+        },
+        "instituicao_cnpj_formato": {
+          "name": "instituicao_cnpj_formato",
+          "value": "\"instituicao\".\"cnpj\" is null or \"instituicao\".\"cnpj\" ~ '^[0-9A-Z]{12}[0-9]{2}$'"
+        },
+        "instituicao_uf_formato": {
+          "name": "instituicao_uf_formato",
+          "value": "\"instituicao\".\"uf\" is null or \"instituicao\".\"uf\" ~ '^[A-Z]{2}$'"
+        },
+        "instituicao_pais_formato": {
+          "name": "instituicao_pais_formato",
+          "value": "\"instituicao\".\"pais\" ~ '^[A-Z]{2}$'"
+        },
+        "instituicao_uf_somente_brasil": {
+          "name": "instituicao_uf_somente_brasil",
+          "value": "\"instituicao\".\"pais\" = 'BR' or \"instituicao\".\"uf\" is null"
+        },
+        "instituicao_cnpj_somente_brasil": {
+          "name": "instituicao_cnpj_somente_brasil",
+          "value": "\"instituicao\".\"pais\" = 'BR' or \"instituicao\".\"cnpj\" is null"
+        },
+        "instituicao_nao_superior_de_si": {
+          "name": "instituicao_nao_superior_de_si",
+          "value": "\"instituicao\".\"instituicao_superior_id\" is distinct from \"instituicao\".\"id\""
+        }
+      },
+      "isRLSEnabled": false
+    },
+    "public.metodologia_versao": {
+      "name": "metodologia_versao",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "nome": {
+          "name": "nome",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "descricao": {
+          "name": "descricao",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "situacao": {
+          "name": "situacao",
+          "type": "situacao_metodologia",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'rascunho'"
+        },
+        "homologada": {
+          "name": "homologada",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": false
+        },
+        "vigente_desde": {
+          "name": "vigente_desde",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "vigente_ate": {
+          "name": "vigente_ate",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "escala_poder_interesse": {
+          "name": "escala_poder_interesse",
+          "type": "escala_poder_interesse",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'ordinal_tres_niveis'"
+        },
+        "escala_posicionamento": {
+          "name": "escala_posicionamento",
+          "type": "escala_posicionamento",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'tres_categorias'"
+        },
+        "metodologia_anterior_id": {
+          "name": "metodologia_anterior_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "natureza_alteracao": {
+          "name": "natureza_alteracao",
+          "type": "natureza_alteracao",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "justificativa_natureza": {
+          "name": "justificativa_natureza",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "natureza_aprovada_por": {
+          "name": "natureza_aprovada_por",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "natureza_aprovada_em": {
+          "name": "natureza_aprovada_em",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "equivalente_posicionamento_a": {
+          "name": "equivalente_posicionamento_a",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "justificativa_equivalencia": {
+          "name": "justificativa_equivalencia",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "criado_em": {
+          "name": "criado_em",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "criado_por": {
+          "name": "criado_por",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "atualizado_em": {
+          "name": "atualizado_em",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "atualizado_por": {
+          "name": "atualizado_por",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "arquivado_em": {
+          "name": "arquivado_em",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {
+        "metodologia_vigente_unica": {
+          "name": "metodologia_vigente_unica",
+          "columns": [
+            {
+              "expression": "situacao",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "where": "\"metodologia_versao\".\"situacao\" = 'vigente'",
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "metodologia_versao_metodologia_anterior_id_metodologia_versao_id_fk": {
+          "name": "metodologia_versao_metodologia_anterior_id_metodologia_versao_id_fk",
+          "tableFrom": "metodologia_versao",
+          "tableTo": "metodologia_versao",
+          "columnsFrom": [
+            "metodologia_anterior_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "metodologia_versao_natureza_aprovada_por_usuario_id_fk": {
+          "name": "metodologia_versao_natureza_aprovada_por_usuario_id_fk",
+          "tableFrom": "metodologia_versao",
+          "tableTo": "usuario",
+          "columnsFrom": [
+            "natureza_aprovada_por"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "metodologia_versao_equivalente_posicionamento_a_metodologia_versao_id_fk": {
+          "name": "metodologia_versao_equivalente_posicionamento_a_metodologia_versao_id_fk",
+          "tableFrom": "metodologia_versao",
+          "tableTo": "metodologia_versao",
+          "columnsFrom": [
+            "equivalente_posicionamento_a"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "metodologia_versao_criado_por_usuario_id_fk": {
+          "name": "metodologia_versao_criado_por_usuario_id_fk",
+          "tableFrom": "metodologia_versao",
+          "tableTo": "usuario",
+          "columnsFrom": [
+            "criado_por"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "metodologia_versao_atualizado_por_usuario_id_fk": {
+          "name": "metodologia_versao_atualizado_por_usuario_id_fk",
+          "tableFrom": "metodologia_versao",
+          "tableTo": "usuario",
+          "columnsFrom": [
+            "atualizado_por"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "metodologia_versao_nome_unico": {
+          "name": "metodologia_versao_nome_unico",
+          "nullsNotDistinct": false,
+          "columns": [
+            "nome"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {
+        "metodologia_versao_datas": {
+          "name": "metodologia_versao_datas",
+          "value": "\"metodologia_versao\".\"vigente_desde\" is null or \"metodologia_versao\".\"vigente_ate\" is null or \"metodologia_versao\".\"vigente_ate\" >= \"metodologia_versao\".\"vigente_desde\""
+        }
+      },
+      "isRLSEnabled": false
+    },
+    "public.permissao_contexto": {
+      "name": "permissao_contexto",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "usuario_id": {
+          "name": "usuario_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "projeto_tema_id": {
+          "name": "projeto_tema_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "perfil": {
+          "name": "perfil",
+          "type": "perfil_contexto",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "valida_ate": {
+          "name": "valida_ate",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "criado_em": {
+          "name": "criado_em",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "criado_por": {
+          "name": "criado_por",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "atualizado_em": {
+          "name": "atualizado_em",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "atualizado_por": {
+          "name": "atualizado_por",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "arquivado_em": {
+          "name": "arquivado_em",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {
+        "permissao_contexto_unica": {
+          "name": "permissao_contexto_unica",
+          "columns": [
+            {
+              "expression": "usuario_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "projeto_tema_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "where": "\"permissao_contexto\".\"arquivado_em\" is null",
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "permissao_contexto_usuario_id_usuario_id_fk": {
+          "name": "permissao_contexto_usuario_id_usuario_id_fk",
+          "tableFrom": "permissao_contexto",
+          "tableTo": "usuario",
+          "columnsFrom": [
+            "usuario_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "permissao_contexto_projeto_tema_id_projeto_tema_id_fk": {
+          "name": "permissao_contexto_projeto_tema_id_projeto_tema_id_fk",
+          "tableFrom": "permissao_contexto",
+          "tableTo": "projeto_tema",
+          "columnsFrom": [
+            "projeto_tema_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "permissao_contexto_criado_por_usuario_id_fk": {
+          "name": "permissao_contexto_criado_por_usuario_id_fk",
+          "tableFrom": "permissao_contexto",
+          "tableTo": "usuario",
+          "columnsFrom": [
+            "criado_por"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "permissao_contexto_atualizado_por_usuario_id_fk": {
+          "name": "permissao_contexto_atualizado_por_usuario_id_fk",
+          "tableFrom": "permissao_contexto",
+          "tableTo": "usuario",
+          "columnsFrom": [
+            "atualizado_por"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.pessoa": {
+      "name": "pessoa",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "tipo_stakeholder": {
+          "name": "tipo_stakeholder",
+          "type": "tipo_stakeholder",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'pessoa'"
+        },
+        "nome_completo": {
+          "name": "nome_completo",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "nome_tratamento": {
+          "name": "nome_tratamento",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "nome_normalizado": {
+          "name": "nome_normalizado",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "observacoes": {
+          "name": "observacoes",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "criado_em": {
+          "name": "criado_em",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "criado_por": {
+          "name": "criado_por",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "atualizado_em": {
+          "name": "atualizado_em",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "atualizado_por": {
+          "name": "atualizado_por",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "arquivado_em": {
+          "name": "arquivado_em",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {
+        "pessoa_nome_normalizado_idx": {
+          "name": "pessoa_nome_normalizado_idx",
+          "columns": [
+            {
+              "expression": "nome_normalizado",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "pessoa_criado_por_usuario_id_fk": {
+          "name": "pessoa_criado_por_usuario_id_fk",
+          "tableFrom": "pessoa",
+          "tableTo": "usuario",
+          "columnsFrom": [
+            "criado_por"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "pessoa_atualizado_por_usuario_id_fk": {
+          "name": "pessoa_atualizado_por_usuario_id_fk",
+          "tableFrom": "pessoa",
+          "tableTo": "usuario",
+          "columnsFrom": [
+            "atualizado_por"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "pessoa_stakeholder_fk": {
+          "name": "pessoa_stakeholder_fk",
+          "tableFrom": "pessoa",
+          "tableTo": "stakeholder",
+          "columnsFrom": [
+            "id",
+            "tipo_stakeholder"
+          ],
+          "columnsTo": [
+            "id",
+            "tipo"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {
+        "pessoa_tipo_stakeholder": {
+          "name": "pessoa_tipo_stakeholder",
+          "value": "\"pessoa\".\"tipo_stakeholder\" = 'pessoa'"
+        },
+        "pessoa_nome_preenchido": {
+          "name": "pessoa_nome_preenchido",
+          "value": "length(trim(\"pessoa\".\"nome_completo\")) > 0"
+        }
+      },
+      "isRLSEnabled": false
+    },
+    "public.projeto_tema": {
+      "name": "projeto_tema",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "tipo": {
+          "name": "tipo",
+          "type": "tipo_projeto_tema",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "nome": {
+          "name": "nome",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "nome_normalizado": {
+          "name": "nome_normalizado",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "descricao": {
+          "name": "descricao",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "comite_id": {
+          "name": "comite_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "situacao": {
+          "name": "situacao",
+          "type": "situacao_projeto_tema",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'proposto'"
+        },
+        "data_inicio": {
+          "name": "data_inicio",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "data_fim": {
+          "name": "data_fim",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "responsavel_id": {
+          "name": "responsavel_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "criado_em": {
+          "name": "criado_em",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "criado_por": {
+          "name": "criado_por",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "atualizado_em": {
+          "name": "atualizado_em",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "atualizado_por": {
+          "name": "atualizado_por",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "arquivado_em": {
+          "name": "arquivado_em",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {
+        "projeto_tema_comite_principal_idx": {
+          "name": "projeto_tema_comite_principal_idx",
+          "columns": [
+            {
+              "expression": "comite_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "projeto_tema_nome_normalizado_idx": {
+          "name": "projeto_tema_nome_normalizado_idx",
+          "columns": [
+            {
+              "expression": "nome_normalizado",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "projeto_tema_comite_id_comite_id_fk": {
+          "name": "projeto_tema_comite_id_comite_id_fk",
+          "tableFrom": "projeto_tema",
+          "tableTo": "comite",
+          "columnsFrom": [
+            "comite_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "projeto_tema_responsavel_id_usuario_id_fk": {
+          "name": "projeto_tema_responsavel_id_usuario_id_fk",
+          "tableFrom": "projeto_tema",
+          "tableTo": "usuario",
+          "columnsFrom": [
+            "responsavel_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "projeto_tema_criado_por_usuario_id_fk": {
+          "name": "projeto_tema_criado_por_usuario_id_fk",
+          "tableFrom": "projeto_tema",
+          "tableTo": "usuario",
+          "columnsFrom": [
+            "criado_por"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "projeto_tema_atualizado_por_usuario_id_fk": {
+          "name": "projeto_tema_atualizado_por_usuario_id_fk",
+          "tableFrom": "projeto_tema",
+          "tableTo": "usuario",
+          "columnsFrom": [
+            "atualizado_por"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "projeto_tema_nome_unico": {
+          "name": "projeto_tema_nome_unico",
+          "nullsNotDistinct": false,
+          "columns": [
+            "comite_id",
+            "tipo",
+            "nome"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {
+        "projeto_tema_datas": {
+          "name": "projeto_tema_datas",
+          "value": "\"projeto_tema\".\"data_inicio\" is null or \"projeto_tema\".\"data_fim\" is null or \"projeto_tema\".\"data_fim\" >= \"projeto_tema\".\"data_inicio\""
+        },
+        "projeto_tema_nome_preenchido": {
+          "name": "projeto_tema_nome_preenchido",
+          "value": "length(trim(\"projeto_tema\".\"nome\")) > 0"
+        }
+      },
+      "isRLSEnabled": false
+    },
+    "public.projeto_tema_comite": {
+      "name": "projeto_tema_comite",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "projeto_tema_id": {
+          "name": "projeto_tema_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "comite_id": {
+          "name": "comite_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "data_inicio": {
+          "name": "data_inicio",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "data_fim": {
+          "name": "data_fim",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "observacao": {
+          "name": "observacao",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "criado_em": {
+          "name": "criado_em",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "criado_por": {
+          "name": "criado_por",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "atualizado_em": {
+          "name": "atualizado_em",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "atualizado_por": {
+          "name": "atualizado_por",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "arquivado_em": {
+          "name": "arquivado_em",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {
+        "projeto_tema_comite_vigente_unico": {
+          "name": "projeto_tema_comite_vigente_unico",
+          "columns": [
+            {
+              "expression": "projeto_tema_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "comite_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "where": "\"projeto_tema_comite\".\"data_fim\" is null and \"projeto_tema_comite\".\"arquivado_em\" is null",
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "projeto_tema_comite_comite_idx": {
+          "name": "projeto_tema_comite_comite_idx",
+          "columns": [
+            {
+              "expression": "comite_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "projeto_tema_comite_projeto_tema_id_projeto_tema_id_fk": {
+          "name": "projeto_tema_comite_projeto_tema_id_projeto_tema_id_fk",
+          "tableFrom": "projeto_tema_comite",
+          "tableTo": "projeto_tema",
+          "columnsFrom": [
+            "projeto_tema_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "projeto_tema_comite_comite_id_comite_id_fk": {
+          "name": "projeto_tema_comite_comite_id_comite_id_fk",
+          "tableFrom": "projeto_tema_comite",
+          "tableTo": "comite",
+          "columnsFrom": [
+            "comite_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "projeto_tema_comite_criado_por_usuario_id_fk": {
+          "name": "projeto_tema_comite_criado_por_usuario_id_fk",
+          "tableFrom": "projeto_tema_comite",
+          "tableTo": "usuario",
+          "columnsFrom": [
+            "criado_por"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "projeto_tema_comite_atualizado_por_usuario_id_fk": {
+          "name": "projeto_tema_comite_atualizado_por_usuario_id_fk",
+          "tableFrom": "projeto_tema_comite",
+          "tableTo": "usuario",
+          "columnsFrom": [
+            "atualizado_por"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {
+        "projeto_tema_comite_datas": {
+          "name": "projeto_tema_comite_datas",
+          "value": "\"projeto_tema_comite\".\"data_inicio\" is null or \"projeto_tema_comite\".\"data_fim\" is null or \"projeto_tema_comite\".\"data_fim\" >= \"projeto_tema_comite\".\"data_inicio\""
+        }
+      },
+      "isRLSEnabled": false
+    },
+    "public.registro_auditoria": {
+      "name": "registro_auditoria",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "bigint",
+          "primaryKey": true,
+          "notNull": true,
+          "identity": {
+            "type": "always",
+            "name": "registro_auditoria_id_seq",
+            "schema": "public",
+            "increment": "1",
+            "startWith": "1",
+            "minValue": "1",
+            "maxValue": "9223372036854775807",
+            "cache": "1",
+            "cycle": false
+          }
+        },
+        "tabela": {
+          "name": "tabela",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "registro_id": {
+          "name": "registro_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "operacao": {
+          "name": "operacao",
+          "type": "operacao_auditoria",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "dados_anteriores": {
+          "name": "dados_anteriores",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "dados_novos": {
+          "name": "dados_novos",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "usuario_id": {
+          "name": "usuario_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "ocorrido_em": {
+          "name": "ocorrido_em",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {
+        "registro_auditoria_registro_idx": {
+          "name": "registro_auditoria_registro_idx",
+          "columns": [
+            {
+              "expression": "tabela",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "registro_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "registro_auditoria_usuario_id_usuario_id_fk": {
+          "name": "registro_auditoria_usuario_id_usuario_id_fk",
+          "tableFrom": "registro_auditoria",
+          "tableTo": "usuario",
+          "columnsFrom": [
+            "usuario_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.rubrica_nivel": {
+      "name": "rubrica_nivel",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "metodologia_versao_id": {
+          "name": "metodologia_versao_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "dimensao": {
+          "name": "dimensao",
+          "type": "dimensao_rubrica",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "nivel": {
+          "name": "nivel",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "criterio_orientador": {
+          "name": "criterio_orientador",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "bases_tipicas": {
+          "name": "bases_tipicas",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "ordem": {
+          "name": "ordem",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "criado_em": {
+          "name": "criado_em",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "criado_por": {
+          "name": "criado_por",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "atualizado_em": {
+          "name": "atualizado_em",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "atualizado_por": {
+          "name": "atualizado_por",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "arquivado_em": {
+          "name": "arquivado_em",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "rubrica_nivel_metodologia_versao_id_metodologia_versao_id_fk": {
+          "name": "rubrica_nivel_metodologia_versao_id_metodologia_versao_id_fk",
+          "tableFrom": "rubrica_nivel",
+          "tableTo": "metodologia_versao",
+          "columnsFrom": [
+            "metodologia_versao_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "rubrica_nivel_criado_por_usuario_id_fk": {
+          "name": "rubrica_nivel_criado_por_usuario_id_fk",
+          "tableFrom": "rubrica_nivel",
+          "tableTo": "usuario",
+          "columnsFrom": [
+            "criado_por"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "rubrica_nivel_atualizado_por_usuario_id_fk": {
+          "name": "rubrica_nivel_atualizado_por_usuario_id_fk",
+          "tableFrom": "rubrica_nivel",
+          "tableTo": "usuario",
+          "columnsFrom": [
+            "atualizado_por"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "rubrica_nivel_unica": {
+          "name": "rubrica_nivel_unica",
+          "nullsNotDistinct": false,
+          "columns": [
+            "metodologia_versao_id",
+            "dimensao",
+            "nivel"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {
+        "rubrica_nivel_valido": {
+          "name": "rubrica_nivel_valido",
+          "value": "(\"rubrica_nivel\".\"dimensao\" in ('poder', 'interesse') and \"rubrica_nivel\".\"nivel\" in ('alto', 'medio', 'baixo', 'nao_avaliado'))\n        or (\"rubrica_nivel\".\"dimensao\" = 'posicionamento' and \"rubrica_nivel\".\"nivel\" in ('favoravel', 'neutro', 'contrario', 'nao_avaliado'))"
+        },
+        "rubrica_nivel_criterio_preenchido": {
+          "name": "rubrica_nivel_criterio_preenchido",
+          "value": "length(trim(\"rubrica_nivel\".\"criterio_orientador\")) > 0"
+        }
+      },
+      "isRLSEnabled": false
+    },
+    "public.stakeholder": {
+      "name": "stakeholder",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "tipo": {
+          "name": "tipo",
+          "type": "tipo_stakeholder",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "criado_em": {
+          "name": "criado_em",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "criado_por": {
+          "name": "criado_por",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "stakeholder_criado_por_usuario_id_fk": {
+          "name": "stakeholder_criado_por_usuario_id_fk",
+          "tableFrom": "stakeholder",
+          "tableTo": "usuario",
+          "columnsFrom": [
+            "criado_por"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "stakeholder_id_tipo_unico": {
+          "name": "stakeholder_id_tipo_unico",
+          "nullsNotDistinct": false,
+          "columns": [
+            "id",
+            "tipo"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.stakeholder_contexto": {
+      "name": "stakeholder_contexto",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "stakeholder_id": {
+          "name": "stakeholder_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "projeto_tema_id": {
+          "name": "projeto_tema_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "tipo_relacao": {
+          "name": "tipo_relacao",
+          "type": "tipo_relacao_contexto",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "descricao": {
+          "name": "descricao",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "data_inicio": {
+          "name": "data_inicio",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "data_fim": {
+          "name": "data_fim",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "criado_em": {
+          "name": "criado_em",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "criado_por": {
+          "name": "criado_por",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "atualizado_em": {
+          "name": "atualizado_em",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "atualizado_por": {
+          "name": "atualizado_por",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "arquivado_em": {
+          "name": "arquivado_em",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {
+        "stakeholder_contexto_vigente_unico": {
+          "name": "stakeholder_contexto_vigente_unico",
+          "columns": [
+            {
+              "expression": "stakeholder_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "projeto_tema_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "tipo_relacao",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "where": "\"stakeholder_contexto\".\"data_fim\" is null and \"stakeholder_contexto\".\"arquivado_em\" is null",
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "stakeholder_contexto_projeto_idx": {
+          "name": "stakeholder_contexto_projeto_idx",
+          "columns": [
+            {
+              "expression": "projeto_tema_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "stakeholder_contexto_stakeholder_idx": {
+          "name": "stakeholder_contexto_stakeholder_idx",
+          "columns": [
+            {
+              "expression": "stakeholder_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "stakeholder_contexto_stakeholder_id_stakeholder_id_fk": {
+          "name": "stakeholder_contexto_stakeholder_id_stakeholder_id_fk",
+          "tableFrom": "stakeholder_contexto",
+          "tableTo": "stakeholder",
+          "columnsFrom": [
+            "stakeholder_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "stakeholder_contexto_projeto_tema_id_projeto_tema_id_fk": {
+          "name": "stakeholder_contexto_projeto_tema_id_projeto_tema_id_fk",
+          "tableFrom": "stakeholder_contexto",
+          "tableTo": "projeto_tema",
+          "columnsFrom": [
+            "projeto_tema_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "stakeholder_contexto_criado_por_usuario_id_fk": {
+          "name": "stakeholder_contexto_criado_por_usuario_id_fk",
+          "tableFrom": "stakeholder_contexto",
+          "tableTo": "usuario",
+          "columnsFrom": [
+            "criado_por"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "stakeholder_contexto_atualizado_por_usuario_id_fk": {
+          "name": "stakeholder_contexto_atualizado_por_usuario_id_fk",
+          "tableFrom": "stakeholder_contexto",
+          "tableTo": "usuario",
+          "columnsFrom": [
+            "atualizado_por"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {
+        "stakeholder_contexto_datas": {
+          "name": "stakeholder_contexto_datas",
+          "value": "\"stakeholder_contexto\".\"data_inicio\" is null or \"stakeholder_contexto\".\"data_fim\" is null or \"stakeholder_contexto\".\"data_fim\" >= \"stakeholder_contexto\".\"data_inicio\""
+        }
+      },
+      "isRLSEnabled": false
+    },
+    "public.usuario": {
+      "name": "usuario",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "nome": {
+          "name": "nome",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "email": {
+          "name": "email",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "administrador": {
+          "name": "administrador",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": false
+        },
+        "situacao": {
+          "name": "situacao",
+          "type": "situacao_usuario",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'ativo'"
+        },
+        "criado_em": {
+          "name": "criado_em",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "atualizado_em": {
+          "name": "atualizado_em",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {
+        "usuario_email_unico": {
+          "name": "usuario_email_unico",
+          "columns": [
+            {
+              "expression": "lower(\"email\")",
+              "asc": true,
+              "isExpression": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.vinculo_pessoa_instituicao": {
+      "name": "vinculo_pessoa_instituicao",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "pessoa_id": {
+          "name": "pessoa_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "instituicao_id": {
+          "name": "instituicao_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "cargo": {
+          "name": "cargo",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "area": {
+          "name": "area",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "data_inicio": {
+          "name": "data_inicio",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "data_fim": {
+          "name": "data_fim",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "principal": {
+          "name": "principal",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": false
+        },
+        "criado_em": {
+          "name": "criado_em",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "criado_por": {
+          "name": "criado_por",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "atualizado_em": {
+          "name": "atualizado_em",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "atualizado_por": {
+          "name": "atualizado_por",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "arquivado_em": {
+          "name": "arquivado_em",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {
+        "vinculo_principal_vigente_unico": {
+          "name": "vinculo_principal_vigente_unico",
+          "columns": [
+            {
+              "expression": "pessoa_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "where": "\"vinculo_pessoa_instituicao\".\"principal\" and \"vinculo_pessoa_instituicao\".\"data_fim\" is null and \"vinculo_pessoa_instituicao\".\"arquivado_em\" is null",
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "vinculo_pessoa_idx": {
+          "name": "vinculo_pessoa_idx",
+          "columns": [
+            {
+              "expression": "pessoa_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "vinculo_instituicao_idx": {
+          "name": "vinculo_instituicao_idx",
+          "columns": [
+            {
+              "expression": "instituicao_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "vinculo_pessoa_instituicao_pessoa_id_pessoa_id_fk": {
+          "name": "vinculo_pessoa_instituicao_pessoa_id_pessoa_id_fk",
+          "tableFrom": "vinculo_pessoa_instituicao",
+          "tableTo": "pessoa",
+          "columnsFrom": [
+            "pessoa_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "vinculo_pessoa_instituicao_instituicao_id_instituicao_id_fk": {
+          "name": "vinculo_pessoa_instituicao_instituicao_id_instituicao_id_fk",
+          "tableFrom": "vinculo_pessoa_instituicao",
+          "tableTo": "instituicao",
+          "columnsFrom": [
+            "instituicao_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "vinculo_pessoa_instituicao_criado_por_usuario_id_fk": {
+          "name": "vinculo_pessoa_instituicao_criado_por_usuario_id_fk",
+          "tableFrom": "vinculo_pessoa_instituicao",
+          "tableTo": "usuario",
+          "columnsFrom": [
+            "criado_por"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "vinculo_pessoa_instituicao_atualizado_por_usuario_id_fk": {
+          "name": "vinculo_pessoa_instituicao_atualizado_por_usuario_id_fk",
+          "tableFrom": "vinculo_pessoa_instituicao",
+          "tableTo": "usuario",
+          "columnsFrom": [
+            "atualizado_por"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {
+        "vinculo_datas": {
+          "name": "vinculo_datas",
+          "value": "\"vinculo_pessoa_instituicao\".\"data_inicio\" is null or \"vinculo_pessoa_instituicao\".\"data_fim\" is null or \"vinculo_pessoa_instituicao\".\"data_fim\" >= \"vinculo_pessoa_instituicao\".\"data_inicio\""
+        }
+      },
+      "isRLSEnabled": false
+    }
+  },
+  "enums": {
+    "public.dimensao_criterio": {
+      "name": "dimensao_criterio",
+      "schema": "public",
+      "values": [
+        "poder",
+        "interesse"
+      ]
+    },
+    "public.dimensao_rubrica": {
+      "name": "dimensao_rubrica",
+      "schema": "public",
+      "values": [
+        "poder",
+        "interesse",
+        "posicionamento"
+      ]
+    },
+    "public.escala_poder_interesse": {
+      "name": "escala_poder_interesse",
+      "schema": "public",
+      "values": [
+        "demonstracao_numerica",
+        "binaria_historica",
+        "ordinal_tres_niveis"
+      ]
+    },
+    "public.escala_posicionamento": {
+      "name": "escala_posicionamento",
+      "schema": "public",
+      "values": [
+        "cinco_categorias",
+        "tres_categorias"
+      ]
+    },
+    "public.esfera_instituicao": {
+      "name": "esfera_instituicao",
+      "schema": "public",
+      "values": [
+        "federal",
+        "estadual",
+        "municipal",
+        "nao_se_aplica"
+      ]
+    },
+    "public.grau_confianca": {
+      "name": "grau_confianca",
+      "schema": "public",
+      "values": [
+        "alto",
+        "medio",
+        "baixo"
+      ]
+    },
+    "public.natureza_alteracao": {
+      "name": "natureza_alteracao",
+      "schema": "public",
+      "values": [
+        "substantiva",
+        "editorial"
+      ]
+    },
+    "public.natureza_contato": {
+      "name": "natureza_contato",
+      "schema": "public",
+      "values": [
+        "pessoal",
+        "institucional",
+        "funcional"
+      ]
+    },
+    "public.natureza_instituicao": {
+      "name": "natureza_instituicao",
+      "schema": "public",
+      "values": [
+        "orgao_publico",
+        "empresa",
+        "entidade_classe",
+        "academia",
+        "terceiro_setor",
+        "imprensa",
+        "outra"
+      ]
+    },
+    "public.natureza_posicionamento": {
+      "name": "natureza_posicionamento",
+      "schema": "public",
+      "values": [
+        "manifestacao_formal",
+        "informacao_informal",
+        "percepcao_consultor"
+      ]
+    },
+    "public.nivel_avaliacao": {
+      "name": "nivel_avaliacao",
+      "schema": "public",
+      "values": [
+        "alto",
+        "medio",
+        "baixo"
+      ]
+    },
+    "public.operacao_auditoria": {
+      "name": "operacao_auditoria",
+      "schema": "public",
+      "values": [
+        "inclusao",
+        "alteracao",
+        "arquivamento",
+        "reativacao",
+        "exclusao"
+      ]
+    },
+    "public.perfil_contexto": {
+      "name": "perfil_contexto",
+      "schema": "public",
+      "values": [
+        "gestor",
+        "colaborador",
+        "leitor"
+      ]
+    },
+    "public.posicionamento": {
+      "name": "posicionamento",
+      "schema": "public",
+      "values": [
+        "favoravel",
+        "parcialmente_favoravel",
+        "neutro",
+        "parcialmente_contrario",
+        "contrario"
+      ]
+    },
+    "public.situacao_metodologia": {
+      "name": "situacao_metodologia",
+      "schema": "public",
+      "values": [
+        "rascunho",
+        "vigente",
+        "encerrada"
+      ]
+    },
+    "public.situacao_projeto_tema": {
+      "name": "situacao_projeto_tema",
+      "schema": "public",
+      "values": [
+        "proposto",
+        "ativo",
+        "suspenso",
+        "concluido"
+      ]
+    },
+    "public.situacao_ressalvas": {
+      "name": "situacao_ressalvas",
+      "schema": "public",
+      "values": [
+        "ha_ressalvas",
+        "nao_identificadas",
+        "informacao_insuficiente"
+      ]
+    },
+    "public.situacao_usuario": {
+      "name": "situacao_usuario",
+      "schema": "public",
+      "values": [
+        "ativo",
+        "inativo"
+      ]
+    },
+    "public.situacao_versao_avaliacao": {
+      "name": "situacao_versao_avaliacao",
+      "schema": "public",
+      "values": [
+        "rascunho",
+        "vigente",
+        "substituida"
+      ]
+    },
+    "public.tipo_comite": {
+      "name": "tipo_comite",
+      "schema": "public",
+      "values": [
+        "desenvolvimento",
+        "tematico"
+      ]
+    },
+    "public.tipo_contato": {
+      "name": "tipo_contato",
+      "schema": "public",
+      "values": [
+        "email",
+        "telefone",
+        "celular",
+        "site",
+        "outro"
+      ]
+    },
+    "public.tipo_evidencia": {
+      "name": "tipo_evidencia",
+      "schema": "public",
+      "values": [
+        "documento",
+        "link",
+        "observacao"
+      ]
+    },
+    "public.tipo_projeto_tema": {
+      "name": "tipo_projeto_tema",
+      "schema": "public",
+      "values": [
+        "projeto",
+        "tema"
+      ]
+    },
+    "public.tipo_relacao_contexto": {
+      "name": "tipo_relacao_contexto",
+      "schema": "public",
+      "values": [
+        "orgao_competente",
+        "parceiro",
+        "financiador",
+        "executor",
+        "beneficiario",
+        "representacao_setorial",
+        "outro"
+      ]
+    },
+    "public.tipo_stakeholder": {
+      "name": "tipo_stakeholder",
+      "schema": "public",
+      "values": [
+        "pessoa",
+        "instituicao"
+      ]
+    }
+  },
+  "schemas": {},
+  "sequences": {},
+  "roles": {},
+  "policies": {},
+  "views": {},
+  "_meta": {
+    "columns": {},
+    "schemas": {},
+    "tables": {}
+  }
+}
