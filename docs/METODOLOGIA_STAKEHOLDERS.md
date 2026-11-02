@@ -12,6 +12,7 @@
 | 0.8 | 02/11/2026 | Diretrizes da Q-66 homologadas com ajustes (D-063): ressalvas em três situações, verificação documental para Poder Baixo, justificativa sem duplicação, informação complementar nos painéis; calibração pendente de execução. Ajustes técnicos T-1, T-4 e T-6 refletidos (seções 3, 7 e 9). |
 | 0.9 | 02/11/2026 | T-4 precisada (D-064): revalidação só em mudança metodológica substantiva; mudanças editoriais aprovadas não exigem reclassificação; natureza de cada alteração registrada com justificativa e aprovação (seções 1, 3, 7 e 9). |
 | 0.10 | 02/11/2026 | Calibração com avaliador único e registro das limitações (D-065, seção 10.5). |
+| 0.11 | 02/11/2026 | Rodada 2 com casos inéditos; gabaritos registrados antes da aplicação, sem alteração retrospectiva (D-066, seção 10.5). |
 
 Legenda: ✅ Aprovado · 🔧 Proposta técnica · ⏳ Pendente.
 
@@ -306,14 +307,15 @@ Sem manifestação, o campo não se aplica. O campo não cria categoria de posic
 ### 10.5 Calibração (H6 — aprovada, pendente de execução, com avaliador único)
 
 **Configuração (D-065):** o exercício é feito por **um único avaliador**, o gestor.
-- **Rodada 1:** dez casos fictícios, em formulário sem gabarito. Registra Poder, Interesse, Posicionamento, Ressalvas e observações sobre dúvidas, evidências insuficientes e dificuldades de interpretação.
+- **Rodada 1 — diagnóstico e familiarização:** dez casos fictícios, em formulário sem gabarito. Registra Poder, Interesse, Posicionamento, Ressalvas e observações sobre dúvidas, evidências insuficientes e dificuldades de interpretação.
 - **Comparação com o gabarito técnico, por dimensão:**
   - percentual de coincidência;
   - divergências extremas e adjacentes;
   - divergências entre classificação e "Não avaliado";
   - ambiguidades da rubrica;
   - casos em que o próprio gabarito deva ser reconsiderado.
-- **Rodada 2:** seis casos adicionais, depois da análise e dos ajustes, sem revelar antes o gabarito.
+- **Rodada 2 — casos inéditos (D-066):** seis casos fictícios novos, em projeto distinto, que não constaram de documentos anteriores, aplicados depois da análise e dos ajustes.
+- **Gabaritos:** registrados antes da aplicação, com impressão digital no Registro de Decisões, separados dos formulários e não alterados retrospectivamente. Revisões só em arquivo novo, com justificativa. Nas divergências, as duas fundamentações são examinadas, sem presumir que o gabarito esteja correto.
 
 **Limitações registradas:**
 - avaliador único;
@@ -321,7 +323,8 @@ Sem manifestação, o campo não se aplica. O campo não cria categoria de posic
 - a comparação com o gabarito **não constitui validação estatística independente**;
 - a referência de 80% é apenas exploratória, não requisito estatístico;
 - a homologação da metodologia será **decisão gerencial fundamentada**, com essas limitações documentadas;
-- a metodologia não será declarada validada antes da execução e da análise do exercício.
+- a metodologia não será declarada validada antes da execução e da análise do exercício;
+- na rodada 1, eventual acesso prévio ao gabarito é registrado como limitação.
 
 ### 10.6 Situação da homologação (D-063, 02/11/2026)
 
