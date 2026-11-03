@@ -29,6 +29,25 @@ const MENSAGENS_POR_REGRA: Record<string, string> = {
   avaliacao_nota_criterio_unica: "Este critério já tem nota nesta versão.",
   evidencia_descricao_preenchida: "Descreva a evidência.",
   permissao_contexto_unica: "Este usuário já tem permissão neste projeto ou tema.",
+  // Etapa 3: iniciativas, interações e compromissos.
+  iniciativa_titulo_preenchido: "Informe o título da iniciativa.",
+  iniciativa_datas: "As datas de previsão e de conclusão não podem ser anteriores à abertura.",
+  iniciativa_concluida_com_data: "Informe a data de conclusão da iniciativa.",
+  iniciativa_projeto_tema_unico: "Este projeto ou tema já está ligado à iniciativa.",
+  iniciativa_stakeholder_unico: "Este stakeholder já está na iniciativa com este papel.",
+  interacao_assunto_preenchido: "Informe o assunto da interação.",
+  interacao_periodo: "O término não pode ser anterior ao início.",
+  interacao_origem_unica: "Esta reunião já foi registrada a partir do calendário de origem.",
+  interacao_participante_stakeholder_unico: "Este participante já está na interação.",
+  interacao_participante_usuario_unico: "Este participante já está na interação.",
+  interacao_participante_um_tipo: "Indique um participante externo ou da equipe, não os dois.",
+  interacao_projeto_tema_unico: "Este projeto ou tema já está ligado à interação.",
+  interacao_iniciativa_unico: "Esta iniciativa já está ligada à interação.",
+  compromisso_descricao_preenchida: "Descreva o compromisso.",
+  compromisso_com_origem: "Ligue o compromisso a uma interação ou a uma iniciativa.",
+  compromisso_com_responsavel: "Indique o responsável pelo compromisso.",
+  compromisso_concluido_com_data: "Informe a data de conclusão do compromisso.",
+  compromisso_acompanhamento_registro_preenchido: "Descreva o acompanhamento.",
 };
 
 /** Traduz um erro de gravação em mensagem compreensível para o usuário. */

@@ -703,3 +703,286 @@ export const permissaoContexto = pgTable(
       .where(sql`${t.arquivadoEm} is null`),
   ],
 );
+
+// --- Iniciativas, interações e compromissos (Etapa 3) ------------------------
+// Cada reunião existe uma única vez (interacao) e se liga a quantas iniciativas,
+// projetos e participantes forem necessários (RN-05, RN-06). Ligações não são
+// apagadas: retirá-las é arquivá-las, com registro na auditoria.
+
+export const tipoIniciativa = pgEnum("tipo_iniciativa", ["demanda", "reuniao_relevante", "frente_atuacao"]);
+
+/** Ciclo de vida proposto em docs/MATRIZ_INICIATIVAS.md, seção 5 (provisório). */
+export const situacaoIniciativa = pgEnum("situacao_iniciativa", [
+  "registrada",
+  "em_analise",
+  "em_andamento",
+  "suspensa",
+  "concluida",
+  "cancelada",
+]);
+
+/** Escala provisória de prioridade (Q-21). */
+export const prioridadeIniciativa = pgEnum("prioridade_iniciativa", ["alta", "media", "baixa"]);
+
+/** Papéis propostos do stakeholder na iniciativa (Q-23, provisório). */
+export const papelIniciativa = pgEnum("papel_iniciativa", [
+  "demandante",
+  "apoiador",
+  "decisor",
+  "executor",
+  "afetado",
+  "outro",
+]);
+
+export const tipoInteracao = pgEnum("tipo_interacao", [
+  "reuniao_presencial",
+  "reuniao_virtual",
+  "ligacao",
+  "email",
+  "evento",
+  "visita",
+  "outro",
+]);
+
+export const situacaoInteracao = pgEnum("situacao_interacao", ["agendada", "realizada", "cancelada"]);
+
+export const presencaInteracao = pgEnum("presenca_interacao", ["convidado", "presente", "ausente"]);
+
+/** "Vencido" não é situação: é calculado (prazo passado e compromisso ainda aberto ou em andamento). */
+export const situacaoCompromisso = pgEnum("situacao_compromisso", [
+  "aberto",
+  "em_andamento",
+  "concluido",
+  "cancelado",
+]);
+
+/**
+ * Iniciativas da Matriz de Iniciativas (cadastro manual). A do tipo "reunião
+ * relevante" representa o assunto acompanhado; os encontros realizados ficam
+ * em interacao, ligados a ela (docs/MATRIZ_INICIATIVAS.md, seção 3).
+ */
+export const iniciativa = pgTable(
+  "iniciativa",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    tipo: tipoIniciativa("tipo").notNull(),
+    titulo: text("titulo").notNull(),
+    tituloNormalizado: text("titulo_normalizado").notNull(),
+    descricao: text("descricao"),
+    origem: text("origem"),
+    situacao: situacaoIniciativa("situacao").notNull().default("registrada"),
+    prioridade: prioridadeIniciativa("prioridade"),
+    responsavelId: uuid("responsavel_id").references(() => usuario.id),
+    dataAbertura: date("data_abertura").notNull(),
+    dataPrevistaConclusao: date("data_prevista_conclusao"),
+    dataConclusao: date("data_conclusao"),
+    ...colunasControle(),
+  },
+  (t) => [
+    check("iniciativa_titulo_preenchido", sql`length(trim(${t.titulo})) > 0`),
+    check(
+      "iniciativa_datas",
+      sql`(${t.dataConclusao} is null or ${t.dataConclusao} >= ${t.dataAbertura}) and (${t.dataPrevistaConclusao} is null or ${t.dataPrevistaConclusao} >= ${t.dataAbertura})`,
+    ),
+    check("iniciativa_concluida_com_data", sql`${t.situacao} <> 'concluida' or ${t.dataConclusao} is not null`),
+    index("iniciativa_titulo_normalizado_idx").on(t.tituloNormalizado),
+    index("iniciativa_responsavel_idx").on(t.responsavelId),
+  ],
+);
+
+/** Projetos e temas da iniciativa (pelo menos um vigente — regra no banco). */
+export const iniciativaProjetoTema = pgTable(
+  "iniciativa_projeto_tema",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    iniciativaId: uuid("iniciativa_id")
+      .notNull()
+      .references(() => iniciativa.id),
+    projetoTemaId: uuid("projeto_tema_id")
+      .notNull()
+      .references(() => projetoTema.id),
+    ...colunasControle(),
+  },
+  (t) => [
+    uniqueIndex("iniciativa_projeto_tema_unico")
+      .on(t.iniciativaId, t.projetoTemaId)
+      .where(sql`${t.arquivadoEm} is null`),
+    index("iniciativa_projeto_tema_projeto_idx").on(t.projetoTemaId),
+  ],
+);
+
+/** Pessoas e instituições envolvidas na iniciativa; o mesmo stakeholder pode ter mais de um papel. */
+export const iniciativaStakeholder = pgTable(
+  "iniciativa_stakeholder",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    iniciativaId: uuid("iniciativa_id")
+      .notNull()
+      .references(() => iniciativa.id),
+    stakeholderId: uuid("stakeholder_id")
+      .notNull()
+      .references(() => stakeholder.id),
+    papel: papelIniciativa("papel").notNull(),
+    observacao: text("observacao"),
+    ...colunasControle(),
+  },
+  (t) => [
+    uniqueIndex("iniciativa_stakeholder_unico")
+      .on(t.iniciativaId, t.stakeholderId, t.papel)
+      .where(sql`${t.arquivadoEm} is null`),
+    index("iniciativa_stakeholder_stakeholder_idx").on(t.stakeholderId),
+  ],
+);
+
+/**
+ * Reuniões, contatos e demais encontros, registrados uma única vez. A origem
+ * (sistema e identificador do evento) impede importar duas vezes a mesma
+ * reunião de um calendário externo (integração futura).
+ */
+export const interacao = pgTable(
+  "interacao",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    tipo: tipoInteracao("tipo").notNull(),
+    assunto: text("assunto").notNull(),
+    assuntoNormalizado: text("assunto_normalizado").notNull(),
+    inicio: timestamp("inicio", { withTimezone: true }).notNull(),
+    fim: timestamp("fim", { withTimezone: true }),
+    local: text("local"),
+    resumo: text("resumo"),
+    situacao: situacaoInteracao("situacao").notNull().default("realizada"),
+    origemSistema: text("origem_sistema"),
+    origemId: text("origem_id"),
+    ...colunasControle(),
+  },
+  (t) => [
+    check("interacao_assunto_preenchido", sql`length(trim(${t.assunto})) > 0`),
+    check("interacao_periodo", sql`${t.fim} is null or ${t.fim} >= ${t.inicio}`),
+    check("interacao_origem_completa", sql`(${t.origemSistema} is null) = (${t.origemId} is null)`),
+    uniqueIndex("interacao_origem_unica")
+      .on(t.origemSistema, t.origemId)
+      .where(sql`${t.origemSistema} is not null`),
+    index("interacao_inicio_idx").on(t.inicio),
+    index("interacao_assunto_normalizado_idx").on(t.assuntoNormalizado),
+  ],
+);
+
+/** Participantes: externo (stakeholder) ou da equipe interna (usuário), nunca os dois. */
+export const interacaoParticipante = pgTable(
+  "interacao_participante",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    interacaoId: uuid("interacao_id")
+      .notNull()
+      .references(() => interacao.id),
+    stakeholderId: uuid("stakeholder_id").references(() => stakeholder.id),
+    usuarioId: uuid("usuario_id").references(() => usuario.id),
+    presenca: presencaInteracao("presenca").notNull().default("presente"),
+    ...colunasControle(),
+  },
+  (t) => [
+    check("interacao_participante_um_tipo", sql`(${t.stakeholderId} is null) <> (${t.usuarioId} is null)`),
+    uniqueIndex("interacao_participante_stakeholder_unico")
+      .on(t.interacaoId, t.stakeholderId)
+      .where(sql`${t.stakeholderId} is not null and ${t.arquivadoEm} is null`),
+    uniqueIndex("interacao_participante_usuario_unico")
+      .on(t.interacaoId, t.usuarioId)
+      .where(sql`${t.usuarioId} is not null and ${t.arquivadoEm} is null`),
+    index("interacao_participante_stakeholder_idx").on(t.stakeholderId),
+  ],
+);
+
+/** Projetos e temas a que a interação se refere diretamente. */
+export const interacaoProjetoTema = pgTable(
+  "interacao_projeto_tema",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    interacaoId: uuid("interacao_id")
+      .notNull()
+      .references(() => interacao.id),
+    projetoTemaId: uuid("projeto_tema_id")
+      .notNull()
+      .references(() => projetoTema.id),
+    ...colunasControle(),
+  },
+  (t) => [
+    uniqueIndex("interacao_projeto_tema_unico")
+      .on(t.interacaoId, t.projetoTemaId)
+      .where(sql`${t.arquivadoEm} is null`),
+    index("interacao_projeto_tema_projeto_idx").on(t.projetoTemaId),
+  ],
+);
+
+/** Uma interação contribui para uma ou mais iniciativas, sem duplicar a reunião (RF-42, RF-43). */
+export const interacaoIniciativa = pgTable(
+  "interacao_iniciativa",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    interacaoId: uuid("interacao_id")
+      .notNull()
+      .references(() => interacao.id),
+    iniciativaId: uuid("iniciativa_id")
+      .notNull()
+      .references(() => iniciativa.id),
+    contribuicao: text("contribuicao"),
+    ...colunasControle(),
+  },
+  (t) => [
+    uniqueIndex("interacao_iniciativa_unico")
+      .on(t.interacaoId, t.iniciativaId)
+      .where(sql`${t.arquivadoEm} is null`),
+    index("interacao_iniciativa_iniciativa_idx").on(t.iniciativaId),
+  ],
+);
+
+/**
+ * Compromissos e encaminhamentos, ligados à interação que os originou e/ou a
+ * uma iniciativa. O vínculo com ações do Plano de Ação entra na Etapa 4.
+ */
+export const compromisso = pgTable(
+  "compromisso",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    descricao: text("descricao").notNull(),
+    interacaoId: uuid("interacao_id").references(() => interacao.id),
+    iniciativaId: uuid("iniciativa_id").references(() => iniciativa.id),
+    responsavelUsuarioId: uuid("responsavel_usuario_id").references(() => usuario.id),
+    responsavelStakeholderId: uuid("responsavel_stakeholder_id").references(() => stakeholder.id),
+    prazo: date("prazo"),
+    situacao: situacaoCompromisso("situacao").notNull().default("aberto"),
+    concluidoEm: date("concluido_em"),
+    ...colunasControle(),
+  },
+  (t) => [
+    check("compromisso_descricao_preenchida", sql`length(trim(${t.descricao})) > 0`),
+    check("compromisso_com_origem", sql`${t.interacaoId} is not null or ${t.iniciativaId} is not null`),
+    check(
+      "compromisso_com_responsavel",
+      sql`${t.responsavelUsuarioId} is not null or ${t.responsavelStakeholderId} is not null`,
+    ),
+    check("compromisso_concluido_com_data", sql`${t.situacao} <> 'concluido' or ${t.concluidoEm} is not null`),
+    index("compromisso_interacao_idx").on(t.interacaoId),
+    index("compromisso_iniciativa_idx").on(t.iniciativaId),
+    index("compromisso_prazo_idx").on(t.prazo),
+  ],
+);
+
+/** Histórico de acompanhamento do compromisso: cada registro é preservado; corrige-se com um novo. */
+export const compromissoAcompanhamento = pgTable(
+  "compromisso_acompanhamento",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    compromissoId: uuid("compromisso_id")
+      .notNull()
+      .references(() => compromisso.id),
+    data: date("data").notNull(),
+    registro: text("registro").notNull(),
+    /** Situação definida neste acompanhamento, quando houve mudança. */
+    situacao: situacaoCompromisso("situacao"),
+    ...colunasControle(),
+  },
+  (t) => [
+    check("compromisso_acompanhamento_registro_preenchido", sql`length(trim(${t.registro})) > 0`),
+    index("compromisso_acompanhamento_compromisso_idx").on(t.compromissoId),
+  ],
+);

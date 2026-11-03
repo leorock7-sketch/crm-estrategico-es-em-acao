@@ -50,6 +50,13 @@
       "when": 1793655127913,
       "tag": "0006_escalas_v2_2",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1793673042125,
+      "tag": "0007_iniciativas_interacoes",
+      "breakpoints": true
     }
   ]
 }

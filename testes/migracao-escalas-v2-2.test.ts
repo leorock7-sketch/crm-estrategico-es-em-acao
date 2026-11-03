@@ -17,6 +17,10 @@ import * as projetos from "@/modulos/projetos-temas/consultas";
 import * as stakeholders from "@/modulos/stakeholders/consultas";
 
 const PASTA_MIGRACOES = path.join(process.cwd(), "src", "lib", "banco", "migracoes");
+/** Total de atualizações do banco atual (cresce a cada etapa). */
+const TOTAL_MIGRACOES = (
+  JSON.parse(readFileSync(path.join(PASTA_MIGRACOES, "meta", "_journal.json"), "utf8")) as { entries: unknown[] }
+).entries.length;
 let temporaria: string;
 let migracoesDa2A: string;
 
@@ -158,7 +162,7 @@ describe("Atualização de um banco da Etapa 2A (migração 0006)", () => {
 
     const atualizado = await abrirBanco(pasta);
     try {
-      expect(await migracoesAplicadas(atualizado)).toBe(7);
+      expect(await migracoesAplicadas(atualizado)).toBe(TOTAL_MIGRACOES);
       const copias = readdirSync(path.join(temporaria, "dados", "copias"));
       expect(copias).toHaveLength(1);
       expect(copias[0]).toMatch(/^antes-migracao-/);
@@ -204,7 +208,7 @@ describe("Atualização de um banco da Etapa 2A (migração 0006)", () => {
     const pasta = path.join(temporaria, "novo", "pglite");
     const banco = await abrirBanco(pasta);
     try {
-      expect(await migracoesAplicadas(banco)).toBe(7);
+      expect(await migracoesAplicadas(banco)).toBe(TOTAL_MIGRACOES);
       expect(existsSync(path.join(temporaria, "novo", "copias"))).toBe(false);
     } finally {
       await fecharBanco(banco);
