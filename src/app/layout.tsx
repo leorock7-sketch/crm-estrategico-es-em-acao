@@ -16,6 +16,9 @@ const LINKS_MENU = [
   { href: "/projetos-temas", rotulo: "Projetos e temas" },
   { href: "/pessoas", rotulo: "Pessoas" },
   { href: "/instituicoes", rotulo: "Instituições" },
+  { href: "/iniciativas", rotulo: "Iniciativas" },
+  { href: "/interacoes", rotulo: "Interações" },
+  { href: "/compromissos", rotulo: "Compromissos" },
 ] as const;
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

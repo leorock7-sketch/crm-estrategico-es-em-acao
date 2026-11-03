@@ -13,6 +13,7 @@
 | 0.9 | 02/11/2026 | Discricionariedade fundamentada (D-067): RF-29.1 e RF-29.2 atualizados; novo RF-29.4 (avaliações profissionais com alertas orientativos). |
 | 0.10 | 02/11/2026 | Versões finais da Q-66 e da Q-67 (D-068): RF-27, RF-29.2 e RF-29.4 atualizados. |
 | 0.11 | 02/11/2026 | Etapa 2B implementada (D-069), aguardando homologação: RF-21, RF-25, RF-27 e RF-29.2 a RF-29.4 atualizados. |
+| 0.12 | 03/11/2026 | Etapa 3 implementada (D-070), aguardando homologação: RF-30 a RF-34, RF-40 a RF-44, RN-05 e RN-06 atualizados. |
 
 ## Como ler este documento
 
@@ -97,11 +98,11 @@ Detalhes em [METODOLOGIA_STAKEHOLDERS.md](METODOLOGIA_STAKEHOLDERS.md).
 
 | ID | Requisito | Situação |
 |---|---|---|
-| RF-30 | Registro de iniciativas dos tipos demanda, reunião relevante e frente de atuação. | ✅ |
-| RF-31 | Cadastro manual das iniciativas. | ✅ |
-| RF-32 | Uma iniciativa pode envolver vários stakeholders e vários projetos. | ✅ |
-| RF-33 | Papel de cada stakeholder na iniciativa (demandante, apoiador, decisor etc.). | 🔧 |
-| RF-34 | Forma de apresentação da matriz (o que aparece nas linhas e colunas). | ⏳ |
+| RF-30 | Registro de iniciativas dos tipos demanda, reunião relevante e frente de atuação. | ✅ (implementado na Etapa 3) |
+| RF-31 | Cadastro manual das iniciativas. | ✅ (implementado na Etapa 3) |
+| RF-32 | Uma iniciativa pode envolver vários stakeholders e vários projetos. | ✅ (implementado na Etapa 3) |
+| RF-33 | Papel de cada stakeholder na iniciativa (demandante, apoiador, decisor etc.). | 🔧 implementado com a lista provisória (P-042) |
+| RF-34 | Forma de apresentação da matriz (o que aparece nas linhas e colunas). | ⏳ solução provisória em uso: lista filtrável (P-040) |
 
 Detalhes em [MATRIZ_INICIATIVAS.md](MATRIZ_INICIATIVAS.md).
 
@@ -109,11 +110,11 @@ Detalhes em [MATRIZ_INICIATIVAS.md](MATRIZ_INICIATIVAS.md).
 
 | ID | Requisito | Situação |
 |---|---|---|
-| RF-40 | Registro de interações: reuniões, contatos e outros encontros. | ✅ |
-| RF-41 | Registro de encaminhamentos e compromissos, com responsáveis e prazos. | ✅ |
-| RF-42 | Uma interação pode contribuir para uma ou mais iniciativas. | ✅ |
-| RF-43 | Reuniões não podem ser registradas em duplicidade: cada reunião existe uma única vez e é ligada às iniciativas, projetos e participantes pertinentes. | ✅ |
-| RF-44 | Controle de agenda (interações futuras) e alerta de prazos de compromissos. | 🔧 |
+| RF-40 | Registro de interações: reuniões, contatos e outros encontros. | ✅ (implementado na Etapa 3) |
+| RF-41 | Registro de encaminhamentos e compromissos, com responsáveis e prazos. | ✅ (implementado na Etapa 3, com acompanhamento) |
+| RF-42 | Uma interação pode contribuir para uma ou mais iniciativas. | ✅ (implementado na Etapa 3) |
+| RF-43 | Reuniões não podem ser registradas em duplicidade: cada reunião existe uma única vez e é ligada às iniciativas, projetos e participantes pertinentes. | ✅ (implementado na Etapa 3, com alerta de possível repetição) |
+| RF-44 | Controle de agenda (interações futuras) e alerta de prazos de compromissos. | 🔧 implementado na Etapa 3: agenda a partir de hoje e compromissos com prazo vencido em destaque, sem notificações |
 
 ### 4.6 Plano de Ação
 
@@ -160,8 +161,8 @@ Detalhes em [MATRIZ_RISCOS.md](MATRIZ_RISCOS.md).
 | RN-02 | Avaliações são independentes entre contextos e versionadas. | ✅ |
 | RN-03 | A visibilidade de uma avaliação é restrita ao seu contexto. | ✅ |
 | RN-04 | O Cadastro Mestre é global: cada pessoa ou instituição existe uma única vez no sistema. | ✅ |
-| RN-05 | Uma iniciativa pode envolver vários stakeholders e projetos; uma interação pode contribuir para uma ou mais iniciativas. | ✅ |
-| RN-06 | Não duplicar registros de reuniões. | ✅ |
+| RN-05 | Uma iniciativa pode envolver vários stakeholders e projetos; uma interação pode contribuir para uma ou mais iniciativas. | ✅ (implementado na Etapa 3) |
+| RN-06 | Não duplicar registros de reuniões. | ✅ (implementado na Etapa 3) |
 | RN-07 | Não definir critérios ou pesos de poder e interesse até a conclusão da revisão dos seis critérios históricos. | ✅ |
 | RN-08 | Versões aprovadas (de avaliações e de planos) não são editadas; mudanças geram nova versão. | 🔧 |
 | RN-09 | Registros não são apagados fisicamente: são arquivados, preservando o histórico. A exclusão definitiva de dados pessoais, quando exigida por lei, seguirá procedimento próprio. | 🔧 / ⏳ |

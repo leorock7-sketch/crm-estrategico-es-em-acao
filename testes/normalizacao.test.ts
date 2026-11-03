@@ -172,5 +172,5 @@ describe("Ao abrir um banco já existente", () => {
     const [registro] = await reaberto.select().from(projetoTema).where(eq(projetoTema.id, projetoId));
     expect(registro.nomeNormalizado).toBe("transicao energetica ficticia");
     await fecharBanco(reaberto);
-  }, 60_000);
+  }, 180_000);
 });

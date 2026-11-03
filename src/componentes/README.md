@@ -5,7 +5,9 @@ Peças visuais usadas em mais de uma tela.
 | Arquivo | Componente |
 |---|---|
 | `alerta.tsx` | Mensagem destacada de erro, aviso ou sucesso |
+| `botao-acao-registro.tsx` | Botão que executa uma ação sobre um registro (por exemplo, retirar uma ligação), com a mensagem de erro |
 | `cabecalho-pagina.tsx` | Título da página, link de retorno e botões de ação |
+| `caixas-selecao.tsx` | Seleção múltipla por caixas de marcação, em grupos e com rolagem própria |
 | `campo.tsx` | Rótulo, campo de formulário, ajuda e mensagem de erro |
 | `carregando.tsx` | Indicação de carregamento |
 | `estilos.ts` | Classes visuais padronizadas (botões, campos, tabelas, cartões) |

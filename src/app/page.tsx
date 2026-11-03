@@ -24,6 +24,21 @@ const MODULOS = [
     descricao: "Órgãos, empresas, entidades e demais instituições, com sua hierarquia.",
   },
   {
+    href: "/iniciativas",
+    titulo: "Iniciativas",
+    descricao: "Matriz de Iniciativas: demandas, reuniões relevantes e frentes de atuação, com projetos e stakeholders.",
+  },
+  {
+    href: "/interacoes",
+    titulo: "Interações",
+    descricao: "Reuniões e contatos, registrados uma única vez e ligados às iniciativas e aos projetos.",
+  },
+  {
+    href: "/compromissos",
+    titulo: "Compromissos",
+    descricao: "Encaminhamentos com responsável e prazo: pendentes, concluídos e vencidos.",
+  },
+  {
     href: "/metodologias",
     titulo: "Metodologias de avaliação",
     descricao: "Versões da metodologia de poder e interesse. Por ora, apenas demonstrações não homologadas.",
@@ -46,8 +61,8 @@ export default function PaginaInicial() {
         </p>
 
         <p className="mt-8 border-t border-borda pt-6 text-sm text-texto-secundario">
-          Esta aplicação está em desenvolvimento (Etapa 2A — avaliação estratégica com metodologia de demonstração, não homologada). O ambiente de
-          testes utiliza exclusivamente dados fictícios.
+          Esta aplicação está em desenvolvimento (Etapa 3 — iniciativas, interações e compromissos; avaliações na escala V2.2
+          com metodologia fictícia, não homologada). O ambiente de testes utiliza exclusivamente dados fictícios.
         </p>
       </section>
 

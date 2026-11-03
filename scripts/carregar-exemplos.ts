@@ -4,7 +4,8 @@
  *
  * Cada grupo só é carregado se ainda estiver vazio: pessoas e instituições,
  * se não houver nenhuma pessoa; projetos e temas, se não houver nenhum;
- * metodologias e avaliações, se não houver nenhuma metodologia. As metodologias
+ * metodologias e avaliações, se não houver nenhuma metodologia; iniciativas,
+ * interações e compromissos (Etapa 3), se não houver nenhuma iniciativa. As metodologias
  * de DEMONSTRAÇÃO (0 a 100) ficam como histórico; a vigente é a V2.2, com as
  * rubricas homologadas (Q-66 1.0). Todas as avaliações são fictícias.
  *
@@ -15,7 +16,8 @@
 import { comoUsuario, diretorioDoBanco, fecharBanco, obterBanco } from "@/lib/banco/conexao";
 import { isNull } from "drizzle-orm";
 import type { Executor } from "@/lib/banco/conexao";
-import { instituicao, metodologiaVersao, pessoa, projetoTema } from "@/lib/banco/esquema";
+import { iniciativa, instituicao, metodologiaVersao, pessoa, projetoTema, usuario } from "@/lib/banco/esquema";
+import { hojeEmBrasilia } from "@/lib/formatacao";
 import { obterUsuarioAtual } from "@/modulos/acesso/usuario-atual";
 import {
   adicionarEvidencia,
@@ -29,6 +31,11 @@ import {
 } from "@/modulos/avaliacoes/consultas";
 import type { DadosRascunho } from "@/modulos/avaliacoes/esquemas";
 import { METODOLOGIA_V22 } from "@/modulos/avaliacoes/rubricas-v22";
+import { criarIniciativa, incluirStakeholderNaIniciativa } from "@/modulos/iniciativas/consultas";
+import type { DadosNovaIniciativa } from "@/modulos/iniciativas/esquemas";
+import type { PapelIniciativa } from "@/modulos/iniciativas/rotulos";
+import { criarCompromisso, criarInteracao, incluirIniciativaNaInteracao, registrarAcompanhamento } from "@/modulos/interacoes/consultas";
+import type { DadosAcompanhamento, DadosNovaInteracao } from "@/modulos/interacoes/esquemas";
 import {
   criarAssociacao,
   criarParticipacao,
@@ -572,18 +579,226 @@ async function carregarAvaliacoes(tx: Executor) {
   return { publicadas, ignoradas };
 }
 
+// --- Iniciativas, interações e compromissos (Etapa 3) ------------------------
+
+/** Equipe interna fictícia (responsáveis e participantes internos). */
+const EQUIPE = [
+  { chave: "helena", nome: "Helena Equipe Exemplo", email: "helena.equipe@exemplo.invalid" },
+  { chave: "marcos", nome: "Marcos Equipe Fictício", email: "marcos.equipe@exemplo.invalid" },
+  { chave: "paula", nome: "Paula Equipe Teste", email: "paula.equipe@exemplo.invalid" },
+] as const;
+type MembroEquipe = (typeof EQUIPE)[number]["chave"];
+
+/** Data relativa a hoje (AAAA-MM-DD), para que os prazos vencidos e a agenda façam sentido em qualquer dia. */
+function diaRelativo(deslocamento: number): string {
+  const data = new Date(`${hojeEmBrasilia()}T12:00:00Z`);
+  data.setUTCDate(data.getUTCDate() + deslocamento);
+  return data.toISOString().slice(0, 10);
+}
+
+type IniciativaExemplo = {
+  chave: string;
+  dados: Omit<DadosNovaIniciativa, "projetos" | "responsavelId" | "dataAbertura" | "dataConclusao" | "dataPrevistaConclusao">;
+  projetos: string[];
+  responsavel: MembroEquipe;
+  abertura: number;
+  previsao?: number;
+  conclusao?: number;
+  stakeholders: { nome: string; papel: PapelIniciativa; observacao?: string }[];
+};
+
+const INICIATIVAS: IniciativaExemplo[] = [
+  { chave: "licenciamento", projetos: ["Corredor Logístico Exemplo"], responsavel: "helena", abertura: -60, previsao: 120,
+    dados: { tipo: "frente_atuacao", titulo: "Articulação do licenciamento do Corredor Logístico Exemplo", situacao: "em_andamento", prioridade: "alta",
+      origem: "Plano de trabalho do Comitê de Infraestrutura (exemplo fictício).",
+      descricao: "Frente contínua de articulação com os órgãos competentes para o licenciamento do corredor (exemplo fictício)." },
+    stakeholders: [
+      { nome: "Governo do Estado Exemplo", papel: "decisor" },
+      { nome: "Secretaria Exemplo de Desenvolvimento", papel: "executor", observacao: "Coordena as autorizações estaduais." },
+      { nome: "Prefeitura Municipal de Vila Exemplo", papel: "afetado" },
+    ] },
+  { chave: "patio", projetos: ["Corredor Logístico Exemplo"], responsavel: "marcos", abertura: -35, previsao: 30,
+    dados: { tipo: "demanda", titulo: "Pedido da Prefeitura de Vila Exemplo sobre o pátio de caminhões", situacao: "em_analise", prioridade: "media",
+      origem: "Ofício fictício da prefeitura.",
+      descricao: "A prefeitura pede alternativas para retirar o pátio de caminhões da área urbana (exemplo fictício)." },
+    stakeholders: [
+      { nome: "Prefeitura Municipal de Vila Exemplo", papel: "demandante" },
+      { nome: "Terminal de Cargas do Porto Modelo", papel: "afetado" },
+    ] },
+  { chave: "financiadores", projetos: ["Corredor Logístico Exemplo", "Ampliação do Porto Modelo"], responsavel: "paula", abertura: -25, previsao: 60,
+    dados: { tipo: "reuniao_relevante", titulo: "Rodada fictícia com financiadores de infraestrutura", situacao: "em_andamento", prioridade: "alta",
+      descricao: "Assunto acompanhado em uma série de encontros com possíveis financiadores; cada encontro é uma interação (exemplo fictício)." },
+    stakeholders: [
+      { nome: "Example Trade Agency", papel: "apoiador" },
+      { nome: "Federação Exemplo da Indústria", papel: "apoiador" },
+    ] },
+  { chave: "universidade", projetos: ["Parque Tecnológico Exemplo"], responsavel: "helena", abertura: -40, conclusao: -5,
+    dados: { tipo: "demanda", titulo: "Apoio da universidade ao Parque Tecnológico Exemplo", situacao: "concluida", prioridade: "baixa",
+      origem: "Solicitação fictícia da reitoria." },
+    stakeholders: [
+      { nome: "Universidade Fictícia do Sudeste", papel: "demandante" },
+      { nome: "Agência Exemplo de Inovação", papel: "executor" },
+    ] },
+];
+
+type CompromissoExemplo = {
+  descricao: string;
+  responsavel?: MembroEquipe;
+  responsavelExterno?: string;
+  prazo: number;
+  iniciativa?: string;
+  acompanhamentos?: { dia: number; registro: string; situacao?: DadosAcompanhamento["situacao"] }[];
+};
+
+type InteracaoExemplo = {
+  dados: Pick<DadosNovaInteracao, "tipo" | "assunto" | "situacao" | "local" | "resumo">;
+  dia: number;
+  hora: string;
+  horaFim?: string;
+  projetos: string[];
+  /** Iniciativas para as quais a interação contribuiu, com a contribuição de cada uma. */
+  iniciativas: { chave: string; contribuicao?: string }[];
+  externos: string[];
+  internos: MembroEquipe[];
+  compromissos?: CompromissoExemplo[];
+};
+
+const INTERACOES: InteracaoExemplo[] = [
+  { dia: -20, hora: "10:00", horaFim: "11:30", projetos: ["Corredor Logístico Exemplo"],
+    dados: { tipo: "reuniao_presencial", assunto: "Reunião de alinhamento do corredor com governo e prefeitura", situacao: "realizada",
+      local: "Sala de reuniões fictícia",
+      resumo: "Reunião fictícia: apresentado o cronograma do licenciamento; a prefeitura reiterou o pedido sobre o pátio de caminhões." },
+    // Uma só reunião, duas iniciativas: registrada uma única vez (RF-43).
+    iniciativas: [
+      { chave: "licenciamento", contribuicao: "Cronograma do licenciamento apresentado aos órgãos." },
+      { chave: "patio", contribuicao: "Pedido da prefeitura discutido com o governo." },
+    ],
+    externos: ["Governo do Estado Exemplo", "Secretaria Exemplo de Desenvolvimento", "Prefeitura Municipal de Vila Exemplo"],
+    internos: ["helena", "marcos"],
+    compromissos: [
+      { descricao: "Enviar à prefeitura a minuta fictícia de alternativas para o pátio de caminhões.", responsavel: "marcos", prazo: -3, iniciativa: "patio" },
+      { descricao: "Consolidar o cronograma de licenciamento com a Secretaria.", responsavel: "helena", prazo: 10, iniciativa: "licenciamento",
+        acompanhamentos: [{ dia: -2, registro: "Cronograma preliminar recebido da Secretaria (exemplo).", situacao: "em_andamento" }] },
+      { descricao: "Apresentar o estudo de tráfego do entorno (exemplo fictício).", responsavelExterno: "Prefeitura Municipal de Vila Exemplo", prazo: 5, iniciativa: "patio" },
+    ] },
+  { dia: -10, hora: "15:00", horaFim: "16:00", projetos: [],
+    dados: { tipo: "reuniao_virtual", assunto: "Primeira rodada com financiadores", situacao: "realizada", local: "Videoconferência (link fictício)",
+      resumo: "Encontro fictício: interesse preliminar na carteira do corredor e do porto." },
+    iniciativas: [{ chave: "financiadores", contribuicao: "Primeiro encontro da rodada." }],
+    externos: ["Example Trade Agency", "Federação Exemplo da Indústria"],
+    internos: ["paula"],
+    compromissos: [
+      { descricao: "Enviar a apresentação do corredor e do porto aos financiadores.", responsavel: "paula", prazo: -6, iniciativa: "financiadores",
+        acompanhamentos: [{ dia: -7, registro: "Apresentação enviada por e-mail (exemplo).", situacao: "concluido" }] },
+      { descricao: "Indicar empresas associadas interessadas (exemplo fictício).", responsavelExterno: "Federação Exemplo da Indústria", prazo: 15, iniciativa: "financiadores" },
+    ] },
+  { dia: -4, hora: "09:30", projetos: [],
+    dados: { tipo: "ligacao", assunto: "Ligação com a Secretaria sobre o licenciamento", situacao: "realizada",
+      resumo: "Contato fictício para confirmar documentos pendentes." },
+    iniciativas: [{ chave: "licenciamento" }],
+    externos: ["Secretaria Exemplo de Desenvolvimento"],
+    internos: ["helena"] },
+  { dia: 7, hora: "14:00", horaFim: "15:30", projetos: [],
+    dados: { tipo: "reuniao_presencial", assunto: "Segunda rodada com financiadores", situacao: "agendada", local: "Auditório fictício" },
+    iniciativas: [{ chave: "financiadores", contribuicao: "Segundo encontro da rodada (agendado)." }],
+    externos: ["Example Trade Agency"],
+    internos: ["paula", "marcos"] },
+  { dia: -15, hora: "10:00", horaFim: "12:00", projetos: ["Parque Tecnológico Exemplo"],
+    dados: { tipo: "visita", assunto: "Visita técnica fictícia ao parque tecnológico", situacao: "realizada", local: "Campus fictício",
+      resumo: "Visita fictícia às áreas propostas para o parque." },
+    iniciativas: [{ chave: "universidade" }],
+    externos: ["Universidade Fictícia do Sudeste", "Agência Exemplo de Inovação"],
+    internos: ["helena"],
+    compromissos: [
+      { descricao: "Registrar o parecer da visita técnica.", responsavel: "helena", prazo: -10, iniciativa: "universidade",
+        acompanhamentos: [{ dia: -12, registro: "Parecer registrado e enviado à reitoria (exemplo).", situacao: "concluido" }] },
+    ] },
+];
+
+/** Carrega a equipe fictícia, as iniciativas, as interações (cada uma uma única vez) e os compromissos com acompanhamento. */
+async function carregarAtividades(tx: Executor) {
+  await tx.insert(usuario).values(EQUIPE.map(({ nome, email }) => ({ nome, email }))).onConflictDoNothing();
+  const membros = await tx.select({ id: usuario.id, email: usuario.email }).from(usuario);
+  const idMembro = new Map(EQUIPE.map((m) => [m.chave, membros.find((u) => u.email === m.email)?.id]));
+  const [projetos, pessoas, instituicoes] = await Promise.all([
+    tx.select({ id: projetoTema.id, nome: projetoTema.nome }).from(projetoTema).where(isNull(projetoTema.arquivadoEm)),
+    tx.select({ id: pessoa.id, nome: pessoa.nomeCompleto }).from(pessoa).where(isNull(pessoa.arquivadoEm)),
+    tx.select({ id: instituicao.id, nome: instituicao.nome }).from(instituicao).where(isNull(instituicao.arquivadoEm)),
+  ]);
+  const idProjeto = new Map(projetos.map((p) => [p.nome, p.id]));
+  const idStakeholder = new Map([...pessoas, ...instituicoes].map((s) => [s.nome, s.id]));
+  const ids = (nomes: string[], mapa: Map<string, string>) =>
+    nomes.map((nome) => mapa.get(nome)).filter((id): id is string => id !== undefined);
+
+  const idIniciativa = new Map<string, string>();
+  for (const exemplo of INICIATIVAS) {
+    const projetosDaIniciativa = ids(exemplo.projetos, idProjeto);
+    if (projetosDaIniciativa.length === 0) continue;
+    const id = await criarIniciativa(tx, {
+      ...exemplo.dados,
+      projetos: projetosDaIniciativa,
+      responsavelId: idMembro.get(exemplo.responsavel),
+      dataAbertura: diaRelativo(exemplo.abertura),
+      dataPrevistaConclusao: exemplo.previsao === undefined ? undefined : diaRelativo(exemplo.previsao),
+      dataConclusao: exemplo.conclusao === undefined ? undefined : diaRelativo(exemplo.conclusao),
+    });
+    idIniciativa.set(exemplo.chave, id);
+    for (const s of exemplo.stakeholders) {
+      const stakeholderId = idStakeholder.get(s.nome);
+      if (stakeholderId) await incluirStakeholderNaIniciativa(tx, { iniciativaId: id, stakeholderId, papel: s.papel, observacao: s.observacao });
+    }
+  }
+
+  let totalInteracoes = 0;
+  let totalCompromissos = 0;
+  for (const exemplo of INTERACOES) {
+    const iniciativasDaInteracao = exemplo.iniciativas.filter((i) => idIniciativa.has(i.chave));
+    const projetosDaInteracao = ids(exemplo.projetos, idProjeto);
+    if (projetosDaInteracao.length === 0 && iniciativasDaInteracao.length === 0) continue;
+    const interacaoId = await criarInteracao(tx, {
+      ...exemplo.dados,
+      inicio: `${diaRelativo(exemplo.dia)}T${exemplo.hora}`,
+      fim: exemplo.horaFim ? `${diaRelativo(exemplo.dia)}T${exemplo.horaFim}` : undefined,
+      projetos: projetosDaInteracao,
+      iniciativas: [],
+      participantesExternos: ids(exemplo.externos, idStakeholder),
+      participantesInternos: exemplo.internos.map((m) => idMembro.get(m)).filter((id): id is string => id !== undefined),
+    });
+    for (const i of iniciativasDaInteracao) {
+      await incluirIniciativaNaInteracao(tx, { interacaoId, iniciativaId: idIniciativa.get(i.chave) as string, contribuicao: i.contribuicao });
+    }
+    totalInteracoes++;
+    for (const c of exemplo.compromissos ?? []) {
+      const compromissoId = await criarCompromisso(tx, {
+        descricao: c.descricao,
+        interacaoId,
+        iniciativaId: c.iniciativa ? idIniciativa.get(c.iniciativa) : undefined,
+        responsavelUsuarioId: c.responsavel ? idMembro.get(c.responsavel) : undefined,
+        responsavelStakeholderId: c.responsavelExterno ? idStakeholder.get(c.responsavelExterno) : undefined,
+        prazo: diaRelativo(c.prazo),
+      });
+      for (const a of c.acompanhamentos ?? []) {
+        await registrarAcompanhamento(tx, { compromissoId, data: diaRelativo(a.dia), registro: a.registro, situacao: a.situacao });
+      }
+      totalCompromissos++;
+    }
+  }
+  return { iniciativas: idIniciativa.size, interacoes: totalInteracoes, compromissos: totalCompromissos };
+}
+
 async function principal() {
   console.log(`Banco local: ${diretorioDoBanco()}`);
   const banco = await obterBanco();
   try {
-    const [pessoasExistentes, projetosExistentes, metodologiasExistentes] = await Promise.all([
+    const [pessoasExistentes, projetosExistentes, metodologiasExistentes, iniciativasExistentes] = await Promise.all([
       banco.$count(pessoa),
       banco.$count(projetoTema),
       banco.$count(metodologiaVersao),
+      banco.$count(iniciativa),
     ]);
-    if (pessoasExistentes > 0 && projetosExistentes > 0 && metodologiasExistentes > 0) {
+    if (pessoasExistentes > 0 && projetosExistentes > 0 && metodologiasExistentes > 0 && iniciativasExistentes > 0) {
       console.log(
-        `O banco já tem ${pessoasExistentes} pessoa(s), ${projetosExistentes} projeto(s) ou tema(s) e ${metodologiasExistentes} metodologia(s). Nada foi carregado.`,
+        `O banco já tem ${pessoasExistentes} pessoa(s), ${projetosExistentes} projeto(s) ou tema(s), ${metodologiasExistentes} metodologia(s) e ${iniciativasExistentes} iniciativa(s). Nada foi carregado.`,
       );
       console.log('Para recomeçar do zero: "npm run banco:reiniciar" e depois "npm run banco:exemplos".');
       return;
@@ -618,6 +833,14 @@ async function principal() {
         if (ignoradas.length > 0) console.log(`Não encontrados, avaliação ignorada: ${ignoradas.join(", ")}.`);
       } else {
         console.log(`Metodologias: o banco já tem ${metodologiasExistentes}; avaliações mantidas como estão.`);
+      }
+      if (iniciativasExistentes === 0) {
+        const atividades = await carregarAtividades(tx);
+        console.log(
+          `Carregados: equipe fictícia (${EQUIPE.length} pessoas), ${atividades.iniciativas} iniciativas, ${atividades.interacoes} interações e ${atividades.compromissos} compromissos fictícios.`,
+        );
+      } else {
+        console.log(`Iniciativas: o banco já tem ${iniciativasExistentes}; mantidas como estão.`);
       }
     });
   } finally {

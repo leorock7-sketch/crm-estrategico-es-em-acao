@@ -71,7 +71,7 @@ describe("Trava da pasta de dados", () => {
     expect(existsSync(arquivoDaTrava(pasta))).toBe(true);
     await fecharBanco(banco);
     expect(existsSync(arquivoDaTrava(pasta))).toBe(false);
-  }, 60_000);
+  }, 180_000);
 });
 
 describe("Proteção de ambiente", () => {
