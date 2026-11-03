@@ -14,6 +14,7 @@
 | 0.10 | 02/11/2026 | Seção 6.3.1 e campo `validacao_institucional` conforme a D-067: evidências opcionais, natureza da informação e indicação de não confirmada; regras interpretativas como alertas; bloqueios só técnicos. Não implementado. |
 | 0.11 | 02/11/2026 | Seção 6.3.1 conforme a versão final da Q-67 (D-068): natureza da informação do posicionamento e alertas mantidos; retirados a tabela de evidência por dimensão, o tipo "verificação documental" e a confirmação de pertinência. Não implementado. |
 | 0.12 | 02/11/2026 | Etapa 2B (D-069): seção 6.3.1 implementada pela migração `0006`, aguardando homologação; `rubrica_nivel` com critério orientador e bases típicas; cópia de segurança antes de atualizações pendentes. |
+| 0.13 | 03/11/2026 | Etapa 3 (D-070): seções 6.4 e 6.5 implementadas pela migração `0007`, aguardando homologação; nova tabela `compromisso_acompanhamento`; ligações com identificador próprio e arquivamento; soluções provisórias P-040 a P-046. |
 
 Legenda: ✅ Aprovado · 🔧 Proposta técnica · ⏳ Pendente (ver [REQUISITOS.md](REQUISITOS.md#como-ler-este-documento)).
 
@@ -52,7 +53,7 @@ Os diagramas abaixo são desenhados automaticamente pelo GitHub. Nos diagramas, 
 | Cadastro Mestre | `stakeholder`, `pessoa`, `instituicao`, `vinculo_pessoa_instituicao` |
 | Avaliações | `metodologia_versao`, `criterio_avaliacao`, `avaliacao`, `avaliacao_versao`, `avaliacao_nota_criterio`, `evidencia` |
 | Iniciativas | `iniciativa`, `iniciativa_projeto_tema`, `iniciativa_stakeholder` |
-| Interações e compromissos | `interacao`, `interacao_participante`, `interacao_iniciativa`, `interacao_projeto_tema`, `compromisso` |
+| Interações e compromissos | `interacao`, `interacao_participante`, `interacao_iniciativa`, `interacao_projeto_tema`, `compromisso`, `compromisso_acompanhamento` |
 | Plano de ação | `plano_acao`, `plano_acao_versao`, `acao`, `acao_planejamento`, `acao_acompanhamento` |
 | Riscos | `risco`, `risco_avaliacao`, `risco_gatilho`, `risco_resposta`, `risco_stakeholder` |
 | Acesso e auditoria | `usuario`, `permissao_contexto`, `registro_auditoria` |
@@ -446,7 +447,9 @@ Linhas existentes: as metodologias de demonstração já registradas recebem `de
 
 Implementação (D-069): os alertas detectados por regra são Neutro por percepção do consultor, origem da informação não registrada, situação das ressalvas não indicada diante de manifestação, "há ressalvas" sem descrição, indefinição sem justificativa e confiança alta com informação não confirmada; as orientações que dependem da leitura do texto (Poder Baixo, manifestação de pessoa usada para a instituição) ficam como lembretes fixos no formulário. Cópia de segurança (T-1): ao abrir um banco existente com atualizações pendentes, a pasta de dados é copiada para `.dados/copias/antes-migracao-<data e hora>` antes de aplicá-las; se a cópia falhar, nada é aplicado. A preservação campo a campo é verificada em `testes/migracao-escalas-v2-2.test.ts`.
 
-### 6.4 Iniciativas ✅ (cadastro manual; vários stakeholders e projetos)
+### 6.4 Iniciativas ✅ (cadastro manual; vários stakeholders e projetos) — implementadas na Etapa 3 (migração `0007`)
+
+Implementação (D-070, P-046): as tabelas de ligação desta seção e da seguinte têm identificador próprio, campos de controle e arquivamento — retirar uma ligação é arquivá-la, com auditoria —, como `stakeholder_contexto`. A "PK composta" indicada abaixo é garantida por índice único das ligações vigentes. Uma ligação não muda de lado (gatilho); só o campo descritivo (observação, contribuição ou presença) pode ser ajustado.
 
 #### `iniciativa`
 
@@ -454,17 +457,18 @@ Implementação (D-069): os alertas detectados por regra são Neutro por percep�
 |---|---|---|---|---|
 | `tipo` | lista: `demanda`, `reuniao_relevante`, `frente_atuacao` | | Sim | ✅ |
 | `titulo` | texto | | Sim | |
+| `titulo_normalizado` | texto | | Sim | Campo técnico para a busca |
 | `descricao` | texto longo | | Não | |
 | `origem` | texto | | Não | Quem ou o que originou |
-| `situacao` | lista | | Sim | Proposta em [MATRIZ_INICIATIVAS.md](MATRIZ_INICIATIVAS.md) 🔧 |
-| `prioridade` | lista | | Não | ⏳ |
+| `situacao` | lista: `registrada`, `em_analise`, `em_andamento`, `suspensa`, `concluida`, `cancelada` | | Sim | Ciclo da [Matriz de Iniciativas](MATRIZ_INICIATIVAS.md), sem transições obrigatórias (provisório, P-044) |
+| `prioridade` | lista: `alta`, `media`, `baixa` | | Não | Provisória (Q-21, P-041) |
 | `responsavel_id` | UUID | FK → `usuario.id` | Não | |
 | `data_abertura` | data | | Sim | |
 | `data_prevista_conclusao`, `data_conclusao` | data | | Não | |
 
-Regras: `data_conclusao` ≥ `data_abertura`; situação `concluida` exige `data_conclusao`. 🔧
+Regras (no banco): `data_conclusao` e `data_prevista_conclusao` ≥ `data_abertura`; situação `concluida` exige `data_conclusao`; pelo menos um projeto ou tema vigente, verificado ao fim da transação. ✅ (implementadas)
 
-Uma iniciativa do tipo `reuniao_relevante` **não guarda os dados da reunião**: data, local, participantes e registro ficam na `interacao` ligada a ela por `interacao_iniciativa`. Isso evita duplicar reuniões. 🔧 ⏳ (interpretação a validar)
+Uma iniciativa do tipo `reuniao_relevante` **não guarda os dados da reunião**: data, local, participantes e registro ficam na `interacao` ligada a ela por `interacao_iniciativa`. Isso evita duplicar reuniões. ✅ (interpretação confirmada pela D-070)
 
 #### `iniciativa_projeto_tema` (ligação N:N)
 
@@ -473,7 +477,7 @@ Uma iniciativa do tipo `reuniao_relevante` **não guarda os dados da reunião**:
 | `iniciativa_id` | UUID | PK composta, FK → `iniciativa.id` | Sim |
 | `projeto_tema_id` | UUID | PK composta, FK → `projeto_tema.id` | Sim |
 
-Regra: toda iniciativa deve estar ligada a pelo menos um projeto ou tema, para que tenha contexto de visibilidade. 🔧 ⏳
+Regra: toda iniciativa deve estar ligada a pelo menos um projeto ou tema, para que tenha contexto de visibilidade. ✅ provisória (Q-24, P-043), garantida no banco
 
 #### `iniciativa_stakeholder` (ligação N:N)
 
@@ -481,12 +485,12 @@ Regra: toda iniciativa deve estar ligada a pelo menos um projeto ou tema, para q
 |---|---|---|---|---|
 | `iniciativa_id` | UUID | PK composta, FK → `iniciativa.id` | Sim | |
 | `stakeholder_id` | UUID | PK composta, FK → `stakeholder.id` | Sim | |
-| `papel` | lista | PK composta | Sim | Proposta: `demandante`, `apoiador`, `decisor`, `executor`, `afetado`, `outro` 🔧 |
+| `papel` | lista | PK composta | Sim | `demandante`, `apoiador`, `decisor`, `executor`, `afetado`, `outro` (provisória, P-042) |
 | `observacao` | texto | | Não | |
 
 A inclusão de `papel` na chave permite que o mesmo stakeholder tenha mais de um papel na mesma iniciativa.
 
-### 6.5 Interações e compromissos ✅ (reunião registrada uma única vez)
+### 6.5 Interações e compromissos ✅ (reunião registrada uma única vez) — implementadas na Etapa 3 (migração `0007`)
 
 #### `interacao`
 
@@ -494,8 +498,9 @@ Reuniões, contatos e demais encontros.
 
 | Campo | Tipo | Chave | Obr. | Observação |
 |---|---|---|---|---|
-| `tipo` | lista | | Sim | Proposta: `reuniao_presencial`, `reuniao_virtual`, `ligacao`, `email`, `evento`, `visita`, `outro` 🔧 |
+| `tipo` | lista | | Sim | `reuniao_presencial`, `reuniao_virtual`, `ligacao`, `email`, `evento`, `visita`, `outro` |
 | `assunto` | texto | | Sim | |
+| `assunto_normalizado` | texto | | Sim | Campo técnico para a busca e o alerta de repetição |
 | `inicio` | data e hora | | Sim | |
 | `fim` | data e hora | | Não | |
 | `local` | texto | | Não | Endereço ou link da reunião virtual |
@@ -505,9 +510,10 @@ Reuniões, contatos e demais encontros.
 | `origem_id` | texto | | Não | Identificador do evento no sistema de origem |
 
 Regras de integridade:
-- `fim` ≥ `inicio`. 🔧
-- UK (`origem_sistema`, `origem_id`) quando preenchidos: a mesma reunião do calendário nunca é importada duas vezes. ✅ (não duplicar) / 🔧 (mecanismo)
-- Alerta de possível duplicidade ao cadastrar manualmente interação com mesmo assunto e horário próximo. 🔧
+- `fim` ≥ `inicio`. ✅
+- Pelo menos um projeto, tema ou iniciativa vigente, verificado ao fim da transação. ✅ (provisória, P-043)
+- UK (`origem_sistema`, `origem_id`) quando preenchidos: a mesma reunião do calendário nunca é importada duas vezes. ✅ (índice único no banco; a importação virá com a integração)
+- Alerta de possível duplicidade ao cadastrar manualmente interação com mesmo assunto e horário próximo. ✅ (assunto igual ou semelhante, até um dia antes ou depois; exige confirmação)
 
 #### `interacao_participante`
 
@@ -518,7 +524,7 @@ Regras de integridade:
 | `usuario_id` | UUID | FK → `usuario.id` | Não | Participante da equipe interna |
 | `presenca` | lista: `convidado`, `presente`, `ausente` | | Sim | |
 
-Regras: exatamente um entre `stakeholder_id` e `usuario_id` preenchido; UK (`interacao_id`, `stakeholder_id`) e UK (`interacao_id`, `usuario_id`). 🔧
+Regras: exatamente um entre `stakeholder_id` e `usuario_id` preenchido; UK (`interacao_id`, `stakeholder_id`) e UK (`interacao_id`, `usuario_id`), entre os participantes vigentes. ✅ (implementadas)
 
 #### `interacao_iniciativa` (ligação N:N) ✅
 
@@ -530,7 +536,7 @@ Uma interação pode contribuir para uma ou mais iniciativas; uma iniciativa rec
 | `iniciativa_id` | UUID | PK composta, FK → `iniciativa.id` | Sim | |
 | `contribuicao` | texto | | Não | Como a interação contribuiu para a iniciativa |
 
-#### `interacao_projeto_tema` (ligação N:N) 🔧
+#### `interacao_projeto_tema` (ligação N:N) ✅ (Etapa 3)
 
 Liga a interação diretamente a projetos ou temas. É necessária para interações que ainda não pertencem a nenhuma iniciativa e define quem pode vê-las.
 
@@ -553,9 +559,20 @@ Encaminhamentos e prazos. ✅
 | `prazo` | data | | Não | |
 | `situacao` | lista: `aberto`, `em_andamento`, `concluido`, `cancelado` | | Sim | "Atrasado" é calculado (prazo vencido e não concluído) |
 | `concluido_em` | data | | Não | |
-| `acao_id` | UUID | FK → `acao.id` | Não | Quando o compromisso vira ação do plano 🔧 |
+| `acao_id` | UUID | FK → `acao.id` | Não | Quando o compromisso vira ação do plano 🔧 — a criar na Etapa 4, com a tabela `acao` |
 
-Regras: ao menos um entre `interacao_id` e `iniciativa_id`; ao menos um responsável; situação `concluido` exige `concluido_em`. 🔧
+Regras: ao menos um entre `interacao_id` e `iniciativa_id`; ao menos um responsável; situação `concluido` exige `concluido_em`. ✅ (implementadas). A situação muda pelos registros de acompanhamento; com iniciativa indicada, o compromisso pertence só a ela; sem iniciativa, vale para todas as iniciativas da interação de origem (P-045).
+
+#### `compromisso_acompanhamento` ✅ (Etapa 3)
+
+Histórico de acompanhamento do compromisso. Cada registro é preservado: corrige-se com um novo registro (gatilho).
+
+| Campo | Tipo | Chave | Obr. | Observação |
+|---|---|---|---|---|
+| `compromisso_id` | UUID | FK → `compromisso.id` | Sim | |
+| `data` | data | | Sim | |
+| `registro` | texto longo | | Sim | O que foi feito ou verificado |
+| `situacao` | lista: `aberto`, `em_andamento`, `concluido`, `cancelado` | | Não | Nova situação definida neste registro; o compromisso é atualizado junto (concluído recebe a data do registro) |
 
 ### 6.6 Plano de ação ✅ (ações, responsáveis, marcos, versões e aprovação)
 
@@ -766,7 +783,8 @@ Resolvidas na Etapa 1: hierarquia entre temas e projetos (D-020); dados mínimos
 | `projeto_tema_comite`, `stakeholder_contexto` | 1.1 | Criadas, com telas |
 | `metodologia_versao`, `criterio_avaliacao`, `avaliacao`, `avaliacao_versao`, `avaliacao_nota_criterio`, `evidencia` | 2A | Criadas, com telas; somente metodologias de demonstração e dados fictícios |
 | `permissao_contexto` | 2A | Criada, com testes; sem tela de gestão (segurança não homologada) |
-| Demais tabelas | 3 e 4 | Não criadas |
+| `iniciativa`, `iniciativa_projeto_tema`, `iniciativa_stakeholder`, `interacao`, `interacao_participante`, `interacao_projeto_tema`, `interacao_iniciativa`, `compromisso`, `compromisso_acompanhamento` | 3 | Criadas, com telas e dados fictícios; aguardam homologação (D-070) |
+| Demais tabelas | 4 | Não criadas |
 
 Onde está cada parte:
 
@@ -777,7 +795,9 @@ Onde está cada parte:
   - `0002`: carga dos 4 comitês;
   - `0003`: revisão de homologação — tabela de contatos (com migração dos dados), país e CNPJ sem unicidade;
   - `0004`: Etapa 1.1 — comitês participantes, stakeholders dos contextos e nome normalizado dos projetos e temas (preenchido também nos registros existentes);
-  - `0005`: Etapa 2A — metodologias, critérios, fichas, versões, notas, evidências e permissões por contexto, com as regras de publicação e imutabilidade.
+  - `0005`: Etapa 2A — metodologias, critérios, fichas, versões, notas, evidências e permissões por contexto, com as regras de publicação e imutabilidade;
+  - `0006`: Etapa 2B — escalas V2.2, rubricas por nível, natureza do posicionamento, ressalvas, alertas mantidos e natureza das alterações da metodologia;
+  - `0007`: Etapa 3 — iniciativas, interações (registro único), participantes, ligações, compromissos e acompanhamento, com contexto obrigatório, ligações imutáveis e acompanhamento preservado.
 - **Regras garantidas por gatilhos** 🔧:
   - preenchimento automático de quem criou ou alterou cada registro, e quando;
   - trilha de auditoria a cada inclusão, alteração, arquivamento e reativação, sem registrar alterações que não mudam nenhum dado;

@@ -11,6 +11,7 @@
 | 0.7 | 01/11/2026 | Verificação automática no GitHub Actions implementada (D-041) |
 | 0.8 | 01/11/2026 | Escalas V2.2 (D-057 a D-060): adaptação do módulo `avaliacoes` e do banco planejada, não implementada (Q-67) |
 | 0.9 | 02/11/2026 | Etapa 2B (D-069): módulo `avaliacoes` adaptado às escalas V2.2 (rubricas, alertas orientativos, matriz 3 × 3) e cópia de segurança automática do banco local antes de atualizações pendentes; aguardando homologação |
+| 0.10 | 03/11/2026 | Etapa 3 (D-070): módulos `iniciativas` e `interacoes` (iniciativas, interações e compromissos), telas e visibilidade por projeto ou tema; aguardando homologação |
 
 Legenda: ✅ Aprovado · 🔧 Proposta técnica · ⏳ Pendente.
 
@@ -104,6 +105,9 @@ crm-estrategico-es-em-acao/
 │   │   ├── comites/          Lista e detalhe dos comitês (somente consulta)
 │   │   ├── projetos-temas/   Projetos e temas; [id]/avaliacoes (fichas e rascunhos) e [id]/matriz
 │   │   ├── metodologias/     Consulta das metodologias de avaliação
+│   │   ├── iniciativas/      Matriz de Iniciativas: lista com filtros, cadastro, página e edição
+│   │   ├── interacoes/       Interações: lista e agenda, registro único, página e edição
+│   │   ├── compromissos/     Compromissos: lista com filtros, página e acompanhamento
 │   │   ├── pessoas/          Lista, inclusão, detalhe e edição de pessoas
 │   │   ├── instituicoes/     Lista, inclusão, detalhe e edição de instituições
 │   │   ├── not-found.tsx     Página "não encontrado"
@@ -112,7 +116,9 @@ crm-estrategico-es-em-acao/
 │   │   └── icon.svg          Ícone exibido na aba do navegador
 │   ├── componentes/          Componentes visuais reutilizáveis (campos, alertas, selos…)
 │   ├── modulos/
-│   │   ├── acesso/           Usuário atual (provisório até a autenticação)
+│   │   ├── acesso/           Usuário atual (provisório até a autenticação), permissões e visibilidade por contexto
+│   │   ├── iniciativas/      Iniciativas: validações, consultas, ações, histórico e telas
+│   │   ├── interacoes/       Interações e compromissos: registro único, prazos, acompanhamento e telas
 │   │   ├── avaliacoes/       Avaliação estratégica: escalas V2.2, rubricas, alertas orientativos, matriz 3 × 3, cálculo de demonstração (histórico), consultas, ações e telas
 │   │   ├── projetos-temas/   Comitês, projetos, temas e contextos: validações, consultas, ações e componentes
 │   │   └── stakeholders/     Cadastro Mestre: validações, consultas, ações e componentes
@@ -177,6 +183,7 @@ Regras de organização:
 | Proteção da branch `main` no GitHub: Pull Request obrigatório, verificações automáticas obrigatórias antes do merge, sem exigir outro revisor, bloqueio de exclusão e de reescrita do histórico (D-045, D-052). | ✅ Configurada e conferida |
 | Repositório público (D-033): verificação de dados pessoais, informações restritas e segredos antes de cada envio; e-mail *noreply* do GitHub nos commits a partir de 01/11/2026 (D-039). O histórico anterior não é reescrito sem aprovação. | ✅ |
 | Controle de acesso por projeto ou tema nas consultas do servidor, com testes (Etapa 2A). Sem autenticação real nem regras no banco: **segurança multiusuário não homologada**. | 🔧 (D-034) |
+| Visibilidade de iniciativas, interações e compromissos pelos projetos e temas com permissão, aplicada no servidor; alterações exigem perfil de gestor ou colaborador (Etapa 3). Sem autenticação real: segurança multiusuário não homologada. | 🔧 (D-034, D-070) |
 | Cópia de segurança automática da pasta do banco local antes de aplicar atualizações pendentes; se a cópia falhar, nada é aplicado (T-1). Não substitui a política de cópias e restauração (C7). | 🔧 (implementada na Etapa 2B) |
 | Verificação automática no GitHub Actions a cada Pull Request e atualização da `main`, com permissões mínimas e sem credenciais (seção 6.1). | ✅ (D-041) |
 

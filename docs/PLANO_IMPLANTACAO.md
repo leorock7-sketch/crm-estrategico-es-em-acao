@@ -21,6 +21,7 @@
 | 0.17 | 02/11/2026 | Discricionariedade fundamentada e ajustes D1 a D4 (D-067): diretriz para a Etapa 2B; rodada 1 encerrada; rodada 2 liberada com rubrica 0.4 |
 | 0.18 | 02/11/2026 | Calibração H6 concluída e versões finais da Q-66 e da Q-67 (D-068); Etapa 2B pronta para autorização; seção 7 conforme a Q-67 1.0 |
 | 0.19 | 02/11/2026 | Etapa 2B autorizada (D-069) e implementada na branch `feature/escalas-v2-2`: escalas V2.2, rubricas da Q-66 1.0, alertas orientativos, matriz 3 × 3 e atualização segura do banco (seção 7.5); aguarda a revisão do Pull Request e a homologação |
+| 0.20 | 03/11/2026 | Etapa 2B homologada para desenvolvimento e Etapa 3 autorizada (D-070); Etapa 3 implementada na branch `feature/iniciativas-interacoes` (seção 8): iniciativas, interações registradas uma única vez e compromissos; aguarda a revisão do Pull Request e a homologação |
 
 Legenda: ✅ Aprovado · 🔧 Proposta técnica · ⏳ Pendente.
 
@@ -42,8 +43,8 @@ Legenda: ✅ Aprovado · 🔧 Proposta técnica · ⏳ Pendente.
 | 1 | Banco de dados de desenvolvimento e Cadastro Mestre | Banco PostgreSQL local, estrutura de comitês e projetos/temas, cadastro de pessoas, instituições e vínculos, com dados fictícios | ✅ **Homologada em 01/11/2026** para desenvolvimento e testes (D-027); pendências C6, C7 e C8 |
 | 1.1 | Projetos, temas e contextos | Telas de comitês, projetos e temas; comitês participantes (D-023); associação de stakeholders aos contextos, sem avaliação de poder × interesse | ✅ **Concluída**: homologada em 01/11/2026 para desenvolvimento com dados fictícios (D-031, D-047, incluindo a correção de normalização) e incorporada à `main` pelo Pull Request #1 (commit de merge `90c319c`, D-053) |
 | 2A | Metodologia e estrutura da avaliação estratégica | Fichas e versões, evidências, posicionamento, grau de confiança, permissões e matriz com metodologia de demonstração e dados fictícios | ✅ **Concluída**: homologada em 01/11/2026 para desenvolvimento e testes com dados fictícios (D-035, D-055) e incorporada à `main` pelo Pull Request #2 (commit de merge `81478af`); adaptação às escalas V2.2 feita na Etapa 2B (seção 7) |
-| 2B | Metodologia institucional V2.2 e adaptação técnica | Escalas aprovadas (D-058 a D-060); rubricas da Q-66 1.0 e adaptação do sistema conforme a Q-67 1.0 (seção 7) | 🔧 **Implementada, aguardando homologação:** autorizada em 02/11/2026 (D-069) e desenvolvida na branch `feature/escalas-v2-2`, com dados fictícios; entrega por Pull Request único, sem merge automático (seção 7.5) |
-| 3 | Iniciativas, interações e compromissos | Matriz de iniciativas, registro único de reuniões, encaminhamentos e prazos | 🔧 |
+| 2B | Metodologia institucional V2.2 e adaptação técnica | Escalas aprovadas (D-058 a D-060); rubricas da Q-66 1.0 e adaptação do sistema conforme a Q-67 1.0 (seção 7) | ✅ **Concluída:** autorizada em 02/11/2026 (D-069), incorporada à `main` pelo Pull Request #6 (commit de merge `73acd04`, verificações Node.js 24 e 26 aprovadas) e homologada para desenvolvimento em 03/11/2026, depois de teste assistido (D-070) |
+| 3 | Iniciativas, interações e compromissos | Matriz de iniciativas, registro único de reuniões, encaminhamentos e prazos | 🔧 **Implementada, aguardando homologação:** autorizada em 03/11/2026 (D-070) e desenvolvida na branch `feature/iniciativas-interacoes`, com dados fictícios (seção 8) |
 | 4 | Plano de ação e matriz de riscos | Versões e aprovação, acompanhamento, riscos, gatilhos e respostas | 🔧 |
 | 5 | Autenticação e permissões | Supabase Auth, perfis e permissões por projeto/tema, segurança no banco. Depende de Q-50 | 🔧 |
 | 6 | Painéis e relatórios | Indicadores executivos e relatórios. Depende de Q-55 | 🔧 |
@@ -299,11 +300,67 @@ Pré-requisito cumprido: Pull Request documental #5 incorporado pelo gestor (`2e
 | Testes automatizados | Executados e aprovados em 02/11/2026: tipos, qualidade e compilação sem erros; 175 de 175 testes (147 anteriores, com dois ajustes intencionais, e 28 novos), inclusive a atualização de um banco da Etapa 2A com preservação campo a campo |
 | Verificação no navegador (dados fictícios) | Executada em 02/11/2026, no computador e no celular (375 px, sem rolagem horizontal da página): matriz, publicação com alertas mantidos e sem evidência, tendência "Não comparável", histórico da escala anterior e nova versão na mesma metodologia. Telas entregues ao gestor fora do repositório |
 | Banco local de desenvolvimento | O banco anterior foi atualizado com a cópia automática, conferido e guardado em `.dados/copias/`; a demonstração usa um banco novo, com os dados fictícios |
-| Homologação do gestor | ⏳ Pendente |
+| Homologação do gestor | ✅ Homologada para desenvolvimento em 03/11/2026 (D-070) |
 
 Ajustes intencionais em testes anteriores: (1) na nova versão depois de uma mudança de metodologia, o posicionamento deixou de ser copiado (T-4); (2) a publicação passou a devolver os alertas mantidos, em vez do resultado numérico (D-067).
 
-## 8. Pendências efetivas (01/11/2026)
+## 8. Etapa 3 — Iniciativas, interações e compromissos 🔧 (D-070)
+
+### Objetivo
+
+Transformar a estrutura de stakeholders, projetos e avaliações em ferramenta de acompanhamento das atividades institucionais dos comitês: quais iniciativas estão em curso, com que projetos, temas, pessoas e instituições; quais reuniões e interações ocorreram; quais encaminhamentos foram definidos, por quem e com que prazo; e quais compromissos estão pendentes, concluídos ou vencidos. Somente dados fictícios.
+
+### Decisões tomadas para a etapa
+
+| ID | Decisão |
+|---|---|
+| D-070 | Etapa 2B homologada para desenvolvimento; Etapa 3 autorizada, com as diretrizes de simplicidade, registro único de reuniões, rastreabilidade, integridade, compatibilidade, responsividade, dados fictícios e escopo controlado |
+| Q-22 | Resolvida pela D-070: a iniciativa do tipo "reunião relevante" representa o assunto acompanhado; cada encontro é registrado uma única vez em Interações |
+
+### Soluções provisórias (reversíveis, não homologadas) 🔧
+
+| Ponto pendente | Solução adotada | Motivo |
+|---|---|---|
+| Q-20 — apresentação da matriz | Lista filtrável por tipo, situação (inclusive "em curso"), comitê, projeto ou tema, responsável e prioridade, com projetos, comitês, responsável, situação, interações e compromissos pendentes (P-040) | Atende às consultas da etapa sem antecipar um formato ainda não decidido |
+| Q-21 — prioridade | Alta, Média ou Baixa, opcional (P-041) | Escala mínima, fácil de trocar |
+| Q-23 — papéis do stakeholder | A lista proposta (demandante, apoiador, decisor, executor, afetado, outro), com observação; o mesmo stakeholder pode ter mais de um papel (P-042) | Já documentada |
+| Q-24 — vínculo obrigatório | Toda iniciativa tem pelo menos um projeto ou tema; toda interação, pelo menos um projeto, tema ou iniciativa; verificado no banco (P-043) | Define a visibilidade por contexto (RN-03) |
+| Ciclo de vida da iniciativa | As seis situações propostas, sem transições obrigatórias; conclusão exige data (P-044) | Evita fluxo burocrático; o histórico registra cada mudança |
+| Andamento dos compromissos | A situação muda pelos registros de acompanhamento, que são preservados; "vencido" é calculado; com iniciativa indicada, o compromisso pertence só a ela; sem iniciativa, vale para todas as da interação de origem (P-045) | Histórico completo, sem campo extra e sem contagem em duplicidade |
+| Ligações e visibilidade | Retirar uma ligação é arquivá-la, com auditoria; listas e páginas mostram só o que está ligado a projetos e temas com permissão (P-046) | Mesmo padrão das etapas anteriores; preparado para a autenticação |
+| Equipe interna | Responsáveis e participantes internos são usuários do sistema; a demonstração cadastra uma equipe fictícia; sem tela de gestão de usuários até a autenticação (Etapa 5) | Mantém o modelo de dados aprovado |
+
+### Entregas
+
+| Entrega | Situação |
+|---|---|
+| Branch `feature/iniciativas-interacoes`, a partir da `main` atualizada (`73acd04`) | Concluída; Pull Request para revisão, sem merge automático |
+| Migração `0007`, somente aditiva | Concluída: nove tabelas novas; nenhuma tabela existente alterada; cópia de segurança automática antes de aplicar (T-1) |
+| Regras no banco | Concluídas: auditoria, responsável e proibição de exclusão em todas as tabelas novas; contexto obrigatório (verificado ao fim da transação); ligações vigentes únicas e imutáveis; participante externo ou interno, nunca os dois; datas coerentes; conclusões datadas; compromisso com origem e responsável; acompanhamento preservado; origem de calendário externo única |
+| Matriz de Iniciativas | Concluída: cadastro, edição, arquivamento, lista filtrável e página da iniciativa (projetos, stakeholders e papéis, interações, compromissos e histórico) |
+| Interações | Concluídas: registro único, já com projetos, temas, iniciativas e participantes; alerta de possível reunião repetida (assunto igual ou semelhante em data próxima), com confirmação; agenda; presença; ligação a outras iniciativas sem novo registro; histórico |
+| Compromissos | Concluídos: encaminhamentos da interação ou da iniciativa, com responsável da equipe e/ou externo e prazo; lista por situação (pendentes, vencidos, concluídos, cancelados), responsável, projeto e iniciativa; acompanhamento com mudança de situação; histórico |
+| Integração | Concluída: menu e página inicial; página do projeto ou tema (iniciativas, interações recentes, compromissos pendentes e vencidos, atalhos); páginas de pessoa e instituição (iniciativas e papéis, interações, compromissos sob responsabilidade). Cadastros existentes reaproveitados, sem duplicação |
+| Dados de demonstração | Equipe fictícia (três pessoas), 4 iniciativas, 5 interações (uma reunião contribui para duas iniciativas; uma está agendada) e 6 compromissos (um vencido; dois concluídos com acompanhamento), em `npm run banco:exemplos` |
+| Testes automatizados | Executados e aprovados em 03/11/2026: tipos, qualidade e compilação sem erros; 204 de 204 testes (175 anteriores e 29 novos), inclusive a atualização de um banco da Etapa 2B com todas as tabelas anteriores preservadas. Ajustes em testes anteriores: o teste da migração 0006 passou a ler o total de migrações da lista; dois testes de banco em disco ganharam limite de tempo maior (execução paralela mais pesada) |
+| Verificação no navegador (dados fictícios) | Executada em 03/11/2026, no computador e no celular (375 px, sem rolagem horizontal da página): listas e filtros; páginas de iniciativa, interação e compromisso; registro de interação com duas iniciativas e participantes; alerta de repetição; compromisso com prazo vencido; acompanhamento com conclusão; validações; integração nas páginas de projeto e de instituição. Telas entregues ao gestor fora do repositório |
+| Banco local de desenvolvimento | Atualizado com a cópia automática; a demonstração da Etapa 3 foi acrescentada sem alterar os registros anteriores |
+| Homologação do gestor | ⏳ Pendente |
+
+### Critérios de aceite
+
+1. Tipos, qualidade, testes e compilação sem erros.
+2. Uma iniciativa com vários projetos e vários stakeholders; uma reunião registrada uma única vez e ligada a várias iniciativas.
+3. Compromissos com responsável e prazo; pendentes, concluídos e vencidos identificáveis, inclusive por responsável e por projeto.
+4. Histórico de todas as operações, com o responsável; nada é apagado.
+5. Registros das etapas anteriores preservados.
+6. Funciona em computador e celular, somente com dados fictícios.
+
+### Fora do escopo (D-070)
+
+Supabase, autenticação real, integração com Outlook e Microsoft 365, painéis executivos e os módulos completos de Plano de Ação e Riscos. A ligação de compromissos a ações do plano (`acao_id`) entra na Etapa 4, com a tabela de ações; as relações já preservam iniciativa, interação e projeto para essa integração. Achados A-01 a A-06 da auditoria técnica independente: pendentes (seção 9), sem implementação nesta etapa.
+
+## 9. Pendências efetivas (atualizadas em 03/11/2026)
 
 | Pendência | Bloqueia | Situação |
 |---|---|---|
@@ -319,9 +376,12 @@ Ajustes intencionais em testes anteriores: (1) na nova versão depois de uma mud
 | Proteção da `main` (verificações obrigatórias antes do merge) | — | ✅ Configurada pelo administrador e conferida (D-045, D-052) |
 | Revisão e incorporação dos Pull Requests das Etapas 1.1 e 2A | Base correta da Etapa 2A | ✅ Concluída: Etapa 1.1 incorporada pelo Pull Request #1 (D-053, `90c319c`) e Etapa 2A pelo Pull Request #2 (D-055, `81478af`) |
 | Fase documental V2.2 (registro da Etapa 2A e escalas V2.2) | Homologação da Q-66 e da Q-67 | ✅ Concluída (D-062): Pull Requests #3 (`9084a74`) e #4 (`a254b40`) incorporados; próxima atividade: homologação da Q-66 e da Q-67 |
-| Homologação da Etapa 2B | Etapa 3 | Implementada (D-069); aguarda a revisão do Pull Request e a homologação do gestor |
+| Homologação da Etapa 2B | Etapa 3 | ✅ Homologada para desenvolvimento em 03/11/2026, depois de teste assistido (D-070) |
+| Homologação da Etapa 3 | Etapa 4 | Implementada (D-070); aguarda a revisão do Pull Request e a homologação do gestor |
+| Achados A-01 a A-06 da auditoria técnica independente | — | Pendentes para tratamento posterior (D-070); documento mantido fora do repositório; correções não implementadas na Etapa 3 |
+| Melhorias de usabilidade não essenciais (U-1 a U-5, registradas em 02/11/2026) | — | Registradas fora do repositório: texto desatualizado na seção de stakeholders da página do projeto; bloco de evidências antes das classificações no rascunho; dica nas versões recolhidas do histórico; colunas da tabela da matriz no celular; legenda do selo "preliminar" no celular. A tratar oportunamente, sem impedir o andamento |
 | Análise LGPD, retenção e anonimização | Etapa 8 | Q-13, Q-58 |
 
-## 9. Local de trabalho ✅ (D-019)
+## 10. Local de trabalho ✅ (D-019)
 
 A cópia de trabalho do projeto fica em `C:\Projetos\crm-estrategico-es-em-acao`, obtida pelo GitHub, fora do Google Drive. O GitHub cumpre o papel de cópia de segurança e histórico. A pasta antiga no Google Drive não foi apagada.
