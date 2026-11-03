@@ -28,7 +28,7 @@ export type PossivelDuplicidade = {
   motivo: string;
   arquivado: boolean;
   /** Página do registro, quando o alerta pode envolver pessoas e instituições. */
-  caminho?: "/pessoas" | "/instituicoes" | "/projetos-temas";
+  caminho?: "/pessoas" | "/instituicoes" | "/projetos-temas" | "/interacoes";
 };
 
 /** Vínculo vigente: sem data de término e não arquivado. */
