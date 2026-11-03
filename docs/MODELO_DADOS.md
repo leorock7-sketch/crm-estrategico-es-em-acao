@@ -15,6 +15,7 @@
 | 0.11 | 02/11/2026 | Seção 6.3.1 conforme a versão final da Q-67 (D-068): natureza da informação do posicionamento e alertas mantidos; retirados a tabela de evidência por dimensão, o tipo "verificação documental" e a confirmação de pertinência. Não implementado. |
 | 0.12 | 02/11/2026 | Etapa 2B (D-069): seção 6.3.1 implementada pela migração `0006`, aguardando homologação; `rubrica_nivel` com critério orientador e bases típicas; cópia de segurança antes de atualizações pendentes. |
 | 0.13 | 03/11/2026 | Etapa 3 (D-070): seções 6.4 e 6.5 implementadas pela migração `0007`, aguardando homologação; nova tabela `compromisso_acompanhamento`; ligações com identificador próprio e arquivamento; soluções provisórias P-040 a P-046. |
+| 0.14 | 03/11/2026 | Etapa 3 homologada para desenvolvimento (D-071); as soluções provisórias P-040 a P-046 continuam não homologadas. |
 
 Legenda: ✅ Aprovado · 🔧 Proposta técnica · ⏳ Pendente (ver [REQUISITOS.md](REQUISITOS.md#como-ler-este-documento)).
 
@@ -783,7 +784,7 @@ Resolvidas na Etapa 1: hierarquia entre temas e projetos (D-020); dados mínimos
 | `projeto_tema_comite`, `stakeholder_contexto` | 1.1 | Criadas, com telas |
 | `metodologia_versao`, `criterio_avaliacao`, `avaliacao`, `avaliacao_versao`, `avaliacao_nota_criterio`, `evidencia` | 2A | Criadas, com telas; somente metodologias de demonstração e dados fictícios |
 | `permissao_contexto` | 2A | Criada, com testes; sem tela de gestão (segurança não homologada) |
-| `iniciativa`, `iniciativa_projeto_tema`, `iniciativa_stakeholder`, `interacao`, `interacao_participante`, `interacao_projeto_tema`, `interacao_iniciativa`, `compromisso`, `compromisso_acompanhamento` | 3 | Criadas, com telas e dados fictícios; aguardam homologação (D-070) |
+| `iniciativa`, `iniciativa_projeto_tema`, `iniciativa_stakeholder`, `interacao`, `interacao_participante`, `interacao_projeto_tema`, `interacao_iniciativa`, `compromisso`, `compromisso_acompanhamento` | 3 | Criadas, com telas e dados fictícios; homologadas para desenvolvimento (D-071) |
 | Demais tabelas | 4 | Não criadas |
 
 Onde está cada parte:
