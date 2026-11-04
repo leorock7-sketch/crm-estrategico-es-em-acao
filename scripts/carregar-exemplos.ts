@@ -5,7 +5,8 @@
  * Cada grupo só é carregado se ainda estiver vazio: pessoas e instituições,
  * se não houver nenhuma pessoa; projetos e temas, se não houver nenhum;
  * metodologias e avaliações, se não houver nenhuma metodologia; iniciativas,
- * interações e compromissos (Etapa 3), se não houver nenhuma iniciativa. As metodologias
+ * interações e compromissos (Etapa 3), se não houver nenhuma iniciativa; plano de ação e
+ * riscos (Etapa 4), se não houver nenhum plano. As metodologias
  * de DEMONSTRAÇÃO (0 a 100) ficam como histórico; a vigente é a V2.2, com as
  * rubricas homologadas (Q-66 1.0). Todas as avaliações são fictícias.
  *
@@ -16,7 +17,7 @@
 import { comoUsuario, diretorioDoBanco, fecharBanco, obterBanco } from "@/lib/banco/conexao";
 import { isNull } from "drizzle-orm";
 import type { Executor } from "@/lib/banco/conexao";
-import { iniciativa, instituicao, metodologiaVersao, pessoa, projetoTema, usuario } from "@/lib/banco/esquema";
+import { compromisso, iniciativa, instituicao, metodologiaVersao, pessoa, planoAcao, projetoTema, risco, usuario } from "@/lib/banco/esquema";
 import { hojeEmBrasilia } from "@/lib/formatacao";
 import { obterUsuarioAtual } from "@/modulos/acesso/usuario-atual";
 import {
@@ -37,12 +38,40 @@ import type { PapelIniciativa } from "@/modulos/iniciativas/rotulos";
 import { criarCompromisso, criarInteracao, incluirIniciativaNaInteracao, registrarAcompanhamento } from "@/modulos/interacoes/consultas";
 import type { DadosAcompanhamento, DadosNovaInteracao } from "@/modulos/interacoes/esquemas";
 import {
+  atualizarAcaoPlanejada,
+  atualizarEixo,
+  converterCompromissoEmAcao,
+  criarNovaVersao,
+  criarPlano,
+  decidirVersao,
+  eixosDoPlano,
+  enviarParaAprovacao,
+  incluirAcaoNaVersao,
+  incluirMarco,
+  incluirStakeholderNaAcao,
+  planejamentoDaVersao,
+  registrarAcompanhamento as registrarAcompanhamentoDaAcao,
+  versaoEmElaboracao,
+} from "@/modulos/plano-acao/consultas";
+import type { DadosAcaoPlanejada, DadosAcompanhamentoAcao } from "@/modulos/plano-acao/esquemas";
+import {
   criarAssociacao,
   criarParticipacao,
   criarProjetoTema,
   encerrarParticipacao,
 } from "@/modulos/projetos-temas/consultas";
 import type { DadosAssociacao, DadosProjetoTema } from "@/modulos/projetos-temas/esquemas";
+import {
+  criarGatilho,
+  criarResposta,
+  criarRisco,
+  eixosDoProjetoTema,
+  gatilhosDoRisco,
+  incluirStakeholderNoRisco,
+  registrarAvaliacao,
+  registrarOcorrenciaGatilho,
+} from "@/modulos/riscos/consultas";
+import type { DadosNovoRisco, DadosResposta } from "@/modulos/riscos/esquemas";
 import {
   criarContato,
   criarInstituicao,
@@ -786,19 +815,302 @@ async function carregarAtividades(tx: Executor) {
   return { iniciativas: idIniciativa.size, interacoes: totalInteracoes, compromissos: totalCompromissos };
 }
 
+// --- Plano de Ação e Matriz de Riscos (Etapa 4) ------------------------------
+
+/** Ação fictícia da versão 1 do plano do Corredor; o eixo é o código do pilar de referência. */
+type AcaoExemplo = {
+  chave: string;
+  eixo: string;
+  titulo: string;
+  descricao?: string;
+  justificativa?: string;
+  responsavel?: MembroEquipe;
+  responsavelExterno?: string;
+  inicio?: number;
+  fim?: number;
+  periodicidade?: DadosAcaoPlanejada["periodicidade"];
+  iniciativa?: string;
+  stakeholders?: string[];
+  marcos: { descricao: string; prazo?: number; alcancadoEm?: number }[];
+  acompanhamentos?: { dia: number; situacao?: DadosAcompanhamentoAcao["situacao"]; percentual?: number; observacao?: string }[];
+};
+
+const OBJETIVOS_PILARES: Record<string, string> = {
+  P1: "Estabelecer a governança do corredor entre os órgãos envolvidos (exemplo fictício).",
+  P2: "Conduzir as licenças e autorizações no prazo planejado (exemplo fictício).",
+  P4: "Preparar a operação indireta e o entorno para a implantação (exemplo fictício).",
+  P5: "Manter a comunidade e os parceiros informados (exemplo fictício).",
+};
+
+const ACOES_CORREDOR: AcaoExemplo[] = [
+  { chave: "governanca", eixo: "P1", titulo: "Instituir grupo de trabalho fictício de governança do corredor", responsavel: "helena",
+    inicio: -50, fim: -10, periodicidade: "mensal",
+    justificativa: "Sem instância de coordenação, as decisões ficam dispersas (exemplo fictício).",
+    marcos: [
+      { descricao: "Ato fictício de instituição do grupo publicado", prazo: -30, alcancadoEm: -28 },
+      { descricao: "Primeira reunião do grupo realizada", prazo: -15, alcancadoEm: -14 },
+    ],
+    acompanhamentos: [
+      { dia: -28, situacao: "em_andamento", observacao: "Ato fictício publicado." },
+      { dia: -12, situacao: "concluida", percentual: 100, observacao: "Grupo instituído e em funcionamento (exemplo)." },
+    ] },
+  { chave: "licencas", eixo: "P2", titulo: "Mapear as licenças e autorizações necessárias ao corredor", responsavel: "helena",
+    responsavelExterno: "Secretaria Exemplo de Desenvolvimento", inicio: -40, fim: 30, periodicidade: "mensal", iniciativa: "licenciamento",
+    descricao: "Levantar licenças, órgãos responsáveis, prazos legais e documentos (exemplo fictício).",
+    marcos: [
+      { descricao: "Matriz fictícia de licenças elaborada", prazo: -10, alcancadoEm: -8 },
+      { descricao: "Matriz validada com a Secretaria", prazo: 20 },
+    ],
+    acompanhamentos: [{ dia: -8, situacao: "em_andamento", percentual: 50, observacao: "Matriz preliminar concluída (exemplo)." }] },
+  { chave: "patio", eixo: "P4", titulo: "Definir alternativas para o pátio de caminhões de Vila Exemplo", responsavel: "marcos",
+    inicio: -30, fim: -5, iniciativa: "patio", stakeholders: ["Prefeitura Municipal de Vila Exemplo", "Terminal de Cargas do Porto Modelo"],
+    marcos: [
+      { descricao: "Levantamento fictício de áreas candidatas", prazo: -20, alcancadoEm: -18 },
+      { descricao: "Minuta de alternativas enviada à prefeitura", prazo: -3 },
+    ],
+    acompanhamentos: [{ dia: -6, situacao: "em_andamento", percentual: 60, observacao: "Aguardando dados de tráfego da prefeitura (exemplo)." }] },
+  { chave: "comunicacao", eixo: "P5", titulo: "Plano de comunicação com a comunidade de Vila Exemplo", responsavel: "paula",
+    responsavelExterno: "Prefeitura Municipal de Vila Exemplo", inicio: 5, fim: 45, periodicidade: "bimestral",
+    stakeholders: ["Jornal Diário Exemplo"],
+    marcos: [{ descricao: "Plano fictício de comunicação aprovado no grupo de trabalho", prazo: 30 }] },
+];
+
+type RiscoExemplo = {
+  projeto: string;
+  eixo?: string;
+  titulo: string;
+  causa?: string;
+  consequencia?: string;
+  controles?: string;
+  responsavel: MembroEquipe;
+  situacao: DadosNovoRisco["situacao"];
+  proximaRevisao?: number;
+  iniciativa?: string;
+  inerente: { dia: number; p: number; i: number; por: MembroEquipe; justificativa: string };
+  residual?: { dia: number; p: number; i: number; por: MembroEquipe; justificativa: string };
+  respostas?: { estrategia: DadosResposta["estrategia"]; descricao: string; situacao: DadosResposta["situacao"]; responsavel?: MembroEquipe; responsavelExterno?: string; prazo?: number; acao?: string }[];
+  gatilhos?: { descricao: string; registros: { dia: number; ocorrido: boolean; observacao?: string }[] }[];
+  stakeholders?: string[];
+};
+
+const RISCOS: RiscoExemplo[] = [
+  { projeto: "Corredor Logístico Exemplo", eixo: "P2", titulo: "Atraso na emissão da licença prévia fictícia do corredor",
+    causa: "Complementações de estudos e fila de análise no órgão (exemplo fictício).",
+    consequencia: "Adiamento do cronograma de implantação (exemplo fictício).",
+    controles: "Reuniões quinzenais com o órgão licenciador (exemplo).", responsavel: "helena", situacao: "em_mitigacao", proximaRevisao: 25,
+    iniciativa: "licenciamento",
+    inerente: { dia: -40, p: 4, i: 5, por: "helena", justificativa: "Histórico fictício de complementações em processos semelhantes." },
+    residual: { dia: -5, p: 3, i: 4, por: "helena", justificativa: "Grupo de trabalho instituído e reuniões com o órgão efetivamente realizadas (exemplo)." },
+    respostas: [{ estrategia: "mitigar", descricao: "Acompanhar o processo e antecipar os documentos pedidos.", situacao: "em_execucao", responsavel: "helena", acao: "licencas" }],
+    gatilhos: [{ descricao: "Pedido formal de complementação de estudos (exemplo).", registros: [
+      { dia: -20, ocorrido: false, observacao: "Sem pedido até a data (exemplo)." },
+      { dia: -2, ocorrido: true, observacao: "Pedido fictício recebido; reavaliar o risco." },
+    ] }],
+    stakeholders: ["Secretaria Exemplo de Desenvolvimento"] },
+  { projeto: "Corredor Logístico Exemplo", eixo: "P5", titulo: "Resistência da comunidade ao pátio de caminhões",
+    causa: "Incômodo com tráfego pesado na área urbana (exemplo fictício).", responsavel: "marcos", situacao: "aberto", proximaRevisao: 15,
+    iniciativa: "patio",
+    inerente: { dia: -25, p: 3, i: 4, por: "marcos", justificativa: "Reclamações fictícias registradas pela prefeitura." },
+    // Medida apenas planejada: não há avaliação residual (não reduz o risco automaticamente).
+    respostas: [{ estrategia: "mitigar", descricao: "Executar o plano de comunicação com a comunidade.", situacao: "planejada", responsavel: "paula", acao: "comunicacao" }],
+    stakeholders: ["Prefeitura Municipal de Vila Exemplo"] },
+  { projeto: "Corredor Logístico Exemplo", eixo: "P1", titulo: "Mudança de prioridade do governo estadual",
+    responsavel: "paula", situacao: "monitorado", proximaRevisao: 60,
+    inerente: { dia: -45, p: 2, i: 5, por: "paula", justificativa: "Ciclo político fictício e revisão do plano plurianual." },
+    residual: { dia: -10, p: 2, i: 3, por: "paula", justificativa: "Projeto incluído na carteira prioritária fictícia; acompanhamento mensal." },
+    respostas: [{ estrategia: "aceitar", descricao: "Monitorar a agenda do governo nas reuniões do grupo.", situacao: "em_execucao", responsavel: "paula" }] },
+  { projeto: "Corredor Logístico Exemplo", eixo: "P3", titulo: "Indisponibilidade de dados de tráfego do entorno",
+    responsavel: "marcos", situacao: "mitigado", proximaRevisao: 90,
+    inerente: { dia: -30, p: 2, i: 2, por: "marcos", justificativa: "Base fictícia desatualizada." },
+    residual: { dia: -7, p: 1, i: 2, por: "marcos", justificativa: "Contagem fictícia de tráfego contratada e entregue." } },
+  { projeto: "Ampliação do Porto Modelo", titulo: "Baixa adesão de financiadores à carteira do porto",
+    responsavel: "paula", situacao: "escalonado", proximaRevisao: -1, iniciativa: "financiadores",
+    inerente: { dia: -15, p: 5, i: 4, por: "paula", justificativa: "Primeira rodada fictícia sem manifestação formal de interesse." },
+    respostas: [{ estrategia: "transferir", descricao: "Apoio da agência na prospecção de financiadores.", situacao: "planejada", responsavelExterno: "Example Trade Agency", prazo: 20 }],
+    gatilhos: [{ descricao: "Nenhuma carta de interesse até a segunda rodada (exemplo).", registros: [] }] },
+];
+
+/** Carrega o plano de ação do Corredor (v1 aprovada, v2 em aprovação) e os riscos fictícios. */
+async function carregarPlanosERiscos(tx: Executor) {
+  const membros = await tx.select({ id: usuario.id, email: usuario.email }).from(usuario);
+  const idMembro = new Map(EQUIPE.map((m) => [m.chave, membros.find((u) => u.email === m.email)?.id]));
+  const [projetos, pessoas, instituicoes, iniciativas, compromissos] = await Promise.all([
+    tx.select({ id: projetoTema.id, nome: projetoTema.nome }).from(projetoTema).where(isNull(projetoTema.arquivadoEm)),
+    tx.select({ id: pessoa.id, nome: pessoa.nomeCompleto }).from(pessoa).where(isNull(pessoa.arquivadoEm)),
+    tx.select({ id: instituicao.id, nome: instituicao.nome }).from(instituicao).where(isNull(instituicao.arquivadoEm)),
+    tx.select({ id: iniciativa.id, titulo: iniciativa.titulo }).from(iniciativa),
+    tx.select({ id: compromisso.id, descricao: compromisso.descricao }).from(compromisso),
+  ]);
+  const idProjeto = new Map(projetos.map((p) => [p.nome, p.id]));
+  const idStakeholder = new Map([...pessoas, ...instituicoes].map((s) => [s.nome, s.id]));
+  const tituloIniciativa = new Map(INICIATIVAS.map((i) => [i.chave, i.dados.titulo]));
+  const idIniciativa = (chave?: string) => (chave ? iniciativas.find((i) => i.titulo === tituloIniciativa.get(chave))?.id : undefined);
+  const membro = (chave?: MembroEquipe) => (chave ? idMembro.get(chave) : undefined);
+
+  let totalAcoes = 0;
+  const idAcao = new Map<string, string>();
+  const corredor = idProjeto.get("Corredor Logístico Exemplo");
+  if (corredor) {
+    const planoId = await criarPlano(tx, {
+      projetoTemaId: corredor,
+      titulo: "Plano de ação fictício do Corredor Logístico Exemplo",
+      objetivo: "Viabilizar a implantação do corredor com governança, licenças, prontidão e comunicação (exemplo fictício).",
+      responsavelId: membro("helena"),
+      usarPilaresReferencia: true,
+    });
+    const eixos = await eixosDoPlano(tx, planoId);
+    const idEixo = new Map(eixos.map((e) => [e.codigo, e.id]));
+    for (const e of eixos) {
+      if (OBJETIVOS_PILARES[e.codigo]) await atualizarEixo(tx, e.id, { nome: e.nome, objetivo: OBJETIVOS_PILARES[e.codigo] });
+    }
+    const v1 = (await versaoEmElaboracao(tx, planoId))!.id;
+    for (const a of ACOES_CORREDOR) {
+      const acaoId = await incluirAcaoNaVersao(tx, {
+        versaoId: v1,
+        eixoId: idEixo.get(a.eixo),
+        titulo: a.titulo,
+        descricao: a.descricao,
+        justificativa: a.justificativa,
+        responsavelUsuarioId: membro(a.responsavel),
+        responsavelStakeholderId: a.responsavelExterno ? idStakeholder.get(a.responsavelExterno) : undefined,
+        inicioPrevisto: a.inicio === undefined ? undefined : diaRelativo(a.inicio),
+        fimPrevisto: a.fim === undefined ? undefined : diaRelativo(a.fim),
+        periodicidade: a.periodicidade,
+        iniciativaId: idIniciativa(a.iniciativa),
+      });
+      idAcao.set(a.chave, acaoId);
+      for (const m of a.marcos) {
+        await incluirMarco(tx, { versaoId: v1, acaoId, descricao: m.descricao, prazoPrevisto: m.prazo === undefined ? undefined : diaRelativo(m.prazo) });
+      }
+      for (const nome of a.stakeholders ?? []) {
+        const stakeholderId = idStakeholder.get(nome);
+        if (stakeholderId) await incluirStakeholderNaAcao(tx, { acaoId, stakeholderId });
+      }
+      totalAcoes++;
+    }
+    await enviarParaAprovacao(tx, v1, undefined);
+    await decidirVersao(tx, v1, "aprovada", "Versão inicial fictícia aprovada para demonstração.");
+
+    // Acompanhamento da versão vigente: situação, percentual e marcos alcançados.
+    const planejadas = await planejamentoDaVersao(tx, v1);
+    for (const a of ACOES_CORREDOR) {
+      const acaoId = idAcao.get(a.chave)!;
+      for (const r of a.acompanhamentos ?? []) {
+        await registrarAcompanhamentoDaAcao(tx, { acaoId, data: diaRelativo(r.dia), situacao: r.situacao, percentual: r.percentual, observacao: r.observacao });
+      }
+      const marcos = planejadas.find((p) => p.acaoId === acaoId)?.marcos ?? [];
+      for (const [indice, m] of a.marcos.entries()) {
+        if (m.alcancadoEm !== undefined && marcos[indice]) {
+          await registrarAcompanhamentoDaAcao(tx, { acaoId, data: diaRelativo(m.alcancadoEm), marcoId: marcos[indice].marcoId, marcoAlcancado: true });
+        }
+      }
+    }
+
+    // Versão 2 em aprovação: compromisso convertido em ação e prazo do pátio repactuado.
+    const origem = compromissos.find((c) => c.descricao === "Consolidar o cronograma de licenciamento com a Secretaria.");
+    let v2: string | undefined;
+    if (origem) {
+      const convertido = await converterCompromissoEmAcao(tx, origem.id, planoId, idEixo.get("P2"));
+      v2 = convertido.versaoId;
+      totalAcoes++;
+    } else {
+      v2 = await criarNovaVersao(tx, planoId);
+    }
+    const patio = (await planejamentoDaVersao(tx, v2)).find((p) => p.acaoId === idAcao.get("patio"));
+    if (patio) {
+      await atualizarAcaoPlanejada(tx, patio.id, {
+        eixoId: patio.eixoId ?? undefined,
+        titulo: patio.titulo,
+        descricao: patio.descricao ?? undefined,
+        justificativa: patio.justificativa ?? undefined,
+        responsavelUsuarioId: patio.responsavelUsuarioId ?? undefined,
+        responsavelStakeholderId: patio.responsavelStakeholderId ?? undefined,
+        inicioPrevisto: patio.inicioPrevisto ?? undefined,
+        fimPrevisto: diaRelativo(15),
+        periodicidade: patio.periodicidade ?? undefined,
+      });
+    }
+    await enviarParaAprovacao(tx, v2, "Repactuação fictícia do prazo do pátio e inclusão do compromisso de cronograma convertido em ação.");
+  }
+
+  let totalRiscos = 0;
+  for (const r of RISCOS) {
+    const projetoTemaId = idProjeto.get(r.projeto);
+    if (!projetoTemaId) continue;
+    const eixos = await eixosDoProjetoTema(tx, projetoTemaId);
+    const riscoId = await criarRisco(tx, {
+      projetoTemaId,
+      titulo: r.titulo,
+      causa: r.causa,
+      consequencia: r.consequencia,
+      controlesExistentes: r.controles,
+      eixoId: r.eixo ? eixos.find((e) => e.codigo === r.eixo)?.id : undefined,
+      iniciativaId: idIniciativa(r.iniciativa),
+      responsavelId: membro(r.responsavel),
+      situacao: r.situacao,
+      proximaRevisao: r.proximaRevisao === undefined ? undefined : diaRelativo(r.proximaRevisao),
+      dataAvaliacao: diaRelativo(r.inerente.dia),
+      probabilidade: r.inerente.p,
+      impacto: r.inerente.i,
+      justificativa: r.inerente.justificativa,
+      avaliadoPor: membro(r.inerente.por)!,
+    });
+    if (r.residual) {
+      await registrarAvaliacao(tx, {
+        riscoId,
+        tipo: "residual",
+        dataAvaliacao: diaRelativo(r.residual.dia),
+        probabilidade: r.residual.p,
+        impacto: r.residual.i,
+        justificativa: r.residual.justificativa,
+        avaliadoPor: membro(r.residual.por)!,
+      });
+    }
+    for (const resposta of r.respostas ?? []) {
+      await criarResposta(tx, {
+        riscoId,
+        estrategia: resposta.estrategia,
+        descricao: resposta.descricao,
+        situacao: resposta.situacao,
+        responsavelUsuarioId: membro(resposta.responsavel),
+        responsavelStakeholderId: resposta.responsavelExterno ? idStakeholder.get(resposta.responsavelExterno) : undefined,
+        prazo: resposta.prazo === undefined ? undefined : diaRelativo(resposta.prazo),
+        acaoId: resposta.acao ? idAcao.get(resposta.acao) : undefined,
+      });
+    }
+    for (const g of r.gatilhos ?? []) {
+      await criarGatilho(tx, riscoId, g.descricao);
+      const [gatilho] = (await gatilhosDoRisco(tx, riscoId)).filter((x) => x.descricao === g.descricao);
+      for (const registro of g.registros) {
+        await registrarOcorrenciaGatilho(tx, { gatilhoId: gatilho.id, data: diaRelativo(registro.dia), ocorrido: registro.ocorrido, observacao: registro.observacao });
+      }
+    }
+    for (const nome of r.stakeholders ?? []) {
+      const stakeholderId = idStakeholder.get(nome);
+      if (stakeholderId) await incluirStakeholderNoRisco(tx, { riscoId, stakeholderId });
+    }
+    totalRiscos++;
+  }
+  return { acoes: totalAcoes, riscos: totalRiscos, plano: corredor !== undefined };
+}
+
 async function principal() {
   console.log(`Banco local: ${diretorioDoBanco()}`);
   const banco = await obterBanco();
   try {
-    const [pessoasExistentes, projetosExistentes, metodologiasExistentes, iniciativasExistentes] = await Promise.all([
-      banco.$count(pessoa),
-      banco.$count(projetoTema),
-      banco.$count(metodologiaVersao),
-      banco.$count(iniciativa),
-    ]);
-    if (pessoasExistentes > 0 && projetosExistentes > 0 && metodologiasExistentes > 0 && iniciativasExistentes > 0) {
+    const [pessoasExistentes, projetosExistentes, metodologiasExistentes, iniciativasExistentes, planosExistentes, riscosExistentes] =
+      await Promise.all([
+        banco.$count(pessoa),
+        banco.$count(projetoTema),
+        banco.$count(metodologiaVersao),
+        banco.$count(iniciativa),
+        banco.$count(planoAcao),
+        banco.$count(risco),
+      ]);
+    const etapa4Existente = planosExistentes > 0 || riscosExistentes > 0;
+    if (pessoasExistentes > 0 && projetosExistentes > 0 && metodologiasExistentes > 0 && iniciativasExistentes > 0 && etapa4Existente) {
       console.log(
-        `O banco já tem ${pessoasExistentes} pessoa(s), ${projetosExistentes} projeto(s) ou tema(s), ${metodologiasExistentes} metodologia(s) e ${iniciativasExistentes} iniciativa(s). Nada foi carregado.`,
+        `O banco já tem ${pessoasExistentes} pessoa(s), ${projetosExistentes} projeto(s) ou tema(s), ${metodologiasExistentes} metodologia(s), ${iniciativasExistentes} iniciativa(s) e ${planosExistentes} plano(s) de ação. Nada foi carregado.`,
       );
       console.log('Para recomeçar do zero: "npm run banco:reiniciar" e depois "npm run banco:exemplos".');
       return;
@@ -841,6 +1153,14 @@ async function principal() {
         );
       } else {
         console.log(`Iniciativas: o banco já tem ${iniciativasExistentes}; mantidas como estão.`);
+      }
+      if (!etapa4Existente) {
+        const etapa4 = await carregarPlanosERiscos(tx);
+        console.log(
+          `Carregados: ${etapa4.plano ? "1 plano de ação (versão 1 aprovada, versão 2 em aprovação)" : "nenhum plano (projeto de exemplo ausente)"}, ${etapa4.acoes} ações e ${etapa4.riscos} riscos fictícios.`,
+        );
+      } else {
+        console.log(`Planos e riscos: o banco já tem ${planosExistentes} plano(s) e ${riscosExistentes} risco(s); mantidos como estão.`);
       }
     });
   } finally {
