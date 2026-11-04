@@ -12,6 +12,7 @@ import { descreverPeriodo, formatarDataHora } from "@/lib/formatacao";
 import { formatarCnpj } from "@/lib/validacao/cnpj";
 import { esquemaIdentificador } from "@/lib/validacao/comuns";
 import { AtividadesDoStakeholder } from "@/modulos/iniciativas/componentes/atividades-relacionadas";
+import { AcoesERiscosDoStakeholder } from "@/modulos/plano-acao/componentes/integracoes";
 import { ListaContextos } from "@/modulos/projetos-temas/componentes/lista-contextos";
 import { contextosDoStakeholder } from "@/modulos/projetos-temas/consultas";
 import { alterarArquivamentoInstituicao } from "@/modulos/stakeholders/acoes";
@@ -195,6 +196,8 @@ async function DetalheInstituicao({ params }: Pick<PageProps<"/instituicoes/[id]
       </section>
 
       <AtividadesDoStakeholder stakeholderId={id} />
+
+      <AcoesERiscosDoStakeholder stakeholderId={id} />
 
       <section aria-labelledby="titulo-historico" className={classeCartao}>
         <h2 id="titulo-historico" className="mb-4 text-lg font-semibold">

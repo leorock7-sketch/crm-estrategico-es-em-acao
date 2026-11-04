@@ -17,6 +17,7 @@ import {
   encerrarParticipacaoAcao,
 } from "@/modulos/projetos-temas/acoes";
 import { AtividadesDoProjetoTema } from "@/modulos/iniciativas/componentes/atividades-relacionadas";
+import { PlanoERiscosDoProjetoTema } from "@/modulos/plano-acao/componentes/integracoes";
 import { FormularioAssociacao } from "@/modulos/projetos-temas/componentes/formulario-associacao";
 import { FormularioParticipacao } from "@/modulos/projetos-temas/componentes/formulario-participacao";
 import {
@@ -224,6 +225,8 @@ async function DetalheProjetoTema({ params }: Pick<PageProps<"/projetos-temas/[i
       <SecaoAvaliacoes projetoTemaId={id} fichas={fichas} podeVer={permissao.ver} />
 
       <AtividadesDoProjetoTema projetoTemaId={id} arquivado={arquivado} />
+
+      <PlanoERiscosDoProjetoTema projetoTemaId={id} arquivado={arquivado} />
 
       <section aria-labelledby="titulo-historico" className={classeCartao}>
         <h2 id="titulo-historico" className="mb-4 text-lg font-semibold">

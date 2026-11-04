@@ -39,6 +39,16 @@ const MODULOS = [
     descricao: "Encaminhamentos com responsável e prazo: pendentes, concluídos e vencidos.",
   },
   {
+    href: "/planos",
+    titulo: "Planos de ação",
+    descricao: "Um plano por projeto ou tema, por pilares ou eixos, com versões aprovadas, ações, marcos e acompanhamento.",
+  },
+  {
+    href: "/riscos",
+    titulo: "Matriz de Riscos",
+    descricao: "Matriz 5 × 5 do Comitê de Infraestrutura, com riscos inerentes e residuais, gatilhos e respostas.",
+  },
+  {
     href: "/metodologias",
     titulo: "Metodologias de avaliação",
     descricao: "Versões da metodologia de poder e interesse. Por ora, apenas demonstrações não homologadas.",
@@ -61,7 +71,7 @@ export default function PaginaInicial() {
         </p>
 
         <p className="mt-8 border-t border-borda pt-6 text-sm text-texto-secundario">
-          Esta aplicação está em desenvolvimento (Etapa 3 — iniciativas, interações e compromissos; avaliações na escala V2.2
+          Esta aplicação está em desenvolvimento (Etapa 4 — plano de ação e matriz de riscos; avaliações na escala V2.2
           com metodologia fictícia, não homologada). O ambiente de testes utiliza exclusivamente dados fictícios.
         </p>
       </section>

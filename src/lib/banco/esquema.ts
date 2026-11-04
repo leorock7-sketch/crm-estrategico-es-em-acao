@@ -6,7 +6,7 @@
  * regras que envolvem mais de uma linha) ficam em scripts SQL próprios, na
  * mesma pasta. Documentação: docs/MODELO_DADOS.md.
  */
-import { sql } from "drizzle-orm";
+import { type SQL, sql } from "drizzle-orm";
 import {
   type AnyPgColumn,
   bigint,
@@ -951,6 +951,8 @@ export const compromisso = pgTable(
     prazo: date("prazo"),
     situacao: situacaoCompromisso("situacao").notNull().default("aberto"),
     concluidoEm: date("concluido_em"),
+    /** Ação do Plano de Ação em que o compromisso foi convertido (Etapa 4). */
+    acaoId: uuid("acao_id").references((): AnyPgColumn => acao.id),
     ...colunasControle(),
   },
   (t) => [
@@ -984,5 +986,408 @@ export const compromissoAcompanhamento = pgTable(
   (t) => [
     check("compromisso_acompanhamento_registro_preenchido", sql`length(trim(${t.registro})) > 0`),
     index("compromisso_acompanhamento_compromisso_idx").on(t.compromissoId),
+  ],
+);
+
+// --- Plano de Ação e Matriz de Riscos (Etapa 4) ------------------------------
+// Reproduzem os instrumentos do Comitê de Infraestrutura (D-072): plano por
+// projeto ou tema, organizado por pilares ou eixos, com ações e marcos de
+// acompanhamento; matriz de riscos 5 × 5 com avaliações inerente e residual.
+
+/** Fluxo de aprovação das versões do plano (D-072, item 2.3). */
+export const situacaoVersaoPlano = pgEnum("situacao_versao_plano", [
+  "rascunho",
+  "em_aprovacao",
+  "aprovada",
+  "rejeitada",
+  "substituida",
+]);
+
+/** Registro de cada passo do fluxo: quem decidiu, quando e com que parecer (D-072, D3). */
+export const decisaoPlano = pgEnum("decisao_plano", ["enviada", "devolvida", "aprovada", "rejeitada"]);
+
+export const periodicidadeAcao = pgEnum("periodicidade_acao", ["mensal", "bimestral", "trimestral", "semestral", "anual"]);
+
+/** Andamento da ação; "atrasada" é calculada (prazo vencido sem conclusão). */
+export const situacaoAcao = pgEnum("situacao_acao", ["nao_iniciada", "em_andamento", "concluida", "suspensa", "cancelada"]);
+
+/** Status dos riscos conforme a matriz do Comitê de Infraestrutura (D-072, item 3.2). */
+export const situacaoRisco = pgEnum("situacao_risco", ["aberto", "em_mitigacao", "monitorado", "mitigado", "escalonado"]);
+
+export const tipoAvaliacaoRisco = pgEnum("tipo_avaliacao_risco", ["inerente", "residual"]);
+
+export const estrategiaResposta = pgEnum("estrategia_resposta", ["evitar", "mitigar", "transferir", "aceitar"]);
+
+export const situacaoResposta = pgEnum("situacao_resposta", ["planejada", "em_execucao", "concluida", "cancelada"]);
+
+/** Um plano de ação por projeto ou tema (D-072, D2), com versões. */
+export const planoAcao = pgTable(
+  "plano_acao",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    projetoTemaId: uuid("projeto_tema_id")
+      .notNull()
+      .references(() => projetoTema.id),
+    titulo: text("titulo").notNull(),
+    /** Objetivo geral do plano no projeto ou tema. */
+    objetivo: text("objetivo"),
+    responsavelId: uuid("responsavel_id").references(() => usuario.id),
+    ...colunasControle(),
+  },
+  (t) => [
+    check("plano_acao_titulo_preenchido", sql`length(trim(${t.titulo})) > 0`),
+    uniqueIndex("plano_acao_projeto_unico").on(t.projetoTemaId).where(sql`${t.arquivadoEm} is null`),
+  ],
+);
+
+/**
+ * Pilares ou eixos do plano, próprios de cada projeto ou tema (D-072, item 2.1):
+ * os cinco pilares da Infraestrutura são um modelo de referência, não obrigatório.
+ */
+export const planoEixo = pgTable(
+  "plano_eixo",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    planoAcaoId: uuid("plano_acao_id")
+      .notNull()
+      .references(() => planoAcao.id),
+    codigo: text("codigo").notNull(),
+    nome: text("nome").notNull(),
+    descricao: text("descricao"),
+    /** Objetivo estratégico do pilar ou eixo neste projeto ou tema. */
+    objetivo: text("objetivo"),
+    ordem: integer("ordem").notNull().default(0),
+    ...colunasControle(),
+  },
+  (t) => [
+    check("plano_eixo_nome_preenchido", sql`length(trim(${t.nome})) > 0`),
+    uniqueIndex("plano_eixo_codigo_unico").on(t.planoAcaoId, t.codigo).where(sql`${t.arquivadoEm} is null`),
+  ],
+);
+
+/** Versões do plano: só a aprovada vigora; as decididas não mudam. */
+export const planoAcaoVersao = pgTable(
+  "plano_acao_versao",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    planoAcaoId: uuid("plano_acao_id")
+      .notNull()
+      .references(() => planoAcao.id),
+    numeroVersao: integer("numero_versao").notNull(),
+    situacao: situacaoVersaoPlano("situacao").notNull().default("rascunho"),
+    motivoAlteracao: text("motivo_alteracao"),
+    propostaPor: uuid("proposta_por").references(() => usuario.id),
+    propostaEm: timestamp("proposta_em", { withTimezone: true }),
+    decididaPor: uuid("decidida_por").references(() => usuario.id),
+    decididaEm: timestamp("decidida_em", { withTimezone: true }),
+    parecer: text("parecer"),
+    ...colunasControle(),
+  },
+  (t) => [
+    unique("plano_acao_versao_numero_unico").on(t.planoAcaoId, t.numeroVersao),
+    uniqueIndex("plano_acao_versao_vigente_unica").on(t.planoAcaoId).where(sql`${t.situacao} = 'aprovada'`),
+    uniqueIndex("plano_acao_versao_elaboracao_unica")
+      .on(t.planoAcaoId)
+      .where(sql`${t.situacao} in ('rascunho', 'em_aprovacao') and ${t.arquivadoEm} is null`),
+    check(
+      "plano_acao_versao_decisao_registrada",
+      sql`${t.situacao} not in ('aprovada', 'rejeitada', 'substituida') or (${t.decididaPor} is not null and ${t.decididaEm} is not null)`,
+    ),
+  ],
+);
+
+/** Histórico do fluxo de aprovação (envio, devolução, aprovação, rejeição), preservado. */
+export const planoAcaoDecisao = pgTable("plano_acao_decisao", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  planoAcaoVersaoId: uuid("plano_acao_versao_id")
+    .notNull()
+    .references(() => planoAcaoVersao.id),
+  decisao: decisaoPlano("decisao").notNull(),
+  parecer: text("parecer"),
+  ...colunasControle(),
+});
+
+/** Identidade permanente da ação (código A-01, A-02…), que atravessa as versões. */
+export const acao = pgTable(
+  "acao",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    planoAcaoId: uuid("plano_acao_id")
+      .notNull()
+      .references(() => planoAcao.id),
+    codigo: text("codigo").notNull(),
+    iniciativaId: uuid("iniciativa_id").references(() => iniciativa.id),
+    ...colunasControle(),
+  },
+  (t) => [unique("acao_codigo_unico").on(t.planoAcaoId, t.codigo), index("acao_iniciativa_idx").on(t.iniciativaId)],
+);
+
+/** O que foi planejado para a ação em cada versão (fotografia completa do plano). */
+export const acaoPlanejamento = pgTable(
+  "acao_planejamento",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    acaoId: uuid("acao_id")
+      .notNull()
+      .references(() => acao.id),
+    planoAcaoVersaoId: uuid("plano_acao_versao_id")
+      .notNull()
+      .references(() => planoAcaoVersao.id),
+    eixoId: uuid("eixo_id").references(() => planoEixo.id),
+    titulo: text("titulo").notNull(),
+    /** Detalhamento: desdobramentos e subações. */
+    descricao: text("descricao"),
+    justificativa: text("justificativa"),
+    responsavelUsuarioId: uuid("responsavel_usuario_id").references(() => usuario.id),
+    responsavelStakeholderId: uuid("responsavel_stakeholder_id").references(() => stakeholder.id),
+    inicioPrevisto: date("inicio_previsto"),
+    fimPrevisto: date("fim_previsto"),
+    periodicidade: periodicidadeAcao("periodicidade"),
+    ...colunasControle(),
+  },
+  (t) => [
+    check("acao_planejamento_titulo_preenchido", sql`length(trim(${t.titulo})) > 0`),
+    check(
+      "acao_planejamento_datas",
+      sql`${t.inicioPrevisto} is null or ${t.fimPrevisto} is null or ${t.fimPrevisto} >= ${t.inicioPrevisto}`,
+    ),
+    check(
+      "acao_planejamento_com_responsavel",
+      sql`${t.responsavelUsuarioId} is not null or ${t.responsavelStakeholderId} is not null`,
+    ),
+    uniqueIndex("acao_planejamento_unico")
+      .on(t.acaoId, t.planoAcaoVersaoId)
+      .where(sql`${t.arquivadoEm} is null`),
+    index("acao_planejamento_versao_idx").on(t.planoAcaoVersaoId),
+  ],
+);
+
+/** Marcos de acompanhamento da ação (M1, M2…): pontos de verificação da evolução. */
+export const acaoMarco = pgTable(
+  "acao_marco",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    acaoId: uuid("acao_id")
+      .notNull()
+      .references(() => acao.id),
+    codigo: text("codigo").notNull(),
+    ...colunasControle(),
+  },
+  (t) => [unique("acao_marco_codigo_unico").on(t.acaoId, t.codigo)],
+);
+
+/** O que foi planejado para o marco em cada versão. */
+export const marcoPlanejamento = pgTable(
+  "marco_planejamento",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    marcoId: uuid("marco_id")
+      .notNull()
+      .references(() => acaoMarco.id),
+    planoAcaoVersaoId: uuid("plano_acao_versao_id")
+      .notNull()
+      .references(() => planoAcaoVersao.id),
+    descricao: text("descricao").notNull(),
+    prazoPrevisto: date("prazo_previsto"),
+    ...colunasControle(),
+  },
+  (t) => [
+    check("marco_planejamento_descricao_preenchida", sql`length(trim(${t.descricao})) > 0`),
+    uniqueIndex("marco_planejamento_unico")
+      .on(t.marcoId, t.planoAcaoVersaoId)
+      .where(sql`${t.arquivadoEm} is null`),
+  ],
+);
+
+/**
+ * Acompanhamento da ação, sem aprovação: situação, percentual (complementar,
+ * opcional), observação e marco alcançado (D-072, item 2.2). Preservado.
+ */
+export const acaoAcompanhamento = pgTable(
+  "acao_acompanhamento",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    acaoId: uuid("acao_id")
+      .notNull()
+      .references(() => acao.id),
+    data: date("data").notNull(),
+    situacao: situacaoAcao("situacao"),
+    percentual: integer("percentual"),
+    observacao: text("observacao"),
+    marcoId: uuid("marco_id").references(() => acaoMarco.id),
+    /** Com marco: verdadeiro se alcançado; falso corrige um registro anterior. */
+    marcoAlcancado: boolean("marco_alcancado"),
+    ...colunasControle(),
+  },
+  (t) => [
+    check("acao_acompanhamento_percentual", sql`${t.percentual} is null or ${t.percentual} between 0 and 100`),
+    check("acao_acompanhamento_marco", sql`(${t.marcoId} is null) = (${t.marcoAlcancado} is null)`),
+    check(
+      "acao_acompanhamento_preenchido",
+      sql`${t.situacao} is not null or ${t.percentual} is not null or ${t.marcoId} is not null or length(trim(coalesce(${t.observacao}, ''))) > 0`,
+    ),
+    index("acao_acompanhamento_acao_idx").on(t.acaoId),
+  ],
+);
+
+/** Pessoas e instituições relacionadas à ação. */
+export const acaoStakeholder = pgTable(
+  "acao_stakeholder",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    acaoId: uuid("acao_id")
+      .notNull()
+      .references(() => acao.id),
+    stakeholderId: uuid("stakeholder_id")
+      .notNull()
+      .references(() => stakeholder.id),
+    observacao: text("observacao"),
+    ...colunasControle(),
+  },
+  (t) => [
+    uniqueIndex("acao_stakeholder_unico").on(t.acaoId, t.stakeholderId).where(sql`${t.arquivadoEm} is null`),
+    index("acao_stakeholder_stakeholder_idx").on(t.stakeholderId),
+  ],
+);
+
+/** Riscos do projeto ou tema (matriz 5 × 5 do Comitê de Infraestrutura). */
+export const risco = pgTable(
+  "risco",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    projetoTemaId: uuid("projeto_tema_id")
+      .notNull()
+      .references(() => projetoTema.id),
+    iniciativaId: uuid("iniciativa_id").references(() => iniciativa.id),
+    /** Pilar ou eixo do plano do mesmo projeto ou tema. */
+    eixoId: uuid("eixo_id").references(() => planoEixo.id),
+    codigo: text("codigo").notNull(),
+    titulo: text("titulo").notNull(),
+    descricao: text("descricao"),
+    causa: text("causa"),
+    consequencia: text("consequencia"),
+    controlesExistentes: text("controles_existentes"),
+    responsavelId: uuid("responsavel_id").references(() => usuario.id),
+    situacao: situacaoRisco("situacao").notNull().default("aberto"),
+    proximaRevisao: date("proxima_revisao"),
+    ...colunasControle(),
+  },
+  (t) => [
+    check("risco_titulo_preenchido", sql`length(trim(${t.titulo})) > 0`),
+    unique("risco_codigo_unico").on(t.projetoTemaId, t.codigo),
+    index("risco_iniciativa_idx").on(t.iniciativaId),
+  ],
+);
+
+/**
+ * Avaliações do risco, inerente (antes dos controles) e residual (depois dos
+ * controles efetivamente implementados). Criticidade = probabilidade × impacto
+ * e classificação pelas faixas da matriz original, calculadas pelo banco.
+ * Cada reavaliação é um novo registro: o histórico é preservado.
+ */
+export const riscoAvaliacao = pgTable(
+  "risco_avaliacao",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    riscoId: uuid("risco_id")
+      .notNull()
+      .references(() => risco.id),
+    tipo: tipoAvaliacaoRisco("tipo").notNull(),
+    dataAvaliacao: date("data_avaliacao").notNull(),
+    probabilidade: integer("probabilidade").notNull(),
+    impacto: integer("impacto").notNull(),
+    criticidade: integer("criticidade")
+      .notNull()
+      .generatedAlwaysAs((): SQL => sql`probabilidade * impacto`),
+    classificacao: text("classificacao")
+      .notNull()
+      .generatedAlwaysAs(
+        (): SQL =>
+          sql`case when probabilidade * impacto <= 4 then 'baixo' when probabilidade * impacto <= 9 then 'moderado' when probabilidade * impacto <= 16 then 'alto' else 'critico' end`,
+      ),
+    justificativa: text("justificativa").notNull(),
+    avaliadoPor: uuid("avaliado_por")
+      .notNull()
+      .references(() => usuario.id),
+    ...colunasControle(),
+  },
+  (t) => [
+    check("risco_avaliacao_probabilidade", sql`${t.probabilidade} between 1 and 5`),
+    check("risco_avaliacao_impacto", sql`${t.impacto} between 1 and 5`),
+    check("risco_avaliacao_justificativa_preenchida", sql`length(trim(${t.justificativa})) > 0`),
+    index("risco_avaliacao_risco_idx").on(t.riscoId),
+  ],
+);
+
+/** Gatilhos (sinais de alerta) do risco. */
+export const riscoGatilho = pgTable(
+  "risco_gatilho",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    riscoId: uuid("risco_id")
+      .notNull()
+      .references(() => risco.id),
+    descricao: text("descricao").notNull(),
+    ...colunasControle(),
+  },
+  (t) => [check("risco_gatilho_descricao_preenchida", sql`length(trim(${t.descricao})) > 0`)],
+);
+
+/**
+ * Acompanhamento do gatilho (ocorreu ou não, com observação). A ocorrência não
+ * altera a avaliação do risco: sinaliza a necessidade de reavaliação (D-072, 3.3).
+ */
+export const riscoGatilhoRegistro = pgTable("risco_gatilho_registro", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  gatilhoId: uuid("gatilho_id")
+    .notNull()
+    .references(() => riscoGatilho.id),
+  data: date("data").notNull(),
+  ocorrido: boolean("ocorrido").notNull(),
+  observacao: text("observacao"),
+  ...colunasControle(),
+});
+
+/** Medidas de resposta; quando já for uma ação do plano, aponta para ela, sem duplicar. */
+export const riscoResposta = pgTable(
+  "risco_resposta",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    riscoId: uuid("risco_id")
+      .notNull()
+      .references(() => risco.id),
+    estrategia: estrategiaResposta("estrategia").notNull(),
+    descricao: text("descricao").notNull(),
+    responsavelUsuarioId: uuid("responsavel_usuario_id").references(() => usuario.id),
+    responsavelStakeholderId: uuid("responsavel_stakeholder_id").references(() => stakeholder.id),
+    prazo: date("prazo"),
+    situacao: situacaoResposta("situacao").notNull().default("planejada"),
+    acaoId: uuid("acao_id").references(() => acao.id),
+    ...colunasControle(),
+  },
+  (t) => [
+    check("risco_resposta_descricao_preenchida", sql`length(trim(${t.descricao})) > 0`),
+    index("risco_resposta_risco_idx").on(t.riscoId),
+    index("risco_resposta_acao_idx").on(t.acaoId),
+  ],
+);
+
+/** Pessoas e instituições relacionadas ao risco. */
+export const riscoStakeholder = pgTable(
+  "risco_stakeholder",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    riscoId: uuid("risco_id")
+      .notNull()
+      .references(() => risco.id),
+    stakeholderId: uuid("stakeholder_id")
+      .notNull()
+      .references(() => stakeholder.id),
+    observacao: text("observacao"),
+    ...colunasControle(),
+  },
+  (t) => [
+    uniqueIndex("risco_stakeholder_unico").on(t.riscoId, t.stakeholderId).where(sql`${t.arquivadoEm} is null`),
+    index("risco_stakeholder_stakeholder_idx").on(t.stakeholderId),
   ],
 );

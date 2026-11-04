@@ -3,7 +3,8 @@
  * Atualização de um banco da Etapa 2B para a Etapa 3 (migração 0007): a pasta
  * de dados é copiada antes (T-1) e todas as tabelas anteriores — cadastro,
  * projetos, avaliações V2.2, auditoria — continuam idênticas, linha a linha.
- * As tabelas novas nascem vazias. Somente dados fictícios.
+ * As tabelas novas nascem vazias. Somente dados fictícios. A atualização para
+ * a Etapa 4 (0008) tem o seu próprio teste (migracao-etapa-4.test.ts).
  */
 import { cpSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import os from "node:os";
@@ -32,14 +33,15 @@ const TABELAS_NOVAS = [
 ];
 let temporaria: string;
 let migracoesDa2B: string;
+let migracoesDaEtapa3: string;
 
-/** Pasta só com as atualizações 0000 a 0006, para criar um banco no estado da Etapa 2B. */
-function prepararMigracoesDa2B(destino: string) {
+/** Pasta só com as atualizações 0000 até a indicada (0006: Etapa 2B; 0007: Etapa 3). */
+function prepararMigracoesAte(destino: string, ultima: number) {
   mkdirSync(path.join(destino, "meta"), { recursive: true });
   const diario = JSON.parse(readFileSync(path.join(PASTA_MIGRACOES, "meta", "_journal.json"), "utf8")) as {
     entries: { idx: number; tag: string }[];
   };
-  const entradas = diario.entries.filter((e) => e.idx <= 6);
+  const entradas = diario.entries.filter((e) => e.idx <= ultima);
   for (const e of entradas) cpSync(path.join(PASTA_MIGRACOES, `${e.tag}.sql`), path.join(destino, `${e.tag}.sql`));
   writeFileSync(path.join(destino, "meta", "_journal.json"), JSON.stringify({ ...diario, entries: entradas }));
 }
@@ -47,7 +49,9 @@ function prepararMigracoesDa2B(destino: string) {
 beforeAll(() => {
   temporaria = mkdtempSync(path.join(os.tmpdir(), "crm-migracao-e3-"));
   migracoesDa2B = path.join(temporaria, "migracoes-2b");
-  prepararMigracoesDa2B(migracoesDa2B);
+  prepararMigracoesAte(migracoesDa2B, 6);
+  migracoesDaEtapa3 = path.join(temporaria, "migracoes-e3");
+  prepararMigracoesAte(migracoesDaEtapa3, 7);
 });
 
 afterAll(() => {
@@ -109,7 +113,7 @@ describe("Atualização de um banco da Etapa 2B (migração 0007)", () => {
     expect(antes.avaliacao_versao.length).toBeGreaterThan(0);
     await fecharBanco(antigo);
 
-    const atualizado = await abrirBanco(pasta);
+    const atualizado = await abrirBanco(pasta, { pastaMigracoes: migracoesDaEtapa3 });
     try {
       const copias = readdirSync(path.join(temporaria, "dados", "copias"));
       expect(copias).toHaveLength(1);

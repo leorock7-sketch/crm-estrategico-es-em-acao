@@ -12,6 +12,7 @@
 | 0.8 | 01/11/2026 | Escalas V2.2 (D-057 a D-060): adaptação do módulo `avaliacoes` e do banco planejada, não implementada (Q-67) |
 | 0.9 | 02/11/2026 | Etapa 2B (D-069): módulo `avaliacoes` adaptado às escalas V2.2 (rubricas, alertas orientativos, matriz 3 × 3) e cópia de segurança automática do banco local antes de atualizações pendentes; aguardando homologação |
 | 0.10 | 03/11/2026 | Etapa 3 (D-070): módulos `iniciativas` e `interacoes` (iniciativas, interações e compromissos), telas e visibilidade por projeto ou tema; aguardando homologação |
+| 0.11 | 03/11/2026 | Etapa 4 (D-072): módulos `plano-acao` e `riscos`, telas de planos, versões, ações e riscos, integração com os módulos anteriores e visibilidade por projeto ou tema; aguardando homologação |
 
 Legenda: ✅ Aprovado · 🔧 Proposta técnica · ⏳ Pendente.
 
@@ -107,7 +108,10 @@ crm-estrategico-es-em-acao/
 │   │   ├── metodologias/     Consulta das metodologias de avaliação
 │   │   ├── iniciativas/      Matriz de Iniciativas: lista com filtros, cadastro, página e edição
 │   │   ├── interacoes/       Interações: lista e agenda, registro único, página e edição
-│   │   ├── compromissos/     Compromissos: lista com filtros, página e acompanhamento
+│   │   ├── compromissos/     Compromissos: lista com filtros, página, acompanhamento e conversão em ação do plano
+│   │   ├── planos/           Planos de ação: lista, criação, página do plano e [id]/versoes (edição, comparação e decisão)
+│   │   ├── acoes/            Página da ação: planejamento vigente, marcos, acompanhamento e relações
+│   │   ├── riscos/           Matriz de Riscos: matrizes 5 × 5, lista com filtros, cadastro, ficha e edição
 │   │   ├── pessoas/          Lista, inclusão, detalhe e edição de pessoas
 │   │   ├── instituicoes/     Lista, inclusão, detalhe e edição de instituições
 │   │   ├── not-found.tsx     Página "não encontrado"
@@ -119,6 +123,8 @@ crm-estrategico-es-em-acao/
 │   │   ├── acesso/           Usuário atual (provisório até a autenticação), permissões e visibilidade por contexto
 │   │   ├── iniciativas/      Iniciativas: validações, consultas, ações, histórico e telas
 │   │   ├── interacoes/       Interações e compromissos: registro único, prazos, acompanhamento e telas
+│   │   ├── plano-acao/       Plano de Ação: versões e aprovação, ações, marcos, acompanhamento, comparação entre versões e integrações
+│   │   ├── riscos/           Matriz de Riscos: parâmetros da matriz 5 × 5 original, avaliações inerente e residual, gatilhos, respostas e telas
 │   │   ├── avaliacoes/       Avaliação estratégica: escalas V2.2, rubricas, alertas orientativos, matriz 3 × 3, cálculo de demonstração (histórico), consultas, ações e telas
 │   │   ├── projetos-temas/   Comitês, projetos, temas e contextos: validações, consultas, ações e componentes
 │   │   └── stakeholders/     Cadastro Mestre: validações, consultas, ações e componentes
@@ -184,6 +190,7 @@ Regras de organização:
 | Repositório público (D-033): verificação de dados pessoais, informações restritas e segredos antes de cada envio; e-mail *noreply* do GitHub nos commits a partir de 01/11/2026 (D-039). O histórico anterior não é reescrito sem aprovação. | ✅ |
 | Controle de acesso por projeto ou tema nas consultas do servidor, com testes (Etapa 2A). Sem autenticação real nem regras no banco: **segurança multiusuário não homologada**. | 🔧 (D-034) |
 | Visibilidade de iniciativas, interações e compromissos pelos projetos e temas com permissão, aplicada no servidor; alterações exigem perfil de gestor ou colaborador (Etapa 3). Sem autenticação real: segurança multiusuário não homologada. | 🔧 (D-034, D-070) |
+| Planos de ação e riscos visíveis e alteráveis pelos mesmos critérios do projeto ou tema; a decisão sobre versões do plano cabe ao administrador do sistema (aprovação em nível único até a autenticação). Sem autenticação real: segurança multiusuário não homologada. | 🔧 (D-034, D-072) |
 | Cópia de segurança automática da pasta do banco local antes de aplicar atualizações pendentes; se a cópia falhar, nada é aplicado (T-1). Não substitui a política de cópias e restauração (C7). | 🔧 (implementada na Etapa 2B) |
 | Verificação automática no GitHub Actions a cada Pull Request e atualização da `main`, com permissões mínimas e sem credenciais (seção 6.1). | ✅ (D-041) |
 

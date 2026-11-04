@@ -25,8 +25,11 @@ import {
   historicoDoCompromisso,
   iniciativasDaInteracao,
   obterCompromisso,
+  projetosDeUmCompromisso,
 } from "@/modulos/interacoes/consultas";
 import { ROTULOS_SITUACAO_COMPROMISSO } from "@/modulos/interacoes/rotulos";
+import { FormularioConversaoCompromisso } from "@/modulos/plano-acao/componentes/formularios-plano";
+import { acaoDoCompromisso, eixosDoPlano, obterAcao, opcoesPlanos } from "@/modulos/plano-acao/consultas";
 import { opcoesStakeholders } from "@/modulos/projetos-temas/consultas";
 import { BotaoArquivamento } from "@/modulos/stakeholders/componentes/botao-arquivamento";
 
@@ -63,6 +66,11 @@ async function DetalheCompromisso({ params }: Pick<PageProps<"/compromissos/[id]
   const nomes = await nomesDoHistorico(banco, historico);
   const hoje = hojeEmBrasilia();
   const arquivado = compromisso.arquivadoEm !== null;
+  // Integração com o Plano de Ação: a ação em que foi convertido ou os planos dos seus projetos e temas.
+  const acaoId = await acaoDoCompromisso(banco, id);
+  const acaoConvertida = acaoId ? await obterAcao(banco, acaoId) : null;
+  const planos = acaoConvertida ? [] : await opcoesPlanos(banco, await projetosDeUmCompromisso(banco, id));
+  const eixos = (await Promise.all(planos.map(async (p) => (await eixosDoPlano(banco, p.id)).map((e) => ({ ...e, planoAcaoId: p.id }))))).flat();
 
   return (
     <div className="flex flex-col gap-6">
@@ -187,6 +195,46 @@ async function DetalheCompromisso({ params }: Pick<PageProps<"/compromissos/[id]
             <h3 className="mb-3 font-medium">Registrar acompanhamento</h3>
             <FormularioAcompanhamento compromissoId={id} hoje={hoje} />
           </div>
+        )}
+      </section>
+
+      <section aria-labelledby="titulo-plano" className={classeCartao}>
+        <h2 id="titulo-plano" className="mb-1 text-lg font-semibold">
+          Plano de Ação
+        </h2>
+        {acaoConvertida ? (
+          <p className="text-sm">
+            Convertido na ação{" "}
+            <Link href={`/acoes/${acaoConvertida.id}`} className={classeLink}>
+              {acaoConvertida.codigo}
+            </Link>{" "}
+            do plano{" "}
+            <Link href={`/planos/${acaoConvertida.planoAcaoId}`} className={classeLink}>
+              {acaoConvertida.planoTitulo}
+            </Link>
+            . O compromisso continua registrado como origem.
+          </p>
+        ) : planos.length === 0 ? (
+          <p className="text-sm text-texto-secundario">
+            Os projetos e temas deste compromisso ainda não têm plano de ação.{" "}
+            <Link href="/planos/novo" className={classeLink}>
+              Criar plano
+            </Link>
+          </p>
+        ) : arquivado ? (
+          <p className="text-sm text-texto-secundario">Reative o compromisso para convertê-lo em ação do plano.</p>
+        ) : (
+          <>
+            <p className="mb-4 text-sm text-texto-secundario">
+              Se o encaminhamento passou a ser uma ação estruturada, converta-o em ação do plano de ação, sem duplicar o registro.
+            </p>
+            <details className="rounded-lg border border-borda p-4">
+              <summary className="cursor-pointer font-medium">Converter em ação do plano</summary>
+              <div className="mt-4">
+                <FormularioConversaoCompromisso compromissoId={id} planos={planos} eixos={eixos} />
+              </div>
+            </details>
+          </>
         )}
       </section>
 

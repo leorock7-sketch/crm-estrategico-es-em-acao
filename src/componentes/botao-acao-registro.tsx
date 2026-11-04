@@ -23,11 +23,14 @@ export function BotaoAcaoRegistro({
   campos,
   rotulo,
   rotuloEnviando,
+  classeBotao,
 }: {
   acao: AcaoRegistro;
   campos: Record<string, string>;
   rotulo: string;
   rotuloEnviando: string;
+  /** Aparência do botão; por padrão, discreta (texto sublinhado ao passar o mouse). */
+  classeBotao?: string;
 }) {
   const [estado, acao, enviando] = useActionState(acaoServidor, ESTADO_INICIAL);
   return (
@@ -38,7 +41,7 @@ export function BotaoAcaoRegistro({
       <button
         type="submit"
         disabled={enviando}
-        className="text-xs text-texto-secundario underline-offset-2 hover:underline disabled:opacity-60"
+        className={classeBotao ?? "text-xs text-texto-secundario underline-offset-2 hover:underline disabled:opacity-60"}
       >
         {enviando ? rotuloEnviando : rotulo}
       </button>

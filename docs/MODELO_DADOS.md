@@ -16,6 +16,7 @@
 | 0.12 | 02/11/2026 | Etapa 2B (D-069): seção 6.3.1 implementada pela migração `0006`, aguardando homologação; `rubrica_nivel` com critério orientador e bases típicas; cópia de segurança antes de atualizações pendentes. |
 | 0.13 | 03/11/2026 | Etapa 3 (D-070): seções 6.4 e 6.5 implementadas pela migração `0007`, aguardando homologação; nova tabela `compromisso_acompanhamento`; ligações com identificador próprio e arquivamento; soluções provisórias P-040 a P-046. |
 | 0.14 | 03/11/2026 | Etapa 3 homologada para desenvolvimento (D-071); as soluções provisórias P-040 a P-046 continuam não homologadas. |
+| 0.15 | 03/11/2026 | Etapa 4 (D-072): seções 6.6 e 6.7 implementadas pela migração `0008`, aguardando homologação; um plano por projeto ou tema; pilares ou eixos (`plano_eixo`); marcos como itens da ação (`acao_marco`, `marco_planejamento`); decisões do fluxo de aprovação (`plano_acao_decisao`); avaliações inerente e residual com criticidade e classificação calculadas pelo banco conforme a matriz original; acompanhamento dos gatilhos; `compromisso.acao_id`. |
 
 Legenda: ✅ Aprovado · 🔧 Proposta técnica · ⏳ Pendente (ver [REQUISITOS.md](REQUISITOS.md#como-ler-este-documento)).
 
@@ -119,20 +120,26 @@ erDiagram
 
 ```mermaid
 erDiagram
-    projeto_tema ||--o{ plano_acao : "possui"
+    projeto_tema ||--o| plano_acao : "possui"
+    plano_acao ||--o{ plano_eixo : "organiza-se em"
     plano_acao ||--|{ plano_acao_versao : "tem versões"
+    plano_acao_versao ||--o{ plano_acao_decisao : "registra decisões"
     plano_acao ||--o{ acao : "contém"
     acao ||--|{ acao_planejamento : "é planejada em"
     plano_acao_versao ||--o{ acao_planejamento : "reúne"
+    acao ||--o{ acao_marco : "tem marcos"
+    acao_marco ||--|{ marco_planejamento : "é planejado em"
     acao ||--o{ acao_acompanhamento : "é acompanhada por"
     iniciativa |o--o{ acao : "origina"
+    compromisso }o--o| acao : "convertido em"
     projeto_tema ||--o{ risco : "está exposto a"
-    risco ||--o{ risco_avaliacao : "é reavaliado em"
+    risco ||--|{ risco_avaliacao : "é avaliado em"
     risco ||--o{ risco_gatilho : "é sinalizado por"
+    risco_gatilho ||--o{ risco_gatilho_registro : "é acompanhado em"
     risco ||--o{ risco_resposta : "recebe"
     acao |o--o{ risco_resposta : "executa"
     risco ||--o{ risco_stakeholder : "envolve"
-    stakeholder ||--o{ risco_stakeholder : "relaciona-se a"
+    acao ||--o{ acao_stakeholder : "envolve"
 ```
 
 ### 4.5 Acesso
@@ -575,20 +582,35 @@ Histórico de acompanhamento do compromisso. Cada registro é preservado: corrig
 | `registro` | texto longo | | Sim | O que foi feito ou verificado |
 | `situacao` | lista: `aberto`, `em_andamento`, `concluido`, `cancelado` | | Não | Nova situação definida neste registro; o compromisso é atualizado junto (concluído recebe a data do registro) |
 
-### 6.6 Plano de ação ✅ (ações, responsáveis, marcos, versões e aprovação)
+### 6.6 Plano de ação ✅ (ações, responsáveis, marcos, versões e aprovação) — implementado na Etapa 4 (migração `0008`)
 
-O detalhamento do fluxo está em [PLANO_ACAO.md](PLANO_ACAO.md).
+O detalhamento do fluxo está em [PLANO_ACAO.md](PLANO_ACAO.md). Um plano por projeto ou tema (D-072); as tabelas abaixo têm os campos comuns da seção 5 (inclusive arquivamento; nada é excluído).
 
 #### `plano_acao`
 
 | Campo | Tipo | Chave | Obr. | Observação |
 |---|---|---|---|---|
-| `projeto_tema_id` | UUID | FK → `projeto_tema.id` | Sim | Contexto e visibilidade |
+| `projeto_tema_id` | UUID | FK → `projeto_tema.id` | Sim | Contexto e visibilidade; não muda depois de criado |
 | `titulo` | texto | | Sim | |
-| `objetivo` | texto longo | | Não | |
+| `objetivo` | texto longo | | Não | Objetivo geral |
 | `responsavel_id` | UUID | FK → `usuario.id` | Não | |
 
-Cardinalidade: projeto_tema 1:N plano_acao. ⏳ Confirmar se há um único plano por projeto/tema.
+Regra: um plano ativo por projeto ou tema (índice único parcial `plano_acao_projeto_unico`).
+
+#### `plano_eixo`
+
+Pilares ou eixos próprios de cada plano (D-072, item 2.1); os cinco pilares do Comitê de Infraestrutura são oferecidos como modelo ao criar o plano.
+
+| Campo | Tipo | Chave | Obr. | Observação |
+|---|---|---|---|---|
+| `plano_acao_id` | UUID | FK → `plano_acao.id` | Sim | Não muda depois de criado |
+| `codigo` | texto | | Sim | P1, P2… (P-048) |
+| `nome` | texto | | Sim | |
+| `objetivo` | texto longo | | Não | Objetivo estratégico do pilar no projeto ou tema |
+| `descricao` | texto longo | | Não | |
+| `ordem` | número inteiro | | Sim | |
+
+Regra: código único no plano, entre os ativos.
 
 #### `plano_acao_versao`
 
@@ -596,119 +618,134 @@ Cardinalidade: projeto_tema 1:N plano_acao. ⏳ Confirmar se há um único plano
 |---|---|---|---|---|
 | `plano_acao_id` | UUID | FK → `plano_acao.id` | Sim | |
 | `numero_versao` | número inteiro | | Sim | |
-| `situacao` | lista: `rascunho`, `em_aprovacao`, `aprovada`, `rejeitada`, `substituida` | | Sim | |
-| `motivo_alteracao` | texto longo | | Sim a partir da versão 2 | |
-| `proposta_por`, `proposta_em` | UUID / data e hora | FK → `usuario.id` | Sim | |
-| `decidida_por`, `decidida_em` | UUID / data e hora | FK → `usuario.id` | Não | Obrigatórios em `aprovada` e `rejeitada` |
+| `situacao` | lista: `rascunho`, `em_aprovacao`, `aprovada`, `rejeitada`, `substituida` | | Sim | Nasce como `rascunho` |
+| `motivo_alteracao` | texto longo | | Sim a partir da versão 2 (no envio) | |
+| `proposta_por`, `proposta_em` | UUID / data e hora | FK → `usuario.id` | No envio | Preenchidos pelo banco |
+| `decidida_por`, `decidida_em` | UUID / data e hora | FK → `usuario.id` | Em `aprovada`, `rejeitada` e `substituida` | Preenchidos pelo banco na decisão |
 | `parecer` | texto longo | | Não | |
 
-Regras de integridade:
-- UK (`plano_acao_id`, `numero_versao`). 🔧
-- No máximo uma versão `aprovada` (vigente) e uma em `rascunho`/`em_aprovacao` por plano. 🔧
-- Ao aprovar uma nova versão, a anterior passa a `substituida`. 🔧
-- Versões `aprovada`, `rejeitada` e `substituida` não podem ser alteradas. 🔧
+Regras garantidas pelo banco:
+- UK (`plano_acao_id`, `numero_versao`); no máximo uma versão `aprovada` (vigente) e uma em `rascunho`/`em_aprovacao` por plano.
+- Fluxo: rascunho → em aprovação (com ao menos uma ação e, a partir da versão 2, motivo) → aprovada, rejeitada ou rascunho (devolvida para ajustes). Ao aprovar, a vigente anterior passa a `substituida`.
+- Versões decididas não mudam; um rascunho pode ser descartado (arquivado).
+
+#### `plano_acao_decisao`
+
+Histórico do fluxo de aprovação (envio, devolução, aprovação, rejeição), com quem registrou, quando e o parecer. Registros preservados (não são alterados).
 
 #### `acao`
 
-Identidade permanente de uma ação ou marco, que atravessa as versões do plano.
+Identidade permanente da ação, que atravessa as versões do plano.
 
 | Campo | Tipo | Chave | Obr. | Observação |
 |---|---|---|---|---|
-| `plano_acao_id` | UUID | FK → `plano_acao.id` | Sim | |
-| `codigo` | texto | | Sim | Ex.: "A-01", "M-01" |
-| `tipo` | lista: `acao`, `marco` | | Sim | Marco = ponto de verificação com data única ✅ |
-| `iniciativa_id` | UUID | FK → `iniciativa.id` | Não | Iniciativa que originou a ação |
+| `plano_acao_id` | UUID | FK → `plano_acao.id` | Sim | Não muda |
+| `codigo` | texto | | Sim | A-01, A-02… (não muda) |
+| `iniciativa_id` | UUID | FK → `iniciativa.id` | Não | Ligação com a Matriz de Iniciativas; muda sem nova versão (P-051) |
 
-Regra: UK (`plano_acao_id`, `codigo`).
+Regra: UK (`plano_acao_id`, `codigo`). Os marcos são itens de cada ação (P-047), e não ações de outro tipo.
 
 #### `acao_planejamento`
 
-O que foi planejado para a ação **em cada versão** do plano. Cada versão do plano é uma "fotografia" completa das ações planejadas.
+O que foi planejado para a ação **em cada versão** do plano ("fotografia" completa).
 
 | Campo | Tipo | Chave | Obr. | Observação |
 |---|---|---|---|---|
 | `acao_id` | UUID | FK → `acao.id` | Sim | |
 | `plano_acao_versao_id` | UUID | FK → `plano_acao_versao.id` | Sim | |
+| `eixo_id` | UUID | FK → `plano_eixo.id` | Não | Do mesmo plano |
 | `titulo` | texto | | Sim | |
-| `descricao` | texto longo | | Não | |
-| `responsavel_usuario_id` | UUID | FK → `usuario.id` | Não | |
-| `responsavel_stakeholder_id` | UUID | FK → `stakeholder.id` | Não | Responsável externo, quando houver |
-| `inicio_previsto`, `fim_previsto` | data | | Não | Marco: apenas `fim_previsto` |
+| `descricao` | texto longo | | Não | Detalhamento |
+| `justificativa` | texto longo | | Não | |
+| `responsavel_usuario_id` | UUID | FK → `usuario.id` | Não | Ao menos um responsável |
+| `responsavel_stakeholder_id` | UUID | FK → `stakeholder.id` | Não | Responsável externo |
+| `inicio_previsto`, `fim_previsto` | data | | Não | Fim ≥ início |
+| `periodicidade` | lista: `mensal`, `bimestral`, `trimestral`, `semestral`, `anual` | | Não | Do acompanhamento |
 
-Regras: UK (`acao_id`, `plano_acao_versao_id`); `fim_previsto` ≥ `inicio_previsto`; a ação e a versão devem pertencer ao mesmo plano; ao menos um responsável. 🔧
+Regras: um planejamento ativo por ação e versão; só a versão em rascunho é alterada; ação, versão e pilar do mesmo plano. Retirar a ação de uma versão é arquivar o seu planejamento nessa versão.
+
+#### `acao_marco` e `marco_planejamento`
+
+Marcos de acompanhamento (entregas verificáveis): `acao_marco` guarda a identidade (ação e código M1, M2…, permanentes); `marco_planejamento`, a descrição e o prazo previsto **em cada versão**, com as mesmas regras do planejamento da ação.
 
 #### `acao_acompanhamento`
 
-Registros de andamento. Não exigem aprovação. 🔧
+Registros de andamento, sem aprovação (D-072, item 2.2). Preservados: uma correção é um novo registro.
 
 | Campo | Tipo | Chave | Obr. | Observação |
 |---|---|---|---|---|
-| `acao_id` | UUID | FK → `acao.id` | Sim | |
-| `data_registro` | data | | Sim | |
-| `situacao` | lista: `nao_iniciada`, `em_andamento`, `concluida`, `suspensa`, `cancelada` | | Sim | |
-| `percentual` | número inteiro 0–100 | | Não | |
-| `comentario` | texto longo | | Não | |
+| `acao_id` | UUID | FK → `acao.id` | Sim | Ação da versão vigente |
+| `data` | data | | Sim | |
+| `situacao` | lista: `nao_iniciada`, `em_andamento`, `concluida`, `suspensa`, `cancelada` | | Não | |
+| `percentual` | número inteiro 0–100 | | Não | Complementar |
+| `observacao` | texto longo | | Não | |
+| `marco_id` | UUID | FK → `acao_marco.id` | Não | Da mesma ação |
+| `marco_alcancado` | sim/não | | Com marco | Falso corrige um registro anterior |
 
-### 6.7 Riscos ✅ (criticidade, gatilhos e medidas de resposta)
+Regra: ao menos uma informação (situação, percentual, observação ou marco). "Atrasada" é calculada: prazo vencido e ação não concluída nem cancelada.
 
-O detalhamento está em [MATRIZ_RISCOS.md](MATRIZ_RISCOS.md).
+#### `acao_stakeholder` (ligação N:N)
+
+Pessoas e instituições relacionadas à ação, com observação; retirar é arquivar.
+
+#### `compromisso.acao_id`
+
+Coluna acrescentada ao compromisso (Etapa 3): ação do plano em que o compromisso foi convertido (P-052). Vazia nos registros anteriores.
+
+### 6.7 Riscos ✅ (matriz 5 × 5 do Comitê de Infraestrutura) — implementados na Etapa 4 (migração `0008`)
+
+O detalhamento, com os parâmetros do instrumento original, está em [MATRIZ_RISCOS.md](MATRIZ_RISCOS.md).
 
 #### `risco`
 
 | Campo | Tipo | Chave | Obr. | Observação |
 |---|---|---|---|---|
-| `projeto_tema_id` | UUID | FK → `projeto_tema.id` | Sim | Contexto e visibilidade |
+| `projeto_tema_id` | UUID | FK → `projeto_tema.id` | Sim | Contexto e visibilidade; não muda |
 | `iniciativa_id` | UUID | FK → `iniciativa.id` | Não | |
-| `codigo` | texto | | Sim | Ex.: "R-01" |
+| `eixo_id` | UUID | FK → `plano_eixo.id` | Não | Pilar ou eixo do plano do mesmo projeto ou tema (P-053) |
+| `codigo` | texto | | Sim | R-01, R-02… por projeto ou tema (não muda) |
 | `titulo` | texto | | Sim | |
-| `descricao`, `causa`, `consequencia` | texto longo | | Não | |
-| `categoria` | lista | | Não | ⏳ |
-| `responsavel_id` | UUID | FK → `usuario.id` | Não | |
-| `situacao` | lista: `identificado`, `em_monitoramento`, `materializado`, `encerrado` | | Sim | 🔧 |
+| `descricao`, `causa`, `consequencia`, `controles_existentes` | texto longo | | Não | |
+| `responsavel_id` | UUID | FK → `usuario.id` | Não | Dono do risco |
+| `situacao` | lista: `aberto`, `em_mitigacao`, `monitorado`, `mitigado`, `escalonado` | | Sim | Status do instrumento original |
+| `proxima_revisao` | data | | Não | |
 
-Regra: UK (`projeto_tema_id`, `codigo`).
+Regras: UK (`projeto_tema_id`, `codigo`); todo risco ativo tem ao menos uma avaliação inerente (verificado ao fim da transação).
 
 #### `risco_avaliacao`
 
-Histórico de avaliações do risco; a mais recente é a vigente. Não é editada.
+Avaliações inerente e residual; cada reavaliação é um novo registro (histórico preservado, sem alteração).
 
 | Campo | Tipo | Chave | Obr. | Observação |
 |---|---|---|---|---|
 | `risco_id` | UUID | FK → `risco.id` | Sim | |
+| `tipo` | lista: `inerente`, `residual` | | Sim | |
 | `data_avaliacao` | data | | Sim | |
-| `probabilidade` | número inteiro | | Sim | Escala ⏳ |
-| `impacto` | número inteiro | | Sim | Escala ⏳ |
-| `criticidade` | número | | Sim | Calculada pelo banco (fórmula ⏳) |
-| `justificativa` | texto longo | | Não | |
-| `avaliado_por` | UUID | FK → `usuario.id` | Sim | |
+| `probabilidade`, `impacto` | número inteiro 1–5 | | Sim | Escalas da matriz original |
+| `criticidade` | número inteiro 1–25 | | Sim | Calculada pelo banco: probabilidade × impacto |
+| `classificacao` | texto | | Sim | Calculada pelo banco: baixo (1–4), moderado (5–9), alto (10–16), crítico (17–25) |
+| `justificativa` | texto longo | | Sim | |
+| `avaliado_por` | UUID | FK → `usuario.id` | Sim | Responsável pela avaliação |
 
-#### `risco_gatilho`
+#### `risco_gatilho` e `risco_gatilho_registro`
 
-| Campo | Tipo | Chave | Obr. | Observação |
-|---|---|---|---|---|
-| `risco_id` | UUID | FK → `risco.id` | Sim | |
-| `descricao` | texto longo | | Sim | Sinal que indica que o risco está se aproximando |
-| `ativo` | sim/não | | Sim | |
+Gatilhos (sinais de alerta) do risco e o seu acompanhamento: data, se ocorreu e observação. A ocorrência não altera a avaliação; sinaliza a reavaliação (P-049). Registros preservados.
 
 #### `risco_resposta`
 
 | Campo | Tipo | Chave | Obr. | Observação |
 |---|---|---|---|---|
-| `risco_id` | UUID | FK → `risco.id` | Sim | |
-| `estrategia` | lista: `evitar`, `mitigar`, `transferir`, `aceitar` | | Sim | 🔧 |
+| `risco_id` | UUID | FK → `risco.id` | Sim | Não muda |
+| `estrategia` | lista: `evitar`, `mitigar`, `transferir`, `aceitar` | | Sim | |
 | `descricao` | texto longo | | Sim | |
-| `responsavel_id` | UUID | FK → `usuario.id` | Não | |
+| `responsavel_usuario_id`, `responsavel_stakeholder_id` | UUID | FK → `usuario.id` / `stakeholder.id` | Não | |
 | `prazo` | data | | Não | |
-| `situacao` | lista: `planejada`, `em_execucao`, `concluida`, `cancelada` | | Sim | |
-| `acao_id` | UUID | FK → `acao.id` | Não | Evita duplicar medidas que já estão no plano de ação |
+| `situacao` | lista: `planejada`, `em_execucao`, `concluida`, `cancelada` | | Sim | P-050 |
+| `acao_id` | UUID | FK → `acao.id` | Não | Aponta para a ação do plano, sem duplicá-la |
 
-#### `risco_stakeholder` (ligação N:N) 🔧
+#### `risco_stakeholder` (ligação N:N)
 
-| Campo | Tipo | Chave | Obr. |
-|---|---|---|---|
-| `risco_id` | UUID | PK composta, FK → `risco.id` | Sim |
-| `stakeholder_id` | UUID | PK composta, FK → `stakeholder.id` | Sim |
-| `observacao` | texto | | Não |
+Pessoas e instituições relacionadas ao risco, com observação; retirar é arquivar.
 
 ### 6.8 Acesso e auditoria
 
@@ -766,12 +803,11 @@ Enquanto houver um único administrador, ele vê tudo; as regras acima passam a 
 
 1. Rubricas dos níveis de poder, interesse e posicionamento (Q-66) e estrutura da adaptação às escalas V2.2 (Q-67, seção 6.3.1). Escalas definidas (D-058, D-059); pesos, fórmula e pontos de corte não aprovados.
 2. Categorias da "Conduta do ES em Ação" e regras de relação com a matriz 3 × 3, sem derivação automática (Q-64, requisito futuro RF-28).
-3. Um único plano de ação por projeto/tema ou vários?
-4. Escalas de probabilidade e impacto e fórmula de criticidade.
-5. Visibilidade do Cadastro Mestre para todos os usuários.
-6. Análise LGPD dos dados pessoais registrados.
+3. Categorias de risco, riscos fora de projeto ou tema e oportunidades (Q-42 a Q-44).
+4. Visibilidade do Cadastro Mestre para todos os usuários.
+5. Análise LGPD dos dados pessoais registrados.
 
-Resolvidas na Etapa 1: hierarquia entre temas e projetos (D-020); dados mínimos de pessoas (D-021). Na revisão de homologação: comitês participantes (D-023), CNPJ e país (D-024), contatos (D-025). Na Etapa 1.1: tipos de relação dos stakeholders com os contextos (D-030). Na Etapa 2A: posicionamento em cinco níveis (superado para novas avaliações pela D-059), grau de confiança em três níveis e regras de versionamento (Manual V2.0, D-034). Na revisão V2.2: escalas de poder, interesse, posicionamento e confiança (D-058 a D-060). As decisões são acompanhadas em [REGISTRO_DECISOES.md](REGISTRO_DECISOES.md).
+Resolvidas na Etapa 1: hierarquia entre temas e projetos (D-020); dados mínimos de pessoas (D-021). Na revisão de homologação: comitês participantes (D-023), CNPJ e país (D-024), contatos (D-025). Na Etapa 1.1: tipos de relação dos stakeholders com os contextos (D-030). Na Etapa 2A: posicionamento em cinco níveis (superado para novas avaliações pela D-059), grau de confiança em três níveis e regras de versionamento (Manual V2.0, D-034). Na revisão V2.2: escalas de poder, interesse, posicionamento e confiança (D-058 a D-060). Na Etapa 4: um plano por projeto ou tema e matriz de riscos 5 × 5 original (D-072). As decisões são acompanhadas em [REGISTRO_DECISOES.md](REGISTRO_DECISOES.md).
 
 ## 9. Situação da implementação
 
@@ -785,7 +821,7 @@ Resolvidas na Etapa 1: hierarquia entre temas e projetos (D-020); dados mínimos
 | `metodologia_versao`, `criterio_avaliacao`, `avaliacao`, `avaliacao_versao`, `avaliacao_nota_criterio`, `evidencia` | 2A | Criadas, com telas; somente metodologias de demonstração e dados fictícios |
 | `permissao_contexto` | 2A | Criada, com testes; sem tela de gestão (segurança não homologada) |
 | `iniciativa`, `iniciativa_projeto_tema`, `iniciativa_stakeholder`, `interacao`, `interacao_participante`, `interacao_projeto_tema`, `interacao_iniciativa`, `compromisso`, `compromisso_acompanhamento` | 3 | Criadas, com telas e dados fictícios; homologadas para desenvolvimento (D-071) |
-| Demais tabelas | 4 | Não criadas |
+| `plano_acao`, `plano_eixo`, `plano_acao_versao`, `plano_acao_decisao`, `acao`, `acao_planejamento`, `acao_marco`, `marco_planejamento`, `acao_acompanhamento`, `acao_stakeholder`, `risco`, `risco_avaliacao`, `risco_gatilho`, `risco_gatilho_registro`, `risco_resposta`, `risco_stakeholder`; coluna `compromisso.acao_id` | 4 | Criadas, com telas e dados fictícios; aguardam homologação (D-072) |
 
 Onde está cada parte:
 
@@ -798,7 +834,8 @@ Onde está cada parte:
   - `0004`: Etapa 1.1 — comitês participantes, stakeholders dos contextos e nome normalizado dos projetos e temas (preenchido também nos registros existentes);
   - `0005`: Etapa 2A — metodologias, critérios, fichas, versões, notas, evidências e permissões por contexto, com as regras de publicação e imutabilidade;
   - `0006`: Etapa 2B — escalas V2.2, rubricas por nível, natureza do posicionamento, ressalvas, alertas mantidos e natureza das alterações da metodologia;
-  - `0007`: Etapa 3 — iniciativas, interações (registro único), participantes, ligações, compromissos e acompanhamento, com contexto obrigatório, ligações imutáveis e acompanhamento preservado.
+  - `0007`: Etapa 3 — iniciativas, interações (registro único), participantes, ligações, compromissos e acompanhamento, com contexto obrigatório, ligações imutáveis e acompanhamento preservado;
+  - `0008`: Etapa 4 — plano de ação (pilares ou eixos, versões e fluxo de aprovação, ações, marcos, acompanhamento) e matriz de riscos (avaliações inerente e residual com criticidade calculada, gatilhos, respostas), com campos fixos, históricos preservados e planejamento alterável só no rascunho; somente aditiva (`compromisso` ganha a coluna `acao_id`).
 - **Regras garantidas por gatilhos** 🔧:
   - preenchimento automático de quem criou ou alterou cada registro, e quando;
   - trilha de auditoria a cada inclusão, alteração, arquivamento e reativação, sem registrar alterações que não mudam nenhum dado;

@@ -11,6 +11,7 @@ import { bancoDaRequisicao } from "@/lib/banco/requisicao";
 import { descreverPeriodo, formatarDataHora } from "@/lib/formatacao";
 import { esquemaIdentificador } from "@/lib/validacao/comuns";
 import { AtividadesDoStakeholder } from "@/modulos/iniciativas/componentes/atividades-relacionadas";
+import { AcoesERiscosDoStakeholder } from "@/modulos/plano-acao/componentes/integracoes";
 import { ListaContextos } from "@/modulos/projetos-temas/componentes/lista-contextos";
 import { contextosDoStakeholder } from "@/modulos/projetos-temas/consultas";
 import { alterarArquivamentoPessoa, encerrarVinculoPessoa } from "@/modulos/stakeholders/acoes";
@@ -204,6 +205,8 @@ async function DetalhePessoa({ params }: Pick<PageProps<"/pessoas/[id]">, "param
       </section>
 
       <AtividadesDoStakeholder stakeholderId={id} />
+
+      <AcoesERiscosDoStakeholder stakeholderId={id} />
 
       <section aria-labelledby="titulo-historico" className={classeCartao}>
         <h2 id="titulo-historico" className="mb-4 text-lg font-semibold">
