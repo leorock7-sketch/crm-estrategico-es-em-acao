@@ -39,6 +39,7 @@ import { ListaCompromissos } from "@/modulos/interacoes/componentes/lista-compro
 import { SeloIniciativa, SeloInteracao } from "@/modulos/interacoes/componentes/selos";
 import { compromissosDaIniciativa, interacoesDaIniciativa } from "@/modulos/interacoes/consultas";
 import { ROTULOS_TIPO_INTERACAO } from "@/modulos/interacoes/rotulos";
+import { AcoesERiscosDaIniciativa } from "@/modulos/plano-acao/componentes/integracoes";
 import { opcoesStakeholders } from "@/modulos/projetos-temas/consultas";
 import { ROTULOS_TIPO_PROJETO_TEMA } from "@/modulos/projetos-temas/rotulos";
 import { BotaoArquivamento } from "@/modulos/stakeholders/componentes/botao-arquivamento";
@@ -286,6 +287,8 @@ async function DetalheIniciativa({ params }: Pick<PageProps<"/iniciativas/[id]">
           </details>
         )}
       </section>
+
+      <AcoesERiscosDaIniciativa iniciativaId={id} arquivada={arquivada} />
 
       <section aria-labelledby="titulo-historico" className={classeCartao}>
         <h2 id="titulo-historico" className="mb-4 text-lg font-semibold">
