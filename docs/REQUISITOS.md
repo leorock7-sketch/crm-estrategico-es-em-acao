@@ -14,6 +14,7 @@
 | 0.10 | 02/11/2026 | Versões finais da Q-66 e da Q-67 (D-068): RF-27, RF-29.2 e RF-29.4 atualizados. |
 | 0.11 | 02/11/2026 | Etapa 2B implementada (D-069), aguardando homologação: RF-21, RF-25, RF-27 e RF-29.2 a RF-29.4 atualizados. |
 | 0.12 | 03/11/2026 | Etapa 3 implementada (D-070), aguardando homologação: RF-30 a RF-34, RF-40 a RF-44, RN-05 e RN-06 atualizados. |
+| 0.13 | 03/11/2026 | Etapa 4 aprovada e implementada (D-072), aguardando homologação: RF-50 a RF-54 e RF-60 a RF-63 atualizados; novos RF-55 a RF-57 e RF-64 a RF-66. |
 
 ## Como ler este documento
 
@@ -120,11 +121,14 @@ Detalhes em [MATRIZ_INICIATIVAS.md](MATRIZ_INICIATIVAS.md).
 
 | ID | Requisito | Situação |
 |---|---|---|
-| RF-50 | Registro de ações, responsáveis e marcos. | ✅ |
-| RF-51 | Versionamento do plano de ação. | ✅ |
-| RF-52 | Aprovação de alterações do plano antes de entrarem em vigor. | ✅ |
-| RF-53 | Atualização de andamento (percentual, situação) sem necessidade de nova aprovação. | 🔧 |
-| RF-54 | Quem aprova as alterações do plano em cenário multiusuário. | ⏳ |
+| RF-50 | Registro de ações, responsáveis e marcos. | ✅ (implementado na Etapa 4: marcos como entregas verificáveis de cada ação, P-047) |
+| RF-51 | Versionamento do plano de ação: um plano por projeto ou tema, com versões rascunho, em aprovação, aprovada, rejeitada ou devolvida para ajustes, e substituída (D-072). | ✅ (implementado na Etapa 4) |
+| RF-52 | Aprovação de alterações do plano antes de entrarem em vigor; mudanças estruturais criam nova versão; quem decidiu, a data e o parecer ficam registrados. | ✅ (implementado na Etapa 4) |
+| RF-53 | Acompanhamento sem nova aprovação: situação, marcos alcançados, observações e percentual (complementar e não obrigatório); atrasos calculados. | ✅ (D-072; implementado na Etapa 4) |
+| RF-54 | Quem aprova as alterações do plano: por ora, o administrador do sistema, em nível único, com estrutura preparada para governança futura. | ✅ (D-072; revisitar com a autenticação) |
+| RF-55 | Ações e marcos organizados por pilares ou eixos próprios de cada projeto ou tema, com os cinco pilares do Comitê de Infraestrutura como modelo opcional. | ✅ (D-072; implementado na Etapa 4) |
+| RF-56 | Comparação entre versões do plano (ações e marcos incluídos, retirados e alterados). | 🔧 implementado na Etapa 4 |
+| RF-57 | Conversão de compromisso em ação do plano, preservando a origem e sem duplicidade; ações ligadas a iniciativas e a stakeholders. | ✅ (D-072; implementado na Etapa 4, P-052) |
 
 Detalhes em [PLANO_ACAO.md](PLANO_ACAO.md).
 
@@ -132,10 +136,13 @@ Detalhes em [PLANO_ACAO.md](PLANO_ACAO.md).
 
 | ID | Requisito | Situação |
 |---|---|---|
-| RF-60 | Registro de riscos com criticidade, gatilhos e medidas de resposta. | ✅ |
-| RF-61 | Criticidade calculada a partir de probabilidade e impacto. | 🔧 |
-| RF-62 | Escalas de probabilidade e impacto e faixas de criticidade. | ⏳ |
-| RF-63 | Histórico das reavaliações de cada risco. | 🔧 |
+| RF-60 | Registro de riscos com criticidade, gatilhos e medidas de resposta. | ✅ (implementado na Etapa 4) |
+| RF-61 | Criticidade calculada a partir de probabilidade e impacto: criticidade = probabilidade × impacto, calculada pelo banco. | ✅ (D-072; matriz original do Comitê de Infraestrutura) |
+| RF-62 | Escalas de probabilidade e impacto (1 a 5) e faixas de criticidade (Baixo 1–4, Moderado 5–9, Alto 10–16, Crítico 17–25), com as cores e prioridades do instrumento original. | ✅ (D-072; implementado na Etapa 4) |
+| RF-63 | Histórico das avaliações de cada risco, inerentes e residuais, com data, responsável e justificativa; reavaliação sempre fundamentada. | ✅ (D-072; implementado na Etapa 4) |
+| RF-64 | Distinção entre risco inerente e residual, sem redução automática por registro de medida ou gatilho; comparação sem percentual de redução da exposição. | ✅ (D-072; implementado na Etapa 4) |
+| RF-65 | Situações Aberto, Em mitigação, Monitorado, Mitigado e Escalonado; gatilhos com acompanhamento que sinaliza a reavaliação; respostas evitar, mitigar, transferir e aceitar, que podem apontar para ações do plano. | ✅ (D-072; implementado na Etapa 4) |
+| RF-66 | Matriz 5 × 5 com as cores institucionais e consulta por projeto ou tema, criticidade, situação, responsável e gatilho. | ✅ (D-072; implementado na Etapa 4) |
 
 Detalhes em [MATRIZ_RISCOS.md](MATRIZ_RISCOS.md).
 
