@@ -4,6 +4,7 @@
 |---|---|---|
 | 0.1 | 31/10/2026 | Rascunho para revisão |
 | 0.2 | 03/11/2026 | Etapa 4 aprovada e implementada (D-072), aguardando homologação: um plano por projeto ou tema, pilares ou eixos, marcos verificáveis, versões com aprovação em nível único e acompanhamento sem aprovação; Q-30, Q-31, Q-32 e Q-34 resolvidas; Q-33 adotada provisoriamente |
+| 0.3 | 04/11/2026 | Etapa 4 homologada para desenvolvimento (D-073); as soluções provisórias P-047, P-048, P-051 e P-052 continuam não homologadas |
 
 Legenda: ✅ Aprovado · 🔧 Proposta técnica · ⏳ Pendente.
 

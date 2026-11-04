@@ -17,6 +17,7 @@
 | 0.13 | 03/11/2026 | Etapa 3 (D-070): seções 6.4 e 6.5 implementadas pela migração `0007`, aguardando homologação; nova tabela `compromisso_acompanhamento`; ligações com identificador próprio e arquivamento; soluções provisórias P-040 a P-046. |
 | 0.14 | 03/11/2026 | Etapa 3 homologada para desenvolvimento (D-071); as soluções provisórias P-040 a P-046 continuam não homologadas. |
 | 0.15 | 03/11/2026 | Etapa 4 (D-072): seções 6.6 e 6.7 implementadas pela migração `0008`, aguardando homologação; um plano por projeto ou tema; pilares ou eixos (`plano_eixo`); marcos como itens da ação (`acao_marco`, `marco_planejamento`); decisões do fluxo de aprovação (`plano_acao_decisao`); avaliações inerente e residual com criticidade e classificação calculadas pelo banco conforme a matriz original; acompanhamento dos gatilhos; `compromisso.acao_id`. |
+| 0.16 | 04/11/2026 | Etapa 4 homologada para desenvolvimento (D-073); as soluções provisórias P-047 a P-053 continuam não homologadas. |
 
 Legenda: ✅ Aprovado · 🔧 Proposta técnica · ⏳ Pendente (ver [REQUISITOS.md](REQUISITOS.md#como-ler-este-documento)).
 
@@ -821,7 +822,7 @@ Resolvidas na Etapa 1: hierarquia entre temas e projetos (D-020); dados mínimos
 | `metodologia_versao`, `criterio_avaliacao`, `avaliacao`, `avaliacao_versao`, `avaliacao_nota_criterio`, `evidencia` | 2A | Criadas, com telas; somente metodologias de demonstração e dados fictícios |
 | `permissao_contexto` | 2A | Criada, com testes; sem tela de gestão (segurança não homologada) |
 | `iniciativa`, `iniciativa_projeto_tema`, `iniciativa_stakeholder`, `interacao`, `interacao_participante`, `interacao_projeto_tema`, `interacao_iniciativa`, `compromisso`, `compromisso_acompanhamento` | 3 | Criadas, com telas e dados fictícios; homologadas para desenvolvimento (D-071) |
-| `plano_acao`, `plano_eixo`, `plano_acao_versao`, `plano_acao_decisao`, `acao`, `acao_planejamento`, `acao_marco`, `marco_planejamento`, `acao_acompanhamento`, `acao_stakeholder`, `risco`, `risco_avaliacao`, `risco_gatilho`, `risco_gatilho_registro`, `risco_resposta`, `risco_stakeholder`; coluna `compromisso.acao_id` | 4 | Criadas, com telas e dados fictícios; aguardam homologação (D-072) |
+| `plano_acao`, `plano_eixo`, `plano_acao_versao`, `plano_acao_decisao`, `acao`, `acao_planejamento`, `acao_marco`, `marco_planejamento`, `acao_acompanhamento`, `acao_stakeholder`, `risco`, `risco_avaliacao`, `risco_gatilho`, `risco_gatilho_registro`, `risco_resposta`, `risco_stakeholder`; coluna `compromisso.acao_id` | 4 | Criadas, com telas e dados fictícios; homologadas para desenvolvimento (D-073) |
 
 Onde está cada parte:
 
