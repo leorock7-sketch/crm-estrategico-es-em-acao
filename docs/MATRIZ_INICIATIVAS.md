@@ -4,6 +4,7 @@
 |---|---|---|
 | 0.1 | 31/10/2026 | Rascunho para revisão |
 | 0.2 | 03/11/2026 | Etapa 3 implementada (D-070), aguardando homologação: Q-22 resolvida; soluções provisórias para Q-20, Q-21, Q-23 e Q-24 (P-040 a P-046) |
+| 0.3 | 03/11/2026 | Etapa 3 homologada para desenvolvimento (D-071); as soluções provisórias P-040 a P-046 continuam não homologadas |
 
 Legenda: ✅ Aprovado · 🔧 Proposta técnica · ⏳ Pendente.
 

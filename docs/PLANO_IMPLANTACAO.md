@@ -22,6 +22,7 @@
 | 0.18 | 02/11/2026 | Calibração H6 concluída e versões finais da Q-66 e da Q-67 (D-068); Etapa 2B pronta para autorização; seção 7 conforme a Q-67 1.0 |
 | 0.19 | 02/11/2026 | Etapa 2B autorizada (D-069) e implementada na branch `feature/escalas-v2-2`: escalas V2.2, rubricas da Q-66 1.0, alertas orientativos, matriz 3 × 3 e atualização segura do banco (seção 7.5); aguarda a revisão do Pull Request e a homologação |
 | 0.20 | 03/11/2026 | Etapa 2B homologada para desenvolvimento e Etapa 3 autorizada (D-070); Etapa 3 implementada na branch `feature/iniciativas-interacoes` (seção 8): iniciativas, interações registradas uma única vez e compromissos; aguarda a revisão do Pull Request e a homologação |
+| 0.21 | 03/11/2026 | Etapa 3 homologada para desenvolvimento e incorporada à `main` (D-071); P-040 a P-046 continuam não homologadas; backlog da V3.0 (V3-01 a V3-04); próxima atividade: roteiro da Etapa 4 para validação do gestor |
 
 Legenda: ✅ Aprovado · 🔧 Proposta técnica · ⏳ Pendente.
 
@@ -30,6 +31,7 @@ Legenda: ✅ Aprovado · 🔧 Proposta técnica · ⏳ Pendente.
 ## 1. Princípios ✅
 
 - Cada etapa é desenvolvida em branch própria e entregue por Pull Request.
+- A incorporação de um Pull Request à `main` ocorre somente depois da homologação do gestor (D-071).
 - A etapa seguinte só começa após aprovação da anterior.
 - Testes e verificações são executados e relatados com resultados reais.
 - Somente dados fictícios até autorização formal para dados reais.
@@ -44,8 +46,8 @@ Legenda: ✅ Aprovado · 🔧 Proposta técnica · ⏳ Pendente.
 | 1.1 | Projetos, temas e contextos | Telas de comitês, projetos e temas; comitês participantes (D-023); associação de stakeholders aos contextos, sem avaliação de poder × interesse | ✅ **Concluída**: homologada em 01/11/2026 para desenvolvimento com dados fictícios (D-031, D-047, incluindo a correção de normalização) e incorporada à `main` pelo Pull Request #1 (commit de merge `90c319c`, D-053) |
 | 2A | Metodologia e estrutura da avaliação estratégica | Fichas e versões, evidências, posicionamento, grau de confiança, permissões e matriz com metodologia de demonstração e dados fictícios | ✅ **Concluída**: homologada em 01/11/2026 para desenvolvimento e testes com dados fictícios (D-035, D-055) e incorporada à `main` pelo Pull Request #2 (commit de merge `81478af`); adaptação às escalas V2.2 feita na Etapa 2B (seção 7) |
 | 2B | Metodologia institucional V2.2 e adaptação técnica | Escalas aprovadas (D-058 a D-060); rubricas da Q-66 1.0 e adaptação do sistema conforme a Q-67 1.0 (seção 7) | ✅ **Concluída:** autorizada em 02/11/2026 (D-069), incorporada à `main` pelo Pull Request #6 (commit de merge `73acd04`, verificações Node.js 24 e 26 aprovadas) e homologada para desenvolvimento em 03/11/2026, depois de teste assistido (D-070) |
-| 3 | Iniciativas, interações e compromissos | Matriz de iniciativas, registro único de reuniões, encaminhamentos e prazos | 🔧 **Implementada, aguardando homologação:** autorizada em 03/11/2026 (D-070) e desenvolvida na branch `feature/iniciativas-interacoes`, com dados fictícios (seção 8) |
-| 4 | Plano de ação e matriz de riscos | Versões e aprovação, acompanhamento, riscos, gatilhos e respostas | 🔧 |
+| 3 | Iniciativas, interações e compromissos | Matriz de iniciativas, registro único de reuniões, encaminhamentos e prazos | ✅ **Concluída:** autorizada em 03/11/2026 (D-070), incorporada à `main` pelo Pull Request #7 (commit de merge `aa17fe4`, verificações Node.js 24 e 26 aprovadas) e homologada para desenvolvimento (D-071); as soluções provisórias P-040 a P-046 continuam não homologadas (seção 8) |
+| 4 | Plano de ação e matriz de riscos | Versões e aprovação, acompanhamento, riscos, gatilhos e respostas | 🔧 **Próxima (D-071):** roteiro de implementação apresentado ao gestor para validação do escopo; programação só depois da validação |
 | 5 | Autenticação e permissões | Supabase Auth, perfis e permissões por projeto/tema, segurança no banco. Depende de Q-50 | 🔧 |
 | 6 | Painéis e relatórios | Indicadores executivos e relatórios. Depende de Q-55 | 🔧 |
 | 7 | Homologação e hospedagem | Supabase e Vercel com dados fictícios, validação técnica e institucional, plano de cópias de segurança. **Pré-requisitos: C6, C7 e C8 solucionadas** (D-027) | 🔧 ⏳ (exige contas e autorização) |
@@ -304,7 +306,7 @@ Pré-requisito cumprido: Pull Request documental #5 incorporado pelo gestor (`2e
 
 Ajustes intencionais em testes anteriores: (1) na nova versão depois de uma mudança de metodologia, o posicionamento deixou de ser copiado (T-4); (2) a publicação passou a devolver os alertas mantidos, em vez do resultado numérico (D-067).
 
-## 8. Etapa 3 — Iniciativas, interações e compromissos 🔧 (D-070)
+## 8. Etapa 3 — Iniciativas, interações e compromissos ✅ (D-070, D-071)
 
 ### Objetivo
 
@@ -318,6 +320,8 @@ Transformar a estrutura de stakeholders, projetos e avaliações em ferramenta d
 | Q-22 | Resolvida pela D-070: a iniciativa do tipo "reunião relevante" representa o assunto acompanhado; cada encontro é registrado uma única vez em Interações |
 
 ### Soluções provisórias (reversíveis, não homologadas) 🔧
+
+A homologação da etapa (D-071) não homologa estas soluções: elas continuam provisórias até decisão do gestor.
 
 | Ponto pendente | Solução adotada | Motivo |
 |---|---|---|
@@ -345,7 +349,7 @@ Transformar a estrutura de stakeholders, projetos e avaliações em ferramenta d
 | Testes automatizados | Executados e aprovados em 03/11/2026: tipos, qualidade e compilação sem erros; 204 de 204 testes (175 anteriores e 29 novos), inclusive a atualização de um banco da Etapa 2B com todas as tabelas anteriores preservadas. Ajustes em testes anteriores: o teste da migração 0006 passou a ler o total de migrações da lista; dois testes de banco em disco ganharam limite de tempo maior (execução paralela mais pesada) |
 | Verificação no navegador (dados fictícios) | Executada em 03/11/2026, no computador e no celular (375 px, sem rolagem horizontal da página): listas e filtros; páginas de iniciativa, interação e compromisso; registro de interação com duas iniciativas e participantes; alerta de repetição; compromisso com prazo vencido; acompanhamento com conclusão; validações; integração nas páginas de projeto e de instituição. Telas entregues ao gestor fora do repositório |
 | Banco local de desenvolvimento | Atualizado com a cópia automática; a demonstração da Etapa 3 foi acrescentada sem alterar os registros anteriores |
-| Homologação do gestor | ⏳ Pendente |
+| Homologação do gestor | ✅ Homologada para desenvolvimento em 03/11/2026 (D-071), depois do merge do Pull Request #7 (`aa17fe4`) |
 
 ### Critérios de aceite
 
@@ -377,9 +381,11 @@ Supabase, autenticação real, integração com Outlook e Microsoft 365, painéi
 | Revisão e incorporação dos Pull Requests das Etapas 1.1 e 2A | Base correta da Etapa 2A | ✅ Concluída: Etapa 1.1 incorporada pelo Pull Request #1 (D-053, `90c319c`) e Etapa 2A pelo Pull Request #2 (D-055, `81478af`) |
 | Fase documental V2.2 (registro da Etapa 2A e escalas V2.2) | Homologação da Q-66 e da Q-67 | ✅ Concluída (D-062): Pull Requests #3 (`9084a74`) e #4 (`a254b40`) incorporados; próxima atividade: homologação da Q-66 e da Q-67 |
 | Homologação da Etapa 2B | Etapa 3 | ✅ Homologada para desenvolvimento em 03/11/2026, depois de teste assistido (D-070) |
-| Homologação da Etapa 3 | Etapa 4 | Implementada (D-070); aguarda a revisão do Pull Request e a homologação do gestor |
-| Achados A-01 a A-06 da auditoria técnica independente | — | Pendentes para tratamento posterior (D-070); documento mantido fora do repositório; correções não implementadas na Etapa 3 |
-| Melhorias de usabilidade não essenciais (U-1 a U-5, registradas em 02/11/2026) | — | Registradas fora do repositório: texto desatualizado na seção de stakeholders da página do projeto; bloco de evidências antes das classificações no rascunho; dica nas versões recolhidas do histórico; colunas da tabela da matriz no celular; legenda do selo "preliminar" no celular. A tratar oportunamente, sem impedir o andamento |
+| Homologação da Etapa 3 | Etapa 4 | ✅ Homologada para desenvolvimento em 03/11/2026 (D-071), depois do merge do Pull Request #7 (`aa17fe4`) |
+| Soluções provisórias da Etapa 3 (P-040 a P-046) | — | Em uso e não homologadas (D-071); decisão do gestor pendente (Q-20, Q-21, Q-23 e Q-24) |
+| Backlog da V3.0: melhorias de interface V3-01 a V3-04 | — | Registradas pelo gestor (D-071), com descrição mantida fora do repositório; incluem, em especial, a unificação visual de Iniciativas e Interações; não implementar antes da V3.0 |
+| Achados A-01 a A-06 da auditoria técnica independente | — | Pendentes para tratamento posterior (D-070); documento mantido fora do repositório; correções não implementadas nas Etapas 3 e 4 (D-071) |
+| Melhorias de usabilidade não essenciais (U-1 a U-5, registradas em 02/11/2026) | — | Registradas fora do repositório: texto desatualizado na seção de stakeholders da página do projeto; bloco de evidências antes das classificações no rascunho; dica nas versões recolhidas do histórico; colunas da tabela da matriz no celular; legenda do selo "preliminar" no celular. A tratar oportunamente, sem impedir o andamento; não implementar na Etapa 4 (D-071) |
 | Análise LGPD, retenção e anonimização | Etapa 8 | Q-13, Q-58 |
 
 ## 10. Local de trabalho ✅ (D-019)
