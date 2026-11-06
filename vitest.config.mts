@@ -10,5 +10,10 @@ export default defineConfig({
   test: {
     environment: "jsdom",
     include: ["testes/**/*.test.{ts,tsx}"],
+    // Os testes de banco rodam em paralelo, cada um com um PostgreSQL próprio, e podem
+    // demorar quando o computador está com pouca memória livre. Estes limites valem só
+    // para o tempo de espera; não mudam o que cada teste confere.
+    testTimeout: 30_000,
+    hookTimeout: 120_000,
   },
 });
