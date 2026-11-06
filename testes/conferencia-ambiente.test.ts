@@ -46,6 +46,18 @@ describe("Conferência das variáveis", () => {
     expect(situacao(ambiente, "Campos enviados ao navegador")?.situacao).toBe("problema");
   });
 
+  test("o nome do campo colado junto com o valor é apontado, sem repetir o valor", () => {
+    const ambiente = {
+      ...correto,
+      NEXT_PUBLIC_SUPABASE_URL: `NEXT_PUBLIC_SUPABASE_URL=${correto.NEXT_PUBLIC_SUPABASE_URL}`,
+      NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=${CHAVE_PUBLICA}`,
+    };
+    for (const item of ["Endereço do projeto", "Chave publishable"]) {
+      expect(situacao(ambiente, item)?.detalhe).toContain("nome do campo");
+    }
+    expect(JSON.stringify(conferirVariaveis(ambiente))).not.toContain(CHAVE_PUBLICA);
+  });
+
   test("conexão com o banco em campo público é apontada", () => {
     const ambiente = { ...correto, NEXT_PUBLIC_QUALQUER: correto.CRM_BANCO_ADMIN_URL };
     expect(situacao(ambiente, "Campos enviados ao navegador")?.situacao).toBe("problema");

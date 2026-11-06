@@ -26,9 +26,16 @@ function referenciaDoProjeto(endereco: string | undefined): string | null {
   }
 }
 
+/** Quem cola a linha inteira depois do sinal de igual fica com NOME=NOME=valor. */
+const NOME_COLADO: Omit<ItemConferido, "item"> = {
+  situacao: "problema",
+  detalhe: "o nome do campo foi colado junto: deixe só o valor depois do sinal de igual",
+};
+
 function conferirEndereco(valor: string | undefined): ItemConferido {
   const item = "Endereço do projeto";
   if (!preenchido(valor)) return { item, situacao: "pendente", detalhe: "campo vazio" };
+  if (valor.startsWith("NEXT_PUBLIC_")) return { item, ...NOME_COLADO };
   return referenciaDoProjeto(valor)
     ? { item, situacao: "ok", detalhe: "formato correto" }
     : { item, situacao: "problema", detalhe: "use somente o endereço https://....supabase.co, sem nada depois" };
@@ -37,6 +44,7 @@ function conferirEndereco(valor: string | undefined): ItemConferido {
 function conferirChavePublica(valor: string | undefined): ItemConferido {
   const item = "Chave publishable";
   if (!preenchido(valor)) return { item, situacao: "pendente", detalhe: "campo vazio" };
+  if (valor.startsWith("NEXT_PUBLIC_")) return { item, ...NOME_COLADO };
   if (valor.startsWith("sb_secret_")) {
     return { item, situacao: "problema", detalhe: "a chave secreta está neste campo, que vai para o navegador: corrija agora" };
   }
