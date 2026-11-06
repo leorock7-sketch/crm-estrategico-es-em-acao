@@ -26,6 +26,7 @@
 | 0.22 | 03/11/2026 | Etapa 4 aprovada com a matriz de riscos original do Comitê de Infraestrutura (D-072) e implementada na branch `feature/plano-acao-riscos` (seção 9): plano de ação por projeto ou tema e matriz de riscos 5 × 5; aguarda a revisão do Pull Request e a homologação; seções seguintes renumeradas (10 e 11) |
 | 0.23 | 04/11/2026 | Etapa 4 incorporada à `main` (Pull Requests #8 e #9, `1246331`) e homologada para desenvolvimento (D-073); P-047 a P-053 continuam não homologadas; próxima atividade: roteiro da Etapa 5 — Autenticação e Permissões — para validação do gestor |
 | 0.24 | 06/11/2026 | Roteiro da Etapa 5 validado (D-074) e organizado na seção 10, com o plano de testes de autenticação e segurança; programação depende da autorização específica do projeto Supabase de desenvolvimento; seções seguintes renumeradas (11 e 12) |
+| 0.25 | 06/11/2026 | Ambiente Supabase de desenvolvimento autorizado (D-075), a ser criado pelo gestor; regra da Data API, A-01, C8 e backlog V3-08 atualizados |
 
 Legenda: ✅ Aprovado · 🔧 Proposta técnica · ⏳ Pendente.
 
@@ -427,7 +428,7 @@ Supabase, autenticação real, integrações externas e painéis executivos. Ach
 
 ## 10. Etapa 5 — Autenticação e permissões 🔧 (D-074)
 
-**Situação:** roteiro validado (D-074) e branch `feature/autenticacao-permissoes` organizada. A programação depende da autorização específica do projeto Supabase de desenvolvimento; nenhum serviço externo foi criado ou conectado.
+**Situação:** roteiro validado (D-074), branch `feature/autenticacao-permissoes` organizada e ambiente Supabase de desenvolvimento autorizado (D-075). A programação começa depois que o gestor criar e configurar o projeto; até este registro, nenhum serviço externo foi criado ou conectado.
 
 ### Objetivo
 
@@ -449,7 +450,7 @@ Substituir o administrador fictício por autenticação real e fazer valer, no p
 2. **Correspondência:** a identidade autenticada liga-se ao usuário interno por um identificador próprio (`usuario.auth_id`), nunca pelo e-mail em tempo de execução. Sem correspondência ou com usuário inativo, nada é acessível.
 3. **Consultas no contexto do usuário:** a aplicação conecta-se ao banco com um papel próprio, sem privilégios (`crm_app`: sem `BYPASSRLS` e sem ser dono das tabelas), e cada operação ocorre em transação com a identidade já verificada. Sem contexto, o banco devolve zero linhas: o erro de programação nega acesso, em vez de abrir.
 4. **Conexões privilegiadas:** o papel `postgres` e a chave secreta só são usados em comandos de migração e na criação de contas, em código exclusivo do servidor; nunca em consulta de tela, nunca no navegador.
-5. **Superfície externa:** a API automática do Supabase (Data API) fica desligada, porque o CRM não a usa, e as permissões padrão dos papéis `anon` e `authenticated` são retiradas.
+5. **Superfície externa:** as permissões padrão dos papéis `anon` e `authenticated` são retiradas. A API automática do Supabase (Data API) só é desligada depois de confirmado que nenhuma funcionalidade da arquitetura implementada depende dos seus endpoints; a autenticação (Supabase Auth) permanece operacional (D-075).
 6. **Revogação imediata:** situação do usuário e permissões são lidas no banco a cada consulta. Sessão ainda válida não garante acesso.
 7. **Regras internas:** gatilhos de auditoria e de integridade passam a executar com privilégio controlado (`security definer`, com `search_path` fixo), para que o RLS não os altere nem seja contornado por eles.
 8. **Registros compartilhados:** o registro aparece para quem tem permissão em ao menos um dos contextos ligados; as ligações e os dados específicos de outro contexto continuam ocultos.
@@ -483,19 +484,19 @@ Usuários fictícios: administrador, gestor, colaborador e leitor com permissão
 | 10 | Os testes das Etapas 1 a 4 continuam aprovados; a migração preserva todas as tabelas anteriores, linha a linha | PGlite; Supabase |
 | D4 | Diretório básico visível a todos os perfis; contatos pessoais e observações, só nas condições da tabela acima | PGlite; Supabase |
 
-Os itens estão listados como pendentes em `testes/seguranca-etapa-5.test.ts` e só deixam essa condição quando forem efetivamente executados. Testes em "PGlite" rodam a cada Pull Request, sem segredos; testes em "Supabase" e "aplicação" rodam localmente, com as chaves em `.env.local`, e os resultados são relatados na entrega.
+Os itens estão listados como pendentes em `testes/seguranca-etapa-5.test.ts` e só deixam essa condição quando forem efetivamente executados. Testes em "PGlite" rodam a cada Pull Request, sem segredos; testes em "Supabase" e "aplicação" rodam localmente, com as chaves em `.env.local`, e os resultados são relatados na entrega. Os testes automatizados e, quando tecnicamente possível, os funcionais no navegador com contas fictícias são executados pelo Claude; ao gestor cabe a homologação gerencial (D-075).
 
 ### Providências externas
 
 | Providência | Quem | Situação |
 |---|---|---|
-| Projeto Supabase de desenvolvimento (`sa-east-1`, plano gratuito, somente dados fictícios) | Gestor cria a conta e o projeto; as chaves ficam só em `.env.local` | ⏳ Aguarda autorização específica (D-074) |
+| Projeto Supabase de desenvolvimento `crm-es-em-acao-dev` (`sa-east-1`, plano Free, somente dados fictícios) | Gestor cria a conta e o projeto; as chaves ficam só em `.env.local`, e `npm run ambiente:conferir` confere o ambiente sem exibir nenhum valor | ✅ Autorizado (D-075); ⏳ aguarda a criação pelo gestor |
 | Registro do CRM no Microsoft Entra ID, restrito à organização | TI institucional | ⏳ Pendente; não bloqueia a etapa (D1) |
 | Serviço de e-mail institucional (SMTP) para convites e recuperação de senha | TI institucional | ⏳ Necessário só para usuários reais (Etapa 7); os testes não enviam e-mail |
 
 ### Fora do escopo (D-074)
 
-Hospedagem pública e produção; dados reais; integrações com Outlook e Microsoft 365 (Etapa 9); painéis; backup, recuperação e homologação da implantação (Etapa 7); achados A-02 a A-06, salvo correções estritamente necessárias à segurança; melhorias U-1 a U-5; backlog V3-01 a V3-07.
+Hospedagem pública e produção; dados reais; integrações com Outlook e Microsoft 365 (Etapa 9); painéis; backup, recuperação e homologação da implantação (Etapa 7); achados A-02 a A-06, salvo correções estritamente necessárias à segurança; melhorias U-1 a U-5; backlog V3-01 a V3-08.
 
 ## 11. Pendências efetivas (atualizadas em 06/11/2026)
 
@@ -503,9 +504,9 @@ Hospedagem pública e produção; dados reais; integrações com Outlook e Micro
 |---|---|---|
 | C6. Reforço da auditoria | Etapas 7 e 8 (D-027) | Planejada |
 | C7. Cópia de segurança e restauração | Etapas 7 e 8 (D-027) | Planejada |
-| C8. Portabilidade em PostgreSQL real | Etapas 7 e 8 (D-027) | Depende de autorização (Q-57) |
+| C8. Portabilidade em PostgreSQL real | Etapas 7 e 8 (D-027) | Validação autorizada no projeto Supabase de desenvolvimento (D-075). Só será considerada resolvida depois de comprovada a compatibilidade das operações e migrações essenciais no PostgreSQL real |
 | Autenticação e segurança multiusuário (inclusive regras de acesso no banco) | Uso por mais de uma pessoa; Etapas 7 e 8 | Etapa 5, roteiro validado (D-074, seção 10); estrutura de permissões preparada na 2A, não homologada |
-| Projeto Supabase de desenvolvimento | Programação da Etapa 5 | ⏳ Aguarda autorização específica do gestor (D-074) |
+| Projeto Supabase de desenvolvimento | Programação da Etapa 5 | ✅ Autorizado (D-075); ⏳ aguarda a criação e a configuração pelo gestor |
 | Registro do CRM no Microsoft Entra ID | Login Microsoft (D1); não bloqueia a Etapa 5 | ⏳ Depende de autorização e configuração pela TI institucional |
 | Serviço de e-mail institucional (SMTP) para convites e recuperação de senha | Usuários reais (Etapa 7) | ⏳ Depende da TI institucional |
 | Rubricas das escalas V2.2 e plano de adaptação técnica | Etapa 2B (D-060, D-063) | ✅ **Resolvida (D-068):** Q-66 1.0 e Q-67 1.0; calibração H6 concluída, com limitações registradas; Etapa 2B pronta para autorização (documento entregue fora do repositório). Decisões Q-65.1, Q-65.4 e Q-65.6 continuam pendentes, sem bloquear a 2B |
@@ -521,8 +522,8 @@ Hospedagem pública e produção; dados reais; integrações com Outlook e Micro
 | Homologação da Etapa 4 | Etapa 5 | ✅ Homologada para desenvolvimento em 04/11/2026 (D-073), depois do merge dos Pull Requests #8 e #9 (`1246331`) |
 | Soluções provisórias da Etapa 4 (P-047 a P-053) e pontos pendentes Q-33 (correção de digitação) e Q-42 a Q-44 | — | Em uso e não homologadas (D-072, D-073); decisão do gestor pendente |
 | Soluções provisórias da Etapa 3 (P-040 a P-046) | — | Em uso e não homologadas (D-071); decisão do gestor pendente (Q-20, Q-21, Q-23 e Q-24) |
-| Backlog da V3.0: melhorias V3-01 a V3-07 | — | Registradas pelo gestor (D-071, D-074) e preservadas (D-072, D-073): V3-01, simplificação visual, com base em modelo de referência indicado pelo gestor; V3-02, matriz Poder × Interesse na página do projeto, com marcadores interativos e identificação por mouse ou toque; V3-03, redução dos caminhos de navegação para as informações relevantes; V3-04, unificação visual de Iniciativas e Interações, com estas como subitens, preservando o registro único de reuniões; V3-05, fotografias dos stakeholders; V3-06, integração funcional entre iniciativas, interações, ações e riscos; V3-07, interoperabilidade futura com outra ferramenta institucional indicada pelo gestor. Não implementar antes da V3.0 |
-| Achados A-01 a A-06 da auditoria técnica independente | — | Documento mantido fora do repositório. A-01 tratado na Etapa 5, por corresponder ao seu objetivo; A-02 a A-06 no backlog, salvo correções estritamente necessárias à segurança (D-074) |
+| Backlog da V3.0: melhorias V3-01 a V3-08 | — | Registradas pelo gestor (D-071, D-074, D-075) e preservadas (D-072, D-073): V3-01, simplificação visual, com base em modelo de referência indicado pelo gestor; V3-02, matriz Poder × Interesse na página do projeto, com marcadores interativos e identificação por mouse ou toque; V3-03, redução dos caminhos de navegação para as informações relevantes; V3-04, unificação visual de Iniciativas e Interações, com estas como subitens, preservando o registro único de reuniões; V3-05, fotografias dos stakeholders; V3-06, integração funcional entre iniciativas, interações, ações e riscos; V3-07, interoperabilidade futura com outra ferramenta institucional indicada pelo gestor; V3-08, interoperabilidade com monday.com: permitir, no mínimo, exportação compatível em XLSX/CSV de informações selecionadas do CRM para boards do monday.com, com campos e identificadores adequados, podendo uma integração automatizada por API ser avaliada posteriormente (D-075). Não implementar antes da V3.0 |
+| Achados A-01 a A-06 da auditoria técnica independente | — | Documento mantido fora do repositório. A-01 (síntese do gestor, D-075): ausência de autenticação real e de segurança multiusuário efetiva, a ser solucionada pela Etapa 5. A-02 a A-06 no backlog, salvo correções estritamente necessárias à segurança (D-074) |
 | Melhorias de usabilidade não essenciais (U-1 a U-5, registradas em 02/11/2026) | — | Registradas fora do repositório: texto desatualizado na seção de stakeholders da página do projeto; bloco de evidências antes das classificações no rascunho; dica nas versões recolhidas do histórico; colunas da tabela da matriz no celular; legenda do selo "preliminar" no celular. A tratar oportunamente, sem impedir o andamento; não implementadas nas Etapas 4 e 5 e preservadas (D-071, D-072, D-073, D-074) |
 | Análise LGPD, retenção e anonimização | Etapa 8 | Q-13, Q-58 |
 

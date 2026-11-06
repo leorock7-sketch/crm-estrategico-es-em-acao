@@ -13,6 +13,7 @@
 | 0.9 | 02/11/2026 | Etapa 2B (D-069): módulo `avaliacoes` adaptado às escalas V2.2 (rubricas, alertas orientativos, matriz 3 × 3) e cópia de segurança automática do banco local antes de atualizações pendentes; aguardando homologação |
 | 0.10 | 03/11/2026 | Etapa 3 (D-070): módulos `iniciativas` e `interacoes` (iniciativas, interações e compromissos), telas e visibilidade por projeto ou tema; aguardando homologação |
 | 0.11 | 03/11/2026 | Etapa 4 (D-072): módulos `plano-acao` e `riscos`, telas de planos, versões, ações e riscos, integração com os módulos anteriores e visibilidade por projeto ou tema; aguardando homologação |
+| 0.12 | 06/11/2026 | Q-57 atualizada: teste em PostgreSQL real autorizado no projeto Supabase de desenvolvimento (D-075) |
 
 Legenda: ✅ Aprovado · 🔧 Proposta técnica · ⏳ Pendente.
 
@@ -244,7 +245,7 @@ Passo posterior, dependente de Q-57: um segundo teste em PostgreSQL real, para a
 | Q-50 | Login por e-mail e senha (Supabase Auth) ou por contas Microsoft 365 institucionais (Microsoft Entra ID, também suportado pelo Supabase Auth). |
 | Q-51 | Região de hospedagem dos dados. O Supabase oferece região em São Paulo. |
 | Q-52 | Transferência dos serviços e do repositório para contas institucionais. |
-| Q-57 | Teste de portabilidade em PostgreSQL real (C8). |
+| Q-57 | Teste de portabilidade em PostgreSQL real (C8): autorizado no projeto Supabase de desenvolvimento (D-075), sem dar C8 por resolvida antes da comprovação. Pendentes: eventual repetição no GitHub Actions e versão de destino definitiva. |
 | — | Abordagem das integrações com Microsoft 365 (Microsoft Graph) e de IA assistiva. |
 
 Resolvidas na Etapa 1: local da cópia de trabalho (D-019) e ferramenta de banco local (D-018). Resolvida na D-068 e implementada na Etapa 2B (D-069): Q-67, adaptação do módulo `avaliacoes` e do banco às escalas V2.2 ([Plano de Implantação](PLANO_IMPLANTACAO.md), seção 7).
