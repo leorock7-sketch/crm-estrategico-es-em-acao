@@ -30,7 +30,13 @@ Os testes conferem, de forma automática e repetível, se o sistema se comporta 
 | `telas-plano-acao-riscos.test.tsx` | Matriz 5 × 5 com as cores institucionais e a contagem por célula, selo da classificação, comparação inerente × residual sem percentual, cálculo da criticidade no formulário de avaliação, diferenças entre versões, pilares de referência no novo plano e formulário de acompanhamento com percentual opcional e marco. |
 | `migracao-etapa-4.test.ts` | Atualização de um banco da Etapa 3 para a Etapa 4: cópia de segurança antes, todas as tabelas anteriores idênticas linha a linha (o compromisso ganha só a coluna `acao_id`, vazia) e tabelas novas vazias. |
 | `conferencia-ambiente.test.ts` | Conferência do projeto Supabase de desenvolvimento (D-075): campos vazios, chaves trocadas, segredo em campo enviado ao navegador, conexão errada ou de outra região, e nenhum resultado repete senha, chave ou identificador. |
-| `seguranca-etapa-5.test.ts` | Plano executável dos testes de autenticação e segurança da Etapa 5 (D-074): itens pendentes, que não contam como aprovados até serem implementados e executados. |
+| `seguranca-etapa-5.test.ts` | Regras de acesso da Etapa 5 (D-074) no PGlite, pelo papel `crm_app`: mesmo conjunto rodado no Supabase (`apoio/regras-acesso.ts`). |
+| `seguranca-credenciais.test.ts` | Como credenciais e identidade são tratadas no código: chave secreta só em arquivo do servidor, conexão administrativa fora da aplicação, nunca `getSession`, telas e operações sempre com identidade, modos de acesso. |
+| `migracao-etapa-5.test.ts` | Atualização de um banco da Etapa 4 para a Etapa 5: cópia de segurança antes, todas as tabelas anteriores idênticas linha a linha (o usuário ganha só `auth_id`, vazio), autoria preservada e regras valendo sobre os dados antigos. |
+| `supabase/regras.test.ts` | Mesmas regras no PostgreSQL do Supabase, com a conexão real da aplicação. Roda com `npm run test:supabase`, neste computador. |
+| `supabase/autenticacao.test.ts` | Login real, senha errada, autocadastro desligado, token adulterado, saída, correspondência por `auth_id`, revogação com token válido, chave pública sem acesso a dados. |
+| `supabase/navegador.test.ts` | Navegador de verdade, com login real: telas por perfil, cookies, revogação com sessão aberta, chamadas diretas às operações do servidor com a sessão de outro usuário, autoria. |
+| `supabase/credenciais.test.ts` | Varredura com os valores reais: nenhum segredo nos arquivos versionados nem no pacote enviado ao navegador. |
 | `formulario-projeto-tema.test.tsx` | Formulário de projeto ou tema com alerta de nome parecido; formulário de associação com a lista neutra de tipos de relação. |
 
 Ferramentas: [Vitest](https://vitest.dev) e [Testing Library](https://testing-library.com).

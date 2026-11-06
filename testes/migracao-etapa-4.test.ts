@@ -131,7 +131,8 @@ describe("Atualização de um banco da Etapa 3 (migração 0008)", () => {
 
       expect(await tabelasPublicas(atualizado)).toEqual([...tabelasAntes, ...TABELAS_NOVAS].sort());
       for (const tabela of tabelasAntes) {
-        const semColunas = tabela === "compromisso" ? ["acao_id"] : [];
+        // O compromisso ganhou acao_id na Etapa 4; o usuário, auth_id na Etapa 5.
+        const semColunas = tabela === "compromisso" ? ["acao_id"] : tabela === "usuario" ? ["auth_id"] : [];
         expect(await conteudo(atualizado, tabela, semColunas), tabela).toEqual(antes[tabela]);
       }
       const acoes = await atualizado.execute(sql`select acao_id from compromisso`);
