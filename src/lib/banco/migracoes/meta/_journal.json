@@ -64,6 +64,13 @@
       "when": 1793751194323,
       "tag": "0008_plano_acao_riscos",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1794003477850,
+      "tag": "0009_identidade_rls",
+      "breakpoints": true
     }
   ]
 }

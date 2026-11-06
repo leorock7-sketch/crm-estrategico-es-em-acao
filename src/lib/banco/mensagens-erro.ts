@@ -85,6 +85,11 @@ export function mensagemDeErro(erro: unknown): string {
   if (original?.constraint && MENSAGENS_POR_REGRA[original.constraint]) {
     return MENSAGENS_POR_REGRA[original.constraint];
   }
+  // Recusa pelas regras de acesso (RLS) ou por gatilho que confere a permissão.
+  if (original?.code === "42501") {
+    const dePostgres = /^(new row violates|permission denied)/.test(original.message ?? "");
+    return original.message && !dePostgres ? original.message : "Você não tem permissão para esta operação.";
+  }
   // Mensagens dos gatilhos do banco, já escritas em português.
   if (original?.code === "P0001" && original.message) return original.message;
   console.error(erro);
