@@ -10,8 +10,8 @@ Cada módulo do CRM tem sua própria pasta, reunindo regras de negócio, valida�
 | `avaliacoes/` | Avaliações de stakeholders e matriz de poder × interesse | Etapas 2A e 2B: escalas V2.2, com metodologia fictícia (não homologada para uso institucional) | [METODOLOGIA_STAKEHOLDERS.md](../../docs/METODOLOGIA_STAKEHOLDERS.md) |
 | `iniciativas/` | Matriz de Iniciativas: iniciativas, projetos e stakeholders envolvidos, histórico | Implementado na Etapa 3 (homologado para desenvolvimento, D-071) | [MATRIZ_INICIATIVAS.md](../../docs/MATRIZ_INICIATIVAS.md) |
 | `interacoes/` | Interações (registro único), agenda, compromissos e acompanhamento | Implementado na Etapa 3 (homologado para desenvolvimento, D-071) | [MODELO_DADOS.md](../../docs/MODELO_DADOS.md) |
-| `plano-acao/` | Plano de Ação: um plano por projeto ou tema, pilares ou eixos, versões e aprovação, ações, marcos, acompanhamento e conversão de compromissos | Implementado na Etapa 4 (aguardando homologação, D-072) | [PLANO_ACAO.md](../../docs/PLANO_ACAO.md) |
-| `riscos/` | Matriz de Riscos 5 × 5 do Comitê de Infraestrutura: avaliações inerente e residual, gatilhos, respostas e stakeholders | Implementado na Etapa 4 (aguardando homologação, D-072) | [MATRIZ_RISCOS.md](../../docs/MATRIZ_RISCOS.md) |
+| `plano-acao/` | Plano de Ação: um plano por projeto ou tema, pilares ou eixos, versões e aprovação, ações, marcos, acompanhamento e conversão de compromissos | Implementado na Etapa 4 (homologado para desenvolvimento, D-073) | [PLANO_ACAO.md](../../docs/PLANO_ACAO.md) |
+| `riscos/` | Matriz de Riscos 5 × 5 do Comitê de Infraestrutura: avaliações inerente e residual, gatilhos, respostas e stakeholders | Implementado na Etapa 4 (homologado para desenvolvimento, D-073) | [MATRIZ_RISCOS.md](../../docs/MATRIZ_RISCOS.md) |
 | `paineis/` | Painéis e relatórios gerenciais | Previsto | [REQUISITOS.md](../../docs/REQUISITOS.md) |
 
 Organização interna de cada módulo, como em `stakeholders/`:

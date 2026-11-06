@@ -24,6 +24,7 @@
 | 0.20 | 03/11/2026 | Etapa 2B homologada para desenvolvimento e Etapa 3 autorizada (D-070); Etapa 3 implementada na branch `feature/iniciativas-interacoes` (seção 8): iniciativas, interações registradas uma única vez e compromissos; aguarda a revisão do Pull Request e a homologação |
 | 0.21 | 03/11/2026 | Etapa 3 homologada para desenvolvimento e incorporada à `main` (D-071); P-040 a P-046 continuam não homologadas; backlog da V3.0 (V3-01 a V3-04); próxima atividade: roteiro da Etapa 4 para validação do gestor |
 | 0.22 | 03/11/2026 | Etapa 4 aprovada com a matriz de riscos original do Comitê de Infraestrutura (D-072) e implementada na branch `feature/plano-acao-riscos` (seção 9): plano de ação por projeto ou tema e matriz de riscos 5 × 5; aguarda a revisão do Pull Request e a homologação; seções seguintes renumeradas (10 e 11) |
+| 0.23 | 04/11/2026 | Etapa 4 incorporada à `main` (Pull Requests #8 e #9, `1246331`) e homologada para desenvolvimento (D-073); P-047 a P-053 continuam não homologadas; próxima atividade: roteiro da Etapa 5 — Autenticação e Permissões — para validação do gestor |
 
 Legenda: ✅ Aprovado · 🔧 Proposta técnica · ⏳ Pendente.
 
@@ -48,8 +49,8 @@ Legenda: ✅ Aprovado · 🔧 Proposta técnica · ⏳ Pendente.
 | 2A | Metodologia e estrutura da avaliação estratégica | Fichas e versões, evidências, posicionamento, grau de confiança, permissões e matriz com metodologia de demonstração e dados fictícios | ✅ **Concluída**: homologada em 01/11/2026 para desenvolvimento e testes com dados fictícios (D-035, D-055) e incorporada à `main` pelo Pull Request #2 (commit de merge `81478af`); adaptação às escalas V2.2 feita na Etapa 2B (seção 7) |
 | 2B | Metodologia institucional V2.2 e adaptação técnica | Escalas aprovadas (D-058 a D-060); rubricas da Q-66 1.0 e adaptação do sistema conforme a Q-67 1.0 (seção 7) | ✅ **Concluída:** autorizada em 02/11/2026 (D-069), incorporada à `main` pelo Pull Request #6 (commit de merge `73acd04`, verificações Node.js 24 e 26 aprovadas) e homologada para desenvolvimento em 03/11/2026, depois de teste assistido (D-070) |
 | 3 | Iniciativas, interações e compromissos | Matriz de iniciativas, registro único de reuniões, encaminhamentos e prazos | ✅ **Concluída:** autorizada em 03/11/2026 (D-070), incorporada à `main` pelo Pull Request #7 (commit de merge `aa17fe4`, verificações Node.js 24 e 26 aprovadas) e homologada para desenvolvimento (D-071); as soluções provisórias P-040 a P-046 continuam não homologadas (seção 8) |
-| 4 | Plano de ação e matriz de riscos | Versões e aprovação, acompanhamento, riscos, gatilhos e respostas | 🔧 **Implementada, aguardando homologação:** aprovada em 03/11/2026 com a matriz de riscos original do Comitê de Infraestrutura (D-072) e desenvolvida na branch `feature/plano-acao-riscos`, com dados fictícios (seção 9) |
-| 5 | Autenticação e permissões | Supabase Auth, perfis e permissões por projeto/tema, segurança no banco. Depende de Q-50 | 🔧 |
+| 4 | Plano de ação e matriz de riscos | Versões e aprovação, acompanhamento, riscos, gatilhos e respostas | ✅ **Concluída:** aprovada em 03/11/2026 com a matriz de riscos original do Comitê de Infraestrutura (D-072), incorporada à `main` pelo Pull Request #9 (commit de merge `1246331`, verificações Node.js 24 e 26 aprovadas) e homologada para desenvolvimento em 04/11/2026 (D-073); as soluções provisórias P-047 a P-053 continuam não homologadas (seção 9) |
+| 5 | Autenticação e permissões | Supabase Auth, perfis e permissões por projeto/tema, segurança no banco. Depende de Q-50 | 🔧 **Próxima (D-073):** roteiro de implementação e decisões necessárias apresentados ao gestor para validação; programação só depois da validação; nenhum serviço externo sem autorização |
 | 6 | Painéis e relatórios | Indicadores executivos e relatórios. Depende de Q-55 | 🔧 |
 | 7 | Homologação e hospedagem | Supabase e Vercel com dados fictícios, validação técnica e institucional, plano de cópias de segurança. **Pré-requisitos: C6, C7 e C8 solucionadas** (D-027) | 🔧 ⏳ (exige contas e autorização) |
 | 8 | Piloto com dados reais | Somente após autorização formal, análise LGPD e solução de C6, C7 e C8 (D-027) | ⏳ |
@@ -365,7 +366,7 @@ A homologação da etapa (D-071) não homologa estas soluções: elas continuam 
 
 Supabase, autenticação real, integração com Outlook e Microsoft 365, painéis executivos e os módulos completos de Plano de Ação e Riscos. A ligação de compromissos a ações do plano (`acao_id`) entra na Etapa 4, com a tabela de ações; as relações já preservam iniciativa, interação e projeto para essa integração. Achados A-01 a A-06 da auditoria técnica independente: pendentes (seção 10), sem implementação nesta etapa.
 
-## 9. Etapa 4 — Plano de ação e matriz de riscos 🔧 (D-072)
+## 9. Etapa 4 — Plano de ação e matriz de riscos ✅ (D-072, D-073)
 
 ### Objetivo
 
@@ -381,6 +382,8 @@ Permitir que cada projeto ou tema tenha o seu plano de ação — organizado por
 
 ### Soluções provisórias (reversíveis, não homologadas) 🔧
 
+A homologação da etapa (D-073) não homologa estas soluções: elas continuam provisórias até decisão do gestor. A matriz de riscos 5 × 5 original e a distinção entre risco inerente e residual permanecem como referência aprovada (D-072, D-073).
+
 | Ponto | Solução adotada | Motivo |
 |---|---|---|
 | Marcos | Itens de cada ação (M1, M2…), com prazo previsto; evolução por marcos alcançados sobre previstos (P-047) | Reproduz o instrumento do Plano de Ação |
@@ -395,7 +398,7 @@ Permitir que cada projeto ou tema tenha o seu plano de ação — organizado por
 
 | Entrega | Situação |
 |---|---|
-| Branch `feature/plano-acao-riscos`, a partir da `main` atualizada (`aa17fe4`, com o registro documental da D-071) | Concluída; Pull Request para revisão, sem merge automático |
+| Branch `feature/plano-acao-riscos`, a partir da `main` atualizada (`aa17fe4`, com o registro documental da D-071) | Concluída; incorporada à `main` pelo Pull Request #9 (`1246331`), depois do Pull Request documental #8 |
 | Migração `0008`, somente aditiva | Concluída: 16 tabelas novas e a coluna `compromisso.acao_id` (vazia nos registros anteriores); nenhuma outra tabela alterada; cópia de segurança automática antes de aplicar |
 | Regras no banco | Concluídas: auditoria, responsável e proibição de exclusão em todas as tabelas novas; campos que não mudam depois de criados (projeto, plano, códigos); históricos preservados (decisões, acompanhamentos, avaliações e ocorrências de gatilhos); fluxo das versões (nascimento em rascunho, envio com ação e motivo, decisão só em aprovação, substituição da vigente, imutabilidade das decididas); planejamento alterável só no rascunho e dentro do mesmo plano; acompanhamento só nas ações da versão vigente; criticidade e classificação calculadas pelo banco; todo risco com avaliação inerente (verificado ao fim da transação); pilar do risco do mesmo projeto |
 | Plano de Ação | Concluído: lista de planos; criação com os pilares de referência opcionais; página do plano (ações vigentes por pilar, andamento, atrasos, marcos, pilares, versões, fluxo de aprovação e histórico); página da versão (edição no rascunho, envio, comparação com a versão aprovada anterior, decisão do administrador com parecer); página da ação (planejamento vigente, marcos, acompanhamento, iniciativa, compromissos de origem, riscos, stakeholders, a ação ao longo das versões e histórico) |
@@ -405,7 +408,7 @@ Permitir que cada projeto ou tema tenha o seu plano de ação — organizado por
 | Testes automatizados | Executados e aprovados em 03/11/2026: tipos, qualidade e compilação sem erros; 241 de 241 testes (204 anteriores e 37 novos): regras do banco (versões, aprovação, imutabilidade, acompanhamento, marcos, atrasos, histórico e visibilidade), classificação das 25 células igual no banco e nas telas, teste específico de inerente × residual, gatilhos e respostas, conversão de compromisso, validações, telas (cores da matriz, comparação sem percentual, diferenças entre versões) e atualização de um banco da Etapa 3 com todas as tabelas anteriores preservadas. Ajuste em teste anterior: o teste da migração `0007` passou a aplicar só as migrações até a `0007`, mantendo exatamente a mesma verificação |
 | Verificação no navegador (dados fictícios) | Executada em 03/11/2026, no computador e no celular (375 px, sem rolagem horizontal nas 10 páginas conferidas): lista de planos; página do plano; versão em aprovação com a comparação; ação atrasada; matrizes e lista de riscos; ficha do risco com o aviso de reavaliação; novo risco; compromisso convertido; integração na página do projeto; página inicial. Gravações pelos formulários conferidas numa cópia descartável do banco: aprovação com parecer, acompanhamento com marco alcançado, avaliação residual (cálculo na hora e comparação sem percentual), conversão de compromisso (nova versão em rascunho), inclusão de marco, envio para aprovação e cadastro de risco; sem erros no servidor nem no navegador. Ajustes feitos: selo de situação sem quebra de linha, ordem do fluxo de aprovação e reinício do formulário de acompanhamento depois de salvar. Telas entregues ao gestor fora do repositório |
 | Banco local de desenvolvimento | Atualizado com a cópia automática (e uma cópia manual antes); a demonstração da Etapa 4 foi acrescentada sem alterar os registros anteriores; os testes de gravação foram desfeitos com a restauração da cópia, mantendo a versão 2 do plano em aprovação para a homologação |
-| Homologação do gestor | ⏳ Pendente |
+| Homologação do gestor | ✅ Homologada para desenvolvimento em 04/11/2026 (D-073), somente para continuidade do desenvolvimento com dados fictícios; a homologação operacional definitiva ocorrerá na etapa de implantação |
 
 ### Critérios de aceite
 
@@ -421,7 +424,7 @@ Permitir que cada projeto ou tema tenha o seu plano de ação — organizado por
 
 Supabase, autenticação real, integrações externas e painéis executivos. Achados A-01 a A-06 (pendentes), melhorias U-1 a U-5 (registradas, sem execução) e backlog da V3.0 (V3-01 a V3-04) não implementados (seção 10).
 
-## 10. Pendências efetivas (atualizadas em 03/11/2026)
+## 10. Pendências efetivas (atualizadas em 04/11/2026)
 
 | Pendência | Bloqueia | Situação |
 |---|---|---|
@@ -439,12 +442,12 @@ Supabase, autenticação real, integrações externas e painéis executivos. Ach
 | Fase documental V2.2 (registro da Etapa 2A e escalas V2.2) | Homologação da Q-66 e da Q-67 | ✅ Concluída (D-062): Pull Requests #3 (`9084a74`) e #4 (`a254b40`) incorporados; próxima atividade: homologação da Q-66 e da Q-67 |
 | Homologação da Etapa 2B | Etapa 3 | ✅ Homologada para desenvolvimento em 03/11/2026, depois de teste assistido (D-070) |
 | Homologação da Etapa 3 | Etapa 4 | ✅ Homologada para desenvolvimento em 03/11/2026 (D-071), depois do merge do Pull Request #7 (`aa17fe4`) |
-| Homologação da Etapa 4 | Etapa 5 | Implementada (D-072); aguarda a revisão do Pull Request e a homologação do gestor |
-| Soluções provisórias da Etapa 4 (P-047 a P-053) e pontos pendentes Q-33 (correção de digitação) e Q-42 a Q-44 | — | Em uso e não homologadas (D-072); decisão do gestor pendente |
+| Homologação da Etapa 4 | Etapa 5 | ✅ Homologada para desenvolvimento em 04/11/2026 (D-073), depois do merge dos Pull Requests #8 e #9 (`1246331`) |
+| Soluções provisórias da Etapa 4 (P-047 a P-053) e pontos pendentes Q-33 (correção de digitação) e Q-42 a Q-44 | — | Em uso e não homologadas (D-072, D-073); decisão do gestor pendente |
 | Soluções provisórias da Etapa 3 (P-040 a P-046) | — | Em uso e não homologadas (D-071); decisão do gestor pendente (Q-20, Q-21, Q-23 e Q-24) |
-| Backlog da V3.0: melhorias de interface V3-01 a V3-04 | — | Registradas pelo gestor (D-071) e preservadas (D-072): V3-01, simplificação visual, com base em modelo de referência indicado pelo gestor; V3-02, matriz Poder × Interesse na página do projeto, com marcadores interativos e identificação por mouse ou toque; V3-03, redução dos caminhos de navegação para as informações relevantes; V3-04, unificação visual de Iniciativas e Interações, com estas como subitens, preservando o registro único de reuniões. Não implementar antes da V3.0 |
-| Achados A-01 a A-06 da auditoria técnica independente | — | Pendentes para tratamento posterior (D-070); documento mantido fora do repositório; correções não implementadas nas Etapas 3 e 4 (D-071, D-072) |
-| Melhorias de usabilidade não essenciais (U-1 a U-5, registradas em 02/11/2026) | — | Registradas fora do repositório: texto desatualizado na seção de stakeholders da página do projeto; bloco de evidências antes das classificações no rascunho; dica nas versões recolhidas do histórico; colunas da tabela da matriz no celular; legenda do selo "preliminar" no celular. A tratar oportunamente, sem impedir o andamento; não implementadas na Etapa 4 (D-071, D-072) |
+| Backlog da V3.0: melhorias de interface V3-01 a V3-04 | — | Registradas pelo gestor (D-071) e preservadas (D-072, D-073): V3-01, simplificação visual, com base em modelo de referência indicado pelo gestor; V3-02, matriz Poder × Interesse na página do projeto, com marcadores interativos e identificação por mouse ou toque; V3-03, redução dos caminhos de navegação para as informações relevantes; V3-04, unificação visual de Iniciativas e Interações, com estas como subitens, preservando o registro único de reuniões. Não implementar antes da V3.0 |
+| Achados A-01 a A-06 da auditoria técnica independente | — | Pendentes para tratamento posterior (D-070); documento mantido fora do repositório; correções não implementadas nas Etapas 3 e 4 e preservadas (D-071, D-072, D-073) |
+| Melhorias de usabilidade não essenciais (U-1 a U-5, registradas em 02/11/2026) | — | Registradas fora do repositório: texto desatualizado na seção de stakeholders da página do projeto; bloco de evidências antes das classificações no rascunho; dica nas versões recolhidas do histórico; colunas da tabela da matriz no celular; legenda do selo "preliminar" no celular. A tratar oportunamente, sem impedir o andamento; não implementadas na Etapa 4 e preservadas (D-071, D-072, D-073) |
 | Análise LGPD, retenção e anonimização | Etapa 8 | Q-13, Q-58 |
 
 ## 11. Local de trabalho ✅ (D-019)

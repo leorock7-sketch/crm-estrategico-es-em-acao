@@ -4,6 +4,7 @@
 |---|---|---|
 | 0.1 | 31/10/2026 | Rascunho para revisão |
 | 0.2 | 03/11/2026 | Etapa 4 aprovada e implementada (D-072), aguardando homologação: matriz 5 × 5 original do Comitê de Infraestrutura, riscos inerente e residual, gatilhos com acompanhamento e respostas ligadas ao Plano de Ação; Q-40 e Q-41 resolvidas |
+| 0.3 | 04/11/2026 | Etapa 4 homologada para desenvolvimento (D-073); a matriz 5 × 5 original e a distinção entre risco inerente e residual permanecem como referência aprovada; as soluções provisórias P-048 a P-050 e P-053 continuam não homologadas |
 
 Legenda: ✅ Aprovado · 🔧 Proposta técnica · ⏳ Pendente.
 
