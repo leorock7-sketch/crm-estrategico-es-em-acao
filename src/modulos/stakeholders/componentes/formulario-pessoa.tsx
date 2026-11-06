@@ -26,7 +26,14 @@ const ESTADO_INICIAL: EstadoFormulario = {};
  * Inclusão e edição de pessoa (dados mínimos — decisão D-021). E-mails e
  * telefones são registrados na seção de contatos da página da pessoa (D-025).
  */
-export function FormularioPessoa({ inicial = {} }: { inicial?: ValoresPessoa }) {
+export function FormularioPessoa({
+  inicial = {},
+  mostrarObservacoes = true,
+}: {
+  inicial?: ValoresPessoa;
+  /** As observações só aparecem a quem pode vê-las (P-054, provisória). */
+  mostrarObservacoes?: boolean;
+}) {
   const [estado, acao, enviando] = useActionState(salvarPessoa, ESTADO_INICIAL);
   const erros = estado.erros ?? {};
   const valor = (campo: keyof ValoresPessoa) => estado.valores?.[campo] ?? inicial[campo] ?? "";
@@ -75,19 +82,21 @@ export function FormularioPessoa({ inicial = {} }: { inicial?: ValoresPessoa }) 
             {...atributosErro("nomeTratamento")}
           />
         </Campo>
-        <div className="sm:col-span-2">
-          <Campo id="observacoes" rotulo="Observações" erros={erros.observacoes}>
-            <textarea
-              id="observacoes"
-              name="observacoes"
-              rows={4}
-              maxLength={2000}
-              defaultValue={valor("observacoes")}
-              className={classeEntrada}
-              {...atributosErro("observacoes")}
-            />
-          </Campo>
-        </div>
+        {mostrarObservacoes && (
+          <div className="sm:col-span-2">
+            <Campo id="observacoes" rotulo="Observações" erros={erros.observacoes}>
+              <textarea
+                id="observacoes"
+                name="observacoes"
+                rows={4}
+                maxLength={2000}
+                defaultValue={valor("observacoes")}
+                className={classeEntrada}
+                {...atributosErro("observacoes")}
+              />
+            </Campo>
+          </div>
+        )}
       </div>
 
       {estado.duplicidades && estado.duplicidades.length > 0 && (

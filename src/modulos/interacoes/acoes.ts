@@ -9,7 +9,8 @@ import { and, inArray, isNull } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { z } from "zod";
-import { comoUsuario, type Executor, obterBanco } from "@/lib/banco/conexao";
+import { comoUsuario, type Executor } from "@/lib/banco/conexao";
+import { bancoDaSessao } from "@/lib/banco/requisicao";
 import { iniciativa, iniciativaProjetoTema, projetoTema } from "@/lib/banco/esquema";
 import { mensagemDeErro } from "@/lib/banco/mensagens-erro";
 import { lerFormulario } from "@/lib/formulario";
@@ -121,7 +122,7 @@ export async function salvarInteracao(
     "participantesInternos",
   ]);
   const id = identificadorOpcional(valores.id);
-  const banco = await obterBanco();
+  const banco = await bancoDaSessao();
   const usuario = await obterUsuarioAtual(banco);
 
   let interacaoId: string;
@@ -164,7 +165,7 @@ export async function salvarInteracao(
 
 export async function alterarArquivamentoInteracao(id: string, arquivar: boolean) {
   const interacaoId = esquemaIdentificador.parse(id);
-  const banco = await obterBanco();
+  const banco = await bancoDaSessao();
   const usuario = await obterUsuarioAtual(banco);
   await exigirEdicaoEmAlgum(banco, usuario.id, await projetosDeUmaInteracao(banco, interacaoId));
   await comoUsuario(banco, usuario.id, (tx) => definirArquivamentoInteracao(tx, interacaoId, arquivar));
@@ -180,7 +181,7 @@ export async function incluirParticipanteAcao(
   const { valores, dados } = lerFormulario(formData);
   const resultado = esquemaParticipante.safeParse(dados);
   if (!resultado.success) return { erros: z.flattenError(resultado.error).fieldErrors, valores };
-  const banco = await obterBanco();
+  const banco = await bancoDaSessao();
   const usuario = await obterUsuarioAtual(banco);
   const editavel = await interacaoEditavel(banco, usuario.id, resultado.data.interacaoId);
   if ("erro" in editavel) return { mensagem: editavel.erro, valores };
@@ -201,7 +202,7 @@ export async function alterarPresencaAcao(
   const resultado = esquemaPresenca.safeParse(dados);
   const interacaoId = identificadorOpcional(valores.interacaoId);
   if (!resultado.success || !interacaoId) return { mensagem: "Selecione a presença.", valores };
-  const banco = await obterBanco();
+  const banco = await bancoDaSessao();
   const usuario = await obterUsuarioAtual(banco);
   const editavel = await interacaoEditavel(banco, usuario.id, interacaoId);
   if ("erro" in editavel) return { mensagem: editavel.erro, valores };
@@ -225,7 +226,7 @@ async function retirarDaInteracao(
   const resultado = esquemaRetirada.safeParse(dados);
   const interacaoId = identificadorOpcional(valores.interacaoId);
   if (!resultado.success || !interacaoId) return { mensagem: "Registro inválido.", valores };
-  const banco = await obterBanco();
+  const banco = await bancoDaSessao();
   const usuario = await obterUsuarioAtual(banco);
   const editavel = await interacaoEditavel(banco, usuario.id, interacaoId);
   if ("erro" in editavel) return { mensagem: editavel.erro, valores };
@@ -255,7 +256,7 @@ export async function incluirProjetoNaInteracaoAcao(
   const { valores, dados } = lerFormulario(formData);
   const resultado = esquemaProjetoDaInteracao.safeParse(dados);
   if (!resultado.success) return { erros: z.flattenError(resultado.error).fieldErrors, valores };
-  const banco = await obterBanco();
+  const banco = await bancoDaSessao();
   const usuario = await obterUsuarioAtual(banco);
   const editavel = await interacaoEditavel(banco, usuario.id, resultado.data.interacaoId);
   if ("erro" in editavel) return { mensagem: editavel.erro, valores };
@@ -286,7 +287,7 @@ export async function incluirIniciativaNaInteracaoAcao(
   const { valores, dados } = lerFormulario(formData);
   const resultado = esquemaIniciativaDaInteracao.safeParse(dados);
   if (!resultado.success) return { erros: z.flattenError(resultado.error).fieldErrors, valores };
-  const banco = await obterBanco();
+  const banco = await bancoDaSessao();
   const usuario = await obterUsuarioAtual(banco);
   const editavel = await interacaoEditavel(banco, usuario.id, resultado.data.interacaoId);
   if ("erro" in editavel) return { mensagem: editavel.erro, valores };
@@ -319,7 +320,7 @@ export async function salvarCompromisso(
   const resultado = esquemaCompromisso.safeParse(dados);
   if (!resultado.success) return { erros: z.flattenError(resultado.error).fieldErrors, valores };
 
-  const banco = await obterBanco();
+  const banco = await bancoDaSessao();
   const usuario = await obterUsuarioAtual(banco);
   let compromissoId: string;
   try {
@@ -356,7 +357,7 @@ export async function salvarCompromisso(
 
 export async function alterarArquivamentoCompromisso(id: string, arquivar: boolean) {
   const compromissoId = esquemaIdentificador.parse(id);
-  const banco = await obterBanco();
+  const banco = await bancoDaSessao();
   const usuario = await obterUsuarioAtual(banco);
   await exigirEdicaoEmAlgum(banco, usuario.id, await projetosDeUmCompromisso(banco, compromissoId));
   await comoUsuario(banco, usuario.id, (tx) => definirArquivamentoCompromisso(tx, compromissoId, arquivar));
@@ -370,7 +371,7 @@ export async function registrarAcompanhamentoAcao(
   const { valores, dados } = lerFormulario(formData);
   const resultado = esquemaAcompanhamento.safeParse(dados);
   if (!resultado.success) return { erros: z.flattenError(resultado.error).fieldErrors, valores };
-  const banco = await obterBanco();
+  const banco = await bancoDaSessao();
   const usuario = await obterUsuarioAtual(banco);
   const atual = await obterCompromisso(banco, resultado.data.compromissoId);
   if (!atual) return { mensagem: "Compromisso não encontrado.", valores };

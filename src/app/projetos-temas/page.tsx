@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { Suspense } from "react";
 import { CabecalhoPagina } from "@/componentes/cabecalho-pagina";
+import { SeAdministrador } from "@/modulos/acesso/componentes/conforme-perfil";
 import { Carregando } from "@/componentes/carregando";
 import {
   classeBotaoPrimario,
@@ -31,9 +32,11 @@ export default function PaginaProjetosTemas({ searchParams }: PageProps<"/projet
         titulo="Projetos e temas"
         descricao="Contextos de atuação dos comitês, com comitês participantes e stakeholders associados."
         acoes={
-          <Link href="/projetos-temas/novo" className={classeBotaoPrimario}>
-            Novo projeto ou tema
-          </Link>
+          <SeAdministrador>
+            <Link href="/projetos-temas/novo" className={classeBotaoPrimario}>
+              Novo projeto ou tema
+            </Link>
+          </SeAdministrador>
         }
       />
       <Suspense fallback={<Carregando />}>

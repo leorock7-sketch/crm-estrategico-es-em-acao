@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { Suspense } from "react";
 import { CabecalhoPagina } from "@/componentes/cabecalho-pagina";
+import { SeRegistra } from "@/modulos/acesso/componentes/conforme-perfil";
 import { Carregando } from "@/componentes/carregando";
 import {
   classeBotaoPrimario,
@@ -45,9 +46,11 @@ export default function PaginaRiscos({ searchParams }: PageProps<"/riscos">) {
         titulo="Matriz de Riscos"
         descricao="Riscos dos projetos e temas na matriz 5 × 5 do Comitê de Infraestrutura, com avaliações inerente e residual."
         acoes={
-          <Link href="/riscos/novo" className={classeBotaoPrimario}>
-            Novo risco
-          </Link>
+          <SeRegistra>
+            <Link href="/riscos/novo" className={classeBotaoPrimario}>
+              Novo risco
+            </Link>
+          </SeRegistra>
         }
       />
       <Suspense fallback={<Carregando />}>

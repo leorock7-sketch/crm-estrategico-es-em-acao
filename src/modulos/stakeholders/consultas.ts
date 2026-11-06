@@ -110,22 +110,45 @@ export async function listarPessoas(
     .limit(500);
 }
 
+/** Observações só vêm pela função do banco, que aplica a regra de acesso (P-054, provisória). */
 export async function obterPessoa(banco: Executor, id: string) {
-  const [encontrada] = await banco.select().from(pessoa).where(eq(pessoa.id, id));
+  const [encontrada] = await banco
+    .select({
+      id: pessoa.id,
+      nomeCompleto: pessoa.nomeCompleto,
+      nomeTratamento: pessoa.nomeTratamento,
+      nomeNormalizado: pessoa.nomeNormalizado,
+      observacoes: sql<string | null>`observacoes_da_pessoa(${pessoa.id})`,
+      criadoEm: pessoa.criadoEm,
+      criadoPor: pessoa.criadoPor,
+      atualizadoEm: pessoa.atualizadoEm,
+      atualizadoPor: pessoa.atualizadoPor,
+      arquivadoEm: pessoa.arquivadoEm,
+    })
+    .from(pessoa)
+    .where(eq(pessoa.id, id));
   return encontrada ?? null;
 }
 
-export async function criarPessoa(banco: Executor, dados: DadosPessoa): Promise<string> {
+/** Quem não pode ver as observações também não as grava: o campo fica de fora da operação. */
+type OpcoesPessoa = { incluirObservacoes?: boolean };
+
+function camposPessoaPermitidos(dados: DadosPessoa, { incluirObservacoes = true }: OpcoesPessoa) {
+  const { observacoes, ...demais } = camposPessoa(dados);
+  return incluirObservacoes ? { ...demais, observacoes } : demais;
+}
+
+export async function criarPessoa(banco: Executor, dados: DadosPessoa, opcoes: OpcoesPessoa = {}): Promise<string> {
   const [novo] = await banco
     .insert(stakeholder)
     .values({ tipo: "pessoa" })
     .returning({ id: stakeholder.id });
-  await banco.insert(pessoa).values({ id: novo.id, ...camposPessoa(dados) });
+  await banco.insert(pessoa).values({ id: novo.id, ...camposPessoaPermitidos(dados, opcoes) });
   return novo.id;
 }
 
-export async function atualizarPessoa(banco: Executor, id: string, dados: DadosPessoa) {
-  await banco.update(pessoa).set(camposPessoa(dados)).where(eq(pessoa.id, id));
+export async function atualizarPessoa(banco: Executor, id: string, dados: DadosPessoa, opcoes: OpcoesPessoa = {}) {
+  await banco.update(pessoa).set(camposPessoaPermitidos(dados, opcoes)).where(eq(pessoa.id, id));
 }
 
 export async function definirArquivamentoPessoa(banco: Executor, id: string, arquivar: boolean) {
@@ -411,7 +434,7 @@ export async function listarContatos(banco: Executor, stakeholderId: string) {
       principal: contato.principal,
       dataInicio: contato.dataInicio,
       dataFim: contato.dataFim,
-      observacao: contato.observacao,
+      observacao: sql<string | null>`observacao_do_contato(${contato.id})`,
       vinculoId: contato.vinculoId,
       vinculoCargo: vinculo.cargo,
       vinculoInstituicao: instituicao.nome,

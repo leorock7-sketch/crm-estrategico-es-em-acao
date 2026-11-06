@@ -3,18 +3,20 @@
 /**
  * Operações chamadas pelos formulários do Plano de Ação (Server Actions). Todas
  * validam os dados no servidor e conferem a permissão no projeto ou tema do
- * plano antes de gravar. A decisão sobre versões (aprovar, rejeitar, devolver)
- * cabe ao administrador do sistema até a autenticação real (D-072, D3).
+ * plano antes de gravar. A decisão sobre versões (aprovar, rejeitar, devolver) cabe ao
+ * administrador ou ao gestor do projeto ou tema, em nível único (D-074, D3).
  */
 import { eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { z } from "zod";
-import { comoUsuario, type Executor, obterBanco } from "@/lib/banco/conexao";
-import { acaoPlanejamento, marcoPlanejamento, planoAcaoVersao, usuario as tabelaUsuario } from "@/lib/banco/esquema";
+import { comoUsuario, type Executor } from "@/lib/banco/conexao";
+import { bancoDaSessao } from "@/lib/banco/requisicao";
+import { acaoPlanejamento, marcoPlanejamento, planoAcaoVersao } from "@/lib/banco/esquema";
 import { mensagemDeErro } from "@/lib/banco/mensagens-erro";
 import { lerFormulario } from "@/lib/formulario";
 import { esquemaIdentificador } from "@/lib/validacao/comuns";
+import { podeDecidirNoProjeto } from "@/modulos/acesso/capacidades";
 import { obterUsuarioAtual } from "@/modulos/acesso/usuario-atual";
 import { EdicaoNegadaError, exigirEdicaoEmAlgum } from "@/modulos/acesso/visibilidade";
 import { obterCompromisso, projetosDeUmCompromisso } from "@/modulos/interacoes/consultas";
@@ -84,7 +86,7 @@ async function gravarNoPlano(
   planoId: string,
   gravar: (tx: Executor, usuarioId: string) => Promise<unknown>,
 ): Promise<string | null> {
-  const banco = await obterBanco();
+  const banco = await bancoDaSessao();
   const usuario = await obterUsuarioAtual(banco);
   const plano = await obterPlano(banco, planoId);
   if (!plano) return "Plano não encontrado.";
@@ -129,7 +131,7 @@ const caminhoDaVersao = (planoId: string, versaoId: string) => `/planos/${planoI
 export async function salvarPlano(_estadoAnterior: EstadoFormulario, formData: FormData): Promise<EstadoFormulario> {
   const { valores, dados } = lerFormulario(formData);
   const id = identificadorOpcional(valores.id);
-  const banco = await obterBanco();
+  const banco = await bancoDaSessao();
   const usuario = await obterUsuarioAtual(banco);
   let planoId: string;
   if (id) {
@@ -196,7 +198,7 @@ export async function criarNovaVersaoAcao(_estadoAnterior: EstadoFormulario, for
 
 export async function descartarRascunhoAcao(_estadoAnterior: EstadoFormulario, formData: FormData): Promise<EstadoFormulario> {
   const versaoId = esquemaIdentificador.parse(formData.get("versaoId"));
-  const banco = await obterBanco();
+  const banco = await bancoDaSessao();
   const planoId = await planoDaVersao(banco, versaoId);
   if (!planoId) return { mensagem: "Versão não encontrada." };
   const erro = await gravarNoPlano(planoId, async (tx) => {
@@ -211,7 +213,7 @@ export async function enviarParaAprovacaoAcao(_estadoAnterior: EstadoFormulario,
   const { valores, dados } = lerFormulario(formData);
   const resultado = esquemaEnvio.safeParse(dados);
   if (!resultado.success) return { erros: z.flattenError(resultado.error).fieldErrors, valores };
-  const banco = await obterBanco();
+  const banco = await bancoDaSessao();
   const planoId = await planoDaVersao(banco, resultado.data.versaoId);
   if (!planoId) return { mensagem: "Versão não encontrada.", valores };
   const erro = await gravarNoPlano(planoId, (tx) =>
@@ -227,15 +229,13 @@ export async function decidirVersaoAcao(_estadoAnterior: EstadoFormulario, formD
   const { valores, dados } = lerFormulario(formData);
   const resultado = esquemaDecisao.safeParse(dados);
   if (!resultado.success) return { erros: z.flattenError(resultado.error).fieldErrors, valores };
-  const banco = await obterBanco();
-  const usuario = await obterUsuarioAtual(banco);
-  const [perfil] = await banco
-    .select({ administrador: tabelaUsuario.administrador })
-    .from(tabelaUsuario)
-    .where(eq(tabelaUsuario.id, usuario.id));
-  if (!perfil?.administrador) return { mensagem: "Somente o administrador do sistema decide sobre versões do plano.", valores };
+  const banco = await bancoDaSessao();
   const planoId = await planoDaVersao(banco, resultado.data.versaoId);
   if (!planoId) return { mensagem: "Versão não encontrada.", valores };
+  const plano = await obterPlano(banco, planoId);
+  if (!plano || !(await podeDecidirNoProjeto(banco, plano.projetoTemaId))) {
+    return { mensagem: "Somente o administrador ou o gestor do projeto ou tema decide sobre versões do plano.", valores };
+  }
   const erro = await gravarNoPlano(planoId, (tx) =>
     decidirVersao(tx, resultado.data.versaoId, resultado.data.decisao, resultado.data.parecer),
   );
@@ -251,7 +251,7 @@ export async function salvarAcaoPlanejada(_estadoAnterior: EstadoFormulario, for
   const planejamentoId = identificadorOpcional(valores.planejamentoId);
   const resultado = esquemaAcaoPlanejada.safeParse(dados);
   if (!resultado.success) return { erros: z.flattenError(resultado.error).fieldErrors, valores };
-  const banco = await obterBanco();
+  const banco = await bancoDaSessao();
   const planoId = await planoDaVersao(banco, resultado.data.versaoId);
   if (!planoId) return { mensagem: "Versão não encontrada.", valores };
   if (planejamentoId) {
@@ -269,7 +269,7 @@ export async function salvarAcaoPlanejada(_estadoAnterior: EstadoFormulario, for
 
 export async function retirarAcaoDaVersaoAcao(_estadoAnterior: EstadoFormulario, formData: FormData): Promise<EstadoFormulario> {
   const planejamentoId = esquemaIdentificador.parse(formData.get("planejamentoId"));
-  const banco = await obterBanco();
+  const banco = await bancoDaSessao();
   const atual = await versaoDoPlanejamento(banco, planejamentoId);
   if (!atual) return { mensagem: "Ação não encontrada nesta versão." };
   const erro = await gravarNoPlano(atual.planoId, (tx) => retirarAcaoDaVersao(tx, planejamentoId));
@@ -283,7 +283,7 @@ export async function salvarMarco(_estadoAnterior: EstadoFormulario, formData: F
   const marcoPlanejamentoId = identificadorOpcional(valores.marcoPlanejamentoId);
   const resultado = esquemaMarco.safeParse(dados);
   if (!resultado.success) return { erros: z.flattenError(resultado.error).fieldErrors, valores };
-  const banco = await obterBanco();
+  const banco = await bancoDaSessao();
   const planoId = await planoDaVersao(banco, resultado.data.versaoId);
   if (!planoId) return { mensagem: "Versão não encontrada.", valores };
   if (marcoPlanejamentoId) {
@@ -301,7 +301,7 @@ export async function salvarMarco(_estadoAnterior: EstadoFormulario, formData: F
 
 export async function retirarMarcoAcao(_estadoAnterior: EstadoFormulario, formData: FormData): Promise<EstadoFormulario> {
   const marcoPlanejamentoId = esquemaIdentificador.parse(formData.get("marcoPlanejamentoId"));
-  const banco = await obterBanco();
+  const banco = await bancoDaSessao();
   const atual = await versaoDoMarcoPlanejado(banco, marcoPlanejamentoId);
   if (!atual) return { mensagem: "Marco não encontrado nesta versão." };
   const erro = await gravarNoPlano(atual.planoId, (tx) => retirarMarcoDaVersao(tx, marcoPlanejamentoId));
@@ -319,7 +319,7 @@ export async function registrarAcompanhamentoDaAcao(
   const { valores, dados } = lerFormulario(formData);
   const resultado = esquemaAcompanhamentoAcao.safeParse(dados);
   if (!resultado.success) return { erros: z.flattenError(resultado.error).fieldErrors, valores };
-  const banco = await obterBanco();
+  const banco = await bancoDaSessao();
   const encontrada = await obterAcao(banco, resultado.data.acaoId);
   if (!encontrada) return { mensagem: "Ação não encontrada.", valores };
   const erro = await gravarNoPlano(encontrada.planoAcaoId, (tx) => registrarAcompanhamento(tx, resultado.data));
@@ -332,7 +332,7 @@ export async function registrarAcompanhamentoDaAcao(
 export async function alterarIniciativaDaAcao(_estadoAnterior: EstadoFormulario, formData: FormData): Promise<EstadoFormulario> {
   const acaoId = esquemaIdentificador.parse(formData.get("acaoId"));
   const iniciativaId = identificadorOpcional((formData.get("iniciativaId") as string | null) ?? undefined) ?? null;
-  const banco = await obterBanco();
+  const banco = await bancoDaSessao();
   const encontrada = await obterAcao(banco, acaoId);
   if (!encontrada) return { mensagem: "Ação não encontrada." };
   const erro = await gravarNoPlano(encontrada.planoAcaoId, (tx) => atualizarIniciativaDaAcao(tx, acaoId, iniciativaId));
@@ -348,7 +348,7 @@ export async function incluirStakeholderNaAcaoAcao(
   const { valores, dados } = lerFormulario(formData);
   const resultado = esquemaStakeholderAcao.safeParse(dados);
   if (!resultado.success) return { erros: z.flattenError(resultado.error).fieldErrors, valores };
-  const banco = await obterBanco();
+  const banco = await bancoDaSessao();
   const encontrada = await obterAcao(banco, resultado.data.acaoId);
   if (!encontrada) return { mensagem: "Ação não encontrada.", valores };
   const erro = await gravarNoPlano(encontrada.planoAcaoId, (tx) => incluirStakeholderNaAcao(tx, resultado.data));
@@ -363,7 +363,7 @@ export async function retirarStakeholderDaAcaoAcao(
 ): Promise<EstadoFormulario> {
   const ligacaoId = esquemaIdentificador.parse(formData.get("id"));
   const acaoId = esquemaIdentificador.parse(formData.get("acaoId"));
-  const banco = await obterBanco();
+  const banco = await bancoDaSessao();
   const encontrada = await obterAcao(banco, acaoId);
   if (!encontrada) return { mensagem: "Ação não encontrada." };
   const erro = await gravarNoPlano(encontrada.planoAcaoId, (tx) => retirarStakeholderDaAcao(tx, ligacaoId, acaoId));
@@ -379,7 +379,7 @@ export async function converterCompromissoAcao(_estadoAnterior: EstadoFormulario
   const { valores, dados } = lerFormulario(formData);
   const resultado = esquemaConversaoCompromisso.safeParse(dados);
   if (!resultado.success) return { erros: z.flattenError(resultado.error).fieldErrors, valores };
-  const banco = await obterBanco();
+  const banco = await bancoDaSessao();
   const usuario = await obterUsuarioAtual(banco);
   const origem = await obterCompromisso(banco, resultado.data.compromissoId);
   if (!origem) return { mensagem: "Compromisso não encontrado.", valores };

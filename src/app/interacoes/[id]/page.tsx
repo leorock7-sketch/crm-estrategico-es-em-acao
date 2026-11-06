@@ -8,6 +8,8 @@ import { CabecalhoPagina } from "@/componentes/cabecalho-pagina";
 import { Carregando } from "@/componentes/carregando";
 import { classeBotaoPrimario, classeCartao, classeLink } from "@/componentes/estilos";
 import { SeloSituacao } from "@/componentes/selo-situacao";
+import { AreaConformePermissao } from "@/modulos/acesso/componentes/area-conforme-permissao";
+import { podeEditarRegistro } from "@/modulos/acesso/capacidades";
 import { bancoDaRequisicao } from "@/lib/banco/requisicao";
 import { formatarDataHora, hojeEmBrasilia } from "@/lib/formatacao";
 import { esquemaIdentificador } from "@/lib/validacao/comuns";
@@ -85,7 +87,9 @@ async function DetalheInteracao({ params }: Pick<PageProps<"/interacoes/[id]">, 
   // A última ligação (projeto, tema ou iniciativa) não pode ser retirada.
   const podeRetirarLigacao = projetos.length + iniciativas.length > 1;
 
+  const podeEditar = await podeEditarRegistro(banco, "interacao", id);
   return (
+    <AreaConformePermissao podeEditar={podeEditar}>
     <div className="flex flex-col gap-6">
       <CabecalhoPagina
         titulo={interacao.assunto}
@@ -306,5 +310,6 @@ async function DetalheInteracao({ params }: Pick<PageProps<"/interacoes/[id]">, 
         <HistoricoAtividade registros={historico} nomes={nomes} />
       </section>
     </div>
+    </AreaConformePermissao>
   );
 }

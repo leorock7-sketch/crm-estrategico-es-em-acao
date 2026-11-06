@@ -9,7 +9,8 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { z } from "zod";
-import { comoUsuario, obterBanco } from "@/lib/banco/conexao";
+import { comoUsuario } from "@/lib/banco/conexao";
+import { bancoDaSessao } from "@/lib/banco/requisicao";
 import { mensagemDeErro } from "@/lib/banco/mensagens-erro";
 import { esquemaIdentificador } from "@/lib/validacao/comuns";
 import { AcessoNegadoError, permissaoNoContexto } from "@/modulos/acesso/permissoes";
@@ -45,7 +46,7 @@ function revalidarContexto(projetoTemaId: string) {
 
 /** Banco, usuário e contexto da versão, se o usuário puder editar; senão, a mensagem de erro. */
 async function versaoEditavel(versaoId: string) {
-  const banco = await obterBanco();
+  const banco = await bancoDaSessao();
   const usuario = await obterUsuarioAtual(banco);
   const contexto = await contextoDaVersao(banco, versaoId);
   if (!contexto) return { erro: "Rascunho não encontrado." } as const;
@@ -61,7 +62,7 @@ async function versaoEditavel(versaoId: string) {
 export async function iniciarAvaliacao(projetoTemaId: string, stakeholderId: string) {
   const projeto = esquemaIdentificador.parse(projetoTemaId);
   const pessoaOuInstituicao = esquemaIdentificador.parse(stakeholderId);
-  const banco = await obterBanco();
+  const banco = await bancoDaSessao();
   const usuario = await obterUsuarioAtual(banco);
   const permissao = await permissaoNoContexto(banco, usuario.id, projeto);
   if (!permissao.editar) throw new AcessoNegadoError("editar");
@@ -147,7 +148,7 @@ export async function adicionarEvidenciaAcao(
 
 export async function removerEvidenciaAcao(evidenciaId: string) {
   const id = esquemaIdentificador.parse(evidenciaId);
-  const encontrada = await contextoDaEvidencia(await obterBanco(), id);
+  const encontrada = await contextoDaEvidencia(await bancoDaSessao(), id);
   if (!encontrada) throw new Error("Evidência não encontrada.");
   const editavel = await versaoEditavel(encontrada.versaoId);
   if ("erro" in editavel) throw new Error(editavel.erro);

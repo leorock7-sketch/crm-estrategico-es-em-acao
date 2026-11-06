@@ -8,6 +8,8 @@ import { CabecalhoPagina } from "@/componentes/cabecalho-pagina";
 import { Carregando } from "@/componentes/carregando";
 import { classeCartao, classeLink } from "@/componentes/estilos";
 import { FormularioStakeholderRelacionado } from "@/componentes/formulario-registro";
+import { AreaConformePermissao } from "@/modulos/acesso/componentes/area-conforme-permissao";
+import { podeEditarRegistro } from "@/modulos/acesso/capacidades";
 import { bancoDaRequisicao } from "@/lib/banco/requisicao";
 import { formatarData, hojeEmBrasilia } from "@/lib/formatacao";
 import { esquemaIdentificador } from "@/lib/validacao/comuns";
@@ -71,7 +73,9 @@ async function DetalheAcao({ params }: Pick<PageProps<"/acoes/[id]">, "params">)
   const ultimo = planejamentos.find((p) => !p.retirada);
   const titulo = vigente?.titulo ?? ultimo?.titulo ?? acao.codigo;
 
+  const podeEditar = await podeEditarRegistro(banco, "acao", id);
   return (
+    <AreaConformePermissao podeEditar={podeEditar}>
     <div className="flex flex-col gap-6">
       <CabecalhoPagina
         titulo={`${acao.codigo} – ${titulo}`}
@@ -315,6 +319,7 @@ async function DetalheAcao({ params }: Pick<PageProps<"/acoes/[id]">, "params">)
         <HistoricoAtividade registros={historico} nomes={nomes} />
       </section>
     </div>
+    </AreaConformePermissao>
   );
 }
 

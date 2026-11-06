@@ -8,10 +8,12 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { z } from "zod";
-import { comoUsuario, obterBanco } from "@/lib/banco/conexao";
+import { comoUsuario } from "@/lib/banco/conexao";
+import { bancoDaSessao } from "@/lib/banco/requisicao";
 import { mensagemDeErro } from "@/lib/banco/mensagens-erro";
 import { normalizarTexto } from "@/lib/texto";
 import { esquemaIdentificador } from "@/lib/validacao/comuns";
+import { ehAdministrador, MENSAGEM_SOMENTE_CONSULTA, podeEditarNoProjeto } from "@/modulos/acesso/capacidades";
 import { obterUsuarioAtual } from "@/modulos/acesso/usuario-atual";
 import type { EstadoFormulario } from "@/modulos/stakeholders/acoes";
 import { obterStakeholder } from "@/modulos/stakeholders/consultas";
@@ -51,9 +53,10 @@ function identificadorOpcional(valor: string | undefined): string | undefined {
 
 /** Projeto ou tema ativo (existente e não arquivado), ou mensagem de erro. */
 async function projetoAtivo(projetoTemaId: string) {
-  const banco = await obterBanco();
+  const banco = await bancoDaSessao();
   const projeto = await obterProjetoTema(banco, projetoTemaId);
   if (!projeto) return { erro: "Projeto ou tema não encontrado." } as const;
+  if (!(await podeEditarNoProjeto(banco, projetoTemaId))) return { erro: MENSAGEM_SOMENTE_CONSULTA } as const;
   if (projeto.arquivadoEm) return { erro: "Reative o projeto ou tema antes de alterá-lo." } as const;
   return { banco, projeto } as const;
 }
@@ -71,7 +74,10 @@ export async function salvarProjetoTema(
     return { erros: z.flattenError(resultado.error).fieldErrors, valores };
   }
 
-  const banco = await obterBanco();
+  const banco = await bancoDaSessao();
+  if (!(id ? await podeEditarNoProjeto(banco, id) : await ehAdministrador(banco))) {
+    return { mensagem: id ? MENSAGEM_SOMENTE_CONSULTA : "Somente o administrador do sistema cria projetos e temas.", valores };
+  }
   const atual = id ? await obterProjetoTema(banco, id) : null;
   if (id && !atual) return { mensagem: "Projeto ou tema não encontrado.", valores };
   if (atual?.arquivadoEm) return { mensagem: "Reative o cadastro antes de editá-lo.", valores };
@@ -102,7 +108,7 @@ export async function salvarProjetoTema(
 
 export async function alterarArquivamentoProjetoTema(id: string, arquivar: boolean) {
   const projetoTemaId = esquemaIdentificador.parse(id);
-  const banco = await obterBanco();
+  const banco = await bancoDaSessao();
   const usuario = await obterUsuarioAtual(banco);
   await comoUsuario(banco, usuario.id, (tx) =>
     definirArquivamentoProjetoTema(tx, projetoTemaId, arquivar),
@@ -147,7 +153,7 @@ export async function encerrarParticipacaoAcao(
     return { erros: z.flattenError(resultado.error).fieldErrors, valores };
   }
 
-  const banco = await obterBanco();
+  const banco = await bancoDaSessao();
   const usuario = await obterUsuarioAtual(banco);
   try {
     const projetoTemaId = await comoUsuario(banco, usuario.id, (tx) =>
@@ -203,7 +209,7 @@ export async function encerrarAssociacaoAcao(
     return { erros: z.flattenError(resultado.error).fieldErrors, valores };
   }
 
-  const banco = await obterBanco();
+  const banco = await bancoDaSessao();
   const usuario = await obterUsuarioAtual(banco);
   try {
     const encerrada = await comoUsuario(banco, usuario.id, (tx) =>

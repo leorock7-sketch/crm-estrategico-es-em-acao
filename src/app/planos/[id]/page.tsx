@@ -15,6 +15,8 @@ import {
   classeLink,
   classeTabela,
 } from "@/componentes/estilos";
+import { AreaConformePermissao } from "@/modulos/acesso/componentes/area-conforme-permissao";
+import { podeEditarRegistro } from "@/modulos/acesso/capacidades";
 import { bancoDaRequisicao } from "@/lib/banco/requisicao";
 import { formatarData, formatarDataHora, hojeEmBrasilia } from "@/lib/formatacao";
 import { esquemaIdentificador } from "@/lib/validacao/comuns";
@@ -77,7 +79,9 @@ async function DetalhePlano({ params }: Pick<PageProps<"/planos/[id]">, "params"
     { chave: "sem-eixo", titulo: "Sem pilar ou eixo", objetivo: null, acoes: acoes.filter((a) => !a.eixoId || !eixos.some((e) => e.id === a.eixoId)) },
   ].filter((g) => g.acoes.length > 0);
 
+  const podeEditar = await podeEditarRegistro(banco, "plano", id);
   return (
+    <AreaConformePermissao podeEditar={podeEditar}>
     <div className="flex flex-col gap-6">
       <CabecalhoPagina
         titulo={plano.titulo}
@@ -253,8 +257,8 @@ async function DetalhePlano({ params }: Pick<PageProps<"/planos/[id]">, "params"
           Fluxo de aprovação
         </h2>
         <p className="mb-4 text-sm text-texto-secundario">
-          Aprovação em nível único pelo administrador do sistema, até a implantação da autenticação; quem decidiu, a data e o
-          parecer ficam registrados.
+          Aprovação em nível único pelo administrador ou pelo gestor do projeto ou tema; quem decidiu, a data e o parecer ficam
+          registrados.
         </p>
         {decisoes.length === 0 ? (
           <p className="text-sm text-texto-secundario">Nenhum envio para aprovação até agora.</p>
@@ -284,6 +288,7 @@ async function DetalhePlano({ params }: Pick<PageProps<"/planos/[id]">, "params"
         <HistoricoAtividade registros={historico} nomes={nomes} />
       </section>
     </div>
+    </AreaConformePermissao>
   );
 }
 

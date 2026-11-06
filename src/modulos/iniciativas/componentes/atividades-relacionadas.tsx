@@ -1,3 +1,4 @@
+import { SeRegistra } from "@/modulos/acesso/componentes/conforme-perfil";
 import Link from "next/link";
 import { classeCartao, classeLink } from "@/componentes/estilos";
 import { bancoDaRequisicao } from "@/lib/banco/requisicao";
@@ -126,9 +127,11 @@ export async function AtividadesDoStakeholder({ stakeholderId }: { stakeholderId
         <h2 id="titulo-atividades" className="text-lg font-semibold">
           Iniciativas, interações e compromissos
         </h2>
-        <Link href={`/interacoes/nova?stakeholder=${stakeholderId}`} className={`${classeLink} text-sm`}>
-          Registrar interação
-        </Link>
+        <SeRegistra>
+          <Link href={`/interacoes/nova?stakeholder=${stakeholderId}`} className={`${classeLink} text-sm`}>
+            Registrar interação
+          </Link>
+        </SeRegistra>
       </div>
       <div className="grid gap-6 lg:grid-cols-2">
         <div>

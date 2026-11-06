@@ -47,3 +47,12 @@ body {
   color: var(--texto);
   font-family: var(--font-sans);
 }
+
+/* Área somente consulta (AreaConformePermissao): sem formulários nem atalhos de edição. */
+fieldset:disabled form,
+fieldset:disabled details:has(form),
+fieldset:disabled a[href$="/editar"],
+fieldset:disabled a[href*="/nova"],
+fieldset:disabled a[href*="/novo"] {
+  display: none;
+}

@@ -10,6 +10,7 @@ import { SeloSituacao } from "@/componentes/selo-situacao";
 import { bancoDaRequisicao } from "@/lib/banco/requisicao";
 import { descreverPeriodo, formatarDataHora } from "@/lib/formatacao";
 import { esquemaIdentificador } from "@/lib/validacao/comuns";
+import { podeRegistrarNoCadastro, podeVerDadosRestritos } from "@/modulos/acesso/capacidades";
 import { AtividadesDoStakeholder } from "@/modulos/iniciativas/componentes/atividades-relacionadas";
 import { AcoesERiscosDoStakeholder } from "@/modulos/plano-acao/componentes/integracoes";
 import { ListaContextos } from "@/modulos/projetos-temas/componentes/lista-contextos";
@@ -49,15 +50,18 @@ async function DetalhePessoa({ params }: Pick<PageProps<"/pessoas/[id]">, "param
   const pessoa = await obterPessoa(banco, id);
   if (!pessoa) notFound();
 
-  const [vinculos, contatos, historico, instituicoes, contextos] = await Promise.all([
+  const [vinculos, contatos, historico, instituicoes, contextos, podeRegistrar, dadosRestritos] = await Promise.all([
     listarVinculosDaPessoa(banco, id),
     listarContatos(banco, id),
     historicoDoStakeholder(banco, id),
     opcoesInstituicoes(banco),
     contextosDoStakeholder(banco, id),
+    podeRegistrarNoCadastro(banco),
+    podeVerDadosRestritos(banco, id),
   ]);
   const nomes = await nomesDosRegistros(banco, idsCitadosNoHistorico(historico));
   const arquivada = pessoa.arquivadoEm !== null;
+  const editavel = podeRegistrar && !arquivada;
   const vinculosVigentes = vinculos
     .filter((v) => v.dataFim === null)
     .map((v) => ({ id: v.id, rotulo: [v.cargo, v.instituicaoSigla ?? v.instituicaoNome].filter(Boolean).join(" · ") }));
@@ -74,17 +78,19 @@ async function DetalhePessoa({ params }: Pick<PageProps<"/pessoas/[id]">, "param
           </span>
         }
         acoes={
-          <>
-            {!arquivada && (
-              <Link href={`/pessoas/${id}/editar`} className={classeBotaoPrimario}>
-                Editar
-              </Link>
-            )}
-            <BotaoArquivamento
-              acao={alterarArquivamentoPessoa.bind(null, id, !arquivada)}
-              arquivado={arquivada}
-            />
-          </>
+          podeRegistrar && (
+            <>
+              {!arquivada && (
+                <Link href={`/pessoas/${id}/editar`} className={classeBotaoPrimario}>
+                  Editar
+                </Link>
+              )}
+              <BotaoArquivamento
+                acao={alterarArquivamentoPessoa.bind(null, id, !arquivada)}
+                arquivado={arquivada}
+              />
+            </>
+          )
         }
       />
 
@@ -100,9 +106,11 @@ async function DetalhePessoa({ params }: Pick<PageProps<"/pessoas/[id]">, "param
           Dados
         </h2>
         <dl className="grid gap-4 text-sm sm:grid-cols-2">
-          <div className="sm:col-span-2">
-            <ItemDado rotulo="Observações" valor={pessoa.observacoes} />
-          </div>
+          {dadosRestritos && (
+            <div className="sm:col-span-2">
+              <ItemDado rotulo="Observações" valor={pessoa.observacoes} />
+            </div>
+          )}
           <ItemDado rotulo="Cadastrada em" valor={formatarDataHora(pessoa.criadoEm)} />
           <ItemDado rotulo="Última alteração" valor={formatarDataHora(pessoa.atualizadoEm)} />
         </dl>
@@ -115,9 +123,11 @@ async function DetalhePessoa({ params }: Pick<PageProps<"/pessoas/[id]">, "param
         <p className="mb-4 text-sm text-texto-secundario">
           E-mails e telefones com histórico próprio. Um mesmo contato pode ser compartilhado
           ou passar ao sucessor no cargo.
+          {!dadosRestritos &&
+            " Contatos pessoais e observações aparecem só para quem tem permissão em projeto ou tema associado a esta pessoa."}
         </p>
-        <ListaContatos contatos={contatos} somenteLeitura={arquivada} />
-        {!arquivada && (
+        <ListaContatos contatos={contatos} somenteLeitura={!editavel} />
+        {editavel && (
           <details className="mt-4 rounded-lg border border-borda p-4">
             <summary className="cursor-pointer font-medium">Registrar contato</summary>
             <div className="mt-4">
@@ -125,6 +135,7 @@ async function DetalhePessoa({ params }: Pick<PageProps<"/pessoas/[id]">, "param
                 stakeholderId={id}
                 naturezaPadrao="institucional"
                 vinculos={vinculosVigentes}
+                dadosRestritos={dadosRestritos}
               />
             </div>
           </details>
@@ -161,7 +172,7 @@ async function DetalhePessoa({ params }: Pick<PageProps<"/pessoas/[id]">, "param
                   <p className="text-xs text-texto-secundario">
                     {descreverPeriodo(v.dataInicio, v.dataFim)}
                   </p>
-                  {vigente && !arquivada && (
+                  {vigente && editavel && (
                     <details className="mt-2 text-sm">
                       <summary className="cursor-pointer text-texto-secundario hover:underline">
                         Encerrar vínculo
@@ -176,7 +187,7 @@ async function DetalhePessoa({ params }: Pick<PageProps<"/pessoas/[id]">, "param
         )}
       </section>
 
-      {!arquivada && (
+      {editavel && (
         <section aria-labelledby="titulo-novo-vinculo" className={classeCartao}>
           <h2 id="titulo-novo-vinculo" className="mb-4 text-lg font-semibold">
             Registrar vínculo

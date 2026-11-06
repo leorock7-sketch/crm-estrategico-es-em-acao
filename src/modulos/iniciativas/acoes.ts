@@ -9,7 +9,8 @@ import { and, inArray, isNull } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { z } from "zod";
-import { comoUsuario, type Executor, obterBanco } from "@/lib/banco/conexao";
+import { comoUsuario, type Executor } from "@/lib/banco/conexao";
+import { bancoDaSessao } from "@/lib/banco/requisicao";
 import { projetoTema } from "@/lib/banco/esquema";
 import { mensagemDeErro } from "@/lib/banco/mensagens-erro";
 import { lerFormulario } from "@/lib/formulario";
@@ -86,7 +87,7 @@ export async function salvarIniciativa(
 ): Promise<EstadoFormulario> {
   const { valores, dados } = lerFormulario(formData, ["projetos"]);
   const id = identificadorOpcional(valores.id);
-  const banco = await obterBanco();
+  const banco = await bancoDaSessao();
   const usuario = await obterUsuarioAtual(banco);
 
   let iniciativaId: string;
@@ -117,7 +118,7 @@ export async function salvarIniciativa(
 
 export async function alterarArquivamentoIniciativa(id: string, arquivar: boolean) {
   const iniciativaId = esquemaIdentificador.parse(id);
-  const banco = await obterBanco();
+  const banco = await bancoDaSessao();
   const usuario = await obterUsuarioAtual(banco);
   const projetos = await projetosDaIniciativa(banco, iniciativaId);
   await exigirEdicaoEmAlgum(banco, usuario.id, projetos.map((p) => p.projetoTemaId));
@@ -135,7 +136,7 @@ export async function incluirProjetoNaIniciativaAcao(
   const resultado = esquemaProjetoDaIniciativa.safeParse(dados);
   if (!resultado.success) return { erros: z.flattenError(resultado.error).fieldErrors, valores };
 
-  const banco = await obterBanco();
+  const banco = await bancoDaSessao();
   const usuario = await obterUsuarioAtual(banco);
   const editavel = await iniciativaEditavel(banco, usuario.id, resultado.data.iniciativaId);
   if ("erro" in editavel) return { mensagem: editavel.erro, valores };
@@ -160,7 +161,7 @@ export async function retirarProjetoDaIniciativaAcao(
   const resultado = esquemaRetirada.safeParse(dados);
   if (!resultado.success) return { mensagem: "Ligação inválida.", valores };
 
-  const banco = await obterBanco();
+  const banco = await bancoDaSessao();
   const usuario = await obterUsuarioAtual(banco);
   const iniciativaId = identificadorOpcional(valores.iniciativaId);
   if (!iniciativaId) return { mensagem: "Iniciativa não encontrada.", valores };
@@ -188,7 +189,7 @@ export async function incluirStakeholderNaIniciativaAcao(
   const resultado = esquemaStakeholderDaIniciativa.safeParse(dados);
   if (!resultado.success) return { erros: z.flattenError(resultado.error).fieldErrors, valores };
 
-  const banco = await obterBanco();
+  const banco = await bancoDaSessao();
   const usuario = await obterUsuarioAtual(banco);
   const editavel = await iniciativaEditavel(banco, usuario.id, resultado.data.iniciativaId);
   if ("erro" in editavel) return { mensagem: editavel.erro, valores };
@@ -209,7 +210,7 @@ export async function retirarStakeholderDaIniciativaAcao(
   const resultado = esquemaRetirada.safeParse(dados);
   if (!resultado.success) return { mensagem: "Ligação inválida.", valores };
 
-  const banco = await obterBanco();
+  const banco = await bancoDaSessao();
   const usuario = await obterUsuarioAtual(banco);
   const iniciativaId = identificadorOpcional(valores.iniciativaId);
   if (!iniciativaId) return { mensagem: "Iniciativa não encontrada.", valores };

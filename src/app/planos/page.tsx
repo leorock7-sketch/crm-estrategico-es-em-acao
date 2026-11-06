@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { Suspense } from "react";
 import { CabecalhoPagina } from "@/componentes/cabecalho-pagina";
+import { SeRegistra } from "@/modulos/acesso/componentes/conforme-perfil";
 import { Carregando } from "@/componentes/carregando";
 import { classeBotaoPrimario, classeCelula, classeCelulaCabecalho, classeLink, classeTabela } from "@/componentes/estilos";
 import { bancoDaRequisicao } from "@/lib/banco/requisicao";
@@ -21,9 +22,11 @@ export default function PaginaPlanos() {
         titulo="Planos de ação"
         descricao="Um plano por projeto ou tema, organizado por pilares ou eixos, com versões aprovadas e acompanhamento das ações e marcos."
         acoes={
-          <Link href="/planos/novo" className={classeBotaoPrimario}>
-            Novo plano
-          </Link>
+          <SeRegistra>
+            <Link href="/planos/novo" className={classeBotaoPrimario}>
+              Novo plano
+            </Link>
+          </SeRegistra>
         }
       />
       <Suspense fallback={<Carregando />}>

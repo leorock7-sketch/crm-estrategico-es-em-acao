@@ -7,8 +7,10 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { z } from "zod";
-import { comoUsuario, obterBanco } from "@/lib/banco/conexao";
+import { comoUsuario } from "@/lib/banco/conexao";
+import { bancoDaSessao } from "@/lib/banco/requisicao";
 import { esquemaIdentificador } from "@/lib/validacao/comuns";
+import { ehAdministrador, MENSAGEM_SOMENTE_CONSULTA, podeRegistrarNoCadastro, podeVerDadosRestritos } from "@/modulos/acesso/capacidades";
 import { obterUsuarioAtual } from "@/modulos/acesso/usuario-atual";
 import {
   arquivarContato,
@@ -82,7 +84,8 @@ export async function salvarPessoa(
     return { erros: z.flattenError(resultado.error).fieldErrors, valores };
   }
 
-  const banco = await obterBanco();
+  const banco = await bancoDaSessao();
+  if (!(await podeRegistrarNoCadastro(banco))) return { mensagem: MENSAGEM_SOMENTE_CONSULTA, valores };
   const atual = id ? await obterPessoa(banco, id) : null;
   if (id && !atual) return { mensagem: "Pessoa não encontrada.", valores };
   if (atual?.arquivadoEm) return { mensagem: "Reative o cadastro antes de editá-lo.", valores };
@@ -96,9 +99,10 @@ export async function salvarPessoa(
   const usuario = await obterUsuarioAtual(banco);
   let pessoaId: string;
   try {
+    const incluirObservacoes = id ? await podeVerDadosRestritos(banco, id) : await ehAdministrador(banco);
     pessoaId = await comoUsuario(banco, usuario.id, async (tx) => {
-      if (!id) return criarPessoa(tx, resultado.data);
-      await atualizarPessoa(tx, id, resultado.data);
+      if (!id) return criarPessoa(tx, resultado.data, { incluirObservacoes });
+      await atualizarPessoa(tx, id, resultado.data, { incluirObservacoes });
       return id;
     });
   } catch (erro) {
@@ -111,7 +115,8 @@ export async function salvarPessoa(
 
 export async function alterarArquivamentoPessoa(id: string, arquivar: boolean) {
   const pessoaId = esquemaIdentificador.parse(id);
-  const banco = await obterBanco();
+  const banco = await bancoDaSessao();
+  if (!(await podeRegistrarNoCadastro(banco))) throw new Error(MENSAGEM_SOMENTE_CONSULTA);
   const usuario = await obterUsuarioAtual(banco);
   await comoUsuario(banco, usuario.id, (tx) =>
     definirArquivamentoPessoa(tx, pessoaId, arquivar),
@@ -133,7 +138,8 @@ export async function salvarInstituicao(
     return { erros: z.flattenError(resultado.error).fieldErrors, valores };
   }
 
-  const banco = await obterBanco();
+  const banco = await bancoDaSessao();
+  if (!(await podeRegistrarNoCadastro(banco))) return { mensagem: MENSAGEM_SOMENTE_CONSULTA, valores };
   const atual = id ? await obterInstituicao(banco, id) : null;
   if (id && !atual) return { mensagem: "Instituição não encontrada.", valores };
   if (atual?.arquivadoEm) return { mensagem: "Reative o cadastro antes de editá-lo.", valores };
@@ -162,7 +168,7 @@ export async function salvarInstituicao(
 
 export async function alterarArquivamentoInstituicao(id: string, arquivar: boolean) {
   const instituicaoId = esquemaIdentificador.parse(id);
-  const banco = await obterBanco();
+  const banco = await bancoDaSessao();
   const usuario = await obterUsuarioAtual(banco);
   await comoUsuario(banco, usuario.id, (tx) =>
     definirArquivamentoInstituicao(tx, instituicaoId, arquivar),
@@ -183,7 +189,8 @@ export async function salvarVinculo(
     return { erros: z.flattenError(resultado.error).fieldErrors, valores };
   }
 
-  const banco = await obterBanco();
+  const banco = await bancoDaSessao();
+  if (!(await podeRegistrarNoCadastro(banco))) return { mensagem: MENSAGEM_SOMENTE_CONSULTA, valores };
   const [pessoaVinculada, instituicaoVinculada] = await Promise.all([
     obterPessoa(banco, resultado.data.pessoaId),
     obterInstituicao(banco, resultado.data.instituicaoId),
@@ -217,7 +224,8 @@ export async function encerrarVinculoPessoa(
     return { erros: z.flattenError(resultado.error).fieldErrors, valores };
   }
 
-  const banco = await obterBanco();
+  const banco = await bancoDaSessao();
+  if (!(await podeRegistrarNoCadastro(banco))) return { mensagem: MENSAGEM_SOMENTE_CONSULTA, valores };
   const usuario = await obterUsuarioAtual(banco);
   try {
     const encerrado = await comoUsuario(banco, usuario.id, (tx) =>
@@ -246,9 +254,15 @@ export async function salvarContato(
     return { erros: z.flattenError(resultado.error).fieldErrors, valores };
   }
 
-  const banco = await obterBanco();
+  const banco = await bancoDaSessao();
+  if (!(await podeRegistrarNoCadastro(banco))) return { mensagem: MENSAGEM_SOMENTE_CONSULTA, valores };
   const dono = await obterStakeholder(banco, resultado.data.stakeholderId);
   if (!dono) return { mensagem: "Cadastro não encontrado.", valores };
+  const dadosRestritos = await podeVerDadosRestritos(banco, dono.id);
+  if (resultado.data.natureza === "pessoal" && !dadosRestritos) {
+    return { mensagem: "Para registrar um contato pessoal, associe antes este cadastro a um projeto ou tema seu.", valores };
+  }
+  const dadosDoContato = dadosRestritos ? resultado.data : { ...resultado.data, observacao: undefined };
   const registro =
     dono.tipo === "pessoa"
       ? await obterPessoa(banco, dono.id)
@@ -267,7 +281,7 @@ export async function salvarContato(
 
   const usuario = await obterUsuarioAtual(banco);
   try {
-    await comoUsuario(banco, usuario.id, (tx) => criarContato(tx, resultado.data));
+    await comoUsuario(banco, usuario.id, (tx) => criarContato(tx, dadosDoContato));
   } catch (erro) {
     return { mensagem: mensagemDeErro(erro), valores };
   }
@@ -286,7 +300,8 @@ export async function encerrarContatoAcao(
     return { erros: z.flattenError(resultado.error).fieldErrors, valores };
   }
 
-  const banco = await obterBanco();
+  const banco = await bancoDaSessao();
+  if (!(await podeRegistrarNoCadastro(banco))) return { mensagem: MENSAGEM_SOMENTE_CONSULTA, valores };
   const usuario = await obterUsuarioAtual(banco);
   try {
     const dono = await comoUsuario(banco, usuario.id, (tx) =>
@@ -305,7 +320,8 @@ export async function encerrarContatoAcao(
 /** Arquiva contato registrado por engano; ele deixa de aparecer, mas permanece no histórico. */
 export async function arquivarContatoAcao(contatoId: string) {
   const id = esquemaIdentificador.parse(contatoId);
-  const banco = await obterBanco();
+  const banco = await bancoDaSessao();
+  if (!(await podeRegistrarNoCadastro(banco))) throw new Error(MENSAGEM_SOMENTE_CONSULTA);
   const usuario = await obterUsuarioAtual(banco);
   await comoUsuario(banco, usuario.id, (tx) => arquivarContato(tx, id));
   revalidatePath("/pessoas", "layout");

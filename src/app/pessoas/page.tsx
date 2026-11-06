@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { Suspense } from "react";
 import { CabecalhoPagina } from "@/componentes/cabecalho-pagina";
+import { SeRegistra } from "@/modulos/acesso/componentes/conforme-perfil";
 import { Carregando } from "@/componentes/carregando";
 import {
   classeBotaoPrimario,
@@ -24,9 +25,11 @@ export default function PaginaPessoas({ searchParams }: PageProps<"/pessoas">) {
         titulo="Pessoas"
         descricao="Cadastro Mestre: cada pessoa é registrada uma única vez."
         acoes={
-          <Link href="/pessoas/nova" className={classeBotaoPrimario}>
-            Nova pessoa
-          </Link>
+          <SeRegistra>
+            <Link href="/pessoas/nova" className={classeBotaoPrimario}>
+              Nova pessoa
+            </Link>
+          </SeRegistra>
         }
       />
       <Suspense fallback={<Carregando />}>
