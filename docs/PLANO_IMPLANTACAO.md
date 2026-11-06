@@ -25,6 +25,7 @@
 | 0.21 | 03/11/2026 | Etapa 3 homologada para desenvolvimento e incorporada à `main` (D-071); P-040 a P-046 continuam não homologadas; backlog da V3.0 (V3-01 a V3-04); próxima atividade: roteiro da Etapa 4 para validação do gestor |
 | 0.22 | 03/11/2026 | Etapa 4 aprovada com a matriz de riscos original do Comitê de Infraestrutura (D-072) e implementada na branch `feature/plano-acao-riscos` (seção 9): plano de ação por projeto ou tema e matriz de riscos 5 × 5; aguarda a revisão do Pull Request e a homologação; seções seguintes renumeradas (10 e 11) |
 | 0.23 | 04/11/2026 | Etapa 4 incorporada à `main` (Pull Requests #8 e #9, `1246331`) e homologada para desenvolvimento (D-073); P-047 a P-053 continuam não homologadas; próxima atividade: roteiro da Etapa 5 — Autenticação e Permissões — para validação do gestor |
+| 0.24 | 06/11/2026 | Roteiro da Etapa 5 validado (D-074) e organizado na seção 10, com o plano de testes de autenticação e segurança; programação depende da autorização específica do projeto Supabase de desenvolvimento; seções seguintes renumeradas (11 e 12) |
 
 Legenda: ✅ Aprovado · 🔧 Proposta técnica · ⏳ Pendente.
 
@@ -50,7 +51,7 @@ Legenda: ✅ Aprovado · 🔧 Proposta técnica · ⏳ Pendente.
 | 2B | Metodologia institucional V2.2 e adaptação técnica | Escalas aprovadas (D-058 a D-060); rubricas da Q-66 1.0 e adaptação do sistema conforme a Q-67 1.0 (seção 7) | ✅ **Concluída:** autorizada em 02/11/2026 (D-069), incorporada à `main` pelo Pull Request #6 (commit de merge `73acd04`, verificações Node.js 24 e 26 aprovadas) e homologada para desenvolvimento em 03/11/2026, depois de teste assistido (D-070) |
 | 3 | Iniciativas, interações e compromissos | Matriz de iniciativas, registro único de reuniões, encaminhamentos e prazos | ✅ **Concluída:** autorizada em 03/11/2026 (D-070), incorporada à `main` pelo Pull Request #7 (commit de merge `aa17fe4`, verificações Node.js 24 e 26 aprovadas) e homologada para desenvolvimento (D-071); as soluções provisórias P-040 a P-046 continuam não homologadas (seção 8) |
 | 4 | Plano de ação e matriz de riscos | Versões e aprovação, acompanhamento, riscos, gatilhos e respostas | ✅ **Concluída:** aprovada em 03/11/2026 com a matriz de riscos original do Comitê de Infraestrutura (D-072), incorporada à `main` pelo Pull Request #9 (commit de merge `1246331`, verificações Node.js 24 e 26 aprovadas) e homologada para desenvolvimento em 04/11/2026 (D-073); as soluções provisórias P-047 a P-053 continuam não homologadas (seção 9) |
-| 5 | Autenticação e permissões | Supabase Auth, perfis e permissões por projeto/tema, segurança no banco. Depende de Q-50 | 🔧 **Próxima (D-073):** roteiro de implementação e decisões necessárias apresentados ao gestor para validação; programação só depois da validação; nenhum serviço externo sem autorização |
+| 5 | Autenticação e permissões | Supabase Auth, perfis e permissões por projeto/tema, segurança no banco | 🔧 **Roteiro validado (D-074):** organizada na branch `feature/autenticacao-permissoes` (seção 10); programação depende da autorização específica do projeto Supabase de desenvolvimento |
 | 6 | Painéis e relatórios | Indicadores executivos e relatórios. Depende de Q-55 | 🔧 |
 | 7 | Homologação e hospedagem | Supabase e Vercel com dados fictícios, validação técnica e institucional, plano de cópias de segurança. **Pré-requisitos: C6, C7 e C8 solucionadas** (D-027) | 🔧 ⏳ (exige contas e autorização) |
 | 8 | Piloto com dados reais | Somente após autorização formal, análise LGPD e solução de C6, C7 e C8 (D-027) | ⏳ |
@@ -364,7 +365,7 @@ A homologação da etapa (D-071) não homologa estas soluções: elas continuam 
 
 ### Fora do escopo (D-070)
 
-Supabase, autenticação real, integração com Outlook e Microsoft 365, painéis executivos e os módulos completos de Plano de Ação e Riscos. A ligação de compromissos a ações do plano (`acao_id`) entra na Etapa 4, com a tabela de ações; as relações já preservam iniciativa, interação e projeto para essa integração. Achados A-01 a A-06 da auditoria técnica independente: pendentes (seção 10), sem implementação nesta etapa.
+Supabase, autenticação real, integração com Outlook e Microsoft 365, painéis executivos e os módulos completos de Plano de Ação e Riscos. A ligação de compromissos a ações do plano (`acao_id`) entra na Etapa 4, com a tabela de ações; as relações já preservam iniciativa, interação e projeto para essa integração. Achados A-01 a A-06 da auditoria técnica independente: pendentes (seção 11), sem implementação nesta etapa.
 
 ## 9. Etapa 4 — Plano de ação e matriz de riscos ✅ (D-072, D-073)
 
@@ -422,16 +423,91 @@ A homologação da etapa (D-073) não homologa estas soluções: elas continuam 
 
 ### Fora do escopo (D-072)
 
-Supabase, autenticação real, integrações externas e painéis executivos. Achados A-01 a A-06 (pendentes), melhorias U-1 a U-5 (registradas, sem execução) e backlog da V3.0 (V3-01 a V3-04) não implementados (seção 10).
+Supabase, autenticação real, integrações externas e painéis executivos. Achados A-01 a A-06 (pendentes), melhorias U-1 a U-5 (registradas, sem execução) e backlog da V3.0 (V3-01 a V3-04) não implementados (seção 11).
 
-## 10. Pendências efetivas (atualizadas em 04/11/2026)
+## 10. Etapa 5 — Autenticação e permissões 🔧 (D-074)
+
+**Situação:** roteiro validado (D-074) e branch `feature/autenticacao-permissoes` organizada. A programação depende da autorização específica do projeto Supabase de desenvolvimento; nenhum serviço externo foi criado ou conectado.
+
+### Objetivo
+
+Substituir o administrador fictício por autenticação real e fazer valer, no próprio banco de dados, as permissões por projeto ou tema, com quatro perfis e a administração de usuários e acessos. Somente dados fictícios; aplicação executada localmente, sem hospedagem pública. Controle de acesso testado apenas por simulação não é apresentado como funcional.
+
+### Decisões tomadas para a etapa
+
+| ID | Decisão |
+|---|---|
+| D1 (Q-50) | Microsoft 365 institucional como forma principal e e-mail e senha pelo Supabase Auth como alternativa para usuários expressamente autorizados. Acesso fechado, sem autocadastro: conta válida não concede acesso sem cadastro interno prévio e ativo. Sem a TI institucional nesta etapa, a integração Microsoft fica identificada como pendente, sem simulação |
+| D2 | Projeto Supabase exclusivo de desenvolvimento em São Paulo (`sa-east-1`), somente com dados fictícios e mediante autorização específica. PGlite preservado para desenvolvimento e regressão; autenticação real, permissões e RLS verificadas também no PostgreSQL do Supabase |
+| D3 | Decisão sobre versões do plano pelo administrador ou pelo gestor do projeto ou tema, em nível único, com responsável e data |
+| D4 (Q-12) | Diretório básico para todos os usuários ativos e autenticados; dados restritos conforme necessidade e autorização; um único Cadastro Mestre |
+| D5 | Quatro perfis, sem novas categorias ([Governança](GOVERNANCA.md), seção 3) |
+
+### Como o acesso funcionará 🔧
+
+1. **Login:** Supabase Auth, com a sessão em cookies (`@supabase/ssr`). O `proxy.ts` do Next.js 16 apenas renova a sessão; o servidor confirma a identidade com `getClaims()`, que verifica a assinatura, e nunca com `getSession()`, que pode ser forjada.
+2. **Correspondência:** a identidade autenticada liga-se ao usuário interno por um identificador próprio (`usuario.auth_id`), nunca pelo e-mail em tempo de execução. Sem correspondência ou com usuário inativo, nada é acessível.
+3. **Consultas no contexto do usuário:** a aplicação conecta-se ao banco com um papel próprio, sem privilégios (`crm_app`: sem `BYPASSRLS` e sem ser dono das tabelas), e cada operação ocorre em transação com a identidade já verificada. Sem contexto, o banco devolve zero linhas: o erro de programação nega acesso, em vez de abrir.
+4. **Conexões privilegiadas:** o papel `postgres` e a chave secreta só são usados em comandos de migração e na criação de contas, em código exclusivo do servidor; nunca em consulta de tela, nunca no navegador.
+5. **Superfície externa:** a API automática do Supabase (Data API) fica desligada, porque o CRM não a usa, e as permissões padrão dos papéis `anon` e `authenticated` são retiradas.
+6. **Revogação imediata:** situação do usuário e permissões são lidas no banco a cada consulta. Sessão ainda válida não garante acesso.
+7. **Regras internas:** gatilhos de auditoria e de integridade passam a executar com privilégio controlado (`security definer`, com `search_path` fixo), para que o RLS não os altere nem seja contornado por eles.
+8. **Registros compartilhados:** o registro aparece para quem tem permissão em ao menos um dos contextos ligados; as ligações e os dados específicos de outro contexto continuam ocultos.
+9. **PGlite:** mantido para desenvolvimento e regressão. As mesmas regras usam só PostgreSQL padrão, sem depender do esquema `auth` do Supabase, e são testadas nos dois bancos.
+
+### Cadastro Mestre: diretório básico e dados restritos (D4)
+
+| Informação | Quem consulta |
+|---|---|
+| Pessoa: nome e nome de tratamento; vínculos (instituição, cargo, área e período) | Todos os usuários ativos e autenticados |
+| Instituição: dados cadastrais e hierarquia | Todos os usuários ativos e autenticados |
+| Contatos de natureza institucional ou funcional | Todos os usuários ativos e autenticados |
+| Contatos de natureza pessoal; observações da pessoa e dos contatos | Administrador; gestor e colaborador com permissão válida em projeto ou tema ao qual o stakeholder esteja associado (P-054, provisória) |
+| Associação a projetos, avaliações, posicionamentos, evidências, iniciativas, interações, planos e riscos | Conforme a permissão no projeto ou tema |
+
+### Plano de testes (D-074, requisitos 1 a 10)
+
+Usuários fictícios: administrador, gestor, colaborador e leitor com permissão válida; gestor com permissão vencida; colaborador com permissão revogada; usuário inativo com sessão ainda aberta; conta autenticada sem cadastro interno. Dois projetos fictícios (A e B) e registros compartilhados entre eles.
+
+| Req. | O que será comprovado | Onde |
+|---|---|---|
+| 1 | Login real, senha errada, ausência de sessão, cookie ou token adulterado; nenhuma operação usa o administrador fictício fora do modo local de desenvolvimento | Supabase; aplicação |
+| 2 | Correspondência por `auth_id`; conta sem cadastro interno não vê nada; mesmo e-mail sem vínculo não herda acesso | PGlite; Supabase |
+| 3 | Registros anteriores mantêm o autor histórico; novas operações registram o usuário real | PGlite; Supabase |
+| 4 | Revogação, vencimento e desativação bloqueiam na consulta seguinte, mesmo com sessão anteriormente autenticada | PGlite; Supabase; aplicação |
+| 5 | Consulta direta ao banco por perfil; `crm_app` sem `BYPASSRLS` e sem ser dono das tabelas; zero linhas sem contexto; toda tabela com RLS ligado (o teste falha se surgir tabela nova sem regra); aplicação comprovadamente conectada com `crm_app` | PGlite; Supabase; aplicação |
+| 6 | Chamadas diretas às operações do servidor, sem sessão e sem permissão, para ler ou alterar registros de outro projeto; a chave pública não acessa tabelas pela API do Supabase | Supabase; aplicação |
+| 7 | Registro ligado aos projetos A e B: quem só tem A vê o registro, mas não as ligações nem os dados restritos de B | PGlite; Supabase |
+| 8 | Varredura do repositório e do pacote enviado ao navegador: nenhuma chave secreta, senha ou endereço privilegiado | Automático; local |
+| 9 | Matriz dos quatro perfis com permissão válida, vencida e revogada e usuário inativo: ver, registrar, alterar e aprovar versão (gestor aprova; colaborador e leitor, não) | PGlite; Supabase |
+| 10 | Os testes das Etapas 1 a 4 continuam aprovados; a migração preserva todas as tabelas anteriores, linha a linha | PGlite; Supabase |
+| D4 | Diretório básico visível a todos os perfis; contatos pessoais e observações, só nas condições da tabela acima | PGlite; Supabase |
+
+Os itens estão listados como pendentes em `testes/seguranca-etapa-5.test.ts` e só deixam essa condição quando forem efetivamente executados. Testes em "PGlite" rodam a cada Pull Request, sem segredos; testes em "Supabase" e "aplicação" rodam localmente, com as chaves em `.env.local`, e os resultados são relatados na entrega.
+
+### Providências externas
+
+| Providência | Quem | Situação |
+|---|---|---|
+| Projeto Supabase de desenvolvimento (`sa-east-1`, plano gratuito, somente dados fictícios) | Gestor cria a conta e o projeto; as chaves ficam só em `.env.local` | ⏳ Aguarda autorização específica (D-074) |
+| Registro do CRM no Microsoft Entra ID, restrito à organização | TI institucional | ⏳ Pendente; não bloqueia a etapa (D1) |
+| Serviço de e-mail institucional (SMTP) para convites e recuperação de senha | TI institucional | ⏳ Necessário só para usuários reais (Etapa 7); os testes não enviam e-mail |
+
+### Fora do escopo (D-074)
+
+Hospedagem pública e produção; dados reais; integrações com Outlook e Microsoft 365 (Etapa 9); painéis; backup, recuperação e homologação da implantação (Etapa 7); achados A-02 a A-06, salvo correções estritamente necessárias à segurança; melhorias U-1 a U-5; backlog V3-01 a V3-07.
+
+## 11. Pendências efetivas (atualizadas em 06/11/2026)
 
 | Pendência | Bloqueia | Situação |
 |---|---|---|
 | C6. Reforço da auditoria | Etapas 7 e 8 (D-027) | Planejada |
 | C7. Cópia de segurança e restauração | Etapas 7 e 8 (D-027) | Planejada |
 | C8. Portabilidade em PostgreSQL real | Etapas 7 e 8 (D-027) | Depende de autorização (Q-57) |
-| Autenticação e segurança multiusuário (inclusive regras de acesso no banco) | Uso por mais de uma pessoa; Etapas 7 e 8 | Etapa 5; estrutura de permissões preparada na 2A, não homologada |
+| Autenticação e segurança multiusuário (inclusive regras de acesso no banco) | Uso por mais de uma pessoa; Etapas 7 e 8 | Etapa 5, roteiro validado (D-074, seção 10); estrutura de permissões preparada na 2A, não homologada |
+| Projeto Supabase de desenvolvimento | Programação da Etapa 5 | ⏳ Aguarda autorização específica do gestor (D-074) |
+| Registro do CRM no Microsoft Entra ID | Login Microsoft (D1); não bloqueia a Etapa 5 | ⏳ Depende de autorização e configuração pela TI institucional |
+| Serviço de e-mail institucional (SMTP) para convites e recuperação de senha | Usuários reais (Etapa 7) | ⏳ Depende da TI institucional |
 | Rubricas das escalas V2.2 e plano de adaptação técnica | Etapa 2B (D-060, D-063) | ✅ **Resolvida (D-068):** Q-66 1.0 e Q-67 1.0; calibração H6 concluída, com limitações registradas; Etapa 2B pronta para autorização (documento entregue fora do repositório). Decisões Q-65.1, Q-65.4 e Q-65.6 continuam pendentes, sem bloquear a 2B |
 | Documentos de referência V2.3 | — | Roteiro preparado fora do repositório (D-063); emissão a programar, refletindo as D-067 e D-068 (inclusive a adaptação do teste T23) |
 | Arquivos `MANUAL_OPERACIONAL.md` e `PLANO_TRANSFERENCIA_INSTITUCIONAL.md`, previstos no Guia | — | Ainda não existem no repositório; criação a autorizar |
@@ -445,11 +521,11 @@ Supabase, autenticação real, integrações externas e painéis executivos. Ach
 | Homologação da Etapa 4 | Etapa 5 | ✅ Homologada para desenvolvimento em 04/11/2026 (D-073), depois do merge dos Pull Requests #8 e #9 (`1246331`) |
 | Soluções provisórias da Etapa 4 (P-047 a P-053) e pontos pendentes Q-33 (correção de digitação) e Q-42 a Q-44 | — | Em uso e não homologadas (D-072, D-073); decisão do gestor pendente |
 | Soluções provisórias da Etapa 3 (P-040 a P-046) | — | Em uso e não homologadas (D-071); decisão do gestor pendente (Q-20, Q-21, Q-23 e Q-24) |
-| Backlog da V3.0: melhorias de interface V3-01 a V3-04 | — | Registradas pelo gestor (D-071) e preservadas (D-072, D-073): V3-01, simplificação visual, com base em modelo de referência indicado pelo gestor; V3-02, matriz Poder × Interesse na página do projeto, com marcadores interativos e identificação por mouse ou toque; V3-03, redução dos caminhos de navegação para as informações relevantes; V3-04, unificação visual de Iniciativas e Interações, com estas como subitens, preservando o registro único de reuniões. Não implementar antes da V3.0 |
-| Achados A-01 a A-06 da auditoria técnica independente | — | Pendentes para tratamento posterior (D-070); documento mantido fora do repositório; correções não implementadas nas Etapas 3 e 4 e preservadas (D-071, D-072, D-073) |
-| Melhorias de usabilidade não essenciais (U-1 a U-5, registradas em 02/11/2026) | — | Registradas fora do repositório: texto desatualizado na seção de stakeholders da página do projeto; bloco de evidências antes das classificações no rascunho; dica nas versões recolhidas do histórico; colunas da tabela da matriz no celular; legenda do selo "preliminar" no celular. A tratar oportunamente, sem impedir o andamento; não implementadas na Etapa 4 e preservadas (D-071, D-072, D-073) |
+| Backlog da V3.0: melhorias V3-01 a V3-07 | — | Registradas pelo gestor (D-071, D-074) e preservadas (D-072, D-073): V3-01, simplificação visual, com base em modelo de referência indicado pelo gestor; V3-02, matriz Poder × Interesse na página do projeto, com marcadores interativos e identificação por mouse ou toque; V3-03, redução dos caminhos de navegação para as informações relevantes; V3-04, unificação visual de Iniciativas e Interações, com estas como subitens, preservando o registro único de reuniões; V3-05, fotografias dos stakeholders; V3-06, integração funcional entre iniciativas, interações, ações e riscos; V3-07, interoperabilidade futura com outra ferramenta institucional indicada pelo gestor. Não implementar antes da V3.0 |
+| Achados A-01 a A-06 da auditoria técnica independente | — | Documento mantido fora do repositório. A-01 tratado na Etapa 5, por corresponder ao seu objetivo; A-02 a A-06 no backlog, salvo correções estritamente necessárias à segurança (D-074) |
+| Melhorias de usabilidade não essenciais (U-1 a U-5, registradas em 02/11/2026) | — | Registradas fora do repositório: texto desatualizado na seção de stakeholders da página do projeto; bloco de evidências antes das classificações no rascunho; dica nas versões recolhidas do histórico; colunas da tabela da matriz no celular; legenda do selo "preliminar" no celular. A tratar oportunamente, sem impedir o andamento; não implementadas nas Etapas 4 e 5 e preservadas (D-071, D-072, D-073, D-074) |
 | Análise LGPD, retenção e anonimização | Etapa 8 | Q-13, Q-58 |
 
-## 11. Local de trabalho ✅ (D-019)
+## 12. Local de trabalho ✅ (D-019)
 
 A cópia de trabalho do projeto fica em `C:\Projetos\crm-estrategico-es-em-acao`, obtida pelo GitHub, fora do Google Drive. O GitHub cumpre o papel de cópia de segurança e histórico. A pasta antiga no Google Drive não foi apagada.

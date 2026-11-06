@@ -18,6 +18,7 @@
 | 0.14 | 03/11/2026 | Etapa 3 homologada para desenvolvimento (D-071); as soluções provisórias P-040 a P-046 continuam não homologadas. |
 | 0.15 | 03/11/2026 | Etapa 4 (D-072): seções 6.6 e 6.7 implementadas pela migração `0008`, aguardando homologação; um plano por projeto ou tema; pilares ou eixos (`plano_eixo`); marcos como itens da ação (`acao_marco`, `marco_planejamento`); decisões do fluxo de aprovação (`plano_acao_decisao`); avaliações inerente e residual com criticidade e classificação calculadas pelo banco conforme a matriz original; acompanhamento dos gatilhos; `compromisso.acao_id`. |
 | 0.16 | 04/11/2026 | Etapa 4 homologada para desenvolvimento (D-073); as soluções provisórias P-047 a P-053 continuam não homologadas. |
+| 0.17 | 06/11/2026 | Seção 7 conforme a D-074: diretório básico do Cadastro Mestre e dados restritos, a implementar na Etapa 5. |
 
 Legenda: ✅ Aprovado · 🔧 Proposta técnica · ⏳ Pendente (ver [REQUISITOS.md](REQUISITOS.md#como-ler-este-documento)).
 
@@ -791,7 +792,8 @@ A segurança será aplicada no próprio banco de dados (PostgreSQL Row Level Sec
 
 | Registro | Quem pode ver |
 |---|---|
-| Comitês, Cadastro Mestre (pessoas, instituições, vínculos) | Todos os usuários ativos ⏳ |
+| Comitês e diretório básico do Cadastro Mestre (pessoas, instituições, vínculos e contatos institucionais ou funcionais) | Todos os usuários ativos e autenticados (D-074) |
+| Contatos pessoais e observações da pessoa e dos contatos | Administrador; gestor e colaborador com permissão válida em projeto ou tema ao qual o stakeholder esteja associado (P-054, provisória) |
 | Avaliações e suas versões, notas e evidências | Administrador e usuários com permissão no `projeto_tema` da avaliação |
 | Iniciativas | Usuários com permissão em pelo menos um dos projetos/temas ligados |
 | Interações e compromissos | Usuários com permissão em algum projeto/tema ligado à interação, diretamente ou por meio de suas iniciativas |
@@ -805,10 +807,9 @@ Enquanto houver um único administrador, ele vê tudo; as regras acima passam a 
 1. Rubricas dos níveis de poder, interesse e posicionamento (Q-66) e estrutura da adaptação às escalas V2.2 (Q-67, seção 6.3.1). Escalas definidas (D-058, D-059); pesos, fórmula e pontos de corte não aprovados.
 2. Categorias da "Conduta do ES em Ação" e regras de relação com a matriz 3 × 3, sem derivação automática (Q-64, requisito futuro RF-28).
 3. Categorias de risco, riscos fora de projeto ou tema e oportunidades (Q-42 a Q-44).
-4. Visibilidade do Cadastro Mestre para todos os usuários.
-5. Análise LGPD dos dados pessoais registrados.
+4. Análise LGPD dos dados pessoais registrados.
 
-Resolvidas na Etapa 1: hierarquia entre temas e projetos (D-020); dados mínimos de pessoas (D-021). Na revisão de homologação: comitês participantes (D-023), CNPJ e país (D-024), contatos (D-025). Na Etapa 1.1: tipos de relação dos stakeholders com os contextos (D-030). Na Etapa 2A: posicionamento em cinco níveis (superado para novas avaliações pela D-059), grau de confiança em três níveis e regras de versionamento (Manual V2.0, D-034). Na revisão V2.2: escalas de poder, interesse, posicionamento e confiança (D-058 a D-060). Na Etapa 4: um plano por projeto ou tema e matriz de riscos 5 × 5 original (D-072). As decisões são acompanhadas em [REGISTRO_DECISOES.md](REGISTRO_DECISOES.md).
+Resolvidas na Etapa 1: hierarquia entre temas e projetos (D-020); dados mínimos de pessoas (D-021). Na revisão de homologação: comitês participantes (D-023), CNPJ e país (D-024), contatos (D-025). Na Etapa 1.1: tipos de relação dos stakeholders com os contextos (D-030). Na Etapa 2A: posicionamento em cinco níveis (superado para novas avaliações pela D-059), grau de confiança em três níveis e regras de versionamento (Manual V2.0, D-034). Na revisão V2.2: escalas de poder, interesse, posicionamento e confiança (D-058 a D-060). Na Etapa 4: um plano por projeto ou tema e matriz de riscos 5 × 5 original (D-072). No roteiro da Etapa 5: visibilidade do Cadastro Mestre (D-074). As decisões são acompanhadas em [REGISTRO_DECISOES.md](REGISTRO_DECISOES.md).
 
 ## 9. Situação da implementação
 
