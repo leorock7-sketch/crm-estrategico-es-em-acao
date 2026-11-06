@@ -59,7 +59,7 @@ Regras, garantidas pelo banco de dados:
 2. Versões aprovadas, rejeitadas ou substituídas **não podem ser alteradas**; o planejamento (ações e marcos) só muda na versão em rascunho.
 3. A nova versão nasce como cópia completa da vigente; a partir da segunda versão, é obrigatório informar o **motivo da alteração** no envio.
 4. Só se envia para aprovação uma versão com pelo menos uma ação.
-5. **Aprovação em nível único pelo administrador do sistema** até a autenticação real (D-072, D3). Quem decidiu, a data e o parecer (opcional) ficam registrados na versão e no histórico do fluxo (envio, devolução, aprovação, rejeição). A estrutura permite, no futuro, outros níveis de aprovação.
+5. **Aprovação em nível único pelo administrador do sistema ou pelo gestor do projeto ou tema** (D-074, D3, que modifica a D-072). O colaborador registra, altera e envia para aprovação, mas não decide; o leitor só consulta. A regra vale no próprio banco (Etapa 5). Quem decidiu, a data e o parecer (opcional) ficam registrados na versão e no histórico do fluxo (envio, devolução, aprovação, rejeição). A estrutura permite, no futuro, outros níveis de aprovação.
 6. Códigos permanentes (A-01, M1…) permitem comparar como cada ação foi planejada em cada versão; a tela da versão em aprovação mostra as diferenças em relação à vigente, campo a campo.
 
 ### O que exige nova versão e o que não exige (adotado provisoriamente — Q-33)
@@ -100,7 +100,7 @@ Situações de andamento: não iniciada, em andamento, concluída, suspensa e ca
 
 | ID | Questão | Situação |
 |---|---|---|
-| Q-30 | Quem aprova alterações de plano quando houver vários usuários? | ✅ Resolvida por ora (D-072): administrador do sistema, em nível único, até a autenticação |
+| Q-30 | Quem aprova alterações de plano quando houver vários usuários? | ✅ Resolvida (D-074, D3): administrador ou gestor do projeto ou tema, em nível único. Antes (D-072): administrador do sistema, em nível único, até a autenticação |
 | Q-31 | Cada projeto ou tema tem um único plano de ação ou pode ter vários? | ✅ Resolvida (D-072): um plano por projeto ou tema |
 | Q-32 | Planos de ação também podem existir por iniciativa? | ✅ Resolvida (D-072): não; as ações ligam-se a iniciativas |
 | Q-33 | A tabela "exige / não exige nova versão" (seção 4) está correta? | Adotada provisoriamente (D-072); falta decidir a correção de erro de digitação ⏳ |

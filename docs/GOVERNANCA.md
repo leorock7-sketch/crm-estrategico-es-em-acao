@@ -4,6 +4,7 @@
 |---|---|---|
 | 0.1 | 31/10/2026 | Rascunho para revisão |
 | 0.2 | 06/11/2026 | Perfis de acesso aprovados (D-074), a implementar na Etapa 5 |
+| 0.3 | 06/11/2026 | Perfis implementados na Etapa 5, aguardando homologação: administração de usuários e permissões na tela "Usuários" |
 
 Legenda: ✅ Aprovado · 🔧 Proposta técnica · ⏳ Pendente.
 

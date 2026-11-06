@@ -14,6 +14,7 @@
 | 0.10 | 03/11/2026 | Etapa 3 (D-070): módulos `iniciativas` e `interacoes` (iniciativas, interações e compromissos), telas e visibilidade por projeto ou tema; aguardando homologação |
 | 0.11 | 03/11/2026 | Etapa 4 (D-072): módulos `plano-acao` e `riscos`, telas de planos, versões, ações e riscos, integração com os módulos anteriores e visibilidade por projeto ou tema; aguardando homologação |
 | 0.12 | 06/11/2026 | Q-57 atualizada: teste em PostgreSQL real autorizado no projeto Supabase de desenvolvimento (D-075) |
+| 0.13 | 06/11/2026 | Etapa 5 implementada, aguardando homologação: autenticação real, papel `crm_app`, identidade em cada transação e dois modos de acesso (seção 5.1) |
 
 Legenda: ✅ Aprovado · 🔧 Proposta técnica · ⏳ Pendente.
 
@@ -58,8 +59,8 @@ Aprovada como referência, sujeita a validação técnica e institucional (confo
 |---|---|---|
 | Next.js com TypeScript | Aplicação web (telas e servidor) | Instalado e em uso |
 | PostgreSQL | Banco de dados relacional | Em uso localmente, por meio do PGlite (Etapa 1) |
-| Supabase | Gerenciamento do PostgreSQL, autenticação e segurança por linha | Não conectado |
-| Supabase Auth | Login de usuários | Não configurado |
+| Supabase | Gerenciamento do PostgreSQL, autenticação e segurança por linha | Projeto exclusivo de desenvolvimento (`sa-east-1`, plano Free, D-075), somente com dados fictícios |
+| Supabase Auth | Login de usuários | Em uso no projeto de desenvolvimento, com e-mail e senha e sem autocadastro; Microsoft 365 pendente (TI institucional) |
 | Vercel | Hospedagem proposta | Não utilizada |
 | GitHub | Versionamento e revisão (Pull Requests) | Em uso |
 
@@ -194,6 +195,23 @@ Regras de organização:
 | Planos de ação e riscos visíveis e alteráveis pelos mesmos critérios do projeto ou tema; a decisão sobre versões do plano cabe ao administrador do sistema (aprovação em nível único até a autenticação). Sem autenticação real: segurança multiusuário não homologada. | 🔧 (D-034, D-072) |
 | Cópia de segurança automática da pasta do banco local antes de aplicar atualizações pendentes; se a cópia falhar, nada é aplicado (T-1). Não substitui a política de cópias e restauração (C7). | 🔧 (implementada na Etapa 2B) |
 | Verificação automática no GitHub Actions a cada Pull Request e atualização da `main`, com permissões mínimas e sem credenciais (seção 6.1). | ✅ (D-041) |
+
+### 5.1 Autenticação e acesso ao banco (Etapa 5, D-074 e D-075) ✅
+
+| Tema | Como funciona |
+|---|---|
+| Modos de acesso | `supabase`: login real e conexão com `crm_app`. `local`: PGlite e administrador fictício, só em desenvolvimento e testes ou com `CRM_BANCO=pglite`. Em produção, sem configuração, o sistema recusa iniciar (`src/lib/banco/ambiente.ts`) |
+| Sessão | `@supabase/ssr`, em cookies inacessíveis aos programas da página. `src/proxy.ts` renova a sessão e leva ao login; é só a primeira barreira |
+| Identidade | `getClaims()`, que confere a assinatura, nunca `getSession()`. Liga-se ao usuário interno por `usuario.auth_id`, nunca pelo e-mail (`src/lib/autenticacao/sessao.ts`) |
+| Consultas | `bancoDaRequisicao()` e `bancoDaSessao()` devolvem um banco cujo cliente do driver coloca toda operação do Drizzle em uma transação com a identidade (`src/lib/banco/identidade.ts`). Não há como consultar por esse banco fora dessa transação |
+| Papel da aplicação | `crm_app`: sem superusuário, sem `BYPASSRLS`, sem ser dono das tabelas e sem exclusão. Conexão pelo pooler compartilhado (IPv4), modo de transação, porta 6543 |
+| Conexão administrativa | `postgres`, só no comando `npm run supabase:preparar` e nos testes locais; nenhum código da aplicação a lê |
+| Chave secreta | Só em `src/lib/autenticacao/administracao.ts`, para criar, suspender e reativar contas, depois de conferido que o usuário é administrador; nunca para consultar dados |
+| Gatilhos | Executam com privilégio controlado (`security definer`, `search_path` fixo); os que conferem permissão valem só para o papel `crm_app` |
+| API automática do Supabase (Data API) | Os papéis `anon`, `authenticated` e `service_role` perdem todo acesso ao esquema `public` na migração `0009`. O CRM não usa esses endpoints |
+| Microsoft 365 | Pendente: depende da TI institucional. O botão aparece desativado, com o aviso; nada é simulado |
+
+Limites conhecidos: a identidade é informada pela aplicação ao banco, em cada transação, o que confia na aplicação e nas credenciais do papel `crm_app`, guardadas só no servidor; cada consulta faz mais de uma ida e volta ao banco, o que é irrelevante com a aplicação e o banco na mesma região, mas deve ser medido na hospedagem (Etapa 7); o atributo `Secure` dos cookies depende de HTTPS e deve ser ligado na hospedagem (Etapa 7).
 
 ## 6. Comandos do projeto
 

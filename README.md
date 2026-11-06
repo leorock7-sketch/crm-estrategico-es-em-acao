@@ -129,7 +129,18 @@ Para fazer uma cópia de segurança, pare a aplicação e copie a pasta `.dados/
 
 A versão compilada (`npm run build` e depois `npm start`) recusa o banco local, para que ele nunca seja usado em produção por engano. Para testá-la no seu computador, crie um arquivo `.env.local` com a linha `CRM_BANCO=pglite`.
 
-### 5. Verificações de qualidade
+### 5. Login real e Supabase de desenvolvimento (Etapa 5)
+
+Com as chaves do projeto de desenvolvimento em `.env.local` (modelo em `.env.example`), a aplicação exige login e usa o banco do Supabase. Sem elas, em desenvolvimento, funciona no modo local: banco PGlite e administrador fictício, sem login. Somente dados fictícios nos dois casos.
+
+| Comando | O que faz |
+|---|---|
+| `npm run ambiente:conferir` | Confere o projeto Supabase, sem exibir nenhum valor |
+| `npm run supabase:preparar` | Aplica as migrações, ativa o papel `crm_app`, carrega os dados fictícios e cria as contas de teste (senhas só em `.dados/contas-teste.json`, que o Git ignora) |
+| `npm run test:supabase` | Testes de autenticação, regras de acesso e navegador no Supabase (antes: `npm run build`) |
+| `npm run test:postgres` | Testes de banco das Etapas 1 a 4 no PostgreSQL do Supabase. **Apaga os dados do projeto**; depois, rode `npm run supabase:preparar -- --refazer` |
+
+### 6. Verificações de qualidade
 
 | Comando | O que verifica |
 |---|---|

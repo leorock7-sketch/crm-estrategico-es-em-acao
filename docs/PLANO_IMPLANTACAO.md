@@ -27,6 +27,7 @@
 | 0.23 | 04/11/2026 | Etapa 4 incorporada à `main` (Pull Requests #8 e #9, `1246331`) e homologada para desenvolvimento (D-073); P-047 a P-053 continuam não homologadas; próxima atividade: roteiro da Etapa 5 — Autenticação e Permissões — para validação do gestor |
 | 0.24 | 06/11/2026 | Roteiro da Etapa 5 validado (D-074) e organizado na seção 10, com o plano de testes de autenticação e segurança; programação depende da autorização específica do projeto Supabase de desenvolvimento; seções seguintes renumeradas (11 e 12) |
 | 0.25 | 06/11/2026 | Ambiente Supabase de desenvolvimento autorizado (D-075), a ser criado pelo gestor; regra da Data API, A-01, C8 e backlog V3-08 atualizados |
+| 0.26 | 06/11/2026 | Etapa 5 implementada, aguardando homologação (seção 10): login real, papel `crm_app`, regras de acesso no banco, administração de usuários, D3, D4 e P-054; resultados dos testes registrados; C8 comprovada para desenvolvimento, conforme os resultados |
 
 Legenda: ✅ Aprovado · 🔧 Proposta técnica · ⏳ Pendente.
 
@@ -52,7 +53,7 @@ Legenda: ✅ Aprovado · 🔧 Proposta técnica · ⏳ Pendente.
 | 2B | Metodologia institucional V2.2 e adaptação técnica | Escalas aprovadas (D-058 a D-060); rubricas da Q-66 1.0 e adaptação do sistema conforme a Q-67 1.0 (seção 7) | ✅ **Concluída:** autorizada em 02/11/2026 (D-069), incorporada à `main` pelo Pull Request #6 (commit de merge `73acd04`, verificações Node.js 24 e 26 aprovadas) e homologada para desenvolvimento em 03/11/2026, depois de teste assistido (D-070) |
 | 3 | Iniciativas, interações e compromissos | Matriz de iniciativas, registro único de reuniões, encaminhamentos e prazos | ✅ **Concluída:** autorizada em 03/11/2026 (D-070), incorporada à `main` pelo Pull Request #7 (commit de merge `aa17fe4`, verificações Node.js 24 e 26 aprovadas) e homologada para desenvolvimento (D-071); as soluções provisórias P-040 a P-046 continuam não homologadas (seção 8) |
 | 4 | Plano de ação e matriz de riscos | Versões e aprovação, acompanhamento, riscos, gatilhos e respostas | ✅ **Concluída:** aprovada em 03/11/2026 com a matriz de riscos original do Comitê de Infraestrutura (D-072), incorporada à `main` pelo Pull Request #9 (commit de merge `1246331`, verificações Node.js 24 e 26 aprovadas) e homologada para desenvolvimento em 04/11/2026 (D-073); as soluções provisórias P-047 a P-053 continuam não homologadas (seção 9) |
-| 5 | Autenticação e permissões | Supabase Auth, perfis e permissões por projeto/tema, segurança no banco | 🔧 **Roteiro validado (D-074):** organizada na branch `feature/autenticacao-permissoes` (seção 10); programação depende da autorização específica do projeto Supabase de desenvolvimento |
+| 5 | Autenticação e permissões | Supabase Auth, perfis e permissões por projeto/tema, segurança no banco | 🔧 **Implementada, aguardando homologação** (D-074, D-075; seção 10) |
 | 6 | Painéis e relatórios | Indicadores executivos e relatórios. Depende de Q-55 | 🔧 |
 | 7 | Homologação e hospedagem | Supabase e Vercel com dados fictícios, validação técnica e institucional, plano de cópias de segurança. **Pré-requisitos: C6, C7 e C8 solucionadas** (D-027) | 🔧 ⏳ (exige contas e autorização) |
 | 8 | Piloto com dados reais | Somente após autorização formal, análise LGPD e solução de C6, C7 e C8 (D-027) | ⏳ |
@@ -426,9 +427,9 @@ A homologação da etapa (D-073) não homologa estas soluções: elas continuam 
 
 Supabase, autenticação real, integrações externas e painéis executivos. Achados A-01 a A-06 (pendentes), melhorias U-1 a U-5 (registradas, sem execução) e backlog da V3.0 (V3-01 a V3-04) não implementados (seção 11).
 
-## 10. Etapa 5 — Autenticação e permissões 🔧 (D-074)
+## 10. Etapa 5 — Autenticação e permissões 🔧 (D-074, D-075): implementada, aguardando homologação
 
-**Situação:** roteiro validado (D-074), branch `feature/autenticacao-permissoes` organizada e ambiente Supabase de desenvolvimento autorizado (D-075). A programação começa depois que o gestor criar e configurar o projeto; até este registro, nenhum serviço externo foi criado ou conectado.
+**Situação:** implementada na branch `feature/autenticacao-permissoes`, com o projeto Supabase de desenvolvimento criado pelo gestor (`crm-es-em-acao-dev`, plano Free, `sa-east-1`, somente dados fictícios). Aguarda homologação; aplicação local, sem hospedagem pública. Login Microsoft 365 pendente, sem simulação (D1).
 
 ### Objetivo
 
@@ -490,9 +491,25 @@ Os itens estão listados como pendentes em `testes/seguranca-etapa-5.test.ts` e 
 
 | Providência | Quem | Situação |
 |---|---|---|
-| Projeto Supabase de desenvolvimento `crm-es-em-acao-dev` (`sa-east-1`, plano Free, somente dados fictícios) | Gestor cria a conta e o projeto; as chaves ficam só em `.env.local`, e `npm run ambiente:conferir` confere o ambiente sem exibir nenhum valor | ✅ Autorizado (D-075); ⏳ aguarda a criação pelo gestor |
+| Projeto Supabase de desenvolvimento `crm-es-em-acao-dev` (`sa-east-1`, plano Free, somente dados fictícios) | Gestor criou a conta e o projeto; as chaves ficam só em `.env.local`, e `npm run ambiente:conferir` confere o ambiente sem exibir nenhum valor | ✅ Em uso |
+| Desligar a API automática (Integrations > Data API > Enable Data API) | Gestor, depois da confirmação registrada nos resultados | ⏳ Confirmado que nada depende dela: o CRM não chama esses endpoints, os papéis da API não têm permissão em nenhuma tabela e os testes com a chave pública não recebem dados. Falta o gestor desligar; depois, a autenticação é conferida de novo |
 | Registro do CRM no Microsoft Entra ID, restrito à organização | TI institucional | ⏳ Pendente; não bloqueia a etapa (D1) |
 | Serviço de e-mail institucional (SMTP) para convites e recuperação de senha | TI institucional | ⏳ Necessário só para usuários reais (Etapa 7); os testes não enviam e-mail |
+
+### Resultados dos testes (execução de 06/11/2026) 🔧
+
+| Conjunto | Onde | Resultado |
+|---|---|---|
+| Testes do projeto (`npm test`), inclusive 47 de regras de acesso, credenciais no código e migração 0009 | PGlite, a cada Pull Request | 319 de 319 aprovados |
+| Testes de banco das Etapas 1 a 4 pelo papel `crm_app`, sob as regras (`npm run test:regras`) | PGlite, a cada Pull Request | 82 aprovados; 7 fora, porque tentam excluir registros ou trocar o tipo de um cadastro por comando direto (o papel é recusado ou não alcança nenhuma linha antes do que o teste confere) ou conferem transação sem identidade, que esse caminho não permite. Esses 7 são aprovados na configuração principal |
+| Testes de banco das Etapas 1 a 4, sem alteração, com todas as migrações refeitas do zero (`npm run test:postgres`) | PostgreSQL 17 do Supabase | 115 de 115 aprovados |
+| Regras de acesso pela conexão real da aplicação, login real, credenciais e navegador (`npm run test:supabase`) | Supabase Auth, PostgreSQL 17 do Supabase e Edge sem janela | 96 de 96 aprovados: 50 de regras, 15 de autenticação, 4 de credenciais e 27 de navegador |
+| Tipos, qualidade do código e compilação (`npm run verificar`) | Local e GitHub Actions | Aprovados |
+| Modo local compilado (`CRM_BANCO=pglite`), com o banco de demonstração atualizado pela migração 0009 | PGlite | Telas de pessoas, projetos, planos, riscos e usuários abriram com os dados |
+
+Comprovado por execução: a consulta da aplicação ocorre como `crm_app`, com a identidade na transação, e não vaza para a transação seguinte na mesma conexão; revogação, vencimento e desativação bloqueiam na consulta seguinte, com token ainda válido e com sessão aberta no navegador; a chamada original de uma operação do servidor, reenviada com a sessão de outro usuário, não grava nada; a chave pública não acessa tabelas pela API do Supabase, com ou sem sessão; os valores reais das chaves e senhas não aparecem nos arquivos versionados nem no pacote enviado ao navegador.
+
+Não comprovado nesta etapa: login Microsoft 365 (depende da TI); expiração natural do token, que depende de uma hora de espera (a verificação recusa token adulterado e o bloqueio de acesso não depende do token); envio de e-mail (Etapa 7); hospedagem com HTTPS e o atributo `Secure` dos cookies (Etapa 7); desempenho com a aplicação hospedada e com volume real (Etapa 7).
 
 ### Fora do escopo (D-074)
 
@@ -504,9 +521,9 @@ Hospedagem pública e produção; dados reais; integrações com Outlook e Micro
 |---|---|---|
 | C6. Reforço da auditoria | Etapas 7 e 8 (D-027) | Planejada |
 | C7. Cópia de segurança e restauração | Etapas 7 e 8 (D-027) | Planejada |
-| C8. Portabilidade em PostgreSQL real | Etapas 7 e 8 (D-027) | Validação autorizada no projeto Supabase de desenvolvimento (D-075). Só será considerada resolvida depois de comprovada a compatibilidade das operações e migrações essenciais no PostgreSQL real |
-| Autenticação e segurança multiusuário (inclusive regras de acesso no banco) | Uso por mais de uma pessoa; Etapas 7 e 8 | Etapa 5, roteiro validado (D-074, seção 10); estrutura de permissões preparada na 2A, não homologada |
-| Projeto Supabase de desenvolvimento | Programação da Etapa 5 | ✅ Autorizado (D-075); ⏳ aguarda a criação e a configuração pelo gestor |
+| C8. Portabilidade em PostgreSQL real | Etapas 7 e 8 (D-027) | Comprovada no projeto Supabase de desenvolvimento (PostgreSQL 17): as 10 migrações e os 115 testes de banco das Etapas 1 a 4, sem alteração, além dos 96 testes da Etapa 5. Aguarda a homologação do gestor para ser dada por resolvida (D-075). Ainda não é comprovação em ambiente de produção |
+| Autenticação e segurança multiusuário (inclusive regras de acesso no banco) | Uso por mais de uma pessoa; Etapas 7 e 8 | Etapa 5 implementada, aguardando homologação (seção 10). Soluções provisórias P-054 a P-059, não homologadas |
+| Projeto Supabase de desenvolvimento | — | ✅ Criado pelo gestor e em uso, somente com dados fictícios (D-075) |
 | Registro do CRM no Microsoft Entra ID | Login Microsoft (D1); não bloqueia a Etapa 5 | ⏳ Depende de autorização e configuração pela TI institucional |
 | Serviço de e-mail institucional (SMTP) para convites e recuperação de senha | Usuários reais (Etapa 7) | ⏳ Depende da TI institucional |
 | Rubricas das escalas V2.2 e plano de adaptação técnica | Etapa 2B (D-060, D-063) | ✅ **Resolvida (D-068):** Q-66 1.0 e Q-67 1.0; calibração H6 concluída, com limitações registradas; Etapa 2B pronta para autorização (documento entregue fora do repositório). Decisões Q-65.1, Q-65.4 e Q-65.6 continuam pendentes, sem bloquear a 2B |
@@ -523,7 +540,7 @@ Hospedagem pública e produção; dados reais; integrações com Outlook e Micro
 | Soluções provisórias da Etapa 4 (P-047 a P-053) e pontos pendentes Q-33 (correção de digitação) e Q-42 a Q-44 | — | Em uso e não homologadas (D-072, D-073); decisão do gestor pendente |
 | Soluções provisórias da Etapa 3 (P-040 a P-046) | — | Em uso e não homologadas (D-071); decisão do gestor pendente (Q-20, Q-21, Q-23 e Q-24) |
 | Backlog da V3.0: melhorias V3-01 a V3-08 | — | Registradas pelo gestor (D-071, D-074, D-075) e preservadas (D-072, D-073): V3-01, simplificação visual, com base em modelo de referência indicado pelo gestor; V3-02, matriz Poder × Interesse na página do projeto, com marcadores interativos e identificação por mouse ou toque; V3-03, redução dos caminhos de navegação para as informações relevantes; V3-04, unificação visual de Iniciativas e Interações, com estas como subitens, preservando o registro único de reuniões; V3-05, fotografias dos stakeholders; V3-06, integração funcional entre iniciativas, interações, ações e riscos; V3-07, interoperabilidade futura com outra ferramenta institucional indicada pelo gestor; V3-08, interoperabilidade com monday.com: permitir, no mínimo, exportação compatível em XLSX/CSV de informações selecionadas do CRM para boards do monday.com, com campos e identificadores adequados, podendo uma integração automatizada por API ser avaliada posteriormente (D-075). Não implementar antes da V3.0 |
-| Achados A-01 a A-06 da auditoria técnica independente | — | Documento mantido fora do repositório. A-01 (síntese do gestor, D-075): ausência de autenticação real e de segurança multiusuário efetiva, a ser solucionada pela Etapa 5. A-02 a A-06 no backlog, salvo correções estritamente necessárias à segurança (D-074) |
+| Achados A-01 a A-06 da auditoria técnica independente | — | Documento mantido fora do repositório. A-01 (síntese do gestor, D-075): ausência de autenticação real e de segurança multiusuário efetiva; tratado pela Etapa 5, aguardando homologação. A-02 a A-06 no backlog, salvo correções estritamente necessárias à segurança (D-074) |
 | Melhorias de usabilidade não essenciais (U-1 a U-5, registradas em 02/11/2026) | — | Registradas fora do repositório: texto desatualizado na seção de stakeholders da página do projeto; bloco de evidências antes das classificações no rascunho; dica nas versões recolhidas do histórico; colunas da tabela da matriz no celular; legenda do selo "preliminar" no celular. A tratar oportunamente, sem impedir o andamento; não implementadas nas Etapas 4 e 5 e preservadas (D-071, D-072, D-073, D-074) |
 | Análise LGPD, retenção e anonimização | Etapa 8 | Q-13, Q-58 |
 
