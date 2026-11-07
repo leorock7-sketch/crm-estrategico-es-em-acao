@@ -16,6 +16,7 @@
 | 0.12 | 06/11/2026 | Q-57 atualizada: teste em PostgreSQL real autorizado no projeto Supabase de desenvolvimento (D-075) |
 | 0.13 | 06/11/2026 | Etapa 5 implementada, aguardando homologação: autenticação real, papel `crm_app`, identidade em cada transação e dois modos de acesso (seção 5.1) |
 | 0.14 | 06/11/2026 | Etapa 5 homologada para desenvolvimento (D-078); verificações do ambiente definitivo seguem para a Etapa 7 |
+| 0.15 | 06/11/2026 | Etapa 6 implementada, aguardando homologação (D-079): módulo `paineis`, relatórios em XLSX gerados no servidor e consultas sobre o conjunto de projetos e planos |
 
 Legenda: ✅ Aprovado · 🔧 Proposta técnica · ⏳ Pendente.
 
@@ -85,6 +86,8 @@ Versões instaladas e testadas em 31/10/2026 (registradas com exatidão no arqui
 | Drizzle ORM (Etapa 1) | 0.45.4 | Acesso ao banco em TypeScript, compatível com PGlite e Supabase |
 | drizzle-kit (Etapa 1) | 0.31.11 | Gera os scripts SQL de criação e alteração das tabelas |
 | tsx (Etapa 1) | 4.23.15 | Executa os scripts de manutenção do banco local |
+| write-excel-file (Etapa 6) | 4.1.1 | Gera os arquivos XLSX dos relatórios, só no servidor ✅ D-079 |
+| exceljs e fflate (Etapa 6, só nos testes) | 4.4.0 e 0.8.3 | Releem os arquivos gerados e inspecionam o pacote, de forma independente da biblioteca que os gera |
 
 Critérios de escolha: versões estáveis; combinação gerada pelo instalador oficial do Next.js (`create-next-app` 16.4.3); ferramentas de teste recomendadas na documentação do Next.js. Não foram adotadas versões principais muito recentes (TypeScript 7, ESLint 10) porque o próprio instalador oficial ainda utiliza TypeScript 5 e ESLint 9.
 
@@ -114,6 +117,7 @@ crm-estrategico-es-em-acao/
 │   │   ├── compromissos/     Compromissos: lista com filtros, página, acompanhamento e conversão em ação do plano
 │   │   ├── planos/           Planos de ação: lista, criação, página do plano e [id]/versoes (edição, comparação e decisão)
 │   │   ├── acoes/            Página da ação: planejamento vigente, marcos, acompanhamento e relações
+│   │   ├── paineis/          Painéis: visão executiva, por projeto ou tema, relatórios e download dos arquivos
 │   │   ├── riscos/           Matriz de Riscos: matrizes 5 × 5, lista com filtros, cadastro, ficha e edição
 │   │   ├── pessoas/          Lista, inclusão, detalhe e edição de pessoas
 │   │   ├── instituicoes/     Lista, inclusão, detalhe e edição de instituições
@@ -127,6 +131,7 @@ crm-estrategico-es-em-acao/
 │   │   ├── iniciativas/      Iniciativas: validações, consultas, ações, histórico e telas
 │   │   ├── interacoes/       Interações e compromissos: registro único, prazos, acompanhamento e telas
 │   │   ├── plano-acao/       Plano de Ação: versões e aprovação, ações, marcos, acompanhamento, comparação entre versões e integrações
+│   │   ├── paineis/          Painéis e relatórios: filtros, leitura, indicadores, relatórios R1 a R5 e geração do XLSX
 │   │   ├── riscos/           Matriz de Riscos: parâmetros da matriz 5 × 5 original, avaliações inerente e residual, gatilhos, respostas e telas
 │   │   ├── avaliacoes/       Avaliação estratégica: escalas V2.2, rubricas, alertas orientativos, matriz 3 × 3, cálculo de demonstração (histórico), consultas, ações e telas
 │   │   ├── projetos-temas/   Comitês, projetos, temas e contextos: validações, consultas, ações e componentes
@@ -213,6 +218,10 @@ Regras de organização:
 | Microsoft 365 | Pendente: depende da TI institucional. O botão aparece desativado, com o aviso; nada é simulado |
 
 Limites conhecidos: a identidade é informada pela aplicação ao banco, em cada transação, o que confia na aplicação e nas credenciais do papel `crm_app`, guardadas só no servidor; cada consulta faz mais de uma ida e volta ao banco, o que é irrelevante com a aplicação e o banco na mesma região, mas deve ser medido na hospedagem (Etapa 7); o atributo `Secure` dos cookies depende de HTTPS e deve ser ligado na hospedagem (Etapa 7).
+
+### Exportações (Etapa 6) 🔧 D-079
+
+Os arquivos são gerados no servidor, em memória, a cada pedido, com a conexão da aplicação e a identidade do usuário: o alcance é decidido pelas permissões válidas lidas no banco, e a rota responde sem cache. O arquivo só contém o que foi montado nas abas, sem fórmulas nem elementos ocultos, e o texto digitado é neutralizado. Nada fica guardado no servidor.
 
 ## 6. Comandos do projeto
 

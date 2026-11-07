@@ -41,6 +41,8 @@ Projeto em fase inicial de desenvolvimento. As Etapas 1, 1.1, 2A, 2B, 3, 4 e 5 f
 
 Já existem a documentação, um banco de dados local de desenvolvimento, as telas do Cadastro Mestre (pessoas, instituições, vínculos, contatos e histórico de alterações) e as telas de comitês (somente consulta), projetos e temas, com comitês participantes e stakeholders associados, além da estrutura de avaliação de stakeholders (fichas, versões, evidências e matriz de poder × interesse) com uma metodologia fictícia na escala V2.2 e as metodologias de **demonstração** anteriores mantidas como histórico: os resultados exibidos são fictícios e **não homologados**. Ainda não há metodologia homologada para uso institucional, autenticação, hospedagem nem os demais módulos.
 
+A Etapa 6 — painéis por comitê e por projeto ou tema, e relatórios R1 a R5 em XLSX, sempre dentro das permissões de cada usuário — foi implementada e aguarda homologação (D-079), com soluções provisórias ainda não homologadas (P-061 a P-065). O menu "Painéis" dá acesso às três áreas; a impressão e o PDF usam o próprio navegador.
+
 O ambiente de testes utilizará exclusivamente dados fictícios até que o tratamento de dados institucionais reais seja devidamente autorizado.
 
 ## Titularidade provisória
