@@ -5,6 +5,7 @@
 | 0.1 | 07/11/2026 | Fase 7A (D-082): arquitetura de custo zero, monitoramento, consumo, cópias de segurança, restauração e conta pessoal. Somente ambiente de desenvolvimento, com dados fictícios. |
 | 0.2 | 07/11/2026 | Fase 7A homologada para desenvolvimento (D-083). Ressalvas: restauração completa do Supabase Auth não demonstrada, sem hospedagem pública e sem disponibilidade garantida no plano Free. |
 | 0.3 | 07/11/2026 | Monitor ativado pelo gestor (teste de quatro semanas iniciado) e rotina diária de cópias no Agendador de Tarefas do Windows (D-084). |
+| 0.4 | 07/11/2026 | Reativação da tarefa diária, conferência da chave com abertura de cópia existente e reserva do segundo projeto do Supabase para outra ferramenta (D-085). |
 
 Legenda: ✅ Aprovado · 🔧 Proposta técnica · ⏳ Pendente.
 
@@ -23,7 +24,7 @@ Limites e condições dos fornecedores, conferidos em 07/11/2026 nas páginas of
 
 | Fornecedor | Limite ou condição | Efeito para o CRM |
 |---|---|---|
-| Supabase Free | Banco de 500 MB; 5 GB de transferência por mês; 1 GB de arquivos; 50 mil usuários ativos por mês; até 2 projetos gratuitos ativos | Banco de desenvolvimento com 21 MB (4,2%) em 07/11/2026. O CRM não usa armazenamento de arquivos nem funções do Supabase |
+| Supabase Free | Banco de 500 MB; 5 GB de transferência por mês; 1 GB de arquivos; 50 mil usuários ativos por mês; até 2 projetos gratuitos ativos | O segundo projeto gratuito está reservado para outra ferramenta institucional indicada pelo gestor (a mesma da V3-07) e não será usado pelo CRM (D-085). Banco de desenvolvimento com 21 MB (4,2%) em 07/11/2026. O CRM não usa armazenamento de arquivos nem funções do Supabase |
 | Supabase Free | Projeto pausado após cerca de 7 dias de pouca atividade, **sem garantia** de que consultas evitem a pausa | Monitoramento reduz o risco; reativação manual (seção 4) |
 | Supabase Free | Sem cópias automáticas, sem recuperação a um ponto no tempo e sem download de cópias | Cópias próprias (seção 5) |
 | Netlify Free | 300 créditos por mês, limite rígido; ao esgotar, **todos** os sites da conta param até o ciclo seguinte; publicação em produção gasta 15 créditos; prévias não gastam | Sem cobrança, mas com interrupção. Consumo real só será conhecido nos testes T3 e T4 |
@@ -110,15 +111,17 @@ Tarefa **"CRM - copia diaria (desenvolvimento)"** no Agendador de Tarefas do Win
 | Registro | `registro-rotina.log`, só na pasta local (não sincronizado): data, etapa, resultado, duração, categoria e nome da cópia. Nunca conexões, chaves, senhas, mensagens de erro originais ou dados |
 | Avisos | Falha: notificação do Windows e mensagem na tela. Pendência (ensaio vencido, chave não conferida, monitor com problema): notificação. Cada aviso substitui o anterior e é retirado na execução seguinte sem pendências. Sem arquivos de aviso: a Área de Trabalho pode estar no OneDrive, que impede processos do Agendador de regravar arquivos já sincronizados |
 | Ensaio mensal | `npm run backup:ensaiar` pelo menos a cada 31 dias; o resultado entra no registro, e a rotina avisa quando o prazo vence |
-| Chave privada | As cópias só contam como protegidas depois de `npm run backup:conferir-chave`, rodado pelo gestor no próprio terminal: a chave colada não aparece na tela nem é gravada; o programa confere se ela corresponde à chave pública usada nas cópias. Até lá, a rotina avisa a pendência |
+| Chave privada | As cópias só contam como protegidas depois de `npm run backup:conferir-chave`, rodado pelo gestor no próprio terminal com a chave copiada do gerenciador de senhas: a chave colada não aparece na tela nem é gravada; o programa confere se ela corresponde à chave pública usada nas cópias e abre, só na memória, cada arquivo da cópia íntegra mais recente, comparando o conteúdo com o resumo SHA-256 do original (D-085). Vale a conferência mais recente: até a primeira, ou depois de uma conferência com falha, a rotina avisa a pendência |
 
-**Comandos:** `npm run backup:rotina` (o mesmo que a tarefa executa), `npm run backup:conferir` (só confere os destinos), `npm run backup:conferir-chave`, `npm run backup:agendar` (cria ou atualiza a tarefa) e `npm run backup:agendar -- -Remover` (remove a tarefa).
+**Comandos:** `npm run backup:rotina` (o mesmo que a tarefa executa), `npm run backup:conferir` (só confere os destinos e mostra se a tarefa continua habilitada, com a última e a próxima execução), `npm run backup:conferir-chave`, `npm run backup:agendar` (cria ou atualiza a tarefa) e `npm run backup:agendar -- -Remover` (remove a tarefa).
 
 **Limites:** depende do computador ligado e do usuário conectado. A conferência lê a pasta do Google Drive para computador; o envio à nuvem é feito pelo próprio aplicativo do Google Drive. A tarefa executa os scripts do repositório local, que precisa estar na `main` com esta rotina.
 
+**Desativação de 07/11/2026 — causa não identificada (D-085).** A definição da tarefa foi alterada às 18:25:33 (desabilitada) e às 18:33:46 (habilitada de novo), sem comando desta rotina nem da sessão de testes. Os dois horários coincidem com o desligamento da tela ou espera do computador (o serviço de notificações do Windows encerrou a sessão do usuário às 18:25:33) e com a volta (eventos de energia às 18:33:47); na volta, as tarefas do OneDrive do mesmo usuário foram regravadas no mesmo segundo. O Windows não foi reiniciado nesse intervalo e o histórico do Agendador está desligado neste computador, por isso **a causa não pôde ser identificada com certeza**. Se a tarefa aparecer desabilitada de novo em `npm run backup:conferir`, investigar antes de reabilitar; ligar o histórico do Agendador (Agendador de Tarefas > *Habilitar Histórico de Todas as Tarefas*, com permissão de administrador) ajuda a identificar a origem.
+
 ## 6. Restauração num projeto Supabase ⏳
 
-O ensaio local comprova dados, estrutura, regras, permissões e credenciais restauradas, mas **não** o login completo do Supabase Auth, que só roda num projeto Supabase. A demonstração funcional exige restaurar no segundo projeto gratuito, que depende de autorização. Roteiro previsto: criar o projeto; aplicar `npm run supabase:preparar` com a conexão nova; restaurar os dados com `pg_restore --data-only` nas tabelas de `public` e de `auth`; reproduzir as configurações da seção 5; conferir com `backup:comparar` e com os testes não destrutivos.
+O ensaio local comprova dados, estrutura, regras, permissões e credenciais restauradas, mas **não** o login completo do Supabase Auth, que só roda num projeto Supabase. **A demonstração no segundo projeto gratuito não será feita:** ele está reservado para outra ferramenta institucional indicada pelo gestor (a mesma da V3-07) (D-085). A validação integral será replanejada, com uma alternativa tecnicamente segura e gratuita a apresentar; até lá, mantêm-se os ensaios locais isolados, e a pendência **não** está resolvida enquanto a restauração completa não for efetivamente comprovada. Roteiro técnico, para quando houver ambiente autorizado: preparar o projeto; aplicar `npm run supabase:preparar` com a conexão nova; restaurar os dados com `pg_restore --data-only` nas tabelas de `public` e de `auth`; reproduzir as configurações da seção 5; conferir com `backup:comparar` e com os testes não destrutivos.
 
 ## 7. Hospedagem candidata: Netlify Free 🔧 (A1)
 

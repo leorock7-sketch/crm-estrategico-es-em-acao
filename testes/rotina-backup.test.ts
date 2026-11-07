@@ -75,6 +75,7 @@ describe("Registro da rotina", () => {
     expect(diasDesdeUltimoEnsaio([registro("ensaio", "ok", "2026-11-07T21:00:00Z"), registro("ensaio", "falha", "2026-12-19T21:00:00Z")], agora)).toBe(42);
     expect(chaveConferida([registro("chave-conferida", "falha", "2026-11-07T21:00:00Z")])).toBe(false);
     expect(chaveConferida([registro("chave-conferida", "ok", "2026-11-07T21:00:00Z")])).toBe(true);
+    expect(chaveConferida([registro("chave-conferida", "ok", "2026-11-07T21:00:00Z"), registro("chave-conferida", "falha", "2026-11-08T21:00:00Z")])).toBe(false);
   });
 });
 

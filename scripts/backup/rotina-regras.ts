@@ -61,8 +61,9 @@ export function diasDesdeUltimoEnsaio(registros: readonly Registro[], agora = ne
 }
 
 /** A chave privada só conta como guardada depois de conferida (npm run backup:conferir-chave). */
+/** Vale a conferência mais recente: uma falha posterior traz o aviso de volta. */
 export function chaveConferida(registros: readonly Registro[]): boolean {
-  return registros.some((r) => r.etapa === "chave-conferida" && r.resultado === "ok");
+  return registros.filter((r) => r.etapa === "chave-conferida").at(-1)?.resultado === "ok";
 }
 
 const sha256 = (arquivo: string) => createHash("sha256").update(readFileSync(arquivo)).digest("hex");

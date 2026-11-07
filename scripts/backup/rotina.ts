@@ -61,8 +61,28 @@ function conferirCopias(): Registro[] {
   ];
 }
 
+/** Situação da tarefa no Agendador (somente leitura), para conferir se continua habilitada (D-085). */
+function conferirTarefa(): boolean {
+  if (process.platform !== "win32") return true;
+  const comando =
+    "$t = Get-ScheduledTask -TaskName 'CRM - copia diaria (desenvolvimento)' -ErrorAction SilentlyContinue; " +
+    "if (-not $t) { 'ausente' } else { $i = Get-ScheduledTaskInfo -TaskName $t.TaskName; " +
+    "'{0}|{1:dd/MM/yyyy HH:mm}|{2:dd/MM/yyyy HH:mm}' -f $t.Settings.Enabled, $i.LastRunTime, $i.NextRunTime }";
+  const r = spawnSync("powershell.exe", ["-NoProfile", "-Command", comando], { encoding: "utf8", windowsHide: true });
+  const [habilitada, ultima, proxima] = (r.stdout ?? "").trim().split("|");
+  if (habilitada === "True") {
+    console.log(`[OK] Tarefa diária habilitada; última execução ${ultima || "nenhuma"}; próxima ${proxima}.`);
+    return true;
+  }
+  console.log(`[PROBLEMA] Tarefa diária ${habilitada === "False" ? "desabilitada" : "não encontrada"} no Agendador. Investigar a causa antes de reabilitar (D-085).`);
+  return false;
+}
+
 function principal(): number {
-  if (soConferir) return conferirCopias().some((r) => r.resultado === "falha") ? 1 : 0;
+  if (soConferir) {
+    const copiasCertas = !conferirCopias().some((r) => r.resultado === "falha");
+    return conferirTarefa() && copiasCertas ? 0 : 1;
+  }
 
   if (!adquirirTrava(local)) {
     registrar(local, { etapa: "rotina", resultado: "ignorada", duracao_ms: null, categoria: "outra-execucao-em-andamento" });

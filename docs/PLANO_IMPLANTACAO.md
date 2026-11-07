@@ -38,6 +38,7 @@
 | 0.34 | 07/11/2026 | Roteiro da Etapa 7 a custo zero aprovado e Fase 7A concluída, aguardando validação (D-082, seção 12); pendências e local de trabalho renumerados (seções 13 e 14) |
 | 0.35 | 07/11/2026 | Fase 7A homologada para desenvolvimento (D-083), com ressalvas preservadas; próxima fase a custo zero: monitor assistido, cópias diárias e, depois, testes reais no Netlify Free |
 | 0.36 | 07/11/2026 | Monitor ativado pelo gestor (teste de quatro semanas até cerca de 05/12/2026) e rotina diária de cópias no Windows (D-084), aguardando validação; depois, testes reais no Netlify Free, sujeitos a autorização |
+| 0.37 | 07/11/2026 | Resultados da rotina de cópias aprovados e tarefa reativada com condições (D-085); segundo projeto do Supabase reservado para outra ferramenta do gestor, fora do CRM; restauração completa do Supabase Auth a replanejar |
 
 Legenda: ✅ Aprovado · 🔧 Proposta técnica · ⏳ Pendente.
 
@@ -622,7 +623,7 @@ Página inicial; melhorias V3-01 a V3-08, inclusive a nova interface da V3-02; i
 
 ## 12. Etapa 7 — Implantação, homologação técnica e segurança operacional 🔧 (D-080 a D-083): Fase 7A homologada para desenvolvimento
 
-**Premissa (D-082):** custo de **US$ 0/mês**, só com serviços gratuitos; conta pessoal e Supabase Free mantidos; nenhum serviço pago, upgrade ou recurso adicional. A **Fase 7A** (preparação técnica, só com dados fictícios) foi **homologada para desenvolvimento e testes com dados fictícios** (D-083), com o Pull Request #15 aprovado no GitHub Actions. Hospedagem pública, contas institucionais, segundo projeto do Supabase e dados reais dependem de autorização específica. Detalhes de operação em [OPERACAO.md](OPERACAO.md).
+**Premissa (D-082):** custo de **US$ 0/mês**, só com serviços gratuitos; conta pessoal e Supabase Free mantidos; nenhum serviço pago, upgrade ou recurso adicional. A **Fase 7A** (preparação técnica, só com dados fictícios) foi **homologada para desenvolvimento e testes com dados fictícios** (D-083), com o Pull Request #15 aprovado no GitHub Actions. Hospedagem pública, contas institucionais e dados reais dependem de autorização específica. O segundo projeto gratuito do Supabase está reservado para outra ferramenta institucional indicada pelo gestor (a mesma da V3-07) e não será usado pelo CRM (D-085). Detalhes de operação em [OPERACAO.md](OPERACAO.md).
 
 **Ressalvas da homologação (D-083):** a restauração completa do Supabase Auth não foi demonstrada (só num projeto Supabase); não há hospedagem pública; a disponibilidade não pode ser garantida no plano Free. P-066 a P-070 continuam provisórias.
 
@@ -658,7 +659,7 @@ Não executados: `npm run test:postgres` e `supabase:preparar -- --refazer`, des
 1. **Hospedagem não testada de verdade:** criar o site no Netlify (autorização) para os testes T2, T3 (tempo de resposta com funções em Ohio e banco em São Paulo), T4 (consumo real de créditos) e T8 (segurança na hospedagem).
 2. **Monitor sem as quatro semanas:** ativado em 07/11/2026; o teste termina por volta de 05/12/2026 e, mesmo concluído, não garante a continuidade do plano gratuito.
 3. **Sem cópias gerenciadas e sem disponibilidade garantida** no plano gratuito; as cópias próprias diárias (D-084) dependem do computador ligado e do usuário conectado.
-4. **Restauração do login completo** só demonstrável num projeto Supabase (segundo projeto gratuito, não autorizado).
+4. **Restauração completa do login (Supabase Auth) não comprovada:** o segundo projeto gratuito está reservado para outra ferramenta (D-085); a validação integral será replanejada, com alternativa segura e gratuita a apresentar.
 5. **Dados reais:** projeto exclusivo, não descartável; LGPD (Q-13, Q-58), inclusive as cópias integrais de dados pessoais na auditoria; destino e guarda das cópias; aceite institucional da conta pessoal ou solução de continuidade.
 6. **Pendências anteriores:** arquivos XLSX no Microsoft Excel e verificações do ambiente hospedado (D-080); login Microsoft e e-mail institucional (TI).
 
@@ -678,19 +679,28 @@ Não executados: `npm run test:postgres` e `supabase:preparar -- --refazer`, des
 | Segunda execução no mesmo dia | Cópia não duplicada ("já houve cópia hoje"); conferência aprovada |
 | Tarefa | Pronta e habilitada; próxima execução às 12:30 do dia seguinte |
 
-**Pendência da rotina:** conferência da chave privada pelo gestor (`npm run backup:conferir-chave`); até lá, as cópias não são consideradas protegidas (D-084).
+**Resultados aprovados pelo gestor e reativação da tarefa (D-085):**
+
+| Conferência | Resultado |
+|---|---|
+| Configuração da tarefa | Gatilho diário às 12:30, habilitado; usuário conectado, sem privilégio de administrador; execução assim que possível quando o horário é perdido; sem execuções simultâneas; limite de 30 minutos; ação apontando para a rotina do repositório local |
+| Causa da desativação | **Não identificada com certeza.** Desabilitada às 18:25:33 e habilitada de novo às 18:33:46, sem comando da rotina nem da sessão de testes; os horários coincidem com o desligamento da tela ou espera do computador e com a volta; sem reinicialização do Windows; histórico do Agendador desligado ([OPERACAO.md](OPERACAO.md), seção 5) |
+| Origem das cópias | Conferida: conexão, endereço e projeto autorizado neste computador coincidem; marca do banco de testes descartáveis com dados fictícios; proteção da cópia aprovada |
+| Chave privada do age | ⏳ Conferência pelo gestor: `npm run backup:conferir-chave` passou a abrir, só na memória, os arquivos da cópia íntegra mais recente e a comparar com o resumo SHA-256 do original. Testada com chaves e cópia descartáveis (chave certa, chave errada, formato inválido e cópia que não corresponde ao original). Até a conferência do gestor, as cópias não são consideradas protegidas |
+| Teste controlado pelo Agendador | Tarefa habilitada antes e depois; cópia do dia não duplicada; conferência dos dois destinos e do monitor aprovadas; cópia íntegra preservada |
+| Depois de reiniciar o Windows | ⏳ A conferir quando possível, com `npm run backup:conferir`, que passou a mostrar se a tarefa continua habilitada |
 
 ### Próximas fases, dependentes de autorização
 
 - **7B — Hospedagem de teste:** site no Netlify Free ligado ao projeto de desenvolvimento, só com dados fictícios; testes T2, T3, T4 e T8; monitor com a rota `/saude`.
-- **7C — Ambiente do piloto:** segundo projeto gratuito, não descartável, vazio, com cópias e restauração ensaiadas; contas institucionais; critérios objetivos do piloto (Etapa 8).
+- **7C — Ambiente do piloto:** a definir, sem o segundo projeto gratuito, reservado para outra ferramenta (D-085); ambiente não descartável, vazio, com cópias e restauração ensaiadas; contas institucionais; critérios objetivos do piloto (Etapa 8). Depende de solução apropriada de ambiente, segurança, LGPD e continuidade operacional, e de autorização.
 
 ## 13. Pendências efetivas (atualizadas em 07/11/2026)
 
 | Pendência | Bloqueia | Situação |
 |---|---|---|
 | C6. Reforço da auditoria | Etapas 7 e 8 (D-027) | ✅ Implementada na Fase 7A (D-082, migração `0010`) e homologada para desenvolvimento (D-083). As cópias integrais de dados pessoais na auditoria seguem para a política de retenção (Q-58) |
-| C7. Cópia de segurança e restauração | Etapas 7 e 8 (D-027) | ✅ Homologada para desenvolvimento (D-083): cópias criptografadas e ensaio de restauração isolado; rotina diária no Windows (D-084), aguardando validação. ⏳ Pendentes: destino para dados reais e restauração completa num projeto Supabase, inclusive do login |
+| C7. Cópia de segurança e restauração | Etapas 7 e 8 (D-027) | ✅ Homologada para desenvolvimento (D-083): cópias criptografadas e ensaio de restauração isolado; rotina diária no Windows com resultados aprovados (D-084, D-085). ⏳ Pendentes: destino para dados reais e restauração completa do Supabase Auth, a replanejar (D-085) |
 | C8. Portabilidade em PostgreSQL real | Etapas 7 e 8 (D-027) | ✅ Compatibilidade essencial comprovada no PostgreSQL 17 de desenvolvimento (D-078): as 10 migrações e os 115 testes de banco das Etapas 1 a 4, sem alteração, além dos 103 testes da Etapa 5. ⏳ Não dispensa as verificações do ambiente definitivo |
 | Autenticação e segurança multiusuário (inclusive regras de acesso no banco) | Etapas 7 e 8 | ✅ Homologada para desenvolvimento (D-078, seção 10); ⏳ produção sujeita aos testes da Etapa 7. Soluções provisórias P-054 a P-060, não homologadas |
 | Projeto Supabase de desenvolvimento | — | ✅ Criado pelo gestor e em uso, somente com dados fictícios (D-075) |
@@ -703,10 +713,11 @@ Não executados: `npm run test:postgres` e `supabase:preparar -- --refazer`, des
 | Homologação da Etapa 6 | Etapa 7 | ✅ Homologada para desenvolvimento em 07/11/2026 (D-080), com o commit final `8708453` do Pull Request #12; incorporada à `main` pelo gestor (merge `a78af82`, D-081). P-061 a P-065 continuam provisórias, não homologadas individualmente |
 | Roteiro da Etapa 7 — Implantação, Homologação Técnica e Segurança Operacional | Programação da Etapa 7 | ✅ Aprovado com a premissa de custo zero (D-082); Fase 7A homologada para desenvolvimento (D-083, seção 12) |
 | Segredos do monitoramento no GitHub Actions | Teste de quatro semanas do monitor | ✅ Cadastrados pelo gestor em 07/11/2026; primeira execução concluída com sucesso. ⏳ Teste de quatro semanas até cerca de 05/12/2026 ([OPERACAO.md](OPERACAO.md), seção 2) |
-| Tarefa diária de cópias no Windows | Cópias automáticas | ✅ Autorizada (D-084), criada e testada pelo Agendador; aguardando validação do gestor ([OPERACAO.md](OPERACAO.md), seção 5) |
-| Conferência da chave privada do age no gerenciador de senhas | Cópias consideradas protegidas (D-084) | ⏳ Pelo gestor, no próprio terminal: `npm run backup:conferir-chave` |
-| Site no Netlify Free (testes T2, T3, T4 e T8) | Piloto gratuito | ⏳ Depois da validação da rotina diária de cópias (D-084); criação do site depende de autorização específica (D-082, A1) |
-| Segundo projeto gratuito do Supabase | Homologação, piloto e restauração funcional do login | ⏳ Reservado; depende de autorização (D-082, D-083) |
+| Tarefa diária de cópias no Windows | Cópias automáticas | ✅ Resultados aprovados (D-085); habilitada e testada pelo Agendador depois da desativação de 07/11/2026, de causa não identificada. ⏳ Conferir depois de reiniciar o Windows ([OPERACAO.md](OPERACAO.md), seção 5) |
+| Conferência da chave privada do age no gerenciador de senhas | Cópias consideradas protegidas (D-084, D-085) | ⏳ Pelo gestor, no próprio terminal: `npm run backup:conferir-chave`, que também abre uma cópia existente, só na memória |
+| Site no Netlify Free (testes T2, T3, T4 e T8) | Piloto gratuito | ⏳ Próximo passo (D-085), só com dados fictícios e custo zero; criação do site depende de autorização específica (D-082, A1) |
+| Segundo projeto gratuito do Supabase | — | Reservado para a versão 2.0 de outra ferramenta institucional indicada pelo gestor (a mesma da V3-07); não será usado pelo CRM nem criado agora (D-085) |
+| Restauração completa do Supabase Auth | Uso institucional real | ⏳ A replanejar (D-085): alternativa tecnicamente segura e gratuita a apresentar; ensaios locais isolados mantidos; não resolvida até a comprovação efetiva |
 | Conta pessoal: solução institucional de continuidade e proteção de dados | Uso institucional real | ⏳ Consequências documentadas ([OPERACAO.md](OPERACAO.md), seção 8) |
 | Senha administrativa forte do PostgreSQL do projeto de desenvolvimento | — | ✅ Trocada pelo gestor em 06/11/2026; senha anterior recusada e nova confirmada, com `.env.local` atualizado e arquivo temporário sobrescrito e apagado (D-077) |
 | Rubricas das escalas V2.2 e plano de adaptação técnica | Etapa 2B (D-060, D-063) | ✅ **Resolvida (D-068):** Q-66 1.0 e Q-67 1.0; calibração H6 concluída, com limitações registradas; Etapa 2B pronta para autorização (documento entregue fora do repositório). Decisões Q-65.1, Q-65.4 e Q-65.6 continuam pendentes, sem bloquear a 2B |
