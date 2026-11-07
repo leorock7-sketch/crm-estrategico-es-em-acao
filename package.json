@@ -28,6 +28,7 @@
     "backup:preparar": "tsx scripts/backup/preparar.ts",
     "backup:executar": "tsx scripts/backup/backup.ts",
     "backup:ensaiar": "tsx scripts/backup/ensaio-restauracao.ts",
+    "backup:comparar": "tsx scripts/backup/comparar.ts",
     "test:regras": "vitest run --config vitest.regras.config.mts",
     "test:postgres": "vitest run --config vitest.postgres.config.mts",
     "test:supabase": "vitest run --config vitest.supabase.config.mts"

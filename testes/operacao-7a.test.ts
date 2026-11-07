@@ -136,7 +136,7 @@ describe("Papel crm_monitor — privilégios mínimos", () => {
     expect(await comoMonitor(async (tx) => ((await tx.execute(sql.raw(CONSULTA_PROTECOES))).rows[0] as { tabelas_sem_protecao: number }).tabelas_sem_protecao)).toBe(0);
     const lidas: string[] = [];
     for (const tabela of tabelas) {
-      const codigo = await codigoDaFalha(comoMonitor((tx) => tx.execute(sql.raw(`select 1 from "${tabela}" limit 1`))));
+      const codigo = await codigoDaFalha(comoMonitor((tx) => tx.execute(sql.raw(`select 1 from public."${tabela}" limit 1`))));
       if (codigo !== "42501") lidas.push(`${tabela}: ${codigo}`);
     }
     expect(lidas).toEqual([]);

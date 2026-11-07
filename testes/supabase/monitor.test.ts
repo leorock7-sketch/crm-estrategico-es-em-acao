@@ -77,13 +77,15 @@ describe("Monitor no Supabase, com o login real do crm_monitor", () => {
     expect(tabelas.length).toBeGreaterThanOrEqual(44);
     const lidas: string[] = [];
     for (const tabela of tabelas) {
-      const codigo = await codigoDaFalha(monitor.unsafe(`select 1 from "${tabela}" limit 1`));
+      // Nome completo do esquema: sem ele, a recusa aparece como "tabela inexistente", porque no Supabase
+      // o monitor nem enxerga o esquema public.
+      const codigo = await codigoDaFalha(monitor.unsafe(`select 1 from public."${tabela}" limit 1`));
       if (codigo !== "42501") lidas.push(`${tabela}: ${codigo}`);
     }
     expect(lidas).toEqual([]);
-    expect(await codigoDaFalha(monitor`select sessao_ativa()`)).toBe("42501");
-    expect(await codigoDaFalha(monitor`select set_config('app.usuario_id', ${randomUUID()}, false), (select count(*) from usuario)`)).toBe("42501");
-    expect(await codigoDaFalha(monitor`create table monitor_teste (id int)`)).toBe("42501");
+    expect(await codigoDaFalha(monitor`select public.sessao_ativa()`)).toBe("42501");
+    expect(await codigoDaFalha(monitor`select set_config('app.usuario_id', ${randomUUID()}, false), (select count(*) from public.usuario)`)).toBe("42501");
+    expect(await codigoDaFalha(monitor`create table public.monitor_teste (id int)`)).toBe("42501");
   });
 
   test("as proteções estão ativas em todas as tabelas, vistas pelo catálogo", async () => {

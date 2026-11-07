@@ -45,9 +45,11 @@ export async function proxy(requisicao: NextRequest) {
     login.search = caminho === "/" ? "" : `?destino=${encodeURIComponent(caminho + requisicao.nextUrl.search)}`;
     return NextResponse.redirect(login);
   }
-  // P-056: com senha provisória, só a troca de senha. O código 303 transforma qualquer envio em
-  // simples leitura, para nenhuma operação do servidor ser executada no caminho.
-  if (autenticado && exigeTrocaDeSenha(data?.claims) && caminho !== PAGINA_DA_TROCA && !publica) {
+  // P-056: com senha provisória, só a troca de senha. As telas são desviadas para ela (303). Os envios
+  // de operações seguem: o formulário da troca pode estar num endereço anterior, e as demais operações
+  // são recusadas no servidor enquanto a troca estiver pendente (bancoDaSessao).
+  const ehOperacao = requisicao.method === "POST" && requisicao.headers.has("next-action");
+  if (autenticado && exigeTrocaDeSenha(data?.claims) && caminho !== PAGINA_DA_TROCA && !publica && !ehOperacao) {
     const troca = requisicao.nextUrl.clone();
     troca.pathname = PAGINA_DA_TROCA;
     troca.search = DESTINO_DA_TROCA.slice(PAGINA_DA_TROCA.length);

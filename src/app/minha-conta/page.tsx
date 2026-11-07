@@ -5,6 +5,7 @@ import { CabecalhoPagina } from "@/componentes/cabecalho-pagina";
 import { Carregando } from "@/componentes/carregando";
 import { classeCartao, classeLink } from "@/componentes/estilos";
 import { SeloSituacao } from "@/componentes/selo-situacao";
+import { CorrigirEnderecoDaTroca } from "@/lib/autenticacao/corrigir-endereco-da-troca";
 import { FormularioTrocaSenha } from "@/lib/autenticacao/formulario-troca-senha";
 import { modoDeAcesso } from "@/lib/banco/ambiente";
 import { permissaoContexto, projetoTema } from "@/lib/banco/esquema";
@@ -60,6 +61,7 @@ async function Conteudo() {
     <>
       {trocaPendente && (
         <Alerta tom="aviso" titulo="Defina sua senha pessoal para continuar">
+          <CorrigirEnderecoDaTroca />
           Sua conta está com uma senha provisória, criada ou redefinida pelo administrador. As demais telas ficam disponíveis assim que você trocá-la abaixo.
         </Alerta>
       )}

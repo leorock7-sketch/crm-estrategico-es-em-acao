@@ -5,7 +5,7 @@
  * se o e-mail existe. O login não concede acesso por si: quem decide é o cadastro interno.
  */
 import { redirect } from "next/navigation";
-import { exigeTrocaDeSenha } from "./troca-obrigatoria";
+import { DESTINO_DA_TROCA, exigeTrocaDeSenha, MARCA_TROCA_OBRIGATORIA } from "./troca-obrigatoria";
 import { z } from "zod";
 import { clienteSupabaseDaRequisicao } from "./supabase-servidor";
 
@@ -27,11 +27,13 @@ export async function entrar(_estado: EstadoAutenticacao, formData: FormData): P
   const resultado = esquemaLogin.safeParse({ email: formData.get("email"), senha: formData.get("senha") });
   if (!resultado.success) return { mensagem: "Informe o e-mail e a senha." };
   const supabase = await clienteSupabaseDaRequisicao();
-  const { error } = await supabase.auth.signInWithPassword({
+  const { data, error } = await supabase.auth.signInWithPassword({
     email: resultado.data.email,
     password: resultado.data.senha,
   });
   if (error) return { mensagem: "E-mail ou senha incorretos, ou conta sem acesso." };
+  // P-056: com senha provisória, o destino é a troca de senha, qualquer que seja o pedido.
+  if (data.user?.app_metadata?.[MARCA_TROCA_OBRIGATORIA] === true) redirect(DESTINO_DA_TROCA);
   redirect(destinoSeguro(formData.get("destino")));
 }
 

@@ -13,7 +13,7 @@ import { randomUUID } from "node:crypto";
 import { existsSync, mkdirSync } from "node:fs";
 import path from "node:path";
 import { and, eq, isNull, sql } from "drizzle-orm";
-import { type Browser, chromium, type Page } from "playwright-core";
+import { type Browser, type BrowserContext, chromium, type Page } from "playwright-core";
 import { afterAll, beforeAll, describe, expect, test } from "vitest";
 import { abrirBancoPostgres, type Banco, comoUsuario, fecharBanco } from "@/lib/banco/conexao";
 import { permissaoContexto, usuario } from "@/lib/banco/esquema";
@@ -92,6 +92,37 @@ async function textoDaPagina(pagina: Page) {
   return pagina.locator("body").innerText();
 }
 
+async function aguardarCaminho(pagina: Page, caminho: string) {
+  try {
+    await pagina.waitForURL((url) => url.pathname === caminho, { timeout: 60_000 });
+  } catch {
+    const texto = (await pagina.locator("body").innerText().catch(() => "")).replace(/\s+/g, " ").slice(0, 300);
+    throw new Error(`Esperava ${caminho}; a página ficou em ${new URL(pagina.url()).pathname}${new URL(pagina.url()).search}: "${texto}"`);
+  }
+}
+
+type ChamadaCapturada = { url: string; cabecalhos: Record<string, string>; corpo: Buffer };
+
+/** Captura a chamada original de uma operação do servidor, sem deixá-la chegar ao servidor. */
+async function capturarChamada(pagina: Page, acionar: () => Promise<void>): Promise<ChamadaCapturada> {
+  let captura: ChamadaCapturada | undefined;
+  await pagina.route("**/*", async (rota) => {
+    const requisicao = rota.request();
+    if (requisicao.method() === "POST" && requisicao.headers()["next-action"]) {
+      const cabecalhos = { ...requisicao.headers() };
+      delete cabecalhos.cookie;
+      captura = { url: requisicao.url(), cabecalhos, corpo: requisicao.postDataBuffer() as Buffer };
+      await rota.abort();
+    } else {
+      await rota.continue();
+    }
+  });
+  await acionar();
+  await expect.poll(() => captura !== undefined, { timeout: 15_000 }).toBe(true);
+  await pagina.unroute("**/*");
+  return captura as ChamadaCapturada;
+}
+
 /** Campos de formulário no conteúdo da página (o botão "Sair" do topo fica fora do conteúdo). */
 const camposNoConteudo = (pagina: Page) => pagina.locator("main input:not([type=hidden]), main textarea, main select").count();
 
@@ -156,7 +187,8 @@ describe("P-056: troca obrigatória da senha provisória", () => {
     authIdNova = await criarConta(email, senhaProvisoria);
     usuarioIdNovo = await comoUsuario(adm, contas.administrador.usuarioId as string, async (tx) => {
       const [linha] = await tx.insert(usuario).values({ nome: `Conta fictícia P-056 ${sufixo}`, email, authId: authIdNova }).returning({ id: usuario.id });
-      await tx.insert(permissaoContexto).values({ usuarioId: linha.id, projetoTemaId: projetoA, perfil: "leitor" });
+      // Colaborador: assim, se não fosse a troca pendente, a operação reenviada no teste seria aceita.
+      await tx.insert(permissaoContexto).values({ usuarioId: linha.id, projetoTemaId: projetoA, perfil: "colaborador" });
       return linha.id;
     });
   });
@@ -164,7 +196,7 @@ describe("P-056: troca obrigatória da senha provisória", () => {
   test("com a senha provisória, qualquer tela, operação ou arquivo leva à troca de senha", async () => {
     const { contexto, pagina } = await entrar(email, senhaProvisoria, "/paineis");
     try {
-      await pagina.waitForURL((url) => url.pathname === "/minha-conta", { timeout: 60_000 });
+      await aguardarCaminho(pagina, "/minha-conta");
       expect(new URL(pagina.url()).search).toBe("?troca=obrigatoria");
       expect(await textoDaPagina(pagina)).toContain("Defina sua senha pessoal para continuar");
       await pagina.screenshot({ path: path.join(PASTA_TELAS, "02-troca-obrigatoria.png"), fullPage: true });
@@ -175,8 +207,23 @@ describe("P-056: troca obrigatória da senha provisória", () => {
       const arquivo = await pagina.request.get(`${BASE}/paineis/relatorios/R1`, { maxRedirects: 0 });
       expect(arquivo.status()).toBe(303);
       expect(arquivo.headers().location).toContain("/minha-conta?troca=obrigatoria");
-      const envio = await pagina.request.post(`${BASE}/pessoas/nova`, { maxRedirects: 0, headers: { "Next-Action": "0".repeat(42) }, data: "x" });
-      expect(envio.status()).toBe(303);
+      // Operação real (incluir pessoa), capturada da sessão de um colaborador e reenviada com a sessão de
+      // senha provisória: o servidor recusa e nada é gravado.
+      const nome = `Pessoa fictícia P-056 ${sufixo}`;
+      const colaborador = await entrarConta(contas.colaborador, "/pessoas/nova");
+      let chamada: ChamadaCapturada;
+      try {
+        await textoDaPagina(colaborador.pagina);
+        await colaborador.pagina.getByLabel("Nome completo").fill(nome);
+        chamada = await capturarChamada(colaborador.pagina, () => colaborador.pagina.getByRole("button", { name: "Salvar" }).click());
+      } finally {
+        await colaborador.contexto.close();
+      }
+      const resposta = await (contexto as BrowserContext).request.fetch(chamada.url, { method: "POST", headers: chamada.cabecalhos, data: chamada.corpo, maxRedirects: 0 });
+      const destino = `${resposta.headers()["x-action-redirect"] ?? ""} ${resposta.headers().location ?? ""}`;
+      expect(destino).toContain("/minha-conta");
+      const gravadas = (await adm.execute(sql`select count(*)::int as n from pessoa where nome_completo = ${nome}`)).rows[0] as { n: number };
+      expect(gravadas.n).toBe(0);
     } finally {
       await contexto.close();
     }
@@ -185,7 +232,7 @@ describe("P-056: troca obrigatória da senha provisória", () => {
   test("a nova senha precisa ser diferente; depois da troca, o acesso fica liberado e a senha provisória deixa de valer", async () => {
     const { contexto, pagina } = await entrar(email, senhaProvisoria, "/");
     try {
-      await pagina.waitForURL((url) => url.pathname === "/minha-conta", { timeout: 60_000 });
+      await aguardarCaminho(pagina, "/minha-conta");
       await textoDaPagina(pagina);
       await pagina.locator("#senhaAtual").fill(senhaProvisoria);
       await pagina.locator("#novaSenha").fill(senhaProvisoria.padEnd(12, "x"));
@@ -198,7 +245,7 @@ describe("P-056: troca obrigatória da senha provisória", () => {
       await pagina.locator("#novaSenha").fill(senhaPessoal);
       await pagina.locator("#confirmacao").fill(senhaPessoal);
       await pagina.getByRole("button", { name: /Trocar/ }).click();
-      await pagina.waitForURL((url) => url.pathname === "/", { timeout: 60_000 });
+      await aguardarCaminho(pagina, "/");
       await pagina.goto(`${BASE}/paineis`);
       expect(new URL(pagina.url()).pathname).toBe("/paineis");
       expect(await textoDaPagina(pagina)).toContain("Painéis executivos");
@@ -215,7 +262,7 @@ describe("P-056: troca obrigatória da senha provisória", () => {
     }
     const nova = await entrar(email, senhaPessoal, "/paineis");
     try {
-      await nova.pagina.waitForURL((url) => url.pathname === "/paineis", { timeout: 60_000 });
+      await aguardarCaminho(nova.pagina, "/paineis");
     } finally {
       await nova.contexto.close();
     }
@@ -226,7 +273,7 @@ describe("P-056: troca obrigatória da senha provisória", () => {
     await redefinirSenha(authIdNova as string, senhaProvisoria);
     const { contexto, pagina } = await entrar(email, senhaProvisoria, "/paineis");
     try {
-      await pagina.waitForURL((url) => url.pathname === "/minha-conta", { timeout: 60_000 });
+      await aguardarCaminho(pagina, "/minha-conta");
       expect(await textoDaPagina(pagina)).toContain("Defina sua senha pessoal para continuar");
     } finally {
       await contexto.close();
@@ -235,6 +282,6 @@ describe("P-056: troca obrigatória da senha provisória", () => {
       .select({ perfil: permissaoContexto.perfil })
       .from(permissaoContexto)
       .where(and(eq(permissaoContexto.usuarioId, usuarioIdNovo as string), isNull(permissaoContexto.arquivadoEm)));
-    expect(permissao.perfil).toBe("leitor");
+    expect(permissao.perfil).toBe("colaborador");
   });
 });

@@ -478,7 +478,7 @@ describe("Requisitos 3 e 5: autoria e caminho real da aplicação", () => {
     await contexto.close();
   });
 
-  test("o administrador cadastra usuário pela tela: conta e cadastro nascem juntos, e a nova pessoa entra", async () => {
+  test("o administrador cadastra usuário pela tela: conta e cadastro nascem juntos, e a nova pessoa entra direto na troca de senha (P-056)", async () => {
     const email = `novo.pela.tela.${sufixo}@teste.crm-es-em-acao.example.com`;
     const { contexto, pagina } = await entrar(contas.administrador, "/usuarios/novo");
     await pagina.getByLabel("Nome").fill("Teste Novo Pela Tela");
@@ -495,8 +495,10 @@ describe("Requisitos 3 e 5: autoria e caminho real da aplicação", () => {
     const nova = await novaSessao();
     await nova.pagina.goto(`${BASE}/login?destino=${encodeURIComponent("/pessoas")}`);
     await preencherLogin(nova.pagina, email, senha);
-    await nova.pagina.waitForURL(`${BASE}/pessoas`, { timeout: 30_000 });
+    // Senha provisória: a primeira tela é a troca obrigatória (Fase 7A), qualquer que seja o destino pedido.
+    await nova.pagina.waitForURL(`${BASE}/minha-conta?troca=obrigatoria`, { timeout: 30_000 });
     await nova.pagina.locator('[data-teste="usuario-conectado"]').waitFor({ timeout: 30_000 });
+    await nova.pagina.getByText("Defina sua senha pessoal para continuar").waitFor({ timeout: 30_000 });
     await nova.contexto.close();
   });
 
