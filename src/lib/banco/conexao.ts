@@ -161,12 +161,13 @@ const global = globalThis as typeof globalThis & { __bancoCrm?: Promise<Banco> }
  * Conexão com um PostgreSQL de verdade pelo driver postgres, no mesmo formato da conexão com
  * o PGlite (ver clientePostgresBase).
  */
-export function abrirBancoPostgres(url: string, opcoes: { max?: number } = {}): Banco {
+/** ssl: false só para o banco temporário e local do ensaio de restauração (scripts/backup). */
+export function abrirBancoPostgres(url: string, opcoes: { max?: number; ssl?: boolean } = {}): Banco {
   const sql = postgres(url, {
     max: opcoes.max ?? 5,
     // Todas as operações são transações curtas; o pooler do Supabase não guarda consultas preparadas.
     prepare: false,
-    ssl: "require",
+    ssl: opcoes.ssl === false ? false : "require",
     idle_timeout: 20,
     connect_timeout: 15,
     onnotice: () => {},

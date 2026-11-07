@@ -71,6 +71,13 @@
       "when": 1794003477850,
       "tag": "0009_identidade_rls",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1794070298015,
+      "tag": "0010_operacao",
+      "breakpoints": true
     }
   ]
 }

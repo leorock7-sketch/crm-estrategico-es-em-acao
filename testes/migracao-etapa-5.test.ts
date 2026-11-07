@@ -102,7 +102,8 @@ describe("Atualização de um banco da Etapa 4 (migração 0009)", () => {
       // Nenhuma tabela nova nem removida; todas as linhas idênticas.
       expect(await tabelasPublicas(atualizado)).toEqual(tabelasAntes);
       for (const tabela of tabelasAntes) {
-        const semColunas = tabela === "usuario" ? ["auth_id"] : [];
+        // A auditoria ganhou papel_banco na Fase 7A (migração 0010), vazio nos registros antigos.
+        const semColunas = tabela === "usuario" ? ["auth_id"] : tabela === "registro_auditoria" ? ["papel_banco"] : [];
         expect(await conteudo(atualizado, tabela, semColunas), tabela).toEqual(antes[tabela]);
       }
 
