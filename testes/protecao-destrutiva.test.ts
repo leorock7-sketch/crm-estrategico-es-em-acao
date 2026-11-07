@@ -150,14 +150,14 @@ describe("Exclusão no banco", () => {
 
   test("usuário com e-mail real, recusa, mesmo em banco marcado e com a frase certa", async () => {
     await marcar();
-    await banco.insert(usuario).values({ nome: "Pessoa Fictícia", email: "pessoa@instituicao.es.gov.br" });
+    await banco.insert(usuario).values({ nome: "Pessoa Fictícia", email: "pessoa@orgao-exemplo.com.br" });
     await esperarRecusa(autorizado, FRASE, /usuário\(s\) com e-mail fora dos domínios fictícios/);
   });
 
   test("contato de e-mail real, recusa", async () => {
     await marcar();
     await banco.execute(sql`insert into stakeholder (id, tipo) values ('11111111-1111-4111-8111-111111111111', 'pessoa')`);
-    await banco.execute(sql`insert into contato (stakeholder_id, tipo, valor, valor_normalizado, natureza) values ('11111111-1111-4111-8111-111111111111', 'email', 'alguem@empresa.com.br', 'alguem@empresa.com.br', 'institucional')`);
+    await banco.execute(sql`insert into contato (stakeholder_id, tipo, valor, valor_normalizado, natureza) values ('11111111-1111-4111-8111-111111111111', 'email', 'alguem@empresa-exemplo.com.br', 'alguem@empresa-exemplo.com.br', 'institucional')`);
     await esperarRecusa(autorizado, FRASE, /contato\(s\) de e-mail fora dos domínios fictícios/);
   });
 
@@ -165,7 +165,7 @@ describe("Exclusão no banco", () => {
     await marcar();
     await banco.execute(sql`create schema auth`);
     await banco.execute(sql`create table auth.users (id uuid primary key default gen_random_uuid(), email text)`);
-    await banco.execute(sql`insert into auth.users (email) values ('pessoa@instituicao.es.gov.br')`);
+    await banco.execute(sql`insert into auth.users (email) values ('pessoa@orgao-exemplo.com.br')`);
     await esperarRecusa(autorizado, FRASE, /conta\(s\) de acesso fora dos domínios fictícios/);
   });
 
@@ -194,7 +194,7 @@ describe("Exclusão no banco", () => {
   test("marcar exige a frase própria e recusa banco com dado real", async () => {
     await expect(marcarBancoDescartavel(banco, autorizado, undefined)).rejects.toThrow(/frase de confirmação da marcação/);
     await expect(marcarBancoDescartavel(banco, autorizado, FRASE)).rejects.toThrow(/frase de confirmação da marcação/);
-    await banco.insert(usuario).values({ nome: "Pessoa Fictícia", email: "pessoa@instituicao.es.gov.br" });
+    await banco.insert(usuario).values({ nome: "Pessoa Fictícia", email: "pessoa@orgao-exemplo.com.br" });
     await expect(marcarBancoDescartavel(banco, autorizado, fraseDeMarcacao(REF))).rejects.toThrow(/fora dos domínios fictícios/);
     expect(await conferirBanco(banco, REF)).toEqual(["O banco não traz a marca de ambiente descartável."]);
   });

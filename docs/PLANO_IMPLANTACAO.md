@@ -516,7 +516,7 @@ A conferência e a exclusão ocorrem na mesma transação. Sem a marca, `npm run
 
 | Conjunto | Onde | Resultado |
 |---|---|---|
-| Testes do projeto (`npm test`), inclusive 54 de regras de acesso, 57 de bloqueio de operações destrutivas e conferência do ambiente, credenciais no código e migração 0009 | PGlite, a cada Pull Request | 376 de 376 aprovados |
+| Testes do projeto (`npm test`), inclusive 54 de regras de acesso, 47 de bloqueio de operações destrutivas, 20 de conferência do ambiente, credenciais no código e migração 0009 | PGlite, a cada Pull Request | 376 de 376 aprovados |
 | Testes de banco das Etapas 1 a 4 pelo papel `crm_app`, sob as regras (`npm run test:regras`) | PGlite, a cada Pull Request | 82 aprovados; 7 fora, porque tentam excluir registros ou trocar o tipo de um cadastro por comando direto (o papel é recusado ou não alcança nenhuma linha antes do que o teste confere) ou conferem transação sem identidade, que esse caminho não permite. Esses 7 são aprovados na configuração principal |
 | Testes de banco das Etapas 1 a 4, sem alteração, com todas as migrações refeitas do zero (`npm run test:postgres`) | PostgreSQL 17 do Supabase | 115 de 115 aprovados, antes da proteção das operações destrutivas (D-076). Não repetido depois, porque apaga os dados fictícios do projeto; o caminho autorizado da exclusão foi comprovado no PGlite e, no projeto real, a conferência sem apagar nada |
 | Regras de acesso pela conexão real da aplicação, login real, credenciais e navegador (`npm run test:supabase`) | Supabase Auth, PostgreSQL 17 do Supabase e Edge sem janela | 103 de 103 aprovados: 57 de regras, 15 de autenticação, 4 de credenciais e 27 de navegador |
