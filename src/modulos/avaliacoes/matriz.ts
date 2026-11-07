@@ -5,7 +5,7 @@
  * listas próprias, sem ser ocultadas. Escalas e metodologias diferentes nunca
  * são colocadas nos mesmos eixos. A célula é uma leitura, nunca uma conduta (RF-28).
  */
-import type { GrauConfianca, NaturezaPosicionamento, Nivel, Posicionamento } from "./rotulos";
+import type { GrauConfianca, NaturezaPosicionamento, Nivel, Posicionamento, SituacaoRessalvas } from "./rotulos";
 
 export type FichaParaMatriz = {
   stakeholderId: string;
@@ -16,6 +16,8 @@ export type FichaParaMatriz = {
   temRascunho: boolean;
   vigente: {
     numeroVersao: number;
+    /** Quem registrou a versão (usado no filtro de responsável dos painéis). */
+    avaliadorId?: string | null;
     metodologiaId: string | null;
     metodologiaNome: string | null;
     /** Pontuação de 0 a 100 (metodologia de demonstração). */
@@ -27,6 +29,7 @@ export type FichaParaMatriz = {
     posicionamento: Posicionamento | null;
     naturezaPosicionamento: NaturezaPosicionamento | null;
     grauConfianca: GrauConfianca | null;
+    situacaoRessalvas?: SituacaoRessalvas | null;
     dataReferencia: string;
     proximaRevisao: string;
   } | null;

@@ -32,6 +32,8 @@
 | 0.28 | 06/11/2026 | Providências finais da Etapa 5 (D-077): banco marcado como descartável não recebe dados institucionais reais; testes destrutivos só com necessidade e autorização específica |
 | 0.29 | 06/11/2026 | Senha administrativa trocada e Data API desligada pelo gestor; testes repetidos depois das duas providências (D-077); Etapa 5 pronta para a homologação do gestor |
 | 0.30 | 06/11/2026 | Etapa 5 homologada para desenvolvimento (D-078), com o commit final `01e495d`; pendências atualizadas; próxima atividade: roteiro da Etapa 6 — Painéis e Relatórios Executivos — para validação do gestor |
+| 0.31 | 06/11/2026 | Roteiro da Etapa 6 validado e etapa implementada, aguardando homologação (D-079, seção 11); pendências e local de trabalho renumerados (seções 12 e 13) |
+| 0.32 | 07/11/2026 | Etapa 6 homologada para desenvolvimento (D-080), com o commit final `8708453`; pendências preservadas (arquivos no Microsoft Excel, desempenho e segurança no ambiente hospedado); próxima atividade: roteiro da Etapa 7, depois da incorporação do Pull Request #12 |
 
 Legenda: ✅ Aprovado · 🔧 Proposta técnica · ⏳ Pendente.
 
@@ -58,7 +60,7 @@ Legenda: ✅ Aprovado · 🔧 Proposta técnica · ⏳ Pendente.
 | 3 | Iniciativas, interações e compromissos | Matriz de iniciativas, registro único de reuniões, encaminhamentos e prazos | ✅ **Concluída:** autorizada em 03/11/2026 (D-070), incorporada à `main` pelo Pull Request #7 (commit de merge `aa17fe4`, verificações Node.js 24 e 26 aprovadas) e homologada para desenvolvimento (D-071); as soluções provisórias P-040 a P-046 continuam não homologadas (seção 8) |
 | 4 | Plano de ação e matriz de riscos | Versões e aprovação, acompanhamento, riscos, gatilhos e respostas | ✅ **Concluída:** aprovada em 03/11/2026 com a matriz de riscos original do Comitê de Infraestrutura (D-072), incorporada à `main` pelo Pull Request #9 (commit de merge `1246331`, verificações Node.js 24 e 26 aprovadas) e homologada para desenvolvimento em 04/11/2026 (D-073); as soluções provisórias P-047 a P-053 continuam não homologadas (seção 9) |
 | 5 | Autenticação e permissões | Supabase Auth, perfis e permissões por projeto/tema, segurança no banco | ✅ **Homologada para desenvolvimento** (D-078; seção 10). Produção sujeita aos testes da Etapa 7 |
-| 6 | Painéis e relatórios | Indicadores executivos e relatórios, com filtros, permissões da Etapa 5 e exportação. Conteúdo inicial definido na D-078 (Q-55) | 🔧 **Roteiro autorizado, para validação do gestor** (D-078) |
+| 6 | Painéis e relatórios | Indicadores executivos e relatórios, com filtros, permissões da Etapa 5 e exportação. Roteiro validado na D-079 | ✅ **Homologada para desenvolvimento** (D-080; seção 11). Produção sujeita aos testes da Etapa 7 |
 | 7 | Homologação e hospedagem | Supabase e Vercel com dados fictícios, validação técnica e institucional, plano de cópias de segurança. **Pré-requisitos: C6, C7 e C8 solucionadas** (D-027) | 🔧 ⏳ (exige contas e autorização) |
 | 8 | Piloto com dados reais | Somente após autorização formal, análise LGPD e solução de C6, C7 e C8 (D-027) | ⏳ |
 | 9 | Integrações | Outlook, calendário, SharePoint, OneDrive e IA assistiva | ✅ Futuro / 🔧 (ordem) |
@@ -371,7 +373,7 @@ A homologação da etapa (D-071) não homologa estas soluções: elas continuam 
 
 ### Fora do escopo (D-070)
 
-Supabase, autenticação real, integração com Outlook e Microsoft 365, painéis executivos e os módulos completos de Plano de Ação e Riscos. A ligação de compromissos a ações do plano (`acao_id`) entra na Etapa 4, com a tabela de ações; as relações já preservam iniciativa, interação e projeto para essa integração. Achados A-01 a A-06 da auditoria técnica independente: pendentes (seção 11), sem implementação nesta etapa.
+Supabase, autenticação real, integração com Outlook e Microsoft 365, painéis executivos e os módulos completos de Plano de Ação e Riscos. A ligação de compromissos a ações do plano (`acao_id`) entra na Etapa 4, com a tabela de ações; as relações já preservam iniciativa, interação e projeto para essa integração. Achados A-01 a A-06 da auditoria técnica independente: pendentes (seção 12), sem implementação nesta etapa.
 
 ## 9. Etapa 4 — Plano de ação e matriz de riscos ✅ (D-072, D-073)
 
@@ -429,7 +431,7 @@ A homologação da etapa (D-073) não homologa estas soluções: elas continuam 
 
 ### Fora do escopo (D-072)
 
-Supabase, autenticação real, integrações externas e painéis executivos. Achados A-01 a A-06 (pendentes), melhorias U-1 a U-5 (registradas, sem execução) e backlog da V3.0 (V3-01 a V3-04) não implementados (seção 11).
+Supabase, autenticação real, integrações externas e painéis executivos. Achados A-01 a A-06 (pendentes), melhorias U-1 a U-5 (registradas, sem execução) e backlog da V3.0 (V3-01 a V3-04) não implementados (seção 12).
 
 ## 10. Etapa 5 — Autenticação e permissões ✅ (D-074 a D-078): homologada para desenvolvimento
 
@@ -538,7 +540,83 @@ Não comprovado nesta etapa: login Microsoft 365 (depende da TI); expiração na
 
 Hospedagem pública e produção; dados reais; integrações com Outlook e Microsoft 365 (Etapa 9); painéis; backup, recuperação e homologação da implantação (Etapa 7); achados A-02 a A-06, salvo correções estritamente necessárias à segurança; melhorias U-1 a U-5; backlog V3-01 a V3-08.
 
-## 11. Pendências efetivas (atualizadas em 06/11/2026)
+## 11. Etapa 6 — Painéis e relatórios ✅ (D-079, D-080): homologada para desenvolvimento
+
+**Homologação (D-080):** Etapa 6 homologada em 07/11/2026 para fins de desenvolvimento e testes com dados fictícios (Pull Request #12, commit final `8708453`, Node.js 24 e 26 aprovados), com incorporação à `main` pelo gestor. A homologação não aprova o uso institucional com dados reais. P-061 a P-065 continuam provisórias, não homologadas individualmente. Nenhuma tabela nova nem mudança no modelo de dados.
+
+**Antes da operação institucional (D-080):** verificar a abertura e a apresentação dos arquivos XLSX no Microsoft Excel; repetir os testes de desempenho e segurança no ambiente hospedado, que as medições feitas no desenvolvimento não substituem.
+
+### Objetivo
+
+Oferecer uma leitura consolidada do que está registrado no CRM, em três áreas: visão executiva por comitê (`/paineis`), visão por projeto ou tema (`/paineis/projetos/[id]`) e relatórios e exportações (`/paineis/relatorios`).
+
+### Quem pode o quê (D-079)
+
+| Perfil | Painéis | Exportação pelo CRM | Avaliações nominais (R5) |
+|---|---|---|---|
+| Administrador | Todos os projetos e temas | R1 a R5 de todos | Sim |
+| Gestor | Seus projetos e temas | R1 a R5 de seus projetos e temas | Só onde é gestor |
+| Colaborador | Seus projetos e temas | R1 a R5 de seus projetos e temas | Não: só contagens |
+| Leitor | Seus projetos e temas | Não; a tela explica que a regra vale para os recursos do sistema, e não para capturas ou impressões do navegador | Não |
+
+A decisão é tomada no servidor a cada pedido, pelas permissões válidas lidas no banco: chamar diretamente o endereço do arquivo como leitor resulta em recusa (403), e pedir um projeto proibido no filtro resulta em arquivo sem esse projeto.
+
+### Como os números são apurados
+
+| Regra | Como funciona |
+|---|---|
+| Só o que o usuário pode ver | Os dados são lidos com a identidade do usuário, sob as regras do banco; as contagens são feitas sobre esse resultado. O que está oculto não chega à conta e não pode ser deduzido de totais |
+| Sem indicadores inventados | Só contagens, datas e situações registradas. Sem índice, ranking, indicador de saúde, estimativa, média ou percentual calculado. O percentual da ação é mostrado só quando informado no acompanhamento |
+| Ausência à parte (A) | "Sem avaliação", "sem prazo", "sem responsável", "sem situação registrada" e "não avaliado" têm contagem própria e não viram outro valor |
+| Versão vigente (B) | Ações e marcos só da versão aprovada de cada plano. Versões em elaboração ou em aprovação aparecem em grupo e aba próprios, sem somar |
+| Data informada (C) | Cada indicador diz a data usada, ou que é a situação de hoje. Conclusões no período usam a data efetiva, nunca o prazo. Sem período na abertura: todo o histórico |
+| Um registro, uma contagem (D) | Projeto em mais de um comitê aparece em cada linha; o total geral é apurado de novo sobre o conjunto, e não pela soma das linhas. Registro ligado a dois projetos conta uma vez no total |
+| Riscos (E) | Matriz 5 × 5 e faixas aprovadas, inerente e residual em pontos e faixas, sem percentual de redução. "A reavaliar" informa que segue a regra provisória P-049 |
+| Stakeholders (F) | Metodologia V2.2 vigente e sua matriz 3 × 3, sem a interface da V3-02. Metodologia anterior e associação encerrada ficam em contagens próprias |
+
+### Relatórios (XLSX)
+
+Todos têm uma primeira aba "Extração", com o relatório, a data e a hora, o usuário responsável, os filtros e notas sobre as datas usadas.
+
+| Relatório | Conteúdo |
+|---|---|
+| R1 — Panorama por comitê | As contagens da visão executiva, por comitê, com o total geral |
+| R2 — Compromissos | Compromisso, projetos visíveis, origem, responsável, situação, prazo, situação do prazo e conclusão |
+| R3 — Plano de Ação | Abas de ações e marcos da versão vigente e aba separada das versões não aprovadas |
+| R4 — Riscos | Dono, status, inerente e residual (probabilidade, impacto, criticidade, faixa e data), diferença em pontos, mudança de faixa, revisão, gatilho e "a reavaliar" |
+| R5 — Stakeholders | Contagens por projeto ou tema e, para quem pode, aba de avaliações nominais, sem justificativas nem evidências |
+
+**Segurança do arquivo (D-079):** tudo o que é texto é gravado como texto; valor iniciado por `=`, `+`, `-` ou `@` recebe um apóstrofo no início, para não virar fórmula se o arquivo for reeditado ou convertido. Não há fórmulas, abas, linhas ou colunas ocultas, nomes definidos, comentários, macros nem vínculos externos. Impressão e PDF usam o próprio navegador.
+
+### Soluções provisórias (reversíveis, não homologadas) 🔧
+
+P-061 (parâmetro provisório da janela de 30 dias de "a vencer"), P-062 (alcance do filtro de responsável), P-063 (datas de ações e marcos e períodos nos relatórios), P-064 (situação específica H5, que não é classificação de stakeholder) e P-065 (perfis diferentes por projeto e nomes de responsáveis em R2 e R3). O indicador "a reavaliar" depende da P-049, também não homologada.
+
+### Entregas
+
+- Módulo `src/modulos/paineis`: filtros, leitura dos dados, indicadores, relatórios e geração do XLSX.
+- Páginas `/paineis`, `/paineis/projetos/[id]` e `/paineis/relatorios`, rota de download `/paineis/relatorios/[codigo]` e item "Painéis" no menu. Página inicial sem alteração.
+- Consultas sobre o conjunto de projetos e planos (`fichasDosContextos`, `planejamentoDasVersoes`, `acoesDasVersoes`), usadas também pelas consultas individuais: a carga do painel não cresce com o número de projetos (cerca de 2 segundos com 21 projetos e 13 planos, no Supabase de desenvolvimento).
+- Biblioteca `write-excel-file` para gerar os arquivos; `exceljs` e `fflate` só nos testes, como leitores independentes.
+
+### Resultados dos testes (execução de 06/11/2026) 🔧
+
+| Conjunto | Onde | Resultado |
+|---|---|---|
+| Testes do projeto (`npm test`), inclusive 24 de regras de cálculo e 36 de painéis e exportações por perfil | PGlite, a cada Pull Request | 437 aprovados |
+| Testes de banco das Etapas 1 a 4 pelo papel `crm_app` (`npm run test:regras`) | PGlite, a cada Pull Request | 82 aprovados; 7 fora, como documentado em `testes/README.md` |
+| Testes não destrutivos no Supabase (`npm run test:supabase`), inclusive 36 de painéis e exportações por perfil e 9 cenários de navegador | Supabase Auth, PostgreSQL 17 e Edge sem janela | 148 aprovados |
+| Tipos, qualidade do código e compilação (`npm run verificar`) | Local e simulação do GitHub Actions, sem chaves | Aprovados |
+
+Comprovado por execução, nos quatro perfis: contagens iguais às apuradas diretamente nas tabelas de origem, por consulta independente, inclusive sobre todo o banco de desenvolvimento; totais do arquivo iguais aos do painel; registro compartilhado uma única vez nos totais e nos arquivos; nenhum nome ou identificador de outro projeto nos dados e nos arquivos, inclusive em registros compartilhados; download real pelo navegador; recusa do servidor ao leitor; arquivos relidos por biblioteca independente, com o pacote inspecionado.
+
+Não executados: `npm run test:postgres` e `supabase:preparar -- --refazer`, que são destrutivos e exigem autorização específica (D-077); esta etapa não tem migração. Compatibilidade verificada com biblioteca de leitura independente, sem abrir os arquivos no Microsoft Excel, o que fica para a homologação. Desempenho e cabeçalhos no ambiente hospedado ficam para a Etapa 7.
+
+### Fora do escopo (D-079)
+
+Página inicial; melhorias V3-01 a V3-08, inclusive a nova interface da V3-02; integrações com Outlook, Microsoft 365, ferramenta institucional indicada pelo gestor e monday.com; infraestrutura própria de geração de documentos; novas tabelas e mudanças no modelo de dados; dados reais.
+
+## 12. Pendências efetivas (atualizadas em 07/11/2026)
 
 | Pendência | Bloqueia | Situação |
 |---|---|---|
@@ -549,10 +627,12 @@ Hospedagem pública e produção; dados reais; integrações com Outlook e Micro
 | Projeto Supabase de desenvolvimento | — | ✅ Criado pelo gestor e em uso, somente com dados fictícios (D-075) |
 | Registro do CRM no Microsoft Entra ID | Login Microsoft (D1); não bloqueia a Etapa 5 | ⏳ Depende de autorização e configuração pela TI institucional |
 | Serviço de e-mail institucional (SMTP) para convites e recuperação de senha | Usuários reais (Etapa 7) | ⏳ Depende da TI institucional |
-| Senha provisória sem troca obrigatória no primeiro acesso (P-056) | Uso com contas institucionais reais (D-076); não impediu a homologação da Etapa 5 com dados fictícios (D-078) | ⏳ A resolver antes das contas reais |
-| Leitor visualiza formulário de inclusão por acesso direto ao endereço; a gravação já é recusada | Entrada em operação institucional (D-078) | ⏳ A corrigir antes da operação institucional |
-| Verificações do ambiente hospedado: HTTPS, cookies seguros e desempenho | Etapa 7 (D-078) | ⏳ Sujeitas à implantação e às providências da TI institucional |
-| Roteiro da Etapa 6 — Painéis e Relatórios Executivos | Programação da Etapa 6 | ⏳ Para validação do gestor (D-078) |
+| Senha provisória sem troca obrigatória no primeiro acesso (P-056) | Uso com contas institucionais reais (D-076); não impediu a homologação da Etapa 5 com dados fictícios (D-078) | ⏳ A resolver antes das contas reais; obrigatória no roteiro da Etapa 7 (D-080) |
+| Leitor visualiza formulário de inclusão por acesso direto ao endereço; a gravação já é recusada | Entrada em operação institucional (D-078) | ⏳ A corrigir antes da operação institucional; obrigatória no roteiro da Etapa 7 (D-080) |
+| Verificações do ambiente hospedado: HTTPS, cookies seguros, desempenho e segurança, inclusive dos painéis e das exportações | Etapa 7 (D-078, D-080); as medições do desenvolvimento não as substituem | ⏳ Sujeitas à implantação e às providências da TI institucional |
+| Abertura e apresentação dos arquivos XLSX no Microsoft Excel | Operação institucional (D-080) | ⏳ A verificar antes da operação institucional; leitura já conferida por biblioteca independente nos testes |
+| Homologação da Etapa 6 | Etapa 7 | ✅ Homologada para desenvolvimento em 07/11/2026 (D-080), com o commit final `8708453` do Pull Request #12; incorporação à `main` pelo gestor. P-061 a P-065 continuam provisórias, não homologadas individualmente |
+| Roteiro da Etapa 7 — Implantação, Homologação Técnica e Segurança Operacional | Programação da Etapa 7 | ⏳ A preparar depois da incorporação do Pull Request #12, para validação do gestor (D-080) |
 | Senha administrativa forte do PostgreSQL do projeto de desenvolvimento | — | ✅ Trocada pelo gestor em 06/11/2026; senha anterior recusada e nova confirmada, com `.env.local` atualizado e arquivo temporário sobrescrito e apagado (D-077) |
 | Rubricas das escalas V2.2 e plano de adaptação técnica | Etapa 2B (D-060, D-063) | ✅ **Resolvida (D-068):** Q-66 1.0 e Q-67 1.0; calibração H6 concluída, com limitações registradas; Etapa 2B pronta para autorização (documento entregue fora do repositório). Decisões Q-65.1, Q-65.4 e Q-65.6 continuam pendentes, sem bloquear a 2B |
 | Documentos de referência V2.3 | — | Roteiro preparado fora do repositório (D-063); emissão a programar, refletindo as D-067 e D-068 (inclusive a adaptação do teste T23) |
@@ -567,11 +647,11 @@ Hospedagem pública e produção; dados reais; integrações com Outlook e Micro
 | Homologação da Etapa 4 | Etapa 5 | ✅ Homologada para desenvolvimento em 04/11/2026 (D-073), depois do merge dos Pull Requests #8 e #9 (`1246331`) |
 | Soluções provisórias da Etapa 4 (P-047 a P-053) e pontos pendentes Q-33 (correção de digitação) e Q-42 a Q-44 | — | Em uso e não homologadas (D-072, D-073); decisão do gestor pendente |
 | Soluções provisórias da Etapa 3 (P-040 a P-046) | — | Em uso e não homologadas (D-071); decisão do gestor pendente (Q-20, Q-21, Q-23 e Q-24) |
-| Backlog da V3.0: melhorias V3-01 a V3-08 | — | Registradas pelo gestor (D-071, D-074, D-075) e preservadas (D-072, D-073): V3-01, simplificação visual, com base em modelo de referência indicado pelo gestor; V3-02, matriz Poder × Interesse na página do projeto, com marcadores interativos e identificação por mouse ou toque; V3-03, redução dos caminhos de navegação para as informações relevantes; V3-04, unificação visual de Iniciativas e Interações, com estas como subitens, preservando o registro único de reuniões; V3-05, fotografias dos stakeholders; V3-06, integração funcional entre iniciativas, interações, ações e riscos; V3-07, interoperabilidade futura com outra ferramenta institucional indicada pelo gestor; V3-08, interoperabilidade com monday.com: permitir, no mínimo, exportação compatível em XLSX/CSV de informações selecionadas do CRM para boards do monday.com, com campos e identificadores adequados, podendo uma integração automatizada por API ser avaliada posteriormente (D-075). Não implementar antes da V3.0 |
+| Backlog da V3.0: melhorias V3-01 a V3-09 | — | Registradas pelo gestor (D-071, D-074, D-075; a V3-09, citada na D-080, ainda não tem descrição registrada) e preservadas (D-072, D-073): V3-01, simplificação visual, com base em modelo de referência indicado pelo gestor; V3-02, matriz Poder × Interesse na página do projeto, com marcadores interativos e identificação por mouse ou toque; V3-03, redução dos caminhos de navegação para as informações relevantes; V3-04, unificação visual de Iniciativas e Interações, com estas como subitens, preservando o registro único de reuniões; V3-05, fotografias dos stakeholders; V3-06, integração funcional entre iniciativas, interações, ações e riscos; V3-07, interoperabilidade futura com outra ferramenta institucional indicada pelo gestor; V3-08, interoperabilidade com monday.com: permitir, no mínimo, exportação compatível em XLSX/CSV de informações selecionadas do CRM para boards do monday.com, com campos e identificadores adequados, podendo uma integração automatizada por API ser avaliada posteriormente (D-075). Não implementar antes da V3.0 |
 | Achados A-01 a A-06 da auditoria técnica independente | — | Documento mantido fora do repositório. A-01 (síntese do gestor, D-075): ausência de autenticação real e de segurança multiusuário efetiva; tratado para desenvolvimento (D-078), com a homologação de produção sujeita aos testes da Etapa 7. A-02 a A-06 no backlog, salvo correções estritamente necessárias à segurança (D-074) |
 | Melhorias de usabilidade não essenciais (U-1 a U-5, registradas em 02/11/2026) | — | Registradas fora do repositório: texto desatualizado na seção de stakeholders da página do projeto; bloco de evidências antes das classificações no rascunho; dica nas versões recolhidas do histórico; colunas da tabela da matriz no celular; legenda do selo "preliminar" no celular. A tratar oportunamente, sem impedir o andamento; não implementadas nas Etapas 4 e 5 e preservadas (D-071, D-072, D-073, D-074) |
 | Análise LGPD, retenção e anonimização | Etapa 8 | Q-13, Q-58 |
 
-## 12. Local de trabalho ✅ (D-019)
+## 13. Local de trabalho ✅ (D-019)
 
 A cópia de trabalho do projeto fica em `C:\Projetos\crm-estrategico-es-em-acao`, obtida pelo GitHub, fora do Google Drive. O GitHub cumpre o papel de cópia de segurança e histórico. A pasta antiga no Google Drive não foi apagada.

@@ -12,7 +12,7 @@ Cada módulo do CRM tem sua própria pasta, reunindo regras de negócio, valida�
 | `interacoes/` | Interações (registro único), agenda, compromissos e acompanhamento | Implementado na Etapa 3 (homologado para desenvolvimento, D-071) | [MODELO_DADOS.md](../../docs/MODELO_DADOS.md) |
 | `plano-acao/` | Plano de Ação: um plano por projeto ou tema, pilares ou eixos, versões e aprovação, ações, marcos, acompanhamento e conversão de compromissos | Implementado na Etapa 4 (homologado para desenvolvimento, D-073) | [PLANO_ACAO.md](../../docs/PLANO_ACAO.md) |
 | `riscos/` | Matriz de Riscos 5 × 5 do Comitê de Infraestrutura: avaliações inerente e residual, gatilhos, respostas e stakeholders | Implementado na Etapa 4 (homologado para desenvolvimento, D-073) | [MATRIZ_RISCOS.md](../../docs/MATRIZ_RISCOS.md) |
-| `paineis/` | Painéis e relatórios gerenciais | Previsto | [REQUISITOS.md](../../docs/REQUISITOS.md) |
+| `paineis/` | Painéis por comitê e por projeto ou tema, indicadores, relatórios R1 a R5 e geração do XLSX. Só lê: não grava no banco | Etapa 6: homologado para desenvolvimento (D-080) | [PLANO_IMPLANTACAO.md](../../docs/PLANO_IMPLANTACAO.md), seção 11 |
 
 Organização interna de cada módulo, como em `stakeholders/`:
 

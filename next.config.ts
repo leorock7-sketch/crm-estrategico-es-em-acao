@@ -4,7 +4,7 @@ const nextConfig: NextConfig = {
   cacheComponents: true,
   partialPrefetching: true,
   // O PGlite carrega arquivos próprios (WebAssembly) e não pode ser empacotado.
-  serverExternalPackages: ["@electric-sql/pglite"],
+  serverExternalPackages: ["@electric-sql/pglite", "write-excel-file"],
   turbopack: {
     rules: {
       "*.css": {

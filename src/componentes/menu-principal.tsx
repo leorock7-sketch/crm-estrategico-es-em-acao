@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 const LINKS_MENU = [
+  { href: "/paineis", rotulo: "Painéis" },
   { href: "/comites", rotulo: "Comitês" },
   { href: "/projetos-temas", rotulo: "Projetos e temas" },
   { href: "/pessoas", rotulo: "Pessoas" },

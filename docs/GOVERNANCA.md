@@ -6,6 +6,7 @@
 | 0.2 | 06/11/2026 | Perfis de acesso aprovados (D-074), a implementar na Etapa 5 |
 | 0.3 | 06/11/2026 | Perfis implementados na Etapa 5, aguardando homologação: administração de usuários e permissões na tela "Usuários" |
 | 0.4 | 06/11/2026 | Etapa 5 homologada para desenvolvimento (D-078) |
+| 0.5 | 07/11/2026 | Etapa 6 homologada para desenvolvimento (D-080): painéis e exportações por perfil (D-079) |
 
 Legenda: ✅ Aprovado · 🔧 Proposta técnica · ⏳ Pendente.
 
@@ -40,6 +41,8 @@ flowchart TD
 | Leitor | Projetos e temas autorizados | Consulta exclusivamente as informações autorizadas |
 
 Não há outras categorias de perfil. O diretório básico do Cadastro Mestre é consultado por todos os usuários ativos e autenticados; os dados restritos seguem o [Plano de Implantação](PLANO_IMPLANTACAO.md), seção 10.
+
+**Painéis e exportações (D-079; homologados para desenvolvimento, D-080):** todos os perfis consultam os painéis dentro de seu acesso. Administrador, gestor e colaborador exportam relatórios pelo CRM, cada um dentro de seus projetos e temas; avaliações nominais de stakeholders, só administrador e gestor do projeto ou tema. O leitor não tem exportação pelo CRM, regra que não impede capturas ou impressões feitas pelo próprio navegador.
 
 Inicialmente existirá apenas o Administrador. ✅ As permissões são concedidas por projeto ou tema. ✅
 
