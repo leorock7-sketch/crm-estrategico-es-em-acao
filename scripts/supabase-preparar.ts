@@ -7,9 +7,13 @@
  * 3. Carrega os dados de demonstração, exclusivamente fictícios, se o banco estiver vazio.
  * 4. Cria as contas fictícias de teste, uma para cada situação (scripts/contas-teste.ts).
  *
- * Pode ser repetido: o que já existe não é refeito. Nenhum valor secreto é exibido. Com a opção
- * --refazer (npm run supabase:preparar -- --refazer), apaga antes os dados e as contas de teste do
- * projeto: é o caminho depois de npm run test:postgres. Só dados fictícios existem neste projeto.
+ * Pode ser repetido: o que já existe não é refeito. Nenhum valor secreto é exibido. Os passos 3 e 4
+ * só ocorrem no banco identificado como descartável (scripts/protecao-destrutiva.ts): fora dele,
+ * contas com senhas conhecidas nunca são criadas.
+ *
+ * Com a opção --refazer, apaga antes os dados e as contas de teste. Só no banco descartável e com a
+ * frase de confirmação no próprio comando; caso contrário, recusa, sem apagar nada:
+ * CRM_CONFIRMAR_EXCLUSAO="APAGAR DADOS FICTICIOS DE <identificador>" npm run supabase:preparar -- --refazer
  */
 import { randomBytes } from "node:crypto";
 import { readFileSync, writeFileSync } from "node:fs";
@@ -24,8 +28,11 @@ import { alinharValoresNormalizados } from "@/lib/banco/normalizacao";
 import { eq } from "drizzle-orm";
 import { prepararBancoLocal, USUARIO_DESENVOLVIMENTO } from "@/modulos/acesso/usuario-atual";
 import { apagarContasDeTeste, criarContasDeTeste } from "./contas-teste";
+import { apagarBancoDescartavel, motivosContraCargaDeTeste, OperacaoDestrutivaRecusadaError } from "./protecao-destrutiva";
 import { carregarExemplos } from "./carregar-exemplos";
 
+// Lida antes de carregar o arquivo .env.local: a confirmação tem de vir do próprio comando.
+const confirmacaoDeExclusao = process.env.CRM_CONFIRMAR_EXCLUSAO;
 loadEnvConfig(process.cwd(), true, { info: () => {}, error: () => {} });
 
 const PASTA_MIGRACOES = path.join(process.cwd(), "src", "lib", "banco", "migracoes");
@@ -102,15 +109,19 @@ async function principal() {
   const banco = abrirBancoPostgres(conexaoAdministrativa, { max: 3 });
   try {
     if (process.argv.includes("--refazer")) {
+      // Primeiro a proteção: as contas só são apagadas depois de autorizada a exclusão.
+      await apagarBancoDescartavel(banco, process.env, confirmacaoDeExclusao);
       await apagarContasDeTeste();
-      await banco.execute(sql`drop schema if exists drizzle cascade`);
-      await banco.execute(sql`drop schema if exists public cascade`);
-      await banco.execute(sql`create schema public`);
       console.log("[OK] Dados anteriores apagados.");
     }
     await aplicarMigracoes(banco);
     await ativarPapelDaAplicacao(banco, conexaoAdministrativa);
     await conferirPapelDaAplicacao();
+    const contraCarga = await motivosContraCargaDeTeste(banco, process.env);
+    if (contraCarga.length > 0) {
+      console.log(`[AVISO] Banco não identificado como descartável; dados e contas de teste não foram carregados. ${contraCarga.join(" ")}`);
+      return;
+    }
     await carregarDemonstracao(banco);
     await criarContasDeTeste(banco);
     await inativarAdministradorFicticio(banco);
@@ -122,6 +133,7 @@ async function principal() {
 
 principal().catch((erro) => {
   // Sem imprimir o erro inteiro: mensagens de conexão podem conter dados da conexão.
-  console.error(`Falha na preparação: ${erro instanceof Error ? erro.message.split("\n")[0].slice(0, 200) : "erro desconhecido"}`);
+  if (erro instanceof OperacaoDestrutivaRecusadaError) console.error(erro.message);
+  else console.error(`Falha na preparação: ${erro instanceof Error ? erro.message.split("\n")[0].slice(0, 200) : "erro desconhecido"}`);
   process.exitCode = 1;
 });

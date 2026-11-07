@@ -19,6 +19,8 @@
     "banco:exemplos": "tsx scripts/carregar-exemplos.ts",
     "banco:reiniciar": "tsx scripts/reiniciar-banco.ts",
     "ambiente:conferir": "tsx scripts/conferir-ambiente.ts",
+    "ambiente:senha-admin": "tsx scripts/senha-administrativa.ts",
+    "supabase:marcar-descartavel": "tsx scripts/marcar-banco-descartavel.ts",
     "supabase:preparar": "tsx scripts/supabase-preparar.ts",
     "test:regras": "vitest run --config vitest.regras.config.mts",
     "test:postgres": "vitest run --config vitest.postgres.config.mts",

@@ -7,14 +7,16 @@
 import { describe, expect, test } from "vitest";
 import {
   conferirAjustesDeAutenticacao,
+  conexaoComNovaSenha,
   conferirVariaveis,
   explicarFalhaDeConexao,
+  gerarSenhaForte,
 } from "../scripts/conferencia-ambiente";
 
 const REFERENCIA = "projetoficticio";
 const CHAVE_PUBLICA = ["sb", "publishable", "valorficticiopublico"].join("_");
 const CHAVE_SECRETA = ["sb", "secret", "valorficticiosecreto"].join("_");
-const SENHA = "senhaficticia123";
+const SENHA = "senhaficticia12345678";
 const POOLER = "aws-1-sa-east-1.pooler.supabase.com";
 
 const correto = {
@@ -32,7 +34,7 @@ describe("Conferência das variáveis", () => {
   test("campos vazios ficam pendentes, sem apontar problema", () => {
     const itens = conferirVariaveis({ NEXT_PUBLIC_SUPABASE_URL: "", SUPABASE_SECRET_KEY: "" });
     expect(itens.filter((i) => i.situacao === "problema")).toEqual([]);
-    expect(itens.filter((i) => i.situacao === "pendente")).toHaveLength(5);
+    expect(itens.filter((i) => i.situacao === "pendente")).toHaveLength(6);
   });
 
   test("valores corretos ficam aprovados; só a conexão do crm_app aguarda a criação do papel", () => {
@@ -98,6 +100,33 @@ describe("Conferência das variáveis", () => {
         expect(texto).not.toContain(valor);
       }
     }
+  });
+});
+
+describe("Senha administrativa", () => {
+  test("senha curta é apontada, sem repetir o valor", () => {
+    const curta = "curta@#1";
+    const ambiente = { ...correto, CRM_BANCO_ADMIN_URL: `postgresql://postgres.${REFERENCIA}:${encodeURIComponent(curta)}@${POOLER}:5432/postgres` };
+    const item = situacao(ambiente, "Força da senha administrativa");
+    expect(item?.situacao).toBe("problema");
+    expect(JSON.stringify(item)).not.toContain("curta");
+    expect(situacao(correto, "Força da senha administrativa")?.situacao).toBe("ok");
+  });
+
+  test("a senha gerada é longa, só com letras e números, e muda a cada geração", () => {
+    const bytes = (n: number) => Uint8Array.from({ length: n }, () => Math.floor(Math.random() * 256));
+    const senha = gerarSenhaForte(bytes);
+    expect(senha).toMatch(/^[A-Za-z0-9]{40}$/);
+    expect(gerarSenhaForte(bytes)).not.toBe(senha);
+  });
+
+  test("a conexão muda só na senha, inclusive com símbolos", () => {
+    const nova = new URL(conexaoComNovaSenha(correto.CRM_BANCO_ADMIN_URL, "n@va#senha?1"));
+    expect(decodeURIComponent(nova.password)).toBe("n@va#senha?1");
+    expect(nova.username).toBe(`postgres.${REFERENCIA}`);
+    expect(nova.hostname).toBe(POOLER);
+    expect(nova.port).toBe("5432");
+    expect(nova.pathname).toBe("/postgres");
   });
 });
 

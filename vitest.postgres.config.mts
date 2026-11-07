@@ -4,10 +4,12 @@ import { defineConfig } from "vitest/config";
 
 /**
  * C8: os testes de banco das Etapas 1 a 4, sem alteração, no PostgreSQL real do projeto Supabase
- * de desenvolvimento (npm run test:postgres). APAGA os dados do projeto antes de cada arquivo:
- * depois, rode npm run supabase:preparar -- --refazer. Não roda no GitHub Actions: exige as chaves locais.
+ * de desenvolvimento. APAGA os dados do projeto antes de cada arquivo; por isso, só roda no banco
+ * identificado como descartável e com a frase no próprio comando (scripts/protecao-destrutiva.ts):
+ * CRM_CONFIRMAR_EXCLUSAO="APAGAR DADOS FICTICIOS DE <identificador>" npm run test:postgres
+ * Depois, refaça a carga com supabase:preparar --refazer. Não roda no GitHub Actions: exige as chaves.
  */
-const { CRM_BANCO_ADMIN_URL } = loadEnv("development", process.cwd(), "");
+const { CRM_BANCO_ADMIN_URL, NEXT_PUBLIC_SUPABASE_URL, CRM_BANCO_DESCARTAVEL_REF } = loadEnv("development", process.cwd(), "");
 
 export default defineConfig({
   resolve: {
@@ -19,8 +21,14 @@ export default defineConfig({
   },
   test: {
     environment: "node",
-    // Só a conexão administrativa: sem as demais variáveis, nada aqui imita a aplicação em uso.
-    env: { CRM_BANCO_ADMIN_URL, CRM_TESTE_POSTGRES_REINICIAR: "sim" },
+    // Sem as demais variáveis, nada aqui imita a aplicação em uso. A confirmação vem só do próprio
+    // comando: um valor gravado em .env.local não é lido.
+    env: {
+      CRM_BANCO_ADMIN_URL,
+      NEXT_PUBLIC_SUPABASE_URL,
+      CRM_BANCO_DESCARTAVEL_REF,
+      CRM_CONFIRMAR_EXCLUSAO: process.env.CRM_CONFIRMAR_EXCLUSAO ?? "",
+    },
     include: [
       "testes/banco-cadastro-mestre.test.ts",
       "testes/banco-projetos-temas.test.ts",

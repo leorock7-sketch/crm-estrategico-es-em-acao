@@ -7,23 +7,31 @@
  * Somente dados fictícios. Cada execução usa nomes próprios, para não colidir com outras.
  */
 import { randomUUID } from "node:crypto";
-import { and, eq, sql } from "drizzle-orm";
+import { and, eq, like, sql } from "drizzle-orm";
 import { beforeAll, describe, expect, test } from "vitest";
 import { type Banco, comoUsuario } from "@/lib/banco/conexao";
 import {
+  acao,
+  avaliacaoVersao,
   contato,
+  evidencia,
+  iniciativaProjetoTema,
   pessoa,
   permissaoContexto,
   planoAcaoVersao,
   projetoTema,
   registroAuditoria,
+  stakeholder,
   stakeholderContexto,
   usuario,
 } from "@/lib/banco/esquema";
 import { comIdentidade } from "@/lib/banco/identidade";
 import { erroDoBanco } from "@/lib/banco/erros";
 import { ehAdministrador, podeDecidirNoProjeto, podeEditarNoProjeto, podeRegistrarNoCadastro, podeVerDadosRestritos } from "@/modulos/acesso/capacidades";
-import { criarIniciativa, listarIniciativas, obterIniciativa } from "@/modulos/iniciativas/consultas";
+import * as avaliacoes from "@/modulos/avaliacoes/consultas";
+import { METODOLOGIA_V22 } from "@/modulos/avaliacoes/rubricas-v22";
+import { atualizarIniciativa, criarIniciativa, historicoDaIniciativa, incluirProjetoNaIniciativa, listarIniciativas, obterIniciativa } from "@/modulos/iniciativas/consultas";
+import { definirArquivamentoProjetoTema, listarProjetosTemas } from "@/modulos/projetos-temas/consultas";
 import { criarInteracao, incluirIniciativaNaInteracao } from "@/modulos/interacoes/consultas";
 import * as planos from "@/modulos/plano-acao/consultas";
 import { criarContato, criarPessoa, historicoDoStakeholder, listarContatos, listarPessoas, obterPessoa } from "@/modulos/stakeholders/consultas";
@@ -216,6 +224,7 @@ export function regrasDeAcesso(obterAmbiente: () => Ambiente) {
         ),
       ).toBe("42501");
       expect(await codigoDaFalha(administrador.execute(sql`delete from registro_auditoria`))).toBe("42501");
+      expect(await codigoDaFalha(administrador.update(registroAuditoria).set({ tabela: "adulterada" }))).toBe("42501");
     });
 
     test("a aplicação não exclui registros nem com perfil de administrador", async () => {
@@ -437,6 +446,102 @@ export function regrasDeAcesso(obterAmbiente: () => Ambiente) {
       expect(linha.por).toBe(u.gestorA);
       expect(linha.em).toBeInstanceOf(Date);
       expect(planoId).toBeTruthy();
+    });
+
+    test("versão decidida não muda pelo papel crm_app: nem o parecer, nem o código da ação, nem o planejamento", async () => {
+      const gestor = como(u.gestorA);
+      const naTransacao = <T>(operacao: Parameters<typeof comoUsuario<T>>[2]) => comoUsuario(gestor, u.gestorA, operacao);
+      expect(await codigoDaFalha(naTransacao((tx) => tx.update(planoAcaoVersao).set({ parecer: "Mudança indevida" }).where(eq(planoAcaoVersao.id, versaoId))))).toBe("P0001");
+      const [{ id: acaoId }] = await adm.select({ id: acao.id }).from(acao).where(eq(acao.planoAcaoId, planoId));
+      expect(await codigoDaFalha(naTransacao((tx) => tx.update(acao).set({ codigo: "A-99" }).where(eq(acao.id, acaoId))))).toBe("P0001");
+      const [planejada] = await planos.planejamentoDaVersao(gestor, versaoId);
+      await expect(
+        naTransacao((tx) => planos.atualizarAcaoPlanejada(tx, planejada.id, { titulo: "Outro título", responsavelUsuarioId: u.gestorA })),
+      ).rejects.toThrow();
+      const [mantida] = await planos.planejamentoDaVersao(gestor, versaoId);
+      expect(mantida.titulo).toBe("Ação fictícia");
+    });
+  });
+
+  // Cada teste abaixo cobre, pelo papel crm_app, o que um dos 7 testes fora da configuração com RLS
+  // verifica (quadro em testes/README.md). Nenhum deles repete a mensagem do gatilho de exclusão:
+  // aqui, a exclusão é recusada antes, pela falta de permissão do papel.
+  describe("Proteções das Etapas 1 a 4 pelo papel crm_app", () => {
+    test("exclusão direta é recusada em todas as áreas, mesmo com perfil de administrador", async () => {
+      const b = como(u.administrador);
+      for (const tabela of ["pessoa", "projeto_tema", "iniciativa", "interacao", "acao", "risco", "avaliacao_versao", "usuario", "permissao_contexto"]) {
+        expect(await codigoDaFalha(b.execute(sql.raw(`delete from ${tabela}`))), tabela).toBe("42501");
+      }
+    });
+
+    test("o tipo do stakeholder não muda: o comando não alcança nenhuma linha, nem como administrador", async () => {
+      await como(u.administrador).update(stakeholder).set({ tipo: "instituicao" }).where(eq(stakeholder.id, pessoaEmA));
+      const [linha] = await adm.select({ tipo: stakeholder.tipo }).from(stakeholder).where(eq(stakeholder.id, pessoaEmA));
+      expect(linha.tipo).toBe("pessoa");
+    });
+
+    test("a identidade vale só dentro da transação e não vaza para a consulta seguinte", async () => {
+      const [dentro] = (await como(u.gestorA).execute(sql`select usuario_da_sessao() as usuario`)).rows as { usuario: string | null }[];
+      expect(dentro.usuario).toBe(u.gestorA);
+      const [fora] = (await app.execute(sql`select usuario_da_sessao() as usuario`)).rows as { usuario: string | null }[];
+      expect(fora.usuario).toBeNull();
+      const [sem] = (await como(null).execute(sql`select usuario_da_sessao() as usuario`)).rows as { usuario: string | null }[];
+      expect(sem.usuario).toBeNull();
+    });
+
+    test("integridade da iniciativa: datas, conclusão, ligação repetida e ligação imutável valem pelo papel crm_app", async () => {
+      const gestor = como(u.gestorA);
+      const dados = { titulo: `Regras de integridade ${sufixo} fictícias`, tipo: "demanda" as const, prioridade: "media" as const, situacao: "registrada" as const, dataAbertura: "2026-01-10" };
+      const id = await comoUsuario(gestor, u.gestorA, (tx) => criarIniciativa(tx, { ...dados, projetos: [projetoA] }));
+      const naTransacao = <T>(operacao: Parameters<typeof comoUsuario<T>>[2]) => comoUsuario(gestor, u.gestorA, operacao);
+      expect(await codigoDaFalha(naTransacao((tx) => atualizarIniciativa(tx, id, { ...dados, situacao: "concluida" })))).toBe("23514");
+      expect(await codigoDaFalha(naTransacao((tx) => atualizarIniciativa(tx, id, { ...dados, dataConclusao: "2026-01-01" })))).toBe("23514");
+      expect(await codigoDaFalha(naTransacao((tx) => incluirProjetoNaIniciativa(tx, id, projetoA)))).toBe("23505");
+      expect(
+        await codigoDaFalha(
+          comoUsuario(como(u.administrador), u.administrador, (tx) =>
+            tx.update(iniciativaProjetoTema).set({ projetoTemaId: projetoB }).where(eq(iniciativaProjetoTema.iniciativaId, id)),
+          ),
+        ),
+      ).toBe("P0001");
+      await naTransacao((tx) => atualizarIniciativa(tx, id, { ...dados, situacao: "concluida", dataConclusao: "2026-02-01" }));
+      const historico = await historicoDaIniciativa(gestor, id);
+      expect(historico.filter((h) => h.tabela === "iniciativa").map((h) => h.operacao)).toEqual(["alteracao", "inclusao"]);
+    });
+
+    test("versão publicada da avaliação não muda pelo papel crm_app, nem por comando direto", async () => {
+      const vigentes = (await adm.execute(sql`select id from metodologia_versao where situacao = 'vigente'`)).rows;
+      if (vigentes.length === 0) {
+        await comoUsuario(adm, u.administrador, async (tx) => {
+          const id = await avaliacoes.criarMetodologia(tx, { ...METODOLOGIA_V22, nome: `V2.2 fictícia ${sufixo}` });
+          await avaliacoes.alterarSituacaoMetodologia(tx, id, "vigente");
+        });
+      }
+      const gestor = como(u.gestorA);
+      const naTransacao = <T>(operacao: Parameters<typeof comoUsuario<T>>[2]) => comoUsuario(gestor, u.gestorA, operacao);
+      const versaoId = await naTransacao(async (tx) => {
+        const id = await avaliacoes.iniciarRascunho(tx, projetoA, pessoaEmA);
+        await avaliacoes.salvarRascunho(tx, { versaoId: id, dataReferencia: "2026-10-20", justificativa: "Síntese fictícia." }, new Map());
+        await avaliacoes.publicarRascunho(tx, id);
+        return id;
+      });
+      expect(await codigoDaFalha(naTransacao((tx) => tx.update(avaliacaoVersao).set({ justificativa: "Outra" }).where(eq(avaliacaoVersao.id, versaoId))))).toBe("P0001");
+      expect(await codigoDaFalha(naTransacao((tx) => tx.update(avaliacaoVersao).set({ arquivadoEm: new Date() }).where(eq(avaliacaoVersao.id, versaoId))))).toBe("P0001");
+      expect(await codigoDaFalha(naTransacao((tx) => tx.insert(evidencia).values({ avaliacaoVersaoId: versaoId, tipo: "link", descricao: "Nova" })))).toBe("P0001");
+      const [linha] = await adm.select({ justificativa: avaliacaoVersao.justificativa, arquivadoEm: avaliacaoVersao.arquivadoEm }).from(avaliacaoVersao).where(eq(avaliacaoVersao.id, versaoId));
+      expect(linha).toEqual({ justificativa: "Síntese fictícia.", arquivadoEm: null });
+    });
+
+    test("arquivar oculta o projeto da lista por padrão, pelo papel crm_app", async () => {
+      const nome = `Projeto Arquivavel ${sufixo}`;
+      const [comite] = (await adm.execute(sql`select id from comite order by nome limit 1`)).rows as { id: string }[];
+      const [novo] = await adm.insert(projetoTema).values({ tipo: "projeto", nome, nomeNormalizado: nome.toLowerCase(), comiteId: comite.id }).returning({ id: projetoTema.id });
+      await conceder(u.gestorA, novo.id, "gestor");
+      const gestor = como(u.gestorA);
+      await comoUsuario(gestor, u.gestorA, (tx) => definirArquivamentoProjetoTema(tx, novo.id, true));
+      expect(await listarProjetosTemas(gestor, { busca: nome })).toHaveLength(0);
+      expect(await listarProjetosTemas(gestor, { busca: nome, incluirArquivados: true })).toHaveLength(1);
+      expect(await adm.select({ id: projetoTema.id }).from(projetoTema).where(like(projetoTema.nome, nome))).toHaveLength(1);
     });
   });
 

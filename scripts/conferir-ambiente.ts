@@ -9,6 +9,8 @@
  */
 import { loadEnvConfig } from "@next/env";
 import postgres from "postgres";
+import { abrirBancoPostgres, fecharBanco } from "@/lib/banco/conexao";
+import { conferirConfiguracao, conferirBanco as conferirBancoDescartavel } from "./protecao-destrutiva";
 import {
   conferirAjustesDeAutenticacao,
   conferirVariaveis,
@@ -71,6 +73,22 @@ async function conferirBanco(): Promise<ItemConferido> {
   }
 }
 
+/** Só leitura. Não impede o uso normal: é a condição para os comandos que apagam dados. */
+async function conferirDescartavel(): Promise<ItemConferido> {
+  const item = "Banco de testes descartável";
+  const { referencia, motivos } = conferirConfiguracao(ambiente);
+  if (!referencia || motivos.length > 0) return { item, situacao: "pendente", detalhe: motivos[0] ?? "não identificado" };
+  const banco = abrirBancoPostgres(ambiente.CRM_BANCO_ADMIN_URL as string, { max: 1 });
+  try {
+    const noBanco = await conferirBancoDescartavel(banco, referencia);
+    return noBanco.length === 0
+      ? { item, situacao: "ok", detalhe: "identificado; comandos destrutivos ainda exigem a frase de confirmação" }
+      : { item, situacao: "pendente", detalhe: noBanco[0] };
+  } finally {
+    await fecharBanco(banco);
+  }
+}
+
 const SELOS = { ok: "[OK]      ", pendente: "[PENDENTE]", problema: "[PROBLEMA]" } as const;
 
 async function principal() {
@@ -79,13 +97,17 @@ async function principal() {
 
   if (pronto("Endereço do projeto") && pronto("Chave publishable")) itens.push(...(await conferirAutenticacao()));
   if (pronto("Endereço do projeto") && pronto("Chave secreta")) itens.push(await conferirValidadeDaChaveSecreta());
-  if (pronto("Conexão administrativa")) itens.push(await conferirBanco());
+  if (pronto("Conexão administrativa")) {
+    itens.push(await conferirBanco());
+    itens.push(await conferirDescartavel());
+  }
 
   console.log("Conferência do projeto Supabase de desenvolvimento (nenhum valor é exibido)\n");
   for (const { item, situacao, detalhe } of itens) console.log(`${SELOS[situacao]} ${item}: ${detalhe}`);
 
-  // A conexão do papel crm_app é criada depois; o ambiente já pode estar pronto sem ela.
-  const faltando = itens.filter((i) => i.situacao !== "ok" && !(i.item.startsWith("Conexão da aplicação") && i.situacao === "pendente"));
+  // A conexão do papel crm_app e a marca de descartável vêm depois: o ambiente pode estar pronto sem elas.
+  const opcionais = ["Conexão da aplicação", "Banco de testes descartável"];
+  const faltando = itens.filter((i) => i.situacao !== "ok" && !(i.situacao === "pendente" && opcionais.some((o) => i.item.startsWith(o))));
   console.log(faltando.length === 0 ? "\nAmbiente pronto para a Etapa 5." : `\nFaltam ${faltando.length} item(ns).`);
   process.exitCode = faltando.length === 0 ? 0 : 1;
 }

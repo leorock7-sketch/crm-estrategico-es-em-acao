@@ -104,6 +104,43 @@ function conferirConexaoDaAplicacao(valor: string | undefined): ItemConferido {
   }
 }
 
+const TAMANHO_MINIMO_SENHA = 16;
+
+/** Só o tamanho: o valor nunca sai daqui. */
+function conferirForcaDaSenha(conexao: string | undefined): ItemConferido {
+  const item = "Força da senha administrativa";
+  if (!preenchido(conexao)) return { item, situacao: "pendente", detalhe: "conexão não informada" };
+  try {
+    const tamanho = decodeURIComponent(new URL(conexao).password).length;
+    return tamanho >= TAMANHO_MINIMO_SENHA
+      ? { item, situacao: "ok", detalhe: `${TAMANHO_MINIMO_SENHA} caracteres ou mais` }
+      : { item, situacao: "problema", detalhe: `menos de ${TAMANHO_MINIMO_SENHA} caracteres: troque por uma senha forte, gerada aleatoriamente` };
+  } catch {
+    return { item, situacao: "problema", detalhe: "não foi possível conferir" };
+  }
+}
+
+/** Senha forte, aleatória, só com letras e números: dispensa qualquer ajuste na conexão. */
+export function gerarSenhaForte(bytesAleatorios: (quantidade: number) => Uint8Array, tamanho = 40): string {
+  const alfabeto = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+  // Descarta os valores que tornariam algumas letras mais prováveis do que outras.
+  const limite = 256 - (256 % alfabeto.length);
+  let senha = "";
+  while (senha.length < tamanho) {
+    for (const byte of bytesAleatorios(tamanho * 2)) {
+      if (byte < limite && senha.length < tamanho) senha += alfabeto[byte % alfabeto.length];
+    }
+  }
+  return senha;
+}
+
+/** Conexão igual à atual, com outra senha, já no formato aceito em conexões. */
+export function conexaoComNovaSenha(conexao: string, senha: string): string {
+  const url = new URL(conexao);
+  url.password = encodeURIComponent(senha);
+  return url.toString();
+}
+
 /** Nada que vá para o navegador (prefixo NEXT_PUBLIC_) pode conter segredo. */
 function conferirCamposPublicos(ambiente: Ambiente): ItemConferido {
   const item = "Campos enviados ao navegador";
@@ -122,6 +159,7 @@ export function conferirVariaveis(ambiente: Ambiente): ItemConferido[] {
     conferirChavePublica(ambiente.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY),
     conferirChaveSecreta(ambiente.SUPABASE_SECRET_KEY),
     conferirConexaoAdministrativa(ambiente.CRM_BANCO_ADMIN_URL, referenciaDoProjeto(endereco)),
+    conferirForcaDaSenha(ambiente.CRM_BANCO_ADMIN_URL),
     conferirConexaoDaAplicacao(ambiente.CRM_BANCO_URL),
     conferirCamposPublicos(ambiente),
   ];
