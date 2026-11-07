@@ -296,7 +296,9 @@ describe("Comandos reais", () => {
       if (a === "testes/protecao-destrutiva.test.ts") return false;
       return /\bdrop\s+schema\b|\btruncate\s+(table\s+)?[a-z"]/i.test(readFileSync(path.join(process.cwd(), a), "utf8"));
     });
-    expect(comExclusao).toEqual(["scripts/protecao-destrutiva.ts"]);
+    // A tentativa de esvaziar tabelas em testes/operacao-7a.test.ts é recusada pelo banco (C6) e roda só
+    // no PGlite em memória do próprio teste.
+    expect(comExclusao).toEqual(["scripts/protecao-destrutiva.ts", "testes/operacao-7a.test.ts"]);
   });
 
   test("o arquivo .env.local e as senhas temporárias continuam fora do repositório", () => {

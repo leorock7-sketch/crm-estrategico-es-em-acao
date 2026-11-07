@@ -15,7 +15,10 @@ import { afterAll, beforeAll, describe, expect, test } from "vitest";
 import { type ContaDeTeste, lerContasDeTeste } from "../../scripts/contas-teste";
 
 const PORTA = 3211;
-const BASE = `http://127.0.0.1:${PORTA}`;
+// Com CRM_TESTE_BASE_URL, roda contra um servidor já ligado (teste local de compatibilidade com o
+// Netlify, D-082) em vez de iniciar o next start.
+const EXTERNO = process.env.CRM_TESTE_BASE_URL;
+const BASE = EXTERNO ?? `http://127.0.0.1:${PORTA}`;
 const PASTA_TELAS = path.join(process.cwd(), ".dados", "telas-etapa-6");
 const PASTA_ARQUIVOS = path.join(PASTA_TELAS, "arquivos");
 const NOME_A = "Corredor Logístico Exemplo";
@@ -40,10 +43,12 @@ async function aguardarServidor() {
 }
 
 beforeAll(async () => {
-  if (!existsSync(path.join(process.cwd(), ".next", "BUILD_ID"))) throw new Error("Rode npm run build antes destes testes.");
+  if (!EXTERNO && !existsSync(path.join(process.cwd(), ".next", "BUILD_ID"))) throw new Error("Rode npm run build antes destes testes.");
   mkdirSync(PASTA_ARQUIVOS, { recursive: true });
-  const ambiente = { ...process.env, NODE_ENV: "production", PORT: String(PORTA) } as NodeJS.ProcessEnv;
-  servidor = spawn(process.execPath, ["node_modules/next/dist/bin/next", "start", "-H", "127.0.0.1", "-p", String(PORTA)], { env: ambiente, stdio: "ignore" });
+  if (!EXTERNO) {
+    const ambiente = { ...process.env, NODE_ENV: "production", PORT: String(PORTA) } as NodeJS.ProcessEnv;
+    servidor = spawn(process.execPath, ["node_modules/next/dist/bin/next", "start", "-H", "127.0.0.1", "-p", String(PORTA)], { env: ambiente, stdio: "ignore" });
+  }
   await aguardarServidor();
   navegador = await chromium.launch({ channel: "msedge", headless: true });
 });

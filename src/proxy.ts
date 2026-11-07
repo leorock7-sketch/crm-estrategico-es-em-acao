@@ -5,12 +5,17 @@
  */
 import { createServerClient } from "@supabase/ssr";
 import { type NextRequest, NextResponse } from "next/server";
+import { DESTINO_DA_TROCA, exigeTrocaDeSenha, PAGINA_DA_TROCA } from "@/lib/autenticacao/troca-obrigatoria";
 import { modoDeAcesso } from "@/lib/banco/ambiente";
 
 const ROTAS_PUBLICAS = ["/login", "/sem-acesso"];
 
+/** Verificação de funcionamento (monitoramento): não usa sessão nem devolve dado algum. */
+const ROTA_DE_SAUDE = "/saude";
+
 export async function proxy(requisicao: NextRequest) {
   if (modoDeAcesso() !== "supabase") return NextResponse.next();
+  if (requisicao.nextUrl.pathname === ROTA_DE_SAUDE) return NextResponse.next();
 
   let resposta = NextResponse.next({ request: requisicao });
   const supabase = createServerClient(
@@ -39,6 +44,16 @@ export async function proxy(requisicao: NextRequest) {
     login.pathname = "/login";
     login.search = caminho === "/" ? "" : `?destino=${encodeURIComponent(caminho + requisicao.nextUrl.search)}`;
     return NextResponse.redirect(login);
+  }
+  // P-056: com senha provisória, só a troca de senha. As telas são desviadas para ela (303). Os envios
+  // de operações seguem: o formulário da troca pode estar num endereço anterior, e as demais operações
+  // são recusadas no servidor enquanto a troca estiver pendente (bancoDaSessao).
+  const ehOperacao = requisicao.method === "POST" && requisicao.headers.has("next-action");
+  if (autenticado && exigeTrocaDeSenha(data?.claims) && caminho !== PAGINA_DA_TROCA && !publica && !ehOperacao) {
+    const troca = requisicao.nextUrl.clone();
+    troca.pathname = PAGINA_DA_TROCA;
+    troca.search = DESTINO_DA_TROCA.slice(PAGINA_DA_TROCA.length);
+    return NextResponse.redirect(troca, 303);
   }
   if (autenticado && caminho === "/login") {
     const inicio = requisicao.nextUrl.clone();

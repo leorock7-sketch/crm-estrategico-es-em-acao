@@ -1,0 +1,94 @@
+# Teste de compatibilidade com o Netlify Free (Etapa 7, Fase 7A; autorização A1 da D-082).
+#
+# Compila o CRM exatamente como o Netlify faria (ferramenta oficial e adaptador do Next.js), num
+# computador Linux do próprio GitHub Actions, SEM conta no Netlify, SEM segredos e SEM publicar nada.
+# Existe porque a ferramenta do Netlify falha no Windows ao empacotar o proxy (erro de caminhos do
+# Windows), e a compilação real do Netlify acontece em Linux. A configuração do Netlify é criada só
+# durante o teste; o repositório não passa a depender do Netlify.
+
+name: Compatibilidade Netlify
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [feature/implantacao-7a]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: compatibilidade-netlify-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  compilar:
+    name: Compilação e servidor local do Netlify
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    env:
+      NEXT_TELEMETRY_DISABLED: "1"
+      # Valores FICTÍCIOS, só para a aplicação compilar e rodar no modo Supabase (proxy de login ativo).
+      # Nenhuma conexão é feita com eles: não há sessão, e o banco indicado não existe.
+      NEXT_PUBLIC_SUPABASE_URL: https://projeto-ficticio.supabase.co
+      NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: chave-publica-ficticia-de-teste
+      CRM_BANCO_URL: postgresql://teste:teste@127.0.0.1:5999/inexistente
+    steps:
+      - name: Baixar o código
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Instalar o Node.js
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: "24"
+          cache: npm
+
+      - name: Instalar as dependências do CRM
+        run: npm ci
+
+      - name: Instalar a ferramenta do Netlify e o adaptador do Next.js (só neste teste)
+        run: npm install --no-save --no-audit --no-fund --loglevel=error netlify-cli@27.16.2 @netlify/plugin-nextjs@5.16.6
+
+      - name: Criar a configuração do teste (não versionada)
+        run: |
+          printf '[build]\n  command = "npm run build"\n  publish = ".next"\n\n[[plugins]]\n  package = "@netlify/plugin-nextjs"\n' > netlify.toml
+
+      - name: Compilar como o Netlify, sem conta e sem publicar
+        run: npx netlify build --offline
+
+      - name: Conferir o resultado da compilação
+        run: |
+          {
+            echo "### Compilação do Netlify (sem publicação)"
+            echo ""
+            echo "- Adaptador: $(node -p "require('@netlify/plugin-nextjs/package.json').version")"
+            echo "- Next.js: $(node -p "require('next/package.json').version")"
+            echo "- Funções do servidor: $(find .netlify/functions-internal -maxdepth 1 -mindepth 1 | wc -l)"
+            echo "- Edge Functions (proxy): $(find .netlify/edge-functions -maxdepth 1 -mindepth 1 | wc -l)"
+            echo "- Tamanho da pasta .netlify: $(du -sh .netlify | cut -f1)"
+          } >> "$GITHUB_STEP_SUMMARY"
+          test -d .netlify/functions-internal
+          test -d .netlify/edge-functions
+
+      - name: Servir localmente e conferir as respostas
+        run: |
+          npx netlify serve --offline --port 8888 > servidor.log 2>&1 &
+          for i in $(seq 1 90); do
+            codigo=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:8888/login || true)
+            if [ "$codigo" != "000" ]; then break; fi
+            sleep 2
+          done
+          login=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:8888/login)
+          inicio=$(curl -s -o /dev/null -w "%{http_code} %{redirect_url}" http://localhost:8888/paineis)
+          saude=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:8888/saude)
+          {
+            echo ""
+            echo "### Servidor local do Netlify"
+            echo ""
+            echo "- /login: HTTP $login (página renderizada pela função do servidor)"
+            echo "- /paineis sem sessão: HTTP $inicio (o proxy de login deve levar a /login)"
+            echo "- /saude: HTTP $saude (sem banco configurado neste teste; 503 é o esperado)"
+          } >> "$GITHUB_STEP_SUMMARY"
+          test "$login" = "200"
+          case "$inicio" in 307*login*|308*login*|302*login*|303*login*) ;; *) echo "proxy não redirecionou"; exit 1 ;; esac

@@ -1,0 +1,68 @@
+# Monitoramento gratuito do CRM (Etapa 7, Fase 7A; autorização A3 da D-082).
+#
+# Três vezes ao dia confere que o banco (papel crm_monitor, sem acesso a tabelas), o login e, quando
+# houver hospedagem, a aplicação RESPONDEM. Responder não comprova que a atividade baste para evitar
+# a suspensão do projeto gratuito do Supabase: o fornecedor não oferece essa garantia.
+#
+# Segurança:
+# - usa só os segredos CRM_MONITOR_URL, CRM_SUPABASE_URL e CRM_SUPABASE_CHAVE_PUBLICA; nenhuma
+#   credencial administrativa; o script recusa conexão com privilégio;
+# - registra somente data, verificação, resultado, duração, categoria do erro e, no consumo, o
+#   percentual do limite; nunca a mensagem original do erro;
+# - não grava nada no banco e não gera dados artificiais;
+# - os registros deste repositório público são visíveis a usuários do GitHub: por isso não contêm
+#   endereço, usuário, senha ou dado do CRM.
+#
+# Falha → e-mail do GitHub a quem mantém o fluxo. O GitHub desativa fluxos agendados de repositório
+# público após 60 dias sem atividade no repositório: npm run monitor:conferir confere isso
+# (docs/OPERACAO.md, seção 2, traz o procedimento manual alternativo).
+
+name: Monitoramento
+
+on:
+  schedule:
+    # 07:17, 13:17 e 19:17 em Brasília (UTC-3), fora do início da hora, quando há mais atrasos.
+    - cron: "17 10,16,22 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: monitoramento
+  cancel-in-progress: false
+
+jobs:
+  verificar:
+    name: Banco, login e aplicação
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Baixar somente o script do monitor
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          sparse-checkout: scripts/monitor
+          sparse-checkout-cone-mode: false
+
+      - name: Instalar o Node.js
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: "24"
+
+      - name: Instalar somente o driver do PostgreSQL
+        run: |
+          mkdir -p "$RUNNER_TEMP/monitor"
+          cp scripts/monitor/nucleo.mjs scripts/monitor/verificar.mjs "$RUNNER_TEMP/monitor/"
+          cd "$RUNNER_TEMP/monitor"
+          echo '{"type":"module","private":true}' > package.json
+          npm install --no-audit --no-fund --ignore-scripts --loglevel=error postgres@3.4.9
+
+      - name: Verificar
+        working-directory: ${{ runner.temp }}/monitor
+        env:
+          CRM_MONITOR_URL: ${{ secrets.CRM_MONITOR_URL }}
+          CRM_SUPABASE_URL: ${{ secrets.CRM_SUPABASE_URL }}
+          CRM_SUPABASE_CHAVE_PUBLICA: ${{ secrets.CRM_SUPABASE_CHAVE_PUBLICA }}
+          CRM_APP_URL: ${{ vars.CRM_APP_URL }}
+        run: node verificar.mjs

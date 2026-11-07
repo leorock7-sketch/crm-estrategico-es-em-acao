@@ -18,6 +18,8 @@
 | 0.14 | 06/11/2026 | Etapa 5 homologada para desenvolvimento (D-078); verificações do ambiente definitivo seguem para a Etapa 7 |
 | 0.15 | 06/11/2026 | Etapa 6 implementada, aguardando homologação (D-079): módulo `paineis`, relatórios em XLSX gerados no servidor e consultas sobre o conjunto de projetos e planos |
 | 0.16 | 07/11/2026 | Etapa 6 homologada para desenvolvimento (D-080); desempenho e segurança no ambiente hospedado seguem para a Etapa 7 |
+| 0.17 | 07/11/2026 | Fase 7A (D-082): arquitetura de custo zero, papel `crm_monitor`, rota `/saude`, reforço da auditoria (C6), cópias e restauração (C7) e Next.js 16.4.5 |
+| 0.18 | 07/11/2026 | Fase 7A homologada para desenvolvimento (D-083); hospedagem pública, disponibilidade e restauração completa do login seguem pendentes |
 
 Legenda: ✅ Aprovado · 🔧 Proposta técnica · ⏳ Pendente.
 
@@ -74,7 +76,7 @@ Versões instaladas e testadas em 31/10/2026 (registradas com exatidão no arqui
 | Componente | Versão | Para que serve |
 |---|---|---|
 | Node.js | 26.13.0 LTS (aceita 22.22+, 24.15+ ou 26+) | Programa que executa a aplicação e as ferramentas |
-| Next.js | 16.4.3 | Estrutura da aplicação web |
+| Next.js | 16.4.5 | Estrutura da aplicação web (correções de segurança de 03/11/2026, D-082) |
 | React | 19.3.0 | Construção das telas |
 | TypeScript | 5.9.3 | Linguagem com verificação de tipos, que reduz erros |
 | Tailwind CSS | 4.3.3 | Estilos visuais |
@@ -192,7 +194,7 @@ Regras de organização:
 | Trilha de auditoria das alterações, gravada pelo próprio banco e protegida contra alteração. | 🔧 (implementada na Etapa 1) |
 | Registros nunca excluídos, apenas arquivados. | 🔧 (implementado na Etapa 1) |
 | Trava exclusiva do banco local e proteção contra uso do banco local em produção. | 🔧 (revisão de homologação, C1 e C3) |
-| Limites conhecidos da auditoria: responsável informado pela aplicação; `TRUNCATE` não bloqueado; o dono do banco pode desativar gatilhos; cópias integrais de dados pessoais. | ⏳ Reforço planejado (C6) e identificação real na etapa de autenticação |
+| Limites conhecidos da auditoria: responsável informado pela aplicação; `TRUNCATE` não bloqueado; o dono do banco pode desativar gatilhos; cópias integrais de dados pessoais. | 🔧 C6 na Fase 7A (D-082): papel do banco registrado, esvaziamento bloqueado e gatilho desativado detectado diariamente pelo monitor. Seguem: o dono ainda pode desativar gatilhos (detectado, não impedido) e as cópias de dados pessoais (Q-58) |
 | Validação de todos os dados no servidor, inclusive endereços de site (somente http e https). | 🔧 (implementado na Etapa 1) |
 | Princípio do menor privilégio: cada usuário acessa apenas os contextos de que precisa. | 🔧 |
 | Proteção da branch `main` no GitHub: Pull Request obrigatório, verificações automáticas obrigatórias antes do merge, sem exigir outro revisor, bloqueio de exclusão e de reescrita do histórico (D-045, D-052). | ✅ Configurada e conferida |
@@ -223,6 +225,13 @@ Limites conhecidos: a identidade é informada pela aplicação ao banco, em cada
 ### Exportações (Etapa 6) ✅ D-079, D-080 (homologada para desenvolvimento)
 
 Os arquivos são gerados no servidor, em memória, a cada pedido, com a conexão da aplicação e a identidade do usuário: o alcance é decidido pelas permissões válidas lidas no banco, e a rota responde sem cache. O arquivo só contém o que foi montado nas abas, sem fórmulas nem elementos ocultos, e o texto digitado é neutralizado. Nada fica guardado no servidor.
+
+### Operação a custo zero (Fase 7A) ✅ D-082, D-083 (homologada para desenvolvimento)
+
+- **Monitor:** papel `crm_monitor`, sem acesso a tabelas, colunas ou funções; login só no projeto de desenvolvimento. Fluxo agendado no GitHub Actions; rota `/saude` na aplicação, sem sessão e sem dados.
+- **Cópias:** `pg_dump` 17 e `age` no computador de desenvolvimento, fora do repositório; nunca no GitHub.
+- **Hospedagem candidata:** Netlify Free, com o adaptador oficial do Next.js (5.16.6 ou posterior); nada criado.
+- Detalhes, limites e procedimentos em [OPERACAO.md](OPERACAO.md).
 
 ## 6. Comandos do projeto
 

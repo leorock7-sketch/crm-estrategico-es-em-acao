@@ -22,6 +22,11 @@ export function podeRegistrarNoCadastro(banco: Executor) {
   return consultar(banco, sql`pode_editar_algum()`);
 }
 
+/** Incluir em algum projeto ou tema: administrador, ou gestor ou colaborador em algum contexto. */
+export function podeEditarAlgum(banco: Executor) {
+  return consultar(banco, sql`pode_editar_algum()`);
+}
+
 /** Contatos pessoais e observações (P-054, provisória). */
 export function podeVerDadosRestritos(banco: Executor, stakeholderId: string) {
   return consultar(banco, sql`pode_ver_dados_restritos(${stakeholderId}::uuid)`);

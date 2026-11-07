@@ -3,7 +3,8 @@ import { Suspense } from "react";
 import { CabecalhoPagina } from "@/componentes/cabecalho-pagina";
 import { Carregando } from "@/componentes/carregando";
 import { bancoDaRequisicao } from "@/lib/banco/requisicao";
-import { ehAdministrador } from "@/modulos/acesso/capacidades";
+import { ehAdministrador, podeEditarAlgum } from "@/modulos/acesso/capacidades";
+import { SomenteConsulta } from "@/modulos/acesso/componentes/somente-consulta";
 import { FormularioPessoa } from "@/modulos/stakeholders/componentes/formulario-pessoa";
 
 export const metadata: Metadata = { title: "Nova pessoa" };
@@ -26,5 +27,6 @@ export default function PaginaNovaPessoa() {
 /** Pessoa nova ainda não está associada a nenhum contexto: observações, só pelo administrador. */
 async function NovaPessoa() {
   const banco = await bancoDaRequisicao();
+  if (!(await podeEditarAlgum(banco))) return <SomenteConsulta voltar={{ href: "/pessoas", rotulo: "Pessoas" }} />;
   return <FormularioPessoa mostrarObservacoes={await ehAdministrador(banco)} />;
 }

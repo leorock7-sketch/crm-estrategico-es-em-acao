@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import { podeEditarAlgum } from "@/modulos/acesso/capacidades";
+import { SomenteConsulta } from "@/modulos/acesso/componentes/somente-consulta";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import { CabecalhoPagina } from "@/componentes/cabecalho-pagina";
@@ -35,6 +37,7 @@ async function EdicaoInstituicao({
     opcoesInstituicoes(banco),
   ]);
   if (!instituicao || instituicao.arquivadoEm) notFound();
+  if (!(await podeEditarAlgum(banco))) return <SomenteConsulta voltar={{ href: `/instituicoes/${id}`, rotulo: "Instituição" }} />;
 
   return (
     <>

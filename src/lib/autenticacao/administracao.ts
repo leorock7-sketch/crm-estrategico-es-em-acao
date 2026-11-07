@@ -1,6 +1,7 @@
 import "server-only";
 import { randomBytes } from "node:crypto";
 import { createClient } from "@supabase/supabase-js";
+import { MARCA_TROCA_OBRIGATORIA } from "./troca-obrigatoria";
 
 /**
  * Administração de contas no Supabase Auth, com a chave secreta. Usada SOMENTE aqui, nas
@@ -20,12 +21,16 @@ export function gerarSenhaProvisoria(): string {
   return randomBytes(18).toString("base64url");
 }
 
-/** Cria a conta já confirmada, sem enviar e-mail: o serviço institucional de e-mail fica para a Etapa 7. */
+/**
+ * Cria a conta já confirmada, sem enviar e-mail: o serviço institucional de e-mail fica para a Etapa 7.
+ * A senha é provisória: a conta nasce com a troca obrigatória no primeiro acesso (P-056).
+ */
 export async function criarConta(email: string, senha: string): Promise<string> {
   const { data, error } = await clienteAdministrativo().auth.admin.createUser({
     email,
     password: senha,
     email_confirm: true,
+    app_metadata: { [MARCA_TROCA_OBRIGATORIA]: true },
   });
   if (error || !data.user) throw new Error(error?.code === "email_exists" ? "CONTA_EXISTENTE" : "FALHA_AO_CRIAR_CONTA");
   return data.user.id;
@@ -46,7 +51,22 @@ export async function reativarConta(authId: string): Promise<void> {
   if (error) throw new Error("FALHA_AO_REATIVAR_CONTA");
 }
 
+/** Nova senha provisória: volta a exigir a troca no próximo acesso (P-056). */
 export async function redefinirSenha(authId: string, senha: string): Promise<void> {
-  const { error } = await clienteAdministrativo().auth.admin.updateUserById(authId, { password: senha });
+  const { error } = await clienteAdministrativo().auth.admin.updateUserById(authId, {
+    password: senha,
+    app_metadata: { [MARCA_TROCA_OBRIGATORIA]: true },
+  });
   if (error) throw new Error("FALHA_AO_REDEFINIR_SENHA");
+}
+
+/**
+ * Remove a marca de troca obrigatória da própria conta, depois de conferida a senha atual e gravada
+ * a nova (acoes.ts). Só o servidor, com a chave secreta, altera esses metadados.
+ */
+export async function concluirTrocaObrigatoria(authId: string): Promise<void> {
+  const { error } = await clienteAdministrativo().auth.admin.updateUserById(authId, {
+    app_metadata: { [MARCA_TROCA_OBRIGATORIA]: false },
+  });
+  if (error) throw new Error("FALHA_AO_CONCLUIR_TROCA");
 }

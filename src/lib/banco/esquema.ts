@@ -178,6 +178,8 @@ export const registroAuditoria = pgTable(
     dadosAnteriores: jsonb("dados_anteriores"),
     dadosNovos: jsonb("dados_novos"),
     usuarioId: uuid("usuario_id").references(() => usuario.id),
+    /** Papel do banco que executou a operação (C6, migração 0010). */
+    papelBanco: text("papel_banco"),
     ocorridoEm: timestamp("ocorrido_em", { withTimezone: true }).notNull().defaultNow(),
   },
   (t) => [index("registro_auditoria_registro_idx").on(t.tabela, t.registroId)],

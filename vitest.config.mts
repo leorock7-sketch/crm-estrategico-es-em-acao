@@ -14,7 +14,8 @@ export default defineConfig({
     environment: "jsdom",
     include: ["testes/**/*.test.{ts,tsx}"],
     // Exigem as chaves locais do projeto Supabase: rodam com npm run test:supabase.
-    exclude: ["testes/supabase/**"],
+    // O ensaio de restauração roda só com npm run backup:ensaiar, num banco temporário isolado.
+    exclude: ["testes/supabase/**", "testes/restauracao/**"],
     // Os testes de banco rodam em paralelo, cada um com um PostgreSQL próprio, e podem
     // demorar quando o computador está com pouca memória livre. Estes limites valem só
     // para o tempo de espera; não mudam o que cada teste confere.

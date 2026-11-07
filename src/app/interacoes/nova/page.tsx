@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import { podeEditarAlgum } from "@/modulos/acesso/capacidades";
+import { SomenteConsulta } from "@/modulos/acesso/componentes/somente-consulta";
 import { Suspense } from "react";
 import { CabecalhoPagina } from "@/componentes/cabecalho-pagina";
 import { Carregando } from "@/componentes/carregando";
@@ -30,6 +32,7 @@ export default function PaginaNovaInteracao({ searchParams }: PageProps<"/intera
 async function CadastroInteracao({ searchParams }: Pick<PageProps<"/interacoes/nova">, "searchParams">) {
   const parametros = await searchParams;
   const banco = await bancoDaRequisicao();
+  if (!(await podeEditarAlgum(banco))) return <SomenteConsulta voltar={{ href: "/interacoes", rotulo: "Interações" }} />;
   const usuario = await obterUsuarioAtual(banco);
   const visiveis = await projetosVisiveis(banco, usuario.id);
   const [projetos, iniciativas, stakeholders, usuarios] = await Promise.all([

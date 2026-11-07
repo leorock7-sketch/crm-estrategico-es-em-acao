@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import { podeEditarAlgum } from "@/modulos/acesso/capacidades";
+import { SomenteConsulta } from "@/modulos/acesso/componentes/somente-consulta";
 import { Suspense } from "react";
 import { CabecalhoPagina } from "@/componentes/cabecalho-pagina";
 import { Carregando } from "@/componentes/carregando";
@@ -31,6 +33,7 @@ export default function PaginaNovoPlano({ searchParams }: PageProps<"/planos/nov
 async function CadastroPlano({ searchParams }: Pick<PageProps<"/planos/novo">, "searchParams">) {
   const parametros = await searchParams;
   const banco = await bancoDaRequisicao();
+  if (!(await podeEditarAlgum(banco))) return <SomenteConsulta voltar={{ href: "/planos", rotulo: "Planos de ação" }} />;
   const usuario = await obterUsuarioAtual(banco);
   const visiveis = await projetosVisiveis(banco, usuario.id);
   const [projetos, planos, usuarios] = await Promise.all([
