@@ -1,0 +1,20 @@
+# Hospedagem de testes do CRM no Netlify Free (Etapa 7B, D-087): só o projeto de desenvolvimento,
+# com dados fictícios, custo zero.
+#
+# O Netlify compila nos servidores dele, ligado ao GitHub, e publica SOMENTE quando há envio para:
+# - hospedagem-producao: site de produção, privado (só o dono da conta, com login do Netlify);
+# - hospedagem-previa: prévia para os testes automáticos, em endereço não divulgado.
+# A main e os Pull Requests não geram publicações (cada publicação de produção custa 15 créditos).
+# As credenciais ficam só nas variáveis de ambiente do Netlify (npm run hospedagem:credenciais),
+# nunca neste arquivo nem no repositório. Detalhes: docs/OPERACAO.md, seção 7.
+
+[build]
+  command = "npm run build"
+  publish = ".next"
+  # Segunda proteção contra publicações desnecessárias: fora dos dois ramos, a compilação é
+  # cancelada antes de começar (código 0 = cancelar, no Netlify).
+  ignore = "bash -c 'case \"$BRANCH\" in hospedagem-producao|hospedagem-previa) exit 1 ;; *) exit 0 ;; esac'"
+
+[build.environment]
+  NODE_VERSION = "24"
+  NEXT_TELEMETRY_DISABLED = "1"
