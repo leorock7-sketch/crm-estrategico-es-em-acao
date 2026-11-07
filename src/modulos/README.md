@@ -4,7 +4,7 @@ Cada módulo do CRM tem sua própria pasta, reunindo regras de negócio, valida�
 
 | Pasta | Módulo | Situação | Documentação |
 |---|---|---|---|
-| `acesso/` | Usuários, permissões e visibilidade por projeto ou tema | Etapa 5: administração de usuários e permissões; aguardando homologação | [GOVERNANCA.md](../../docs/GOVERNANCA.md) |
+| `acesso/` | Usuários, permissões e visibilidade por projeto ou tema | Etapa 5: administração de usuários e permissões; homologada para desenvolvimento (D-078) | [GOVERNANCA.md](../../docs/GOVERNANCA.md) |
 | `stakeholders/` | Cadastro Mestre: pessoas, instituições, vínculos e contatos | Implementado na Etapa 1 | [MODELO_DADOS.md](../../docs/MODELO_DADOS.md) |
 | `projetos-temas/` | Comitês (consulta), projetos e temas, comitês participantes e stakeholders dos contextos | Implementado na Etapa 1.1 | [MODELO_DADOS.md](../../docs/MODELO_DADOS.md) |
 | `avaliacoes/` | Avaliações de stakeholders e matriz de poder × interesse | Etapas 2A e 2B: escalas V2.2, com metodologia fictícia (não homologada para uso institucional) | [METODOLOGIA_STAKEHOLDERS.md](../../docs/METODOLOGIA_STAKEHOLDERS.md) |

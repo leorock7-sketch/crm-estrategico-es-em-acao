@@ -20,6 +20,7 @@
 | 0.16 | 04/11/2026 | Etapa 4 homologada para desenvolvimento (D-073); as soluções provisórias P-047 a P-053 continuam não homologadas. |
 | 0.17 | 06/11/2026 | Seção 7 conforme a D-074: diretório básico do Cadastro Mestre e dados restritos, a implementar na Etapa 5. |
 | 0.18 | 06/11/2026 | Etapa 5 (D-074, D-075): `usuario.auth_id` e regras de acesso no banco, com a migração `0009`; seção 7 implementada, aguardando homologação; propostas provisórias P-055 a P-059 |
+| 0.19 | 06/11/2026 | Etapa 5 homologada para desenvolvimento (D-078); P-054 a P-060 continuam provisórias |
 
 Legenda: ✅ Aprovado · 🔧 Proposta técnica · ⏳ Pendente (ver [REQUISITOS.md](REQUISITOS.md#como-ler-este-documento)).
 
@@ -787,7 +788,7 @@ Preenchida automaticamente pelo banco a cada inclusão, alteração ou arquivame
 | `usuario_id` | UUID | FK → `usuario.id` |
 | `ocorrido_em` | data e hora com fuso | |
 
-## 7. Regras de visibilidade ✅ (D-074; implementadas na Etapa 5, aguardando homologação)
+## 7. Regras de visibilidade ✅ (D-074; implementadas na Etapa 5 e homologadas para desenvolvimento, D-078)
 
 A segurança é aplicada no próprio banco de dados (Row Level Security do PostgreSQL), e não apenas nas telas (migração `0009`). A aplicação conecta-se com o papel `crm_app`, que não é superusuário, não tem `BYPASSRLS`, não é dono das tabelas e não exclui registros. Toda operação ocorre em uma transação que informa o usuário ao banco; sem essa informação, ou com usuário inativo, as regras devolvem zero linhas. Situação e permissões são lidas a cada consulta, por isso revogar vale de imediato, mesmo com sessão aberta.
 

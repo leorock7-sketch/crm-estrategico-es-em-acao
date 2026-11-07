@@ -15,6 +15,7 @@
 | 0.11 | 03/11/2026 | Etapa 4 (D-072): módulos `plano-acao` e `riscos`, telas de planos, versões, ações e riscos, integração com os módulos anteriores e visibilidade por projeto ou tema; aguardando homologação |
 | 0.12 | 06/11/2026 | Q-57 atualizada: teste em PostgreSQL real autorizado no projeto Supabase de desenvolvimento (D-075) |
 | 0.13 | 06/11/2026 | Etapa 5 implementada, aguardando homologação: autenticação real, papel `crm_app`, identidade em cada transação e dois modos de acesso (seção 5.1) |
+| 0.14 | 06/11/2026 | Etapa 5 homologada para desenvolvimento (D-078); verificações do ambiente definitivo seguem para a Etapa 7 |
 
 Legenda: ✅ Aprovado · 🔧 Proposta técnica · ⏳ Pendente.
 

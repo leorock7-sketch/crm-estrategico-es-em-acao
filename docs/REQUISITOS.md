@@ -17,6 +17,7 @@
 | 0.13 | 03/11/2026 | Etapa 4 aprovada e implementada (D-072), aguardando homologação: RF-50 a RF-54 e RF-60 a RF-63 atualizados; novos RF-55 a RF-57 e RF-64 a RF-66. |
 | 0.14 | 06/11/2026 | Roteiro da Etapa 5 validado (D-074): RU-03 e RU-04 atualizados. |
 | 0.15 | 06/11/2026 | Etapa 5 implementada, aguardando homologação: RU-03. |
+| 0.16 | 06/11/2026 | Etapa 5 homologada para desenvolvimento (D-078): RU-03. Conteúdo inicial dos painéis definido pelo gestor (RF-71, Q-55). |
 
 ## Como ler este documento
 
@@ -47,7 +48,7 @@ Sistema próprio de gestão estratégica de relacionamentos institucionais (CRM)
 |---|---|---|
 | RU-01 | Inicialmente, o sistema será operado por um único administrador. | ✅ |
 | RU-02 | O sistema deve permitir expansão para vários usuários, com permissões por projeto ou tema. | ✅ |
-| RU-03 | Perfis de acesso: Administrador, Gestor, Colaborador e Leitor (ver [GOVERNANCA.md](GOVERNANCA.md)). | ✅ (D-074; implementado na Etapa 5, aguardando homologação) |
+| RU-03 | Perfis de acesso: Administrador, Gestor, Colaborador e Leitor (ver [GOVERNANCA.md](GOVERNANCA.md)). | ✅ (D-074; implementado na Etapa 5 e homologado para desenvolvimento, D-078) |
 | RU-04 | Cadastro Mestre: todos os usuários ativos e autenticados consultam o diretório básico; dados pessoais de contato, observações internas e informações vinculadas a projetos respeitam critérios de necessidade e autorização. | ✅ (D-074; a implementar na Etapa 5) |
 
 ## 4. Requisitos funcionais
