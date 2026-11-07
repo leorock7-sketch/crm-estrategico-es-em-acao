@@ -397,10 +397,15 @@ export type MarcoPlanejado = {
   prazoPrevisto: string | null;
 };
 
-/** Ações planejadas numa versão, com o pilar, os responsáveis e os marcos. */
-export async function planejamentoDaVersao(banco: Executor, versaoId: string) {
+/**
+ * Ações planejadas em várias versões de uma só vez, com o pilar, os responsáveis e os marcos: o painel
+ * lê todos os planos sem uma consulta por plano. Versão sem ações aparece com a lista vazia.
+ */
+export async function planejamentoDasVersoes(banco: Executor, versaoIds: readonly string[]) {
+  const ids = [...versaoIds];
   const acoes = await banco
     .select({
+      versaoId: acaoPlanejamento.planoAcaoVersaoId,
       id: acaoPlanejamento.id,
       acaoId: acao.id,
       codigo: acao.codigo,
@@ -430,10 +435,11 @@ export async function planejamentoDaVersao(banco: Executor, versaoId: string) {
     .leftJoin(responsavelExterno, eq(responsavelExterno.id, acaoPlanejamento.responsavelStakeholderId))
     .leftJoin(pessoaResponsavel, eq(pessoaResponsavel.id, acaoPlanejamento.responsavelStakeholderId))
     .leftJoin(instituicaoResponsavel, eq(instituicaoResponsavel.id, acaoPlanejamento.responsavelStakeholderId))
-    .where(and(eq(acaoPlanejamento.planoAcaoVersaoId, versaoId), isNull(acaoPlanejamento.arquivadoEm)))
+    .where(and(inArray(acaoPlanejamento.planoAcaoVersaoId, ids), isNull(acaoPlanejamento.arquivadoEm)))
     .orderBy(sql`${planoEixo.ordem} nulls last`, asc(acao.codigo));
   const marcos = await banco
     .select({
+      versaoId: marcoPlanejamento.planoAcaoVersaoId,
       id: marcoPlanejamento.id,
       marcoId: acaoMarco.id,
       acaoId: acaoMarco.acaoId,
@@ -443,14 +449,23 @@ export async function planejamentoDaVersao(banco: Executor, versaoId: string) {
     })
     .from(marcoPlanejamento)
     .innerJoin(acaoMarco, eq(acaoMarco.id, marcoPlanejamento.marcoId))
-    .where(and(eq(marcoPlanejamento.planoAcaoVersaoId, versaoId), isNull(marcoPlanejamento.arquivadoEm)))
+    .where(and(inArray(marcoPlanejamento.planoAcaoVersaoId, ids), isNull(marcoPlanejamento.arquivadoEm)))
     .orderBy(asc(acaoMarco.codigo));
-  return acoes.map((a) => ({
-    ...a,
-    marcos: marcos
-      .filter((m) => m.acaoId === a.acaoId)
-      .map((m): MarcoPlanejado => ({ id: m.id, marcoId: m.marcoId, codigo: m.codigo, descricao: m.descricao, prazoPrevisto: m.prazoPrevisto })),
-  }));
+  const porVersao = new Map(ids.map((id) => [id, [] as (Omit<(typeof acoes)[number], "versaoId"> & { marcos: MarcoPlanejado[] })[]]));
+  for (const { versaoId, ...a } of acoes) {
+    porVersao.get(versaoId)?.push({
+      ...a,
+      marcos: marcos
+        .filter((m) => m.versaoId === versaoId && m.acaoId === a.acaoId)
+        .map((m): MarcoPlanejado => ({ id: m.id, marcoId: m.marcoId, codigo: m.codigo, descricao: m.descricao, prazoPrevisto: m.prazoPrevisto })),
+    });
+  }
+  return porVersao;
+}
+
+/** Ações planejadas numa versão, com o pilar, os responsáveis e os marcos. */
+export async function planejamentoDaVersao(banco: Executor, versaoId: string) {
+  return (await planejamentoDasVersoes(banco, [versaoId])).get(versaoId) ?? [];
 }
 
 export type AcaoDaVersao = Awaited<ReturnType<typeof planejamentoDaVersao>>[number];
@@ -609,33 +624,38 @@ export async function marcosAlcancados(banco: Executor, marcoIds: readonly strin
   return mapa;
 }
 
+/** Ações de várias versões de uma só vez, com andamento, atraso e marcos alcançados. */
+export async function acoesDasVersoes(banco: Executor, versaoIds: readonly string[], hoje: string) {
+  const planejadas = await planejamentoDasVersoes(banco, versaoIds);
+  const todas = [...planejadas.values()].flat();
+  const [andamentos, alcancados] = await Promise.all([
+    andamentoDasAcoes(
+      banco,
+      todas.map((a) => a.acaoId),
+    ),
+    marcosAlcancados(
+      banco,
+      todas.flatMap((a) => a.marcos.map((m) => m.marcoId)),
+    ),
+  ]);
+  const comAndamento = (a: AcaoDaVersao) => {
+    const andamento = andamentos.get(a.acaoId) ?? { situacao: null, percentual: null, data: null };
+    return {
+      ...a,
+      andamento,
+      atrasada: acaoAtrasada(andamento.situacao, a.fimPrevisto, hoje),
+      marcos: a.marcos.map((m) => ({ ...m, alcancadoEm: alcancados.get(m.marcoId) ?? null })),
+    };
+  };
+  return new Map([...planejadas].map(([versaoId, acoes]) => [versaoId, acoes.map(comAndamento)]));
+}
+
 /** Ações da versão vigente, com andamento, atraso e marcos alcançados. */
 export async function acoesVigentes(banco: Executor, planoId: string, hoje: string) {
   const vigente = await versaoVigente(banco, planoId);
   if (!vigente) return { versao: null, acoes: [] };
-  const planejadas = await planejamentoDaVersao(banco, vigente.id);
-  const [andamentos, alcancados] = await Promise.all([
-    andamentoDasAcoes(
-      banco,
-      planejadas.map((a) => a.acaoId),
-    ),
-    marcosAlcancados(
-      banco,
-      planejadas.flatMap((a) => a.marcos.map((m) => m.marcoId)),
-    ),
-  ]);
-  return {
-    versao: vigente,
-    acoes: planejadas.map((a) => {
-      const andamento = andamentos.get(a.acaoId) ?? { situacao: null, percentual: null, data: null };
-      return {
-        ...a,
-        andamento,
-        atrasada: acaoAtrasada(andamento.situacao, a.fimPrevisto, hoje),
-        marcos: a.marcos.map((m) => ({ ...m, alcancadoEm: alcancados.get(m.marcoId) ?? null })),
-      };
-    }),
-  };
+  const porVersao = await acoesDasVersoes(banco, [vigente.id], hoje);
+  return { versao: vigente, acoes: porVersao.get(vigente.id) ?? [] };
 }
 
 export type AcaoVigente = Awaited<ReturnType<typeof acoesVigentes>>["acoes"][number];

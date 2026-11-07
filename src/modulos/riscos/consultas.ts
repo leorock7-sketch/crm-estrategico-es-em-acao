@@ -148,6 +148,8 @@ export type FiltroRiscos = {
   /** Somente riscos com gatilho cuja última ocorrência registrada foi "ocorreu". */
   gatilhoOcorrido?: boolean;
   arquivados?: boolean;
+  /** Painéis: sem o limite da lista, para os totais nunca ficarem incompletos. */
+  semLimite?: boolean;
 };
 
 /** Avaliações (não arquivadas) dos riscos informados, agrupadas por risco. */
@@ -240,7 +242,7 @@ export async function listarRiscos(
       ),
     )
     .orderBy(asc(projetoTema.nomeNormalizado), asc(risco.codigo))
-    .limit(500);
+    .limit(filtro.semLimite ? 1_000_000 : 500);
   const ids = linhas.map((l) => l.id);
   const [avaliacoes, gatilhos] = await Promise.all([avaliacoesPorRisco(banco, ids), gatilhosOcorridosPorRisco(banco, ids)]);
   const resultado = linhas.map((l) => {
@@ -255,6 +257,7 @@ export async function listarRiscos(
       residual: ultimas.residual,
       vigente,
       gatilhoOcorrido: ocorridos.length > 0,
+      gatilhosOcorridosEm: ocorridos,
       reavaliacao: motivosReavaliacao({ ultimaAvaliacaoEm, gatilhosOcorridosEm: ocorridos, proximaRevisao: l.proximaRevisao, hoje }),
     };
   });

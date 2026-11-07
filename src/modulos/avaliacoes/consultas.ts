@@ -239,25 +239,34 @@ export async function alterarSituacaoMetodologia(tx: Executor, id: string, situa
  * ocultar avaliações históricas).
  */
 export async function fichasDoContexto(banco: Executor, projetoTemaId: string): Promise<FichaParaMatriz[]> {
+  return (await fichasDosContextos(banco, [projetoTemaId])).get(projetoTemaId) ?? [];
+}
+
+/** As mesmas fichas de vários projetos ou temas de uma só vez, sem uma consulta por contexto (painéis). */
+export async function fichasDosContextos(banco: Executor, projetoTemaIds: readonly string[]): Promise<Map<string, FichaParaMatriz[]>> {
+  const resultado = new Map<string, FichaParaMatriz[]>(projetoTemaIds.map((id) => [id, []]));
+  if (projetoTemaIds.length === 0) return resultado;
+  const contextos = [...projetoTemaIds];
   const [associados, fichas] = await Promise.all([
     banco
-      .selectDistinct({ stakeholderId: associacao.stakeholderId })
+      .selectDistinct({ projetoTemaId: associacao.projetoTemaId, stakeholderId: associacao.stakeholderId })
       .from(associacao)
       .where(
         and(
-          eq(associacao.projetoTemaId, projetoTemaId),
+          inArray(associacao.projetoTemaId, contextos),
           isNull(associacao.dataFim),
           isNull(associacao.arquivadoEm),
         ),
       ),
     banco
-      .select({ id: avaliacao.id, stakeholderId: avaliacao.stakeholderId })
+      .select({ id: avaliacao.id, projetoTemaId: avaliacao.projetoTemaId, stakeholderId: avaliacao.stakeholderId })
       .from(avaliacao)
-      .where(eq(avaliacao.projetoTemaId, projetoTemaId)),
+      .where(inArray(avaliacao.projetoTemaId, contextos)),
   ]);
-  const idsAssociados = new Set(associados.map((a) => a.stakeholderId));
-  const ids = [...new Set([...idsAssociados, ...fichas.map((f) => f.stakeholderId)])];
-  if (ids.length === 0) return [];
+  const chave = (projetoTemaId: string, stakeholderId: string) => `${projetoTemaId}|${stakeholderId}`;
+  const idsAssociados = new Set(associados.map((a) => chave(a.projetoTemaId, a.stakeholderId)));
+  const ids = [...new Set([...associados, ...fichas].map((f) => f.stakeholderId))];
+  if (ids.length === 0) return resultado;
 
   const idsFichas = fichas.map((f) => f.id);
   const [identificacoes, vigentes, rascunhos] = await Promise.all([
@@ -271,7 +280,9 @@ export async function fichasDoContexto(banco: Executor, projetoTemaId: string): 
       ? []
       : banco
           .select({
+            projetoTemaId: avaliacao.projetoTemaId,
             stakeholderId: avaliacao.stakeholderId,
+            avaliadorId: versao.avaliadorId,
             numeroVersao: versao.numeroVersao,
             metodologiaId: versao.metodologiaVersaoId,
             metodologiaNome: metodologia.nome,
@@ -282,6 +293,7 @@ export async function fichasDoContexto(banco: Executor, projetoTemaId: string): 
             posicionamento: versao.posicionamento,
             naturezaPosicionamento: versao.naturezaPosicionamento,
             grauConfianca: versao.grauConfianca,
+            situacaoRessalvas: versao.situacaoRessalvas,
             dataReferencia: versao.dataReferencia,
             proximaRevisao: versao.proximaRevisao,
           })
@@ -292,7 +304,7 @@ export async function fichasDoContexto(banco: Executor, projetoTemaId: string): 
     idsFichas.length === 0
       ? []
       : banco
-          .select({ stakeholderId: avaliacao.stakeholderId })
+          .select({ projetoTemaId: avaliacao.projetoTemaId, stakeholderId: avaliacao.stakeholderId })
           .from(versao)
           .innerJoin(avaliacao, eq(avaliacao.id, versao.avaliacaoId))
           .where(
@@ -300,20 +312,29 @@ export async function fichasDoContexto(banco: Executor, projetoTemaId: string): 
           ),
   ]);
 
-  const vigentePorStakeholder = new Map(vigentes.map((v) => [v.stakeholderId, v]));
-  const comRascunho = new Set(rascunhos.map((r) => r.stakeholderId));
-  return identificacoes
-    .map((s) => {
-      const v = vigentePorStakeholder.get(s.id);
-      return {
+  const identificacaoPorId = new Map(identificacoes.map((s) => [s.id, s]));
+  const vigentePorChave = new Map(vigentes.map((v) => [chave(v.projetoTemaId, v.stakeholderId), v]));
+  const comRascunho = new Set(rascunhos.map((r) => chave(r.projetoTemaId, r.stakeholderId)));
+  for (const projetoTemaId of contextos) {
+    const doContexto = new Set(
+      [...associados, ...fichas].filter((f) => f.projetoTemaId === projetoTemaId).map((f) => f.stakeholderId),
+    );
+    const lista: FichaParaMatriz[] = [];
+    for (const stakeholderId of doContexto) {
+      const s = identificacaoPorId.get(stakeholderId);
+      if (!s) continue;
+      const k = chave(projetoTemaId, s.id);
+      const v = vigentePorChave.get(k);
+      lista.push({
         stakeholderId: s.id,
         nome: s.nome,
         tipoStakeholder: s.tipo,
-        associado: idsAssociados.has(s.id),
-        temRascunho: comRascunho.has(s.id),
+        associado: idsAssociados.has(k),
+        temRascunho: comRascunho.has(k),
         vigente: v
           ? {
               numeroVersao: v.numeroVersao,
+              avaliadorId: v.avaliadorId,
               metodologiaId: v.metodologiaId,
               metodologiaNome: v.metodologiaNome,
               poder: v.poder,
@@ -323,14 +344,17 @@ export async function fichasDoContexto(banco: Executor, projetoTemaId: string): 
               posicionamento: v.posicionamento,
               naturezaPosicionamento: v.naturezaPosicionamento,
               grauConfianca: v.grauConfianca,
+              situacaoRessalvas: v.situacaoRessalvas,
               // Versões publicadas sempre têm as duas datas (garantido pelo banco).
               dataReferencia: v.dataReferencia ?? "",
               proximaRevisao: v.proximaRevisao ?? "",
             }
           : null,
-      };
-    })
-    .sort((a, b) => a.nome.localeCompare(b.nome, "pt-BR"));
+      });
+    }
+    resultado.set(projetoTemaId, lista.sort((a, b) => a.nome.localeCompare(b.nome, "pt-BR")));
+  }
+  return resultado;
 }
 
 // --- Ficha individual --------------------------------------------------------

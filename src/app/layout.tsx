@@ -18,7 +18,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html lang="pt-BR" className="h-full antialiased">
       <body className="flex min-h-full flex-col">
-        <header className="border-b border-borda bg-superficie">
+        <header className="border-b border-borda bg-superficie print:hidden">
           <div className="mx-auto flex w-full max-w-6xl flex-wrap items-center justify-between gap-x-6 gap-y-2 px-4 py-3">
             <Link href="/" className="font-semibold tracking-tight">
               CRM Estratégico <span className="text-texto-secundario">— ES em Ação</span>
