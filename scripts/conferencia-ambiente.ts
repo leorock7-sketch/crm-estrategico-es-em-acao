@@ -3,6 +3,9 @@
  * devolvidos dizem apenas o que está certo ou o que corrigir: nunca contêm valores
  * das variáveis, porque o resultado aparece na tela e em relatórios.
  */
+import { randomBytes } from "node:crypto";
+import { closeSync, fstatSync, fsyncSync, openSync, rmSync, writeSync } from "node:fs";
+
 export type SituacaoItem = "ok" | "pendente" | "problema";
 export type ItemConferido = { item: string; situacao: SituacaoItem; detalhe: string };
 export type Ambiente = Record<string, string | undefined>;
@@ -132,6 +135,21 @@ export function gerarSenhaForte(bytesAleatorios: (quantidade: number) => Uint8Ar
     }
   }
   return senha;
+}
+
+/**
+ * Sobrescreve o conteúdo com valores aleatórios, grava em disco e só então apaga. Melhor esforço:
+ * em discos SSD, o sistema pode manter cópias físicas antigas, fora do alcance de um programa.
+ */
+export function eliminarArquivoComSobrescrita(caminho: string) {
+  const descritor = openSync(caminho, "r+");
+  try {
+    writeSync(descritor, randomBytes(Math.max(fstatSync(descritor).size, 64)));
+    fsyncSync(descritor);
+  } finally {
+    closeSync(descritor);
+  }
+  rmSync(caminho);
 }
 
 /** Conexão igual à atual, com outra senha, já no formato aceito em conexões. */

@@ -8,6 +8,7 @@ import { defineConfig } from "vitest/config";
  * identificado como descartável e com a frase no próprio comando (scripts/protecao-destrutiva.ts):
  * CRM_CONFIRMAR_EXCLUSAO="APAGAR DADOS FICTICIOS DE <identificador>" npm run test:postgres
  * Depois, refaça a carga com supabase:preparar --refazer. Não roda no GitHub Actions: exige as chaves.
+ * Não executar sem necessidade e autorização específica do gestor (D-077).
  */
 const { CRM_BANCO_ADMIN_URL, NEXT_PUBLIC_SUPABASE_URL, CRM_BANCO_DESCARTAVEL_REF } = loadEnv("development", process.cwd(), "");
 

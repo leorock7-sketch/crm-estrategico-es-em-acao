@@ -4,11 +4,15 @@
  * sem nunca repetir os valores. Valores fictícios, montados por partes para não se
  * parecerem com chaves verdadeiras nas varreduras do repositório.
  */
+import { existsSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
+import os from "node:os";
+import path from "node:path";
 import { describe, expect, test } from "vitest";
 import {
   conferirAjustesDeAutenticacao,
   conexaoComNovaSenha,
   conferirVariaveis,
+  eliminarArquivoComSobrescrita,
   explicarFalhaDeConexao,
   gerarSenhaForte,
 } from "../scripts/conferencia-ambiente";
@@ -118,6 +122,21 @@ describe("Senha administrativa", () => {
     const senha = gerarSenhaForte(bytes);
     expect(senha).toMatch(/^[A-Za-z0-9]{40}$/);
     expect(gerarSenhaForte(bytes)).not.toBe(senha);
+  });
+
+  test("o arquivo temporário é eliminado, mesmo vazio, e a falha não passa despercebida", () => {
+    const pasta = mkdtempSync(path.join(os.tmpdir(), "crm-senha-"));
+    try {
+      for (const conteudo of ["valor-ficticio-de-teste", ""]) {
+        const caminho = path.join(pasta, "senha.txt");
+        writeFileSync(caminho, conteudo);
+        eliminarArquivoComSobrescrita(caminho);
+        expect(existsSync(caminho)).toBe(false);
+      }
+      expect(() => eliminarArquivoComSobrescrita(path.join(pasta, "inexistente.txt"))).toThrow();
+    } finally {
+      rmSync(pasta, { recursive: true, force: true });
+    }
   });
 
   test("a conexão muda só na senha, inclusive com símbolos", () => {

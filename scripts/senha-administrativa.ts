@@ -11,11 +11,11 @@
  */
 import { randomBytes } from "node:crypto";
 import { execFileSync } from "node:child_process";
-import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import path from "node:path";
 import { loadEnvConfig } from "@next/env";
 import postgres from "postgres";
-import { conexaoComNovaSenha, explicarFalhaDeConexao, gerarSenhaForte } from "./conferencia-ambiente";
+import { conexaoComNovaSenha, eliminarArquivoComSobrescrita, explicarFalhaDeConexao, gerarSenhaForte } from "./conferencia-ambiente";
 
 loadEnvConfig(process.cwd(), true, { info: () => {}, error: () => {} });
 
@@ -66,13 +66,13 @@ async function aplicar() {
   const texto = readFileSync(ARQUIVO_AMBIENTE, "utf8");
   if (!/^CRM_BANCO_ADMIN_URL=.*$/m.test(texto)) throw new Error("Campo CRM_BANCO_ADMIN_URL não encontrado em .env.local.");
   writeFileSync(ARQUIVO_AMBIENTE, texto.replace(/^CRM_BANCO_ADMIN_URL=.*$/m, () => `CRM_BANCO_ADMIN_URL=${nova}`));
-  rmSync(ARQUIVO_TEMPORARIO, { force: true });
+  eliminarArquivoComSobrescrita(ARQUIVO_TEMPORARIO);
   try {
     areaDeTransferencia(" ");
   } catch {
     // Só limpeza: a senha já foi aplicada.
   }
-  console.log("[OK] Senha nova confirmada, .env.local atualizado, arquivo temporário apagado e área de transferência limpa.");
+  console.log("[OK] Senha nova confirmada, .env.local atualizado, arquivo temporário sobrescrito e apagado, área de transferência limpa.");
 }
 
 async function principal() {

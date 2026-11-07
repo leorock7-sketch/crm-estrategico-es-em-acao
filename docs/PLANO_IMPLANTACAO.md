@@ -29,6 +29,7 @@
 | 0.25 | 06/11/2026 | Ambiente Supabase de desenvolvimento autorizado (D-075), a ser criado pelo gestor; regra da Data API, A-01, C8 e backlog V3-08 atualizados |
 | 0.26 | 06/11/2026 | Etapa 5 implementada, aguardando homologação (seção 10): login real, papel `crm_app`, regras de acesso no banco, administração de usuários, D3, D4 e P-054; resultados dos testes registrados; C8 comprovada para desenvolvimento, conforme os resultados |
 | 0.27 | 06/11/2026 | Revisão da Etapa 5 (D-076): proteção das operações destrutivas, quadro dos 7 testes e troca da senha administrativa; P-056 condicionada ao uso de contas reais |
+| 0.28 | 06/11/2026 | Providências finais da Etapa 5 (D-077): banco marcado como descartável não recebe dados institucionais reais; testes destrutivos só com necessidade e autorização específica |
 
 Legenda: ✅ Aprovado · 🔧 Proposta técnica · ⏳ Pendente.
 
@@ -506,11 +507,13 @@ Os itens estão listados como pendentes em `testes/seguranca-etapa-5.test.ts` e 
 | Projeto identificado | Conexão administrativa no formato do Session pooler em `sa-east-1`, com o identificador do projeto; conexão direta, outro servidor, outra região ou outro banco são recusados |
 | Mesmo projeto em toda a configuração | Endereço do projeto, conexão e lista local (`CRM_BANCO_DESCARTAVEL_REF`, em `.env.local`) têm de coincidir |
 | Marca no próprio banco | O esquema `crm_ambiente`, que não é apagado, declara o projeto, a finalidade de testes descartáveis e os dados fictícios. A marca só é gravada com `npm run supabase:marcar-descartavel` e frase própria. Banco sem marca, ou copiado de outro projeto, é recusado |
-| Sem sinal de dado real | Usuários, contatos de e-mail e contas de acesso só com domínios fictícios; qualquer outro, ou conta sem e-mail, impede a operação |
+| Sem sinal de dado real | Usuários, contatos de e-mail e contas de acesso só com domínios fictícios; qualquer outro, ou conta sem e-mail, impede a operação. É salvaguarda complementar, não comprovação de ausência de dados reais: nomes e notas não são examinados |
 | Confirmação específica | `CRM_CONFIRMAR_EXCLUSAO="APAGAR DADOS FICTICIOS DE <identificador do projeto>"`, na própria linha de comando; o valor gravado em arquivo não é lido |
 | Fora de produção e de hospedagem | Produção, integração contínua e hospedagem são recusadas. Nome de ambiente, como `development` ou `test`, nunca autoriza nada: só pode recusar |
 
 A conferência e a exclusão ocorrem na mesma transação. Sem a marca, `npm run supabase:preparar` também não cria dados nem contas de teste, que têm senhas conhecidas. `npm run ambiente:conferir` mostra a situação, sem apagar nada.
+
+**Regras do banco marcado (D-077):** a marcação e as permissões para operações destrutivas ficam restritas ao projeto de testes autorizado (`crm-es-em-acao-dev`). **Este banco não pode receber dados institucionais reais enquanto estiver marcado como descartável.** Os testes destrutivos não são executados novamente no Supabase sem necessidade e autorização específica do gestor.
 
 ### Resultados dos testes (execução de 06/11/2026) 🔧
 

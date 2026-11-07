@@ -24,6 +24,7 @@ async function principal() {
       writeFileSync(arquivo, `${atual.trimEnd()}${quebra}${quebra}# Único projeto em que comandos destrutivos podem rodar neste computador (D-076).${quebra}CRM_BANCO_DESCARTAVEL_REF=${referencia}${quebra}`);
     }
     console.log("[OK] Banco identificado como descartável, e projeto autorizado neste computador. Nada foi apagado.");
+    console.log("     Enquanto estiver marcado, este banco não pode receber dados institucionais reais (D-077).");
   } finally {
     await fecharBanco(banco);
   }

@@ -7,7 +7,9 @@
  *    (CRM_BANCO_DESCARTAVEL_REF, em .env.local).
  * 3. O próprio banco traz a marca de ambiente descartável, gravada de propósito em um esquema que
  *    não é apagado e que cita esse mesmo projeto. Banco sem a marca, ou copiado de outro, é recusado.
- * 4. Não há sinal de dado real: todas as contas e os e-mails usam domínios fictícios.
+ * 4. Não há sinal de dado real: todas as contas e os e-mails usam domínios fictícios. É salvaguarda
+ *    complementar, não comprovação de ausência de dados reais (nomes ou notas não são examinados).
+ *    O que protege é a regra da D-077: banco marcado como descartável não recebe dados institucionais reais.
  * 5. Quem executa escreveu, nesta execução, a frase de confirmação com o identificador do projeto.
  * 6. Não é ambiente de produção nem de hospedagem ou integração contínua.
  *

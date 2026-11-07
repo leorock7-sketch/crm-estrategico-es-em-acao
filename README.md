@@ -137,10 +137,10 @@ Com as chaves do projeto de desenvolvimento em `.env.local` (modelo em `.env.exa
 |---|---|
 | `npm run ambiente:conferir` | Confere o projeto Supabase, sem exibir nenhum valor |
 | `npm run supabase:preparar` | Aplica as migrações e ativa o papel `crm_app`. Só no banco marcado como descartável, carrega os dados fictícios e cria as contas de teste (senhas só em `.dados/contas-teste.json`, que o Git ignora) |
-| `npm run supabase:marcar-descartavel` | Identifica o banco como descartável, com frase de confirmação; não apaga nada |
+| `npm run supabase:marcar-descartavel` | Identifica o banco como descartável, com frase de confirmação; não apaga nada. Banco marcado não pode receber dados institucionais reais (D-077) |
 | `npm run ambiente:senha-admin -- gerar` e `-- aplicar` | Trocam a senha administrativa do PostgreSQL sem exibir o valor |
 | `npm run test:supabase` | Testes de autenticação, regras de acesso e navegador no Supabase (antes: `npm run build`) |
-| `npm run test:postgres` | Testes de banco das Etapas 1 a 4 no PostgreSQL do Supabase. **Apaga os dados do projeto**: só roda no banco marcado como descartável e com a frase de confirmação no próprio comando; depois, rode `npm run supabase:preparar -- --refazer`, com a mesma frase |
+| `npm run test:postgres` | Testes de banco das Etapas 1 a 4 no PostgreSQL do Supabase. **Apaga os dados do projeto**: só roda no banco marcado como descartável e com a frase de confirmação no próprio comando; depois, rode `npm run supabase:preparar -- --refazer`, com a mesma frase. Não executar sem necessidade e autorização específica do gestor (D-077) |
 
 ### 6. Verificações de qualidade
 
