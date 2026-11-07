@@ -6,6 +6,7 @@
 | 0.2 | 07/11/2026 | Fase 7A homologada para desenvolvimento (D-083). Ressalvas: restauração completa do Supabase Auth não demonstrada, sem hospedagem pública e sem disponibilidade garantida no plano Free. |
 | 0.3 | 07/11/2026 | Monitor ativado pelo gestor (teste de quatro semanas iniciado) e rotina diária de cópias no Agendador de Tarefas do Windows (D-084). |
 | 0.4 | 07/11/2026 | Reativação da tarefa diária, conferência da chave com abertura de cópia existente e reserva do segundo projeto do Supabase para outra ferramenta (D-085). |
+| 0.5 | 07/11/2026 | Chave privada conferida pelo arquivo local, sem gerenciador de senhas; segunda cópia segura da chave pendente antes de dados reais (D-086). |
 
 Legenda: ✅ Aprovado · 🔧 Proposta técnica · ⏳ Pendente.
 
@@ -83,7 +84,7 @@ Somente do banco de desenvolvimento, com dados fictícios. **Nenhuma cópia de d
 |---|---|
 | Conteúdo | Esquemas `public` e `drizzle`: dados, estrutura, regras de acesso (RLS), políticas, gatilhos e permissões. Tabelas `auth.users` e `auth.identities`: contas do login, com as senhas protegidas por hash |
 | Consistência | Contagens e pg_dump usam o mesmo instantâneo do banco (transação somente leitura) |
-| Criptografia | age 1.3.2, para a chave pública. A chave privada fica fora do repositório e das pastas das cópias; o gestor guarda o conteúdo dela no gerenciador de senhas |
+| Criptografia | age 1.3.2, para a chave pública. A chave privada fica num arquivo local (`%USERPROFILE%\.crm-backup\identidade-age.txt`), fora do repositório e das pastas das cópias, sem gerenciador de senhas (D-086). **Pendente antes de dados reais:** segunda cópia segura da chave — sem ela, a perda do computador torna irrecuperáveis também as cópias do Google Drive |
 | Destinos | Pasta local `C:\Projetos\backups-crm-desenvolvimento` e pasta do Google Drive `CRM_ES_em_Acao/Backups do CRM - desenvolvimento (dados ficticios)`. Nunca o GitHub nem artefatos públicos |
 | Retenção | 7 diárias, 4 semanais e 3 mensais (fica a mais recente de cada período), aplicada só às cópias íntegras; a mais recente íntegra nunca é descartada, inclusive quando uma cópia nova falha |
 | Integridade | `pg_restore --list` de cada arquivo, SHA-256 antes e depois da criptografia, manifesto e conferência das cópias nos dois destinos |
@@ -111,9 +112,9 @@ Tarefa **"CRM - copia diaria (desenvolvimento)"** no Agendador de Tarefas do Win
 | Registro | `registro-rotina.log`, só na pasta local (não sincronizado): data, etapa, resultado, duração, categoria e nome da cópia. Nunca conexões, chaves, senhas, mensagens de erro originais ou dados |
 | Avisos | Falha: notificação do Windows e mensagem na tela. Pendência (ensaio vencido, chave não conferida, monitor com problema): notificação. Cada aviso substitui o anterior e é retirado na execução seguinte sem pendências. Sem arquivos de aviso: a Área de Trabalho pode estar no OneDrive, que impede processos do Agendador de regravar arquivos já sincronizados |
 | Ensaio mensal | `npm run backup:ensaiar` pelo menos a cada 31 dias; o resultado entra no registro, e a rotina avisa quando o prazo vence |
-| Chave privada | As cópias só contam como protegidas depois de `npm run backup:conferir-chave`, rodado pelo gestor no próprio terminal com a chave copiada do gerenciador de senhas: a chave colada não aparece na tela nem é gravada; o programa confere se ela corresponde à chave pública usada nas cópias e abre, só na memória, cada arquivo da cópia íntegra mais recente, comparando o conteúdo com o resumo SHA-256 do original (D-085). Vale a conferência mais recente: até a primeira, ou depois de uma conferência com falha, a rotina avisa a pendência |
+| Chave privada | `npm run backup:conferir-chave-arquivo` (D-086) lê a chave direto do arquivo local, sem exibi-la: o próprio age lê o arquivo, que não é alterado nem apagado (o programa compara o resumo do arquivo antes e depois). O programa confere se a chave corresponde à chave pública usada nas cópias, abre só na memória cada arquivo da cópia íntegra mais recente, comparando o conteúdo com o resumo SHA-256 do original, e mostra se a tarefa diária continua habilitada. O registro guarda só o resultado. `npm run backup:conferir-chave` faz o mesmo com a chave colada, que não aparece na tela. Vale a conferência mais recente: até a primeira, ou depois de uma conferência com falha, a rotina avisa a pendência |
 
-**Comandos:** `npm run backup:rotina` (o mesmo que a tarefa executa), `npm run backup:conferir` (só confere os destinos e mostra se a tarefa continua habilitada, com a última e a próxima execução), `npm run backup:conferir-chave`, `npm run backup:agendar` (cria ou atualiza a tarefa) e `npm run backup:agendar -- -Remover` (remove a tarefa).
+**Comandos:** `npm run backup:rotina` (o mesmo que a tarefa executa), `npm run backup:conferir` (só confere os destinos e mostra se a tarefa continua habilitada, com a última e a próxima execução), `npm run backup:conferir-chave-arquivo` (ou `backup:conferir-chave`, com a chave colada), `npm run backup:agendar` (cria ou atualiza a tarefa) e `npm run backup:agendar -- -Remover` (remove a tarefa).
 
 **Limites:** depende do computador ligado e do usuário conectado. A conferência lê a pasta do Google Drive para computador; o envio à nuvem é feito pelo próprio aplicativo do Google Drive. A tarefa executa os scripts do repositório local, que precisa estar na `main` com esta rotina.
 
@@ -139,5 +140,5 @@ Pendentes, todos dependentes de autorização: T2 (prévia publicada com o banco
 | Continuidade | Depende de uma pessoa; indisponibilidade ou perda de acesso dela interrompe reativações, cópias e configurações |
 | Recuperação de acesso | Depende da recuperação da conta pessoal (e-mail e códigos de recuperação) |
 | Autenticação multifator | Deve estar ligada no GitHub, no Supabase, no Google e, se criado, no Netlify, com códigos de recuperação guardados fora do computador |
-| Guarda de credenciais | Senhas, chave privada das cópias e segredos do monitor ficam sob responsabilidade pessoal, no gerenciador de senhas |
+| Guarda de credenciais | Senhas e segredos do monitor ficam sob responsabilidade pessoal. A chave privada das cópias fica só no arquivo local do computador de desenvolvimento, sem gerenciador de senhas (D-086); segunda cópia segura pendente antes de dados reais |
 | Responsabilidade sobre os dados | Termos dos fornecedores aceitos pela pessoa, e não pela instituição. Antes de uso institucional real, é preciso solução aceita pela instituição para continuidade administrativa e proteção de dados; o plano gratuito não resolve isso |

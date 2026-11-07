@@ -39,6 +39,7 @@
 | 0.35 | 07/11/2026 | Fase 7A homologada para desenvolvimento (D-083), com ressalvas preservadas; próxima fase a custo zero: monitor assistido, cópias diárias e, depois, testes reais no Netlify Free |
 | 0.36 | 07/11/2026 | Monitor ativado pelo gestor (teste de quatro semanas até cerca de 05/12/2026) e rotina diária de cópias no Windows (D-084), aguardando validação; depois, testes reais no Netlify Free, sujeitos a autorização |
 | 0.37 | 07/11/2026 | Resultados da rotina de cópias aprovados e tarefa reativada com condições (D-085); segundo projeto do Supabase reservado para outra ferramenta do gestor, fora do CRM; restauração completa do Supabase Auth a replanejar |
+| 0.38 | 07/11/2026 | Chave privada do age conferida pelo arquivo local, com abertura em memória da cópia mais recente (D-086); segunda cópia segura da chave pendente antes de dados reais; Pull Request #16 para homologação |
 
 Legenda: ✅ Aprovado · 🔧 Proposta técnica · ⏳ Pendente.
 
@@ -660,7 +661,7 @@ Não executados: `npm run test:postgres` e `supabase:preparar -- --refazer`, des
 2. **Monitor sem as quatro semanas:** ativado em 07/11/2026; o teste termina por volta de 05/12/2026 e, mesmo concluído, não garante a continuidade do plano gratuito.
 3. **Sem cópias gerenciadas e sem disponibilidade garantida** no plano gratuito; as cópias próprias diárias (D-084) dependem do computador ligado e do usuário conectado.
 4. **Restauração completa do login (Supabase Auth) não comprovada:** o segundo projeto gratuito está reservado para outra ferramenta (D-085); a validação integral será replanejada, com alternativa segura e gratuita a apresentar.
-5. **Dados reais:** projeto exclusivo, não descartável; LGPD (Q-13, Q-58), inclusive as cópias integrais de dados pessoais na auditoria; destino e guarda das cópias; aceite institucional da conta pessoal ou solução de continuidade.
+5. **Dados reais:** projeto exclusivo, não descartável; LGPD (Q-13, Q-58), inclusive as cópias integrais de dados pessoais na auditoria; destino e guarda das cópias, inclusive a segunda cópia segura da chave privada do age (D-086); aceite institucional da conta pessoal ou solução de continuidade.
 6. **Pendências anteriores:** arquivos XLSX no Microsoft Excel e verificações do ambiente hospedado (D-080); login Microsoft e e-mail institucional (TI).
 
 ### Monitor ativado e rotina diária de cópias (D-084)
@@ -686,7 +687,7 @@ Não executados: `npm run test:postgres` e `supabase:preparar -- --refazer`, des
 | Configuração da tarefa | Gatilho diário às 12:30, habilitado; usuário conectado, sem privilégio de administrador; execução assim que possível quando o horário é perdido; sem execuções simultâneas; limite de 30 minutos; ação apontando para a rotina do repositório local |
 | Causa da desativação | **Não identificada com certeza.** Desabilitada às 18:25:33 e habilitada de novo às 18:33:46, sem comando da rotina nem da sessão de testes; os horários coincidem com o desligamento da tela ou espera do computador e com a volta; sem reinicialização do Windows; histórico do Agendador desligado ([OPERACAO.md](OPERACAO.md), seção 5) |
 | Origem das cópias | Conferida: conexão, endereço e projeto autorizado neste computador coincidem; marca do banco de testes descartáveis com dados fictícios; proteção da cópia aprovada |
-| Chave privada do age | ⏳ Conferência pelo gestor: `npm run backup:conferir-chave` passou a abrir, só na memória, os arquivos da cópia íntegra mais recente e a comparar com o resumo SHA-256 do original. Testada com chaves e cópia descartáveis (chave certa, chave errada, formato inválido e cópia que não corresponde ao original). Até a conferência do gestor, as cópias não são consideradas protegidas |
+| Chave privada do age | ✅ Conferida pelo arquivo local, sem gerenciador de senhas (D-086): corresponde à chave pública das cópias; abriu só na memória os 3 arquivos da cópia íntegra mais recente, idênticos ao original pelos resumos SHA-256 do manifesto; arquivo da chave preservado; tarefa habilitada; só o resultado registrado. A ferramenta foi testada antes com chaves e cópia descartáveis (arquivo certo, arquivo errado, arquivo inexistente, chave colada, formato inválido e cópia que não corresponde ao original). Execução seguinte pelo Agendador sem pendências (código 0). ⏳ Segunda cópia segura da chave antes de dados reais |
 | Teste controlado pelo Agendador | Tarefa habilitada antes e depois; cópia do dia não duplicada; conferência dos dois destinos e do monitor aprovadas; cópia íntegra preservada |
 | Depois de reiniciar o Windows | ⏳ A conferir quando possível, com `npm run backup:conferir`, que passou a mostrar se a tarefa continua habilitada |
 
@@ -714,7 +715,8 @@ Não executados: `npm run test:postgres` e `supabase:preparar -- --refazer`, des
 | Roteiro da Etapa 7 — Implantação, Homologação Técnica e Segurança Operacional | Programação da Etapa 7 | ✅ Aprovado com a premissa de custo zero (D-082); Fase 7A homologada para desenvolvimento (D-083, seção 12) |
 | Segredos do monitoramento no GitHub Actions | Teste de quatro semanas do monitor | ✅ Cadastrados pelo gestor em 07/11/2026; primeira execução concluída com sucesso. ⏳ Teste de quatro semanas até cerca de 05/12/2026 ([OPERACAO.md](OPERACAO.md), seção 2) |
 | Tarefa diária de cópias no Windows | Cópias automáticas | ✅ Resultados aprovados (D-085); habilitada e testada pelo Agendador depois da desativação de 07/11/2026, de causa não identificada. ⏳ Conferir depois de reiniciar o Windows ([OPERACAO.md](OPERACAO.md), seção 5) |
-| Conferência da chave privada do age no gerenciador de senhas | Cópias consideradas protegidas (D-084, D-085) | ⏳ Pelo gestor, no próprio terminal: `npm run backup:conferir-chave`, que também abre uma cópia existente, só na memória |
+| Conferência da chave privada do age | Cópias consideradas protegidas (D-084, D-085) | ✅ Conferida em 07/11/2026 pelo arquivo local, sem gerenciador de senhas, com abertura em memória da cópia mais recente (D-086) |
+| Segunda cópia segura da chave privada do age | Uso de dados institucionais reais (D-086) | ⏳ Pendente: hoje a chave existe só no computador de desenvolvimento |
 | Site no Netlify Free (testes T2, T3, T4 e T8) | Piloto gratuito | ⏳ Próximo passo (D-085), só com dados fictícios e custo zero; criação do site depende de autorização específica (D-082, A1) |
 | Segundo projeto gratuito do Supabase | — | Reservado para a versão 2.0 de outra ferramenta institucional indicada pelo gestor (a mesma da V3-07); não será usado pelo CRM nem criado agora (D-085) |
 | Restauração completa do Supabase Auth | Uso institucional real | ⏳ A replanejar (D-085): alternativa tecnicamente segura e gratuita a apresentar; ensaios locais isolados mantidos; não resolvida até a comprovação efetiva |

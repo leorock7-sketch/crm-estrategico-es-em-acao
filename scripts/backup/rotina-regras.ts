@@ -3,6 +3,7 @@
  * integridade das cópias, correspondência entre os destinos, trava contra execuções simultâneas e
  * pendências (ensaio mensal e conferência da chave privada).
  */
+import { spawnSync } from "node:child_process";
 import { createHash } from "node:crypto";
 import { appendFileSync, existsSync, readdirSync, readFileSync, rmSync, statSync, writeFileSync } from "node:fs";
 import path from "node:path";
@@ -132,4 +133,34 @@ export function adquirirTrava(pastaLocal: string, agora = Date.now()): boolean {
 
 export function liberarTrava(pastaLocal: string) {
   rmSync(path.join(pastaLocal, ARQUIVO_TRAVA), { force: true });
+}
+
+/** Nome da tarefa no Agendador de Tarefas do Windows (scripts/backup/agendar.ps1). */
+export const NOME_TAREFA = "CRM - copia diaria (desenvolvimento)";
+
+/**
+ * Situação da tarefa no Agendador (somente leitura, D-085): habilitada (true/false) ou null se não
+ * existir; datas da última e da próxima execução já formatadas. Fora do Windows, não se aplica.
+ */
+export function situacaoDaTarefa(): { habilitada: boolean | null; ultima: string; proxima: string } | undefined {
+  if (process.platform !== "win32") return undefined;
+  const comando =
+    `$t = Get-ScheduledTask -TaskName '${NOME_TAREFA}' -ErrorAction SilentlyContinue; ` +
+    "if (-not $t) { 'ausente' } else { $i = Get-ScheduledTaskInfo -TaskName $t.TaskName; " +
+    "'{0}|{1:dd/MM/yyyy HH:mm}|{2:dd/MM/yyyy HH:mm}' -f $t.Settings.Enabled, $i.LastRunTime, $i.NextRunTime }";
+  const r = spawnSync("powershell.exe", ["-NoProfile", "-Command", comando], { encoding: "utf8", windowsHide: true });
+  const [habilitada, ultima = "", proxima = ""] = (r.stdout ?? "").trim().split("|");
+  return { habilitada: habilitada === "True" ? true : habilitada === "False" ? false : null, ultima, proxima };
+}
+
+/** Mostra a situação da tarefa; devolve false se ela estiver desabilitada ou ausente. */
+export function informarSituacaoDaTarefa(): boolean {
+  const s = situacaoDaTarefa();
+  if (!s) return true;
+  if (s.habilitada) {
+    console.log(`[OK] Tarefa diária habilitada; última execução ${s.ultima || "nenhuma"}; próxima ${s.proxima}.`);
+    return true;
+  }
+  console.log(`[PROBLEMA] Tarefa diária ${s.habilitada === false ? "desabilitada" : "não encontrada"} no Agendador. Investigar a causa antes de reabilitar (D-085).`);
+  return false;
 }
