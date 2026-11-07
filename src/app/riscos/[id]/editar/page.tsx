@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import { podeEditarRegistro } from "@/modulos/acesso/capacidades";
+import { SomenteConsulta } from "@/modulos/acesso/componentes/somente-consulta";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import { CabecalhoPagina } from "@/componentes/cabecalho-pagina";
@@ -31,6 +33,7 @@ async function EdicaoRisco({ params }: Pick<PageProps<"/riscos/[id]/editar">, "p
   const visiveis = await projetosVisiveis(banco, usuario.id);
   const risco = await obterRisco(banco, id);
   if (!risco || risco.arquivadoEm || !(await riscoEhVisivel(banco, id, visiveis))) notFound();
+  if (!(await podeEditarRegistro(banco, "risco", id))) return <SomenteConsulta voltar={{ href: `/riscos/${id}`, rotulo: "Risco" }} />;
   const [eixos, iniciativas, usuarios] = await Promise.all([opcoesEixos(banco, visiveis), opcoesIniciativas(banco, visiveis), opcoesUsuarios(banco)]);
 
   return (

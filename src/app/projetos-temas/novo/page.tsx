@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import { ehAdministrador } from "@/modulos/acesso/capacidades";
+import { SomenteConsulta } from "@/modulos/acesso/componentes/somente-consulta";
 import { Suspense } from "react";
 import { CabecalhoPagina } from "@/componentes/cabecalho-pagina";
 import { Carregando } from "@/componentes/carregando";
@@ -31,6 +33,7 @@ async function CadastroProjetoTema({
   // A página do comitê pode abrir o cadastro com o comitê principal já escolhido.
   const comiteId = esquemaIdentificador.safeParse(parametros.comite).data;
   const banco = await bancoDaRequisicao();
+  if (!(await ehAdministrador(banco))) return <SomenteConsulta voltar={{ href: "/projetos-temas", rotulo: "Projetos e temas" }} />;
   const comites = await opcoesComites(banco);
 
   return <FormularioProjetoTema inicial={{ comiteId }} opcoesComites={comites} />;

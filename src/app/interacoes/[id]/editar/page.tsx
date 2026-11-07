@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import { podeEditarRegistro } from "@/modulos/acesso/capacidades";
+import { SomenteConsulta } from "@/modulos/acesso/componentes/somente-consulta";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import { CabecalhoPagina } from "@/componentes/cabecalho-pagina";
@@ -31,6 +33,7 @@ async function EdicaoInteracao({ params }: Pick<PageProps<"/interacoes/[id]/edit
   const interacao = await obterInteracao(banco, id);
   if (!interacao || interacao.arquivadoEm) notFound();
   if (!(await interacaoEhVisivel(banco, id, await projetosVisiveis(banco, usuario.id)))) notFound();
+  if (!(await podeEditarRegistro(banco, "interacao", id))) return <SomenteConsulta voltar={{ href: `/interacoes/${id}`, rotulo: "Interação" }} />;
 
   return (
     <>

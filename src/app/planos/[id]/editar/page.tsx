@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import { podeEditarRegistro } from "@/modulos/acesso/capacidades";
+import { SomenteConsulta } from "@/modulos/acesso/componentes/somente-consulta";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import { CabecalhoPagina } from "@/componentes/cabecalho-pagina";
@@ -29,6 +31,7 @@ async function EdicaoPlano({ params }: Pick<PageProps<"/planos/[id]/editar">, "p
   const usuario = await obterUsuarioAtual(banco);
   const plano = await obterPlano(banco, id);
   if (!plano || plano.arquivadoEm || !(await planoEhVisivel(banco, id, await projetosVisiveis(banco, usuario.id)))) notFound();
+  if (!(await podeEditarRegistro(banco, "plano", id))) return <SomenteConsulta voltar={{ href: `/planos/${id}`, rotulo: "Plano de ação" }} />;
   const usuarios = await opcoesUsuarios(banco);
   return (
     <>

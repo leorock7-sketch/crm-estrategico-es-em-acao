@@ -37,7 +37,8 @@ export async function prepararBancoLocal(banco: Executor) {
 export async function obterUsuarioAtual(banco: Executor): Promise<UsuarioAtual> {
   if (modoDeAcesso() === "supabase") {
     const { usuarioDaSessao } = await import("@/lib/autenticacao/sessao");
-    return usuarioDaSessao();
+    // Só identifica o usuário; a recusa durante a troca obrigatória de senha (P-056) fica em bancoDaSessao.
+    return usuarioDaSessao({ permitirTrocaPendente: true });
   }
   if (!temIdentidade(banco)) await prepararBancoLocal(banco);
   return USUARIO_DESENVOLVIMENTO;

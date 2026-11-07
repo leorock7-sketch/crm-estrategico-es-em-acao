@@ -5,7 +5,8 @@ import { CabecalhoPagina } from "@/componentes/cabecalho-pagina";
 import { Carregando } from "@/componentes/carregando";
 import { bancoDaRequisicao } from "@/lib/banco/requisicao";
 import { esquemaIdentificador } from "@/lib/validacao/comuns";
-import { podeVerDadosRestritos } from "@/modulos/acesso/capacidades";
+import { podeEditarAlgum, podeVerDadosRestritos } from "@/modulos/acesso/capacidades";
+import { SomenteConsulta } from "@/modulos/acesso/componentes/somente-consulta";
 import { FormularioPessoa } from "@/modulos/stakeholders/componentes/formulario-pessoa";
 import { obterPessoa } from "@/modulos/stakeholders/consultas";
 
@@ -27,6 +28,7 @@ async function EdicaoPessoa({ params }: Pick<PageProps<"/pessoas/[id]/editar">, 
   const banco = await bancoDaRequisicao();
   const pessoa = await obterPessoa(banco, id);
   if (!pessoa || pessoa.arquivadoEm) notFound();
+  if (!(await podeEditarAlgum(banco))) return <SomenteConsulta voltar={{ href: `/pessoas/${id}`, rotulo: "Pessoa" }} />;
   const mostrarObservacoes = await podeVerDadosRestritos(banco, id);
 
   return (

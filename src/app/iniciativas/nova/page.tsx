@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import { podeEditarAlgum } from "@/modulos/acesso/capacidades";
+import { SomenteConsulta } from "@/modulos/acesso/componentes/somente-consulta";
 import { Suspense } from "react";
 import { CabecalhoPagina } from "@/componentes/cabecalho-pagina";
 import { Carregando } from "@/componentes/carregando";
@@ -26,6 +28,7 @@ export default function PaginaNovaIniciativa({ searchParams }: PageProps<"/inici
 async function CadastroIniciativa({ searchParams }: Pick<PageProps<"/iniciativas/nova">, "searchParams">) {
   const parametros = await searchParams;
   const banco = await bancoDaRequisicao();
+  if (!(await podeEditarAlgum(banco))) return <SomenteConsulta voltar={{ href: "/iniciativas", rotulo: "Iniciativas" }} />;
   const usuario = await obterUsuarioAtual(banco);
   const visiveis = await projetosVisiveis(banco, usuario.id);
   const [projetos, usuarios] = await Promise.all([opcoesProjetosTemas(banco, visiveis), opcoesUsuarios(banco)]);

@@ -5,12 +5,17 @@
  */
 import { createServerClient } from "@supabase/ssr";
 import { type NextRequest, NextResponse } from "next/server";
+import { DESTINO_DA_TROCA, exigeTrocaDeSenha, PAGINA_DA_TROCA } from "@/lib/autenticacao/troca-obrigatoria";
 import { modoDeAcesso } from "@/lib/banco/ambiente";
 
 const ROTAS_PUBLICAS = ["/login", "/sem-acesso"];
 
+/** Verificação de funcionamento (monitoramento): não usa sessão nem devolve dado algum. */
+const ROTA_DE_SAUDE = "/saude";
+
 export async function proxy(requisicao: NextRequest) {
   if (modoDeAcesso() !== "supabase") return NextResponse.next();
+  if (requisicao.nextUrl.pathname === ROTA_DE_SAUDE) return NextResponse.next();
 
   let resposta = NextResponse.next({ request: requisicao });
   const supabase = createServerClient(
@@ -39,6 +44,14 @@ export async function proxy(requisicao: NextRequest) {
     login.pathname = "/login";
     login.search = caminho === "/" ? "" : `?destino=${encodeURIComponent(caminho + requisicao.nextUrl.search)}`;
     return NextResponse.redirect(login);
+  }
+  // P-056: com senha provisória, só a troca de senha. O código 303 transforma qualquer envio em
+  // simples leitura, para nenhuma operação do servidor ser executada no caminho.
+  if (autenticado && exigeTrocaDeSenha(data?.claims) && caminho !== PAGINA_DA_TROCA && !publica) {
+    const troca = requisicao.nextUrl.clone();
+    troca.pathname = PAGINA_DA_TROCA;
+    troca.search = DESTINO_DA_TROCA.slice(PAGINA_DA_TROCA.length);
+    return NextResponse.redirect(troca, 303);
   }
   if (autenticado && caminho === "/login") {
     const inicio = requisicao.nextUrl.clone();

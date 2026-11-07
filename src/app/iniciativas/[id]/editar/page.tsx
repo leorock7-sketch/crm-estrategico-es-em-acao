@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import { podeEditarRegistro } from "@/modulos/acesso/capacidades";
+import { SomenteConsulta } from "@/modulos/acesso/componentes/somente-consulta";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import { CabecalhoPagina } from "@/componentes/cabecalho-pagina";
@@ -30,6 +32,7 @@ async function EdicaoIniciativa({ params }: Pick<PageProps<"/iniciativas/[id]/ed
   const iniciativa = await obterIniciativa(banco, id);
   if (!iniciativa || iniciativa.arquivadoEm) notFound();
   if (!(await iniciativaEhVisivel(banco, id, await projetosVisiveis(banco, usuario.id)))) notFound();
+  if (!(await podeEditarRegistro(banco, "iniciativa", id))) return <SomenteConsulta voltar={{ href: `/iniciativas/${id}`, rotulo: "Iniciativa" }} />;
   const usuarios = await opcoesUsuarios(banco);
 
   return (

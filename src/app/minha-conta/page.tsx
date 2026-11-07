@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
+import { Alerta } from "@/componentes/alerta";
 import { CabecalhoPagina } from "@/componentes/cabecalho-pagina";
 import { Carregando } from "@/componentes/carregando";
 import { classeCartao, classeLink } from "@/componentes/estilos";
@@ -16,6 +17,12 @@ import Link from "next/link";
 
 export const metadata: Metadata = { title: "Minha conta" };
 
+async function trocaDeSenhaPendente(): Promise<boolean> {
+  const { consultarSessao } = await import("@/lib/autenticacao/sessao");
+  const sessao = await consultarSessao();
+  return sessao.tipo === "ativa" && sessao.trocaDeSenhaPendente;
+}
+
 export default function PaginaMinhaConta() {
   return (
     <div className="mx-auto flex max-w-2xl flex-col gap-6">
@@ -30,6 +37,7 @@ export default function PaginaMinhaConta() {
 async function Conteudo() {
   const banco = await bancoDaRequisicao();
   const usuario = await obterUsuarioAtual(banco);
+  const trocaPendente = modoDeAcesso() === "supabase" && (await trocaDeSenhaPendente());
   const permissoes = await banco
     .select({
       id: permissaoContexto.id,
@@ -50,6 +58,11 @@ async function Conteudo() {
     .orderBy(asc(projetoTema.nome));
   return (
     <>
+      {trocaPendente && (
+        <Alerta tom="aviso" titulo="Defina sua senha pessoal para continuar">
+          Sua conta está com uma senha provisória, criada ou redefinida pelo administrador. As demais telas ficam disponíveis assim que você trocá-la abaixo.
+        </Alerta>
+      )}
       <section className={classeCartao}>
         <p className="font-medium">{usuario.nome}</p>
         <p className="text-sm text-texto-secundario">{usuario.email}</p>

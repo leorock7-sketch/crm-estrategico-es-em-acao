@@ -5,6 +5,7 @@
  * se o e-mail existe. O login não concede acesso por si: quem decide é o cadastro interno.
  */
 import { redirect } from "next/navigation";
+import { exigeTrocaDeSenha } from "./troca-obrigatoria";
 import { z } from "zod";
 import { clienteSupabaseDaRequisicao } from "./supabase-servidor";
 
@@ -46,7 +47,8 @@ const esquemaNovaSenha = z
     novaSenha: z.string().min(12, "Use pelo menos 12 caracteres."),
     confirmacao: z.string(),
   })
-  .refine((d) => d.novaSenha === d.confirmacao, { path: ["confirmacao"], message: "A confirmação não confere." });
+  .refine((d) => d.novaSenha === d.confirmacao, { path: ["confirmacao"], message: "A confirmação não confere." })
+  .refine((d) => d.novaSenha !== d.senhaAtual, { path: ["novaSenha"], message: "A nova senha deve ser diferente da atual." });
 
 /** Troca a senha da própria conta, depois de conferir a senha atual. */
 export async function trocarSenha(_estado: EstadoAutenticacao, formData: FormData): Promise<EstadoAutenticacao> {
@@ -64,5 +66,12 @@ export async function trocarSenha(_estado: EstadoAutenticacao, formData: FormDat
   if (conferencia.error) return { erros: { senhaAtual: ["Senha atual incorreta."] } };
   const { error } = await supabase.auth.updateUser({ password: resultado.data.novaSenha });
   if (error) return { mensagem: "Não foi possível trocar a senha. Tente outra." };
+  if (exigeTrocaDeSenha(data?.claims) && typeof data?.claims?.sub === "string") {
+    // P-056: libera o acesso. A sessão é renovada para o novo token já não trazer a marca.
+    const { concluirTrocaObrigatoria } = await import("./administracao");
+    await concluirTrocaObrigatoria(data.claims.sub);
+    await supabase.auth.refreshSession();
+    redirect("/");
+  }
   return { sucesso: true };
 }
