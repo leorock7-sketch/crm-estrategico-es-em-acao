@@ -30,6 +30,7 @@
 | 0.26 | 06/11/2026 | Etapa 5 implementada, aguardando homologação (seção 10): login real, papel `crm_app`, regras de acesso no banco, administração de usuários, D3, D4 e P-054; resultados dos testes registrados; C8 comprovada para desenvolvimento, conforme os resultados |
 | 0.27 | 06/11/2026 | Revisão da Etapa 5 (D-076): proteção das operações destrutivas, quadro dos 7 testes e troca da senha administrativa; P-056 condicionada ao uso de contas reais |
 | 0.28 | 06/11/2026 | Providências finais da Etapa 5 (D-077): banco marcado como descartável não recebe dados institucionais reais; testes destrutivos só com necessidade e autorização específica |
+| 0.29 | 06/11/2026 | Senha administrativa trocada e Data API desligada pelo gestor; testes repetidos depois das duas providências (D-077); Etapa 5 pronta para a homologação do gestor |
 
 Legenda: ✅ Aprovado · 🔧 Proposta técnica · ⏳ Pendente.
 
@@ -494,7 +495,7 @@ Os itens estão listados como pendentes em `testes/seguranca-etapa-5.test.ts` e 
 | Providência | Quem | Situação |
 |---|---|---|
 | Projeto Supabase de desenvolvimento `crm-es-em-acao-dev` (`sa-east-1`, plano Free, somente dados fictícios) | Gestor criou a conta e o projeto; as chaves ficam só em `.env.local`, e `npm run ambiente:conferir` confere o ambiente sem exibir nenhum valor | ✅ Em uso |
-| Desligar a API automática (Integrations > Data API > Enable Data API) | Gestor, depois da confirmação registrada nos resultados | ⏳ Confirmado que nada depende dela: o CRM não chama esses endpoints, os papéis da API não têm permissão em nenhuma tabela e os testes com a chave pública não recebem dados. Falta o gestor desligar; depois, login, consultas e permissões são conferidos de novo (D-076) |
+| Desligar a API automática (Integrations > Data API > Enable Data API) | Gestor | ✅ Desligada pelo gestor, no painel, em 06/11/2026; login, consultas, permissões e navegador conferidos depois (D-077) |
 | Registro do CRM no Microsoft Entra ID, restrito à organização | TI institucional | ⏳ Pendente; não bloqueia a etapa (D1) |
 | Serviço de e-mail institucional (SMTP) para convites e recuperação de senha | TI institucional | ⏳ Necessário só para usuários reais (Etapa 7); os testes não enviam e-mail |
 
@@ -519,14 +520,16 @@ A conferência e a exclusão ocorrem na mesma transação. Sem a marca, `npm run
 
 | Conjunto | Onde | Resultado |
 |---|---|---|
-| Testes do projeto (`npm test`), inclusive 54 de regras de acesso, 47 de bloqueio de operações destrutivas, 20 de conferência do ambiente, credenciais no código e migração 0009 | PGlite, a cada Pull Request | 376 de 376 aprovados |
+| Testes do projeto (`npm test`), inclusive 54 de regras de acesso, 47 de bloqueio de operações destrutivas, 21 de conferência do ambiente, credenciais no código e migração 0009 | PGlite, a cada Pull Request | 377 de 377 aprovados |
 | Testes de banco das Etapas 1 a 4 pelo papel `crm_app`, sob as regras (`npm run test:regras`) | PGlite, a cada Pull Request | 82 aprovados; 7 fora, porque tentam excluir registros ou trocar o tipo de um cadastro por comando direto (o papel é recusado ou não alcança nenhuma linha antes do que o teste confere) ou conferem transação sem identidade, que esse caminho não permite. Esses 7 são aprovados na configuração principal |
 | Testes de banco das Etapas 1 a 4, sem alteração, com todas as migrações refeitas do zero (`npm run test:postgres`) | PostgreSQL 17 do Supabase | 115 de 115 aprovados, antes da proteção das operações destrutivas (D-076). Não repetido depois, porque apaga os dados fictícios do projeto; o caminho autorizado da exclusão foi comprovado no PGlite e, no projeto real, a conferência sem apagar nada |
-| Regras de acesso pela conexão real da aplicação, login real, credenciais e navegador (`npm run test:supabase`) | Supabase Auth, PostgreSQL 17 do Supabase e Edge sem janela | 103 de 103 aprovados: 57 de regras, 15 de autenticação, 4 de credenciais e 27 de navegador |
+| Regras de acesso pela conexão real da aplicação, login real, credenciais e navegador (`npm run test:supabase`) | Supabase Auth, PostgreSQL 17 do Supabase e Edge sem janela | 103 de 103 aprovados: 57 de regras, 15 de autenticação, 4 de credenciais e 27 de navegador. Repetidos com a senha nova e com a Data API desligada |
 | Tipos, qualidade do código e compilação (`npm run verificar`) | Local e GitHub Actions | Aprovados |
 | Modo local compilado (`CRM_BANCO=pglite`), com o banco de demonstração atualizado pela migração 0009 | PGlite | Telas de pessoas, projetos, planos, riscos e usuários abriram com os dados |
 
 Comprovado por execução: a consulta da aplicação ocorre como `crm_app`, com a identidade na transação, e não vaza para a transação seguinte na mesma conexão; revogação, vencimento e desativação bloqueiam na consulta seguinte, com token ainda válido e com sessão aberta no navegador; a chamada original de uma operação do servidor, reenviada com a sessão de outro usuário, não grava nada; a chave pública não acessa tabelas pela API do Supabase, com ou sem sessão; os valores reais das chaves e senhas não aparecem nos arquivos versionados nem no pacote enviado ao navegador.
+
+Com a Data API desligada pelo gestor, a autenticação responde normalmente e o acesso às tabelas pela API automática responde 503, sem entregar dados. O desligamento em si foi confirmado pelo gestor no painel, ao qual a aplicação não tem acesso: a mesma resposta 503 já aparecia antes da confirmação, logo depois da troca da senha, e por isso ela não comprova sozinha o desligamento.
 
 Não comprovado nesta etapa: login Microsoft 365 (depende da TI); expiração natural do token, que depende de uma hora de espera (a verificação recusa token adulterado e o bloqueio de acesso não depende do token); envio de e-mail (Etapa 7); hospedagem com HTTPS e o atributo `Secure` dos cookies (Etapa 7); desempenho com a aplicação hospedada e com volume real (Etapa 7).
 
@@ -546,7 +549,7 @@ Hospedagem pública e produção; dados reais; integrações com Outlook e Micro
 | Registro do CRM no Microsoft Entra ID | Login Microsoft (D1); não bloqueia a Etapa 5 | ⏳ Depende de autorização e configuração pela TI institucional |
 | Serviço de e-mail institucional (SMTP) para convites e recuperação de senha | Usuários reais (Etapa 7) | ⏳ Depende da TI institucional |
 | Senha provisória sem troca obrigatória no primeiro acesso (P-056) | Uso com contas institucionais reais (D-076); não impede a homologação da Etapa 5 com dados fictícios | ⏳ A resolver antes das contas reais |
-| Senha administrativa forte do PostgreSQL do projeto de desenvolvimento | Homologação da Etapa 5 (D-076) | ⏳ Troca pelo gestor, com os comandos `npm run ambiente:senha-admin` |
+| Senha administrativa forte do PostgreSQL do projeto de desenvolvimento | — | ✅ Trocada pelo gestor em 06/11/2026; senha anterior recusada e nova confirmada, com `.env.local` atualizado e arquivo temporário sobrescrito e apagado (D-077) |
 | Rubricas das escalas V2.2 e plano de adaptação técnica | Etapa 2B (D-060, D-063) | ✅ **Resolvida (D-068):** Q-66 1.0 e Q-67 1.0; calibração H6 concluída, com limitações registradas; Etapa 2B pronta para autorização (documento entregue fora do repositório). Decisões Q-65.1, Q-65.4 e Q-65.6 continuam pendentes, sem bloquear a 2B |
 | Documentos de referência V2.3 | — | Roteiro preparado fora do repositório (D-063); emissão a programar, refletindo as D-067 e D-068 (inclusive a adaptação do teste T23) |
 | Arquivos `MANUAL_OPERACIONAL.md` e `PLANO_TRANSFERENCIA_INSTITUCIONAL.md`, previstos no Guia | — | Ainda não existem no repositório; criação a autorizar |
