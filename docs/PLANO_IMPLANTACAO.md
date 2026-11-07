@@ -33,6 +33,7 @@
 | 0.29 | 06/11/2026 | Senha administrativa trocada e Data API desligada pelo gestor; testes repetidos depois das duas providências (D-077); Etapa 5 pronta para a homologação do gestor |
 | 0.30 | 06/11/2026 | Etapa 5 homologada para desenvolvimento (D-078), com o commit final `01e495d`; pendências atualizadas; próxima atividade: roteiro da Etapa 6 — Painéis e Relatórios Executivos — para validação do gestor |
 | 0.31 | 06/11/2026 | Roteiro da Etapa 6 validado e etapa implementada, aguardando homologação (D-079, seção 11); pendências e local de trabalho renumerados (seções 12 e 13) |
+| 0.32 | 07/11/2026 | Etapa 6 homologada para desenvolvimento (D-080), com o commit final `8708453`; pendências preservadas (arquivos no Microsoft Excel, desempenho e segurança no ambiente hospedado); próxima atividade: roteiro da Etapa 7, depois da incorporação do Pull Request #12 |
 
 Legenda: ✅ Aprovado · 🔧 Proposta técnica · ⏳ Pendente.
 
@@ -59,7 +60,7 @@ Legenda: ✅ Aprovado · 🔧 Proposta técnica · ⏳ Pendente.
 | 3 | Iniciativas, interações e compromissos | Matriz de iniciativas, registro único de reuniões, encaminhamentos e prazos | ✅ **Concluída:** autorizada em 03/11/2026 (D-070), incorporada à `main` pelo Pull Request #7 (commit de merge `aa17fe4`, verificações Node.js 24 e 26 aprovadas) e homologada para desenvolvimento (D-071); as soluções provisórias P-040 a P-046 continuam não homologadas (seção 8) |
 | 4 | Plano de ação e matriz de riscos | Versões e aprovação, acompanhamento, riscos, gatilhos e respostas | ✅ **Concluída:** aprovada em 03/11/2026 com a matriz de riscos original do Comitê de Infraestrutura (D-072), incorporada à `main` pelo Pull Request #9 (commit de merge `1246331`, verificações Node.js 24 e 26 aprovadas) e homologada para desenvolvimento em 04/11/2026 (D-073); as soluções provisórias P-047 a P-053 continuam não homologadas (seção 9) |
 | 5 | Autenticação e permissões | Supabase Auth, perfis e permissões por projeto/tema, segurança no banco | ✅ **Homologada para desenvolvimento** (D-078; seção 10). Produção sujeita aos testes da Etapa 7 |
-| 6 | Painéis e relatórios | Indicadores executivos e relatórios, com filtros, permissões da Etapa 5 e exportação. Roteiro validado na D-079 | 🔧 **Implementada, aguardando homologação** (D-079; seção 11) |
+| 6 | Painéis e relatórios | Indicadores executivos e relatórios, com filtros, permissões da Etapa 5 e exportação. Roteiro validado na D-079 | ✅ **Homologada para desenvolvimento** (D-080; seção 11). Produção sujeita aos testes da Etapa 7 |
 | 7 | Homologação e hospedagem | Supabase e Vercel com dados fictícios, validação técnica e institucional, plano de cópias de segurança. **Pré-requisitos: C6, C7 e C8 solucionadas** (D-027) | 🔧 ⏳ (exige contas e autorização) |
 | 8 | Piloto com dados reais | Somente após autorização formal, análise LGPD e solução de C6, C7 e C8 (D-027) | ⏳ |
 | 9 | Integrações | Outlook, calendário, SharePoint, OneDrive e IA assistiva | ✅ Futuro / 🔧 (ordem) |
@@ -539,9 +540,11 @@ Não comprovado nesta etapa: login Microsoft 365 (depende da TI); expiração na
 
 Hospedagem pública e produção; dados reais; integrações com Outlook e Microsoft 365 (Etapa 9); painéis; backup, recuperação e homologação da implantação (Etapa 7); achados A-02 a A-06, salvo correções estritamente necessárias à segurança; melhorias U-1 a U-5; backlog V3-01 a V3-08.
 
-## 11. Etapa 6 — Painéis e relatórios 🔧 (D-079): aguardando homologação
+## 11. Etapa 6 — Painéis e relatórios ✅ (D-079, D-080): homologada para desenvolvimento
 
-**Situação:** implementada na branch `feature/paineis-relatorios`, com Pull Request aberto para a homologação do gestor. Não foi incorporada à `main`. Nenhuma tabela nova nem mudança no modelo de dados.
+**Homologação (D-080):** Etapa 6 homologada em 07/11/2026 para fins de desenvolvimento e testes com dados fictícios (Pull Request #12, commit final `8708453`, Node.js 24 e 26 aprovados), com incorporação à `main` pelo gestor. A homologação não aprova o uso institucional com dados reais. P-061 a P-065 continuam provisórias, não homologadas individualmente. Nenhuma tabela nova nem mudança no modelo de dados.
+
+**Antes da operação institucional (D-080):** verificar a abertura e a apresentação dos arquivos XLSX no Microsoft Excel; repetir os testes de desempenho e segurança no ambiente hospedado, que as medições feitas no desenvolvimento não substituem.
 
 ### Objetivo
 
@@ -613,7 +616,7 @@ Não executados: `npm run test:postgres` e `supabase:preparar -- --refazer`, que
 
 Página inicial; melhorias V3-01 a V3-08, inclusive a nova interface da V3-02; integrações com Outlook, Microsoft 365, ferramenta institucional indicada pelo gestor e monday.com; infraestrutura própria de geração de documentos; novas tabelas e mudanças no modelo de dados; dados reais.
 
-## 12. Pendências efetivas (atualizadas em 06/11/2026)
+## 12. Pendências efetivas (atualizadas em 07/11/2026)
 
 | Pendência | Bloqueia | Situação |
 |---|---|---|
@@ -624,10 +627,12 @@ Página inicial; melhorias V3-01 a V3-08, inclusive a nova interface da V3-02; i
 | Projeto Supabase de desenvolvimento | — | ✅ Criado pelo gestor e em uso, somente com dados fictícios (D-075) |
 | Registro do CRM no Microsoft Entra ID | Login Microsoft (D1); não bloqueia a Etapa 5 | ⏳ Depende de autorização e configuração pela TI institucional |
 | Serviço de e-mail institucional (SMTP) para convites e recuperação de senha | Usuários reais (Etapa 7) | ⏳ Depende da TI institucional |
-| Senha provisória sem troca obrigatória no primeiro acesso (P-056) | Uso com contas institucionais reais (D-076); não impediu a homologação da Etapa 5 com dados fictícios (D-078) | ⏳ A resolver antes das contas reais |
-| Leitor visualiza formulário de inclusão por acesso direto ao endereço; a gravação já é recusada | Entrada em operação institucional (D-078) | ⏳ A corrigir antes da operação institucional |
-| Verificações do ambiente hospedado: HTTPS, cookies seguros e desempenho | Etapa 7 (D-078) | ⏳ Sujeitas à implantação e às providências da TI institucional |
-| Etapa 6 — Painéis e Relatórios Executivos | Etapa 7 | 🔧 Implementada, aguardando homologação do gestor (D-079, seção 11). Soluções provisórias P-061 a P-065, não homologadas |
+| Senha provisória sem troca obrigatória no primeiro acesso (P-056) | Uso com contas institucionais reais (D-076); não impediu a homologação da Etapa 5 com dados fictícios (D-078) | ⏳ A resolver antes das contas reais; obrigatória no roteiro da Etapa 7 (D-080) |
+| Leitor visualiza formulário de inclusão por acesso direto ao endereço; a gravação já é recusada | Entrada em operação institucional (D-078) | ⏳ A corrigir antes da operação institucional; obrigatória no roteiro da Etapa 7 (D-080) |
+| Verificações do ambiente hospedado: HTTPS, cookies seguros, desempenho e segurança, inclusive dos painéis e das exportações | Etapa 7 (D-078, D-080); as medições do desenvolvimento não as substituem | ⏳ Sujeitas à implantação e às providências da TI institucional |
+| Abertura e apresentação dos arquivos XLSX no Microsoft Excel | Operação institucional (D-080) | ⏳ A verificar antes da operação institucional; leitura já conferida por biblioteca independente nos testes |
+| Homologação da Etapa 6 | Etapa 7 | ✅ Homologada para desenvolvimento em 07/11/2026 (D-080), com o commit final `8708453` do Pull Request #12; incorporação à `main` pelo gestor. P-061 a P-065 continuam provisórias, não homologadas individualmente |
+| Roteiro da Etapa 7 — Implantação, Homologação Técnica e Segurança Operacional | Programação da Etapa 7 | ⏳ A preparar depois da incorporação do Pull Request #12, para validação do gestor (D-080) |
 | Senha administrativa forte do PostgreSQL do projeto de desenvolvimento | — | ✅ Trocada pelo gestor em 06/11/2026; senha anterior recusada e nova confirmada, com `.env.local` atualizado e arquivo temporário sobrescrito e apagado (D-077) |
 | Rubricas das escalas V2.2 e plano de adaptação técnica | Etapa 2B (D-060, D-063) | ✅ **Resolvida (D-068):** Q-66 1.0 e Q-67 1.0; calibração H6 concluída, com limitações registradas; Etapa 2B pronta para autorização (documento entregue fora do repositório). Decisões Q-65.1, Q-65.4 e Q-65.6 continuam pendentes, sem bloquear a 2B |
 | Documentos de referência V2.3 | — | Roteiro preparado fora do repositório (D-063); emissão a programar, refletindo as D-067 e D-068 (inclusive a adaptação do teste T23) |
@@ -642,7 +647,7 @@ Página inicial; melhorias V3-01 a V3-08, inclusive a nova interface da V3-02; i
 | Homologação da Etapa 4 | Etapa 5 | ✅ Homologada para desenvolvimento em 04/11/2026 (D-073), depois do merge dos Pull Requests #8 e #9 (`1246331`) |
 | Soluções provisórias da Etapa 4 (P-047 a P-053) e pontos pendentes Q-33 (correção de digitação) e Q-42 a Q-44 | — | Em uso e não homologadas (D-072, D-073); decisão do gestor pendente |
 | Soluções provisórias da Etapa 3 (P-040 a P-046) | — | Em uso e não homologadas (D-071); decisão do gestor pendente (Q-20, Q-21, Q-23 e Q-24) |
-| Backlog da V3.0: melhorias V3-01 a V3-08 | — | Registradas pelo gestor (D-071, D-074, D-075) e preservadas (D-072, D-073): V3-01, simplificação visual, com base em modelo de referência indicado pelo gestor; V3-02, matriz Poder × Interesse na página do projeto, com marcadores interativos e identificação por mouse ou toque; V3-03, redução dos caminhos de navegação para as informações relevantes; V3-04, unificação visual de Iniciativas e Interações, com estas como subitens, preservando o registro único de reuniões; V3-05, fotografias dos stakeholders; V3-06, integração funcional entre iniciativas, interações, ações e riscos; V3-07, interoperabilidade futura com outra ferramenta institucional indicada pelo gestor; V3-08, interoperabilidade com monday.com: permitir, no mínimo, exportação compatível em XLSX/CSV de informações selecionadas do CRM para boards do monday.com, com campos e identificadores adequados, podendo uma integração automatizada por API ser avaliada posteriormente (D-075). Não implementar antes da V3.0 |
+| Backlog da V3.0: melhorias V3-01 a V3-09 | — | Registradas pelo gestor (D-071, D-074, D-075; a V3-09, citada na D-080, ainda não tem descrição registrada) e preservadas (D-072, D-073): V3-01, simplificação visual, com base em modelo de referência indicado pelo gestor; V3-02, matriz Poder × Interesse na página do projeto, com marcadores interativos e identificação por mouse ou toque; V3-03, redução dos caminhos de navegação para as informações relevantes; V3-04, unificação visual de Iniciativas e Interações, com estas como subitens, preservando o registro único de reuniões; V3-05, fotografias dos stakeholders; V3-06, integração funcional entre iniciativas, interações, ações e riscos; V3-07, interoperabilidade futura com outra ferramenta institucional indicada pelo gestor; V3-08, interoperabilidade com monday.com: permitir, no mínimo, exportação compatível em XLSX/CSV de informações selecionadas do CRM para boards do monday.com, com campos e identificadores adequados, podendo uma integração automatizada por API ser avaliada posteriormente (D-075). Não implementar antes da V3.0 |
 | Achados A-01 a A-06 da auditoria técnica independente | — | Documento mantido fora do repositório. A-01 (síntese do gestor, D-075): ausência de autenticação real e de segurança multiusuário efetiva; tratado para desenvolvimento (D-078), com a homologação de produção sujeita aos testes da Etapa 7. A-02 a A-06 no backlog, salvo correções estritamente necessárias à segurança (D-074) |
 | Melhorias de usabilidade não essenciais (U-1 a U-5, registradas em 02/11/2026) | — | Registradas fora do repositório: texto desatualizado na seção de stakeholders da página do projeto; bloco de evidências antes das classificações no rascunho; dica nas versões recolhidas do histórico; colunas da tabela da matriz no celular; legenda do selo "preliminar" no celular. A tratar oportunamente, sem impedir o andamento; não implementadas nas Etapas 4 e 5 e preservadas (D-071, D-072, D-073, D-074) |
 | Análise LGPD, retenção e anonimização | Etapa 8 | Q-13, Q-58 |

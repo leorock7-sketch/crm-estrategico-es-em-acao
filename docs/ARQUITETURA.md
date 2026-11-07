@@ -17,6 +17,7 @@
 | 0.13 | 06/11/2026 | Etapa 5 implementada, aguardando homologação: autenticação real, papel `crm_app`, identidade em cada transação e dois modos de acesso (seção 5.1) |
 | 0.14 | 06/11/2026 | Etapa 5 homologada para desenvolvimento (D-078); verificações do ambiente definitivo seguem para a Etapa 7 |
 | 0.15 | 06/11/2026 | Etapa 6 implementada, aguardando homologação (D-079): módulo `paineis`, relatórios em XLSX gerados no servidor e consultas sobre o conjunto de projetos e planos |
+| 0.16 | 07/11/2026 | Etapa 6 homologada para desenvolvimento (D-080); desempenho e segurança no ambiente hospedado seguem para a Etapa 7 |
 
 Legenda: ✅ Aprovado · 🔧 Proposta técnica · ⏳ Pendente.
 
@@ -219,7 +220,7 @@ Regras de organização:
 
 Limites conhecidos: a identidade é informada pela aplicação ao banco, em cada transação, o que confia na aplicação e nas credenciais do papel `crm_app`, guardadas só no servidor; cada consulta faz mais de uma ida e volta ao banco, o que é irrelevante com a aplicação e o banco na mesma região, mas deve ser medido na hospedagem (Etapa 7); o atributo `Secure` dos cookies depende de HTTPS e deve ser ligado na hospedagem (Etapa 7).
 
-### Exportações (Etapa 6) 🔧 D-079
+### Exportações (Etapa 6) ✅ D-079, D-080 (homologada para desenvolvimento)
 
 Os arquivos são gerados no servidor, em memória, a cada pedido, com a conexão da aplicação e a identidade do usuário: o alcance é decidido pelas permissões válidas lidas no banco, e a rota responde sem cache. O arquivo só contém o que foi montado nas abas, sem fórmulas nem elementos ocultos, e o texto digitado é neutralizado. Nada fica guardado no servidor.
 

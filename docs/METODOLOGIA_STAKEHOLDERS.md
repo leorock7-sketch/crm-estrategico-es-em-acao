@@ -17,6 +17,7 @@
 | 0.13 | 02/11/2026 | Versão final das rubricas (Q-66 1.0, D-068): calibração H6 concluída; conselhos consultivos (F1); influência relevante × decisiva (F2); tratamentos das ressalvas (F3); condição já prevista no projeto (F4); distinção entre avaliação preliminar e manifestação confirmada; ajustes da Q-67 1.0 (seções 3, 7, 9 e 10). |
 | 0.14 | 02/11/2026 | Etapa 2B implementada (D-069), aguardando homologação: escalas V2.2, rubricas, alertas orientativos e matriz 3 × 3 no sistema, com dados fictícios (seções 3 a 7, 9 e 10). |
 | 0.15 | 06/11/2026 | Painéis da Etapa 6 (D-079): filtros em visão agregada e informação complementar H5 implementados, aguardando homologação (P-062, P-064). |
+| 0.16 | 07/11/2026 | Painéis da Etapa 6 homologados para desenvolvimento (D-080); P-062 e P-064 continuam provisórias. |
 
 Legenda: ✅ Aprovado · 🔧 Proposta técnica · ⏳ Pendente.
 
@@ -204,7 +205,7 @@ O posicionamento é mostrado como **cor, ícone ou legenda independente**, nunca
 | Total exibido com denominador ("X de Y associados"). | ✅ (Manual V2.2) |
 | Grade 3 × 3 com as células nomeadas acima. | ✅ decisão (D-058); implementada na Etapa 2B 🔧 (D-069): quantidade, nomes, posicionamento por cor e símbolo e selo "preliminar"; no celular, quantidade e marcadores, com os nomes na tabela equivalente |
 | **Conduta do ES em Ação** — registrada **separadamente** de poder, interesse e posicionamento; nunca derivada da matriz. | ⏳ Requisito futuro (RF-28, D-038, Q-64) |
-| Filtros por comitê, período e responsável, em visão agregada. | 🔧 Implementados na Etapa 6, aguardando homologação (D-079, P-062) |
+| Filtros por comitê, período e responsável, em visão agregada. | ✅ Implementados na Etapa 6 e homologados para desenvolvimento (D-079, D-080); alcance do filtro de responsável provisório (P-062) |
 
 Estrutura em quatro camadas ✅ (D-051, camada 1 ajustada pela D-058): (1) poder × interesse, na matriz ordinal 3 × 3; (2) posicionamento; (3) engajamento e confiança; (4) conduta institucional, decidida pelo responsável e nunca preenchida automaticamente.
 
@@ -333,7 +334,7 @@ Expressões como "apoiará se" ou "desde que" **não determinam automaticamente*
 - O sistema pode sugerir o preenchimento, sem bloquear o registro fundamentado.
 - O campo não cria categoria de posicionamento.
 
-**Painéis (H5):** mostrar à parte, como informação complementar e não como quarta categoria, quantos "Não avaliado" no posicionamento têm manifestação registrada. 🔧 Implementado na Etapa 6, aguardando homologação (D-079, P-064), como situação específica em grupo próprio, sem confusão com classificação de stakeholder.
+**Painéis (H5):** mostrar à parte, como informação complementar e não como quarta categoria, quantos "Não avaliado" no posicionamento têm manifestação registrada. ✅ Implementado na Etapa 6 e homologado para desenvolvimento (D-079, D-080), como situação específica em grupo próprio, sem confusão com classificação de stakeholder; definição provisória (P-064).
 
 ### 10.5 Calibração (H6 — concluída, com avaliador único)
 

@@ -19,6 +19,7 @@
 | 0.15 | 06/11/2026 | Etapa 5 implementada, aguardando homologação: RU-03. |
 | 0.16 | 06/11/2026 | Etapa 5 homologada para desenvolvimento (D-078): RU-03. Conteúdo inicial dos painéis definido pelo gestor (RF-71, Q-55). |
 | 0.17 | 06/11/2026 | Etapa 6 validada e implementada, aguardando homologação (D-079): RF-70 e RF-71. |
+| 0.18 | 07/11/2026 | Etapa 6 homologada para desenvolvimento (D-080): RF-70 e RF-71. |
 
 ## Como ler este documento
 
@@ -154,8 +155,8 @@ Detalhes em [MATRIZ_RISCOS.md](MATRIZ_RISCOS.md).
 
 | ID | Requisito | Situação |
 |---|---|---|
-| RF-70 | Painéis e relatórios gerenciais: visão por comitê, visão por projeto ou tema e relatórios R1 a R5 em XLSX, com as permissões da Etapa 5. | ✅ (D-079; implementado na Etapa 6, aguardando homologação) |
-| RF-71 | Indicadores da primeira versão: contagens, datas e situações registradas de comitês, iniciativas, interações, compromissos, planos, ações, marcos, riscos e stakeholders, sem índices, rankings ou estimativas. | ✅ (D-079; implementado na Etapa 6, aguardando homologação) |
+| RF-70 | Painéis e relatórios gerenciais: visão por comitê, visão por projeto ou tema e relatórios R1 a R5 em XLSX, com as permissões da Etapa 5. | ✅ (D-079; implementado na Etapa 6 e homologado para desenvolvimento, D-080) |
+| RF-71 | Indicadores da primeira versão: contagens, datas e situações registradas de comitês, iniciativas, interações, compromissos, planos, ações, marcos, riscos e stakeholders, sem índices, rankings ou estimativas. | ✅ (D-079; implementado na Etapa 6 e homologado para desenvolvimento, D-080) |
 
 ### 4.9 Integrações futuras
 
