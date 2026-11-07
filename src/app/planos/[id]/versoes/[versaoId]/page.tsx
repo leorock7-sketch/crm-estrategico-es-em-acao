@@ -1,4 +1,3 @@
-import { eq } from "drizzle-orm";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -8,10 +7,12 @@ import { BotaoAcaoRegistro } from "@/componentes/botao-acao-registro";
 import { CabecalhoPagina } from "@/componentes/cabecalho-pagina";
 import { Carregando } from "@/componentes/carregando";
 import { classeCartao, classeLink } from "@/componentes/estilos";
-import { usuario as tabelaUsuario } from "@/lib/banco/esquema";
+import { AreaConformePermissao } from "@/modulos/acesso/componentes/area-conforme-permissao";
+import { podeEditarRegistro } from "@/modulos/acesso/capacidades";
 import { bancoDaRequisicao } from "@/lib/banco/requisicao";
 import { formatarData, formatarDataHora } from "@/lib/formatacao";
 import { esquemaIdentificador } from "@/lib/validacao/comuns";
+import { podeDecidirNoProjeto } from "@/modulos/acesso/capacidades";
 import { obterUsuarioAtual } from "@/modulos/acesso/usuario-atual";
 import { opcoesUsuarios, projetosVisiveis } from "@/modulos/acesso/visibilidade";
 import { opcoesIniciativas } from "@/modulos/iniciativas/consultas";
@@ -69,21 +70,22 @@ async function DetalheVersao({ params }: Pick<PageProps<"/planos/[id]/versoes/[v
   const base = versoes.find(
     (v) => v.numeroVersao < versao.numeroVersao && (v.situacao === "aprovada" || v.situacao === "substituida") && !v.arquivadoEm,
   );
-  const [planejadas, anteriores, eixos, usuarios, opcoes, iniciativas, perfil] = await Promise.all([
+  const [planejadas, anteriores, eixos, usuarios, opcoes, iniciativas, podeDecidir] = await Promise.all([
     planejamentoDaVersao(banco, versaoId),
     base ? planejamentoDaVersao(banco, base.id) : Promise.resolve([]),
     eixosDoPlano(banco, id),
     opcoesUsuarios(banco),
     opcoesStakeholders(banco),
     opcoesIniciativas(banco, visiveis),
-    banco.select({ administrador: tabelaUsuario.administrador }).from(tabelaUsuario).where(eq(tabelaUsuario.id, usuario.id)),
+    podeDecidirNoProjeto(banco, plano.projetoTemaId),
   ]);
   const diferencas = diferencasEntreVersoes(anteriores, planejadas);
   const descartada = versao.arquivadoEm !== null;
   const editavel = versao.situacao === "rascunho" && !descartada && !plano.arquivadoEm;
-  const administrador = perfil[0]?.administrador === true;
 
+  const podeEditar = await podeEditarRegistro(banco, "plano", id);
   return (
+    <AreaConformePermissao podeEditar={podeEditar}>
     <div className="flex flex-col gap-6">
       <CabecalhoPagina
         titulo={`Versão ${versao.numeroVersao} do plano`}
@@ -146,13 +148,13 @@ async function DetalheVersao({ params }: Pick<PageProps<"/planos/[id]/versoes/[v
             Decisão sobre a versão
           </h2>
           <p className="mb-4 text-sm text-texto-secundario">
-            Aprovação em nível único pelo administrador do sistema (provisória, até a autenticação). Confira as mudanças
-            abaixo antes de decidir.
+            Aprovação em nível único pelo administrador ou pelo gestor do projeto ou tema. Confira as mudanças abaixo antes
+            de decidir.
           </p>
-          {administrador ? (
+          {podeDecidir ? (
             <FormularioDecisao versaoId={versaoId} />
           ) : (
-            <p className="text-sm text-texto-secundario">Somente o administrador do sistema decide sobre versões do plano.</p>
+            <p className="text-sm text-texto-secundario">Somente o administrador ou o gestor do projeto ou tema decide sobre versões do plano.</p>
           )}
         </section>
       )}
@@ -225,6 +227,7 @@ async function DetalheVersao({ params }: Pick<PageProps<"/planos/[id]/versoes/[v
         )}
       </section>
     </div>
+    </AreaConformePermissao>
   );
 }
 

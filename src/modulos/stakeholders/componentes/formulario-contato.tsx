@@ -22,11 +22,14 @@ export function FormularioContato({
   stakeholderId,
   naturezaPadrao,
   vinculos = [],
+  dadosRestritos = true,
 }: {
   stakeholderId: string;
   naturezaPadrao: (typeof NATUREZAS_CONTATO)[number];
   /** Vínculos vigentes da pessoa, para contatos funcionais ligados a um cargo. */
   vinculos?: OpcaoVinculo[];
+  /** Contato pessoal e observação só para quem pode vê-los (P-054, provisória). */
+  dadosRestritos?: boolean;
 }) {
   const [estado, acao, enviando] = useActionState(salvarContato, ESTADO_INICIAL);
   const erros = estado.erros ?? {};
@@ -87,7 +90,7 @@ export function FormularioContato({
             className={classeEntrada}
             {...atributosErro("natureza")}
           >
-            {NATUREZAS_CONTATO.map((natureza) => (
+            {NATUREZAS_CONTATO.filter((natureza) => dadosRestritos || natureza !== "pessoal").map((natureza) => (
               <option key={natureza} value={natureza}>
                 {ROTULOS_NATUREZA_CONTATO[natureza]}
               </option>
@@ -127,16 +130,18 @@ export function FormularioContato({
             {...atributosErro("dataInicio")}
           />
         </Campo>
-        <Campo id="contato-observacao" rotulo="Observação" erros={erros.observacao}>
-          <input
-            id="contato-observacao"
-            name="observacao"
-            maxLength={500}
-            defaultValue={valor("observacao")}
-            className={classeEntrada}
-            {...atributosErro("observacao")}
-          />
-        </Campo>
+        {dadosRestritos && (
+          <Campo id="contato-observacao" rotulo="Observação" erros={erros.observacao}>
+            <input
+              id="contato-observacao"
+              name="observacao"
+              maxLength={500}
+              defaultValue={valor("observacao")}
+              className={classeEntrada}
+              {...atributosErro("observacao")}
+            />
+          </Campo>
+        )}
       </div>
 
       <label className="flex items-center gap-2 text-sm">

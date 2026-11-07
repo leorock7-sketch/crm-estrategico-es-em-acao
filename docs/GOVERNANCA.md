@@ -3,6 +3,9 @@
 | Versão | Data | Situação |
 |---|---|---|
 | 0.1 | 31/10/2026 | Rascunho para revisão |
+| 0.2 | 06/11/2026 | Perfis de acesso aprovados (D-074), a implementar na Etapa 5 |
+| 0.3 | 06/11/2026 | Perfis implementados na Etapa 5, aguardando homologação: administração de usuários e permissões na tela "Usuários" |
+| 0.4 | 06/11/2026 | Etapa 5 homologada para desenvolvimento (D-078) |
 
 Legenda: ✅ Aprovado · 🔧 Proposta técnica · ⏳ Pendente.
 
@@ -27,14 +30,16 @@ flowchart TD
 | **Validação institucional** | Aprovação formal do ES em Ação para hospedagem, uso de dados reais e titularidade. | ✅ (prevista no README) ⏳ (responsável) |
 | **Encarregado de dados (LGPD)** | Orientação sobre tratamento de dados pessoais de stakeholders. | ⏳ |
 
-## 3. Perfis de acesso ao sistema 🔧
+## 3. Perfis de acesso ao sistema ✅ (D-074)
 
 | Perfil | Escopo | O que pode fazer |
 |---|---|---|
-| Administrador | Todo o sistema | Tudo, inclusive gerenciar usuários, permissões e metodologia |
-| Gestor de contexto | Projetos/temas em que tem permissão | Registrar e alterar dados do contexto e aprovar alterações de plano ⏳ |
-| Colaborador | Projetos/temas em que tem permissão | Registrar interações, avaliações e acompanhamentos |
-| Leitor | Projetos/temas em que tem permissão | Somente consulta |
+| Administrador | Todo o sistema | Controle integral, inclusive administração de usuários e permissões e metodologia |
+| Gestor | Projetos e temas sob sua responsabilidade | Consulta, registra, altera e aprova versões de planos de ação |
+| Colaborador | Projetos e temas autorizados | Consulta, registra e altera, sem aprovar versões |
+| Leitor | Projetos e temas autorizados | Consulta exclusivamente as informações autorizadas |
+
+Não há outras categorias de perfil. O diretório básico do Cadastro Mestre é consultado por todos os usuários ativos e autenticados; os dados restritos seguem o [Plano de Implantação](PLANO_IMPLANTACAO.md), seção 10.
 
 Inicialmente existirá apenas o Administrador. ✅ As permissões são concedidas por projeto ou tema. ✅
 

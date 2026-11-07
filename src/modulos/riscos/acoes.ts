@@ -10,7 +10,8 @@ import { and, eq, isNull } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { z } from "zod";
-import { comoUsuario, type Executor, obterBanco } from "@/lib/banco/conexao";
+import { comoUsuario, type Executor } from "@/lib/banco/conexao";
+import { bancoDaSessao } from "@/lib/banco/requisicao";
 import { projetoTema } from "@/lib/banco/esquema";
 import { mensagemDeErro } from "@/lib/banco/mensagens-erro";
 import { lerFormulario } from "@/lib/formulario";
@@ -70,7 +71,7 @@ async function gravarNoRisco(
   gravar: (tx: Executor) => Promise<unknown>,
   { permitirArquivado = false } = {},
 ): Promise<string | null> {
-  const banco = await obterBanco();
+  const banco = await bancoDaSessao();
   const usuario = await obterUsuarioAtual(banco);
   const encontrado = await obterRisco(banco, riscoId);
   if (!encontrado) return "Risco não encontrado.";
@@ -100,7 +101,7 @@ export async function salvarRisco(_estadoAnterior: EstadoFormulario, formData: F
   } else {
     const resultado = esquemaNovoRisco.safeParse(dados);
     if (!resultado.success) return { erros: z.flattenError(resultado.error).fieldErrors, valores };
-    const banco = await obterBanco();
+    const banco = await bancoDaSessao();
     const usuario = await obterUsuarioAtual(banco);
     try {
       const [ativo] = await banco
@@ -148,7 +149,7 @@ export async function salvarGatilho(_estadoAnterior: EstadoFormulario, formData:
   const id = identificadorOpcional(valores.id);
   const resultado = esquemaGatilho.safeParse(dados);
   if (!resultado.success) return { erros: z.flattenError(resultado.error).fieldErrors, valores };
-  const banco = await obterBanco();
+  const banco = await bancoDaSessao();
   if (id && (await riscoDoGatilho(banco, id)) !== resultado.data.riscoId) return { mensagem: "Gatilho não encontrado.", valores };
   const erro = await gravarNoRisco(resultado.data.riscoId, async (tx) => {
     if (id) await atualizarGatilho(tx, id, resultado.data.descricao);
@@ -161,7 +162,7 @@ export async function salvarGatilho(_estadoAnterior: EstadoFormulario, formData:
 
 export async function arquivarGatilhoAcao(_estadoAnterior: EstadoFormulario, formData: FormData): Promise<EstadoFormulario> {
   const id = esquemaIdentificador.parse(formData.get("id"));
-  const banco = await obterBanco();
+  const banco = await bancoDaSessao();
   const riscoId = await riscoDoGatilho(banco, id);
   if (!riscoId) return { mensagem: "Gatilho não encontrado." };
   const erro = await gravarNoRisco(riscoId, (tx) => arquivarGatilho(tx, id));
@@ -178,7 +179,7 @@ export async function registrarOcorrenciaGatilhoAcao(
   const { valores, dados } = lerFormulario(formData);
   const resultado = esquemaRegistroGatilho.safeParse(dados);
   if (!resultado.success) return { erros: z.flattenError(resultado.error).fieldErrors, valores };
-  const banco = await obterBanco();
+  const banco = await bancoDaSessao();
   const riscoId = await riscoDoGatilho(banco, resultado.data.gatilhoId);
   if (!riscoId) return { mensagem: "Gatilho não encontrado.", valores };
   const erro = await gravarNoRisco(riscoId, (tx) => registrarOcorrenciaGatilho(tx, resultado.data));

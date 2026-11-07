@@ -8,6 +8,8 @@ import { CabecalhoPagina } from "@/componentes/cabecalho-pagina";
 import { Carregando } from "@/componentes/carregando";
 import { classeBotaoPrimario, classeBotaoSecundario, classeCartao, classeLink } from "@/componentes/estilos";
 import { SeloSituacao } from "@/componentes/selo-situacao";
+import { AreaConformePermissao } from "@/modulos/acesso/componentes/area-conforme-permissao";
+import { podeEditarRegistro } from "@/modulos/acesso/capacidades";
 import { bancoDaRequisicao } from "@/lib/banco/requisicao";
 import { formatarData, formatarDataHora, hojeEmBrasilia } from "@/lib/formatacao";
 import { esquemaIdentificador } from "@/lib/validacao/comuns";
@@ -79,7 +81,9 @@ async function DetalheIniciativa({ params }: Pick<PageProps<"/iniciativas/[id]">
   const arquivada = iniciativa.arquivadoEm !== null;
   const ligados = new Set(projetos.map((p) => p.projetoTemaId));
 
+  const podeEditar = await podeEditarRegistro(banco, "iniciativa", id);
   return (
+    <AreaConformePermissao podeEditar={podeEditar}>
     <div className="flex flex-col gap-6">
       <CabecalhoPagina
         titulo={iniciativa.titulo}
@@ -297,6 +301,7 @@ async function DetalheIniciativa({ params }: Pick<PageProps<"/iniciativas/[id]">
         <HistoricoAtividade registros={historico} nomes={nomes} />
       </section>
     </div>
+    </AreaConformePermissao>
   );
 }
 

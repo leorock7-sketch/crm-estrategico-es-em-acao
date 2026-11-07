@@ -7,6 +7,8 @@ import { CabecalhoPagina } from "@/componentes/cabecalho-pagina";
 import { Carregando } from "@/componentes/carregando";
 import { classeCartao, classeLink } from "@/componentes/estilos";
 import { SeloSituacao } from "@/componentes/selo-situacao";
+import { AreaConformePermissao } from "@/modulos/acesso/componentes/area-conforme-permissao";
+import { podeEditarRegistro } from "@/modulos/acesso/capacidades";
 import { bancoDaRequisicao } from "@/lib/banco/requisicao";
 import { formatarData, formatarDataHora, hojeEmBrasilia } from "@/lib/formatacao";
 import { esquemaIdentificador } from "@/lib/validacao/comuns";
@@ -72,7 +74,9 @@ async function DetalheCompromisso({ params }: Pick<PageProps<"/compromissos/[id]
   const planos = acaoConvertida ? [] : await opcoesPlanos(banco, await projetosDeUmCompromisso(banco, id));
   const eixos = (await Promise.all(planos.map(async (p) => (await eixosDoPlano(banco, p.id)).map((e) => ({ ...e, planoAcaoId: p.id }))))).flat();
 
+  const podeEditar = await podeEditarRegistro(banco, "compromisso", id);
   return (
+    <AreaConformePermissao podeEditar={podeEditar}>
     <div className="flex flex-col gap-6">
       <CabecalhoPagina
         titulo="Compromisso"
@@ -245,5 +249,6 @@ async function DetalheCompromisso({ params }: Pick<PageProps<"/compromissos/[id]
         <HistoricoAtividade registros={historico} nomes={nomes} />
       </section>
     </div>
+    </AreaConformePermissao>
   );
 }

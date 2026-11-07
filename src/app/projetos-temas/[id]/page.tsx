@@ -8,6 +8,7 @@ import { Carregando } from "@/componentes/carregando";
 import { classeBotaoPrimario, classeCartao, classeLink } from "@/componentes/estilos";
 import { FormularioEncerramento } from "@/componentes/formulario-encerramento";
 import { SeloSituacao } from "@/componentes/selo-situacao";
+import { AreaConformePermissao } from "@/modulos/acesso/componentes/area-conforme-permissao";
 import { bancoDaRequisicao } from "@/lib/banco/requisicao";
 import { descreverPeriodo, formatarData, formatarDataHora } from "@/lib/formatacao";
 import { esquemaIdentificador } from "@/lib/validacao/comuns";
@@ -82,7 +83,9 @@ async function DetalheProjetoTema({ params }: Pick<PageProps<"/projetos-temas/[i
   const stakeholdersVigentes = stakeholders.filter((s) => s.dataFim === null);
   const stakeholdersEncerrados = stakeholders.filter((s) => s.dataFim !== null);
 
+  const podeEditar = permissao.editar;
   return (
+    <AreaConformePermissao podeEditar={podeEditar}>
     <div className="flex flex-col gap-6">
       <CabecalhoPagina
         titulo={projeto.nome}
@@ -235,6 +238,7 @@ async function DetalheProjetoTema({ params }: Pick<PageProps<"/projetos-temas/[i
         <ListaHistorico registros={historico} nomes={nomes} perspectiva="projeto" />
       </section>
     </div>
+    </AreaConformePermissao>
   );
 }
 

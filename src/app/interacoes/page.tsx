@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { Suspense } from "react";
 import { CabecalhoPagina } from "@/componentes/cabecalho-pagina";
+import { SeRegistra } from "@/modulos/acesso/componentes/conforme-perfil";
 import { Carregando } from "@/componentes/carregando";
 import { classeBotaoPrimario, classeCelula, classeCelulaCabecalho, classeLink, classeTabela } from "@/componentes/estilos";
 import { SeloSituacao } from "@/componentes/selo-situacao";
@@ -26,9 +27,11 @@ export default function PaginaInteracoes({ searchParams }: PageProps<"/interacoe
         titulo="Interações"
         descricao="Reuniões, contatos e encontros, cada um registrado uma única vez e ligado aos projetos, temas e iniciativas."
         acoes={
-          <Link href="/interacoes/nova" className={classeBotaoPrimario}>
-            Registrar interação
-          </Link>
+          <SeRegistra>
+            <Link href="/interacoes/nova" className={classeBotaoPrimario}>
+              Registrar interação
+            </Link>
+          </SeRegistra>
         }
       />
       <Suspense fallback={<Carregando />}>

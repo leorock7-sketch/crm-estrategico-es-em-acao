@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { Suspense } from "react";
 import { CabecalhoPagina } from "@/componentes/cabecalho-pagina";
+import { SeRegistra } from "@/modulos/acesso/componentes/conforme-perfil";
 import { Carregando } from "@/componentes/carregando";
 import { classeBotaoPrimario, classeCelula, classeCelulaCabecalho, classeLink, classeTabela } from "@/componentes/estilos";
 import { SeloSituacao } from "@/componentes/selo-situacao";
@@ -31,9 +32,11 @@ export default function PaginaIniciativas({ searchParams }: PageProps<"/iniciati
         titulo="Matriz de Iniciativas"
         descricao="Demandas, reuniões relevantes e frentes de atuação, com os projetos, temas e stakeholders envolvidos."
         acoes={
-          <Link href="/iniciativas/nova" className={classeBotaoPrimario}>
-            Nova iniciativa
-          </Link>
+          <SeRegistra>
+            <Link href="/iniciativas/nova" className={classeBotaoPrimario}>
+              Nova iniciativa
+            </Link>
+          </SeRegistra>
         }
       />
       <Suspense fallback={<Carregando />}>

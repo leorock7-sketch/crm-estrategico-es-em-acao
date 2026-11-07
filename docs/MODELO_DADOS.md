@@ -18,6 +18,9 @@
 | 0.14 | 03/11/2026 | Etapa 3 homologada para desenvolvimento (D-071); as soluções provisórias P-040 a P-046 continuam não homologadas. |
 | 0.15 | 03/11/2026 | Etapa 4 (D-072): seções 6.6 e 6.7 implementadas pela migração `0008`, aguardando homologação; um plano por projeto ou tema; pilares ou eixos (`plano_eixo`); marcos como itens da ação (`acao_marco`, `marco_planejamento`); decisões do fluxo de aprovação (`plano_acao_decisao`); avaliações inerente e residual com criticidade e classificação calculadas pelo banco conforme a matriz original; acompanhamento dos gatilhos; `compromisso.acao_id`. |
 | 0.16 | 04/11/2026 | Etapa 4 homologada para desenvolvimento (D-073); as soluções provisórias P-047 a P-053 continuam não homologadas. |
+| 0.17 | 06/11/2026 | Seção 7 conforme a D-074: diretório básico do Cadastro Mestre e dados restritos, a implementar na Etapa 5. |
+| 0.18 | 06/11/2026 | Etapa 5 (D-074, D-075): `usuario.auth_id` e regras de acesso no banco, com a migração `0009`; seção 7 implementada, aguardando homologação; propostas provisórias P-055 a P-059 |
+| 0.19 | 06/11/2026 | Etapa 5 homologada para desenvolvimento (D-078); P-054 a P-060 continuam provisórias |
 
 Legenda: ✅ Aprovado · 🔧 Proposta técnica · ⏳ Pendente (ver [REQUISITOS.md](REQUISITOS.md#como-ler-este-documento)).
 
@@ -785,36 +788,52 @@ Preenchida automaticamente pelo banco a cada inclusão, alteração ou arquivame
 | `usuario_id` | UUID | FK → `usuario.id` |
 | `ocorrido_em` | data e hora com fuso | |
 
-## 7. Regras de visibilidade 🔧 (implementação de ✅ RN-03 e RU-02)
+## 7. Regras de visibilidade ✅ (D-074; implementadas na Etapa 5 e homologadas para desenvolvimento, D-078)
 
-A segurança será aplicada no próprio banco de dados (PostgreSQL Row Level Security, recurso nativo do Supabase), e não apenas nas telas.
+A segurança é aplicada no próprio banco de dados (Row Level Security do PostgreSQL), e não apenas nas telas (migração `0009`). A aplicação conecta-se com o papel `crm_app`, que não é superusuário, não tem `BYPASSRLS`, não é dono das tabelas e não exclui registros. Toda operação ocorre em uma transação que informa o usuário ao banco; sem essa informação, ou com usuário inativo, as regras devolvem zero linhas. Situação e permissões são lidas a cada consulta, por isso revogar vale de imediato, mesmo com sessão aberta.
 
 | Registro | Quem pode ver |
 |---|---|
-| Comitês, Cadastro Mestre (pessoas, instituições, vínculos) | Todos os usuários ativos ⏳ |
+| Comitês e diretório básico do Cadastro Mestre (pessoas, instituições, vínculos e contatos institucionais ou funcionais) | Todos os usuários ativos e autenticados (D-074) |
+| Contatos pessoais e observações da pessoa e dos contatos | Administrador; gestor e colaborador com permissão válida em projeto ou tema ao qual o stakeholder esteja associado (P-054, provisória) |
 | Avaliações e suas versões, notas e evidências | Administrador e usuários com permissão no `projeto_tema` da avaliação |
 | Iniciativas | Usuários com permissão em pelo menos um dos projetos/temas ligados |
 | Interações e compromissos | Usuários com permissão em algum projeto/tema ligado à interação, diretamente ou por meio de suas iniciativas |
 | Planos de ação e riscos | Usuários com permissão no `projeto_tema` do plano ou risco |
-| Auditoria | Somente administrador |
+| Auditoria | Administrador; os demais, com as mesmas regras do registro de origem. Histórico de pessoa e de contato, só com acesso aos dados restritos, porque traz observações e dados pessoais (P-055, provisória). Usuários e permissões: somente administrador |
+| Usuários | Todos os usuários ativos consultam a equipe (nome e e-mail); só o administrador inclui ou altera |
+| Permissões | Cada usuário vê as próprias; só o administrador vê todas, concede e revoga |
 
-Enquanto houver um único administrador, ele vê tudo; as regras acima passam a ter efeito quando novos usuários forem incluídos.
+### 7.1 Quem altera ✅
+
+| Registro | Quem pode alterar |
+|---|---|
+| Comitês e metodologias | Administrador (P-057, provisória) |
+| Criação de projeto ou tema | Administrador (P-057, provisória) |
+| Dados de projeto ou tema e tudo o que pertence a ele | Administrador; gestor e colaborador do projeto ou tema |
+| Diretório básico do Cadastro Mestre | Administrador; gestor ou colaborador em ao menos um projeto ou tema |
+| Contatos pessoais e observações | Somente quem pode vê-los |
+| Decisão sobre versões do plano | Administrador; gestor do projeto ou tema (D-074, D3) |
+| Exclusão de registros | Ninguém: os registros são arquivados |
+
+### 7.2 Registros compartilhados ✅
+
+O registro aparece para quem tem permissão em ao menos um dos contextos ligados, mas cada ligação segue o seu próprio contexto: quem só tem o projeto A vê a iniciativa compartilhada, não a ligação com o projeto B, e não a altera nem retira. Interação ligada a iniciativa exclusiva de outro projeto não revela essa iniciativa. Os participantes pertencem à reunião, registro único: quem vê a interação vê os participantes (P-059, provisória). Relacionamento compartilhado não abre os dados restritos de uma pessoa: essa regra olha só a associação do stakeholder ao projeto ou tema do usuário (P-054).
 
 ## 8. Questões de modelagem pendentes ⏳
 
 1. Rubricas dos níveis de poder, interesse e posicionamento (Q-66) e estrutura da adaptação às escalas V2.2 (Q-67, seção 6.3.1). Escalas definidas (D-058, D-059); pesos, fórmula e pontos de corte não aprovados.
 2. Categorias da "Conduta do ES em Ação" e regras de relação com a matriz 3 × 3, sem derivação automática (Q-64, requisito futuro RF-28).
 3. Categorias de risco, riscos fora de projeto ou tema e oportunidades (Q-42 a Q-44).
-4. Visibilidade do Cadastro Mestre para todos os usuários.
-5. Análise LGPD dos dados pessoais registrados.
+4. Análise LGPD dos dados pessoais registrados.
 
-Resolvidas na Etapa 1: hierarquia entre temas e projetos (D-020); dados mínimos de pessoas (D-021). Na revisão de homologação: comitês participantes (D-023), CNPJ e país (D-024), contatos (D-025). Na Etapa 1.1: tipos de relação dos stakeholders com os contextos (D-030). Na Etapa 2A: posicionamento em cinco níveis (superado para novas avaliações pela D-059), grau de confiança em três níveis e regras de versionamento (Manual V2.0, D-034). Na revisão V2.2: escalas de poder, interesse, posicionamento e confiança (D-058 a D-060). Na Etapa 4: um plano por projeto ou tema e matriz de riscos 5 × 5 original (D-072). As decisões são acompanhadas em [REGISTRO_DECISOES.md](REGISTRO_DECISOES.md).
+Resolvidas na Etapa 1: hierarquia entre temas e projetos (D-020); dados mínimos de pessoas (D-021). Na revisão de homologação: comitês participantes (D-023), CNPJ e país (D-024), contatos (D-025). Na Etapa 1.1: tipos de relação dos stakeholders com os contextos (D-030). Na Etapa 2A: posicionamento em cinco níveis (superado para novas avaliações pela D-059), grau de confiança em três níveis e regras de versionamento (Manual V2.0, D-034). Na revisão V2.2: escalas de poder, interesse, posicionamento e confiança (D-058 a D-060). Na Etapa 4: um plano por projeto ou tema e matriz de riscos 5 × 5 original (D-072). No roteiro da Etapa 5: visibilidade do Cadastro Mestre (D-074). As decisões são acompanhadas em [REGISTRO_DECISOES.md](REGISTRO_DECISOES.md).
 
 ## 9. Situação da implementação
 
 | Tabela | Etapa | Situação |
 |---|---|---|
-| `usuario`, `registro_auditoria` | 1 | Criadas no banco de desenvolvimento |
+| `usuario`, `registro_auditoria` | 1 | Criadas no banco de desenvolvimento; `usuario.auth_id` na Etapa 5 (migração `0009`) |
 | `comite` (com os 4 comitês), `projeto_tema` | 1 | Criadas; telas na Etapa 1.1 (comitês somente consulta) |
 | `stakeholder`, `pessoa`, `instituicao`, `vinculo_pessoa_instituicao` | 1 | Criadas, com telas do Cadastro Mestre |
 | `contato` | 1 (revisão) | Criada, com telas; e-mails e telefones antigos migrados |

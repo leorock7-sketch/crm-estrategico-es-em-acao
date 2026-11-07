@@ -1,13 +1,14 @@
 /**
- * Conexão com o banco de dados de desenvolvimento (PGlite — decisão D-018).
+ * Conexões com o banco de dados. Dois caminhos, escolhidos pelo ambiente (ambiente.ts):
  *
- * O PGlite é um PostgreSQL completo executado dentro da própria aplicação; os
- * dados ficam na pasta .dados/pglite (ignorada pelo Git). Ao abrir o banco, os
- * scripts de ./migracoes ainda não aplicados são executados automaticamente.
+ * - PGlite (D-018): PostgreSQL completo executado dentro da própria aplicação, para
+ *   desenvolvimento e testes com dados fictícios; os dados ficam na pasta .dados/pglite
+ *   (ignorada pelo Git) e os scripts de ./migracoes pendentes são aplicados ao abrir.
+ * - Supabase (D-074, D-075): conexão com o papel crm_app, sem privilégios. Nenhuma migração
+ *   é aplicada por essa conexão; isso cabe ao comando administrativo (npm run supabase:preparar).
  *
- * Uso exclusivo em desenvolvimento e testes, com dados fictícios. Na etapa de
- * hospedagem, esta conexão será substituída pela do Supabase, reaproveitando
- * os mesmos scripts de criação.
+ * As telas e as operações NUNCA usam diretamente o banco devolvido por obterBancoBase():
+ * usam requisicao.ts, que informa a identidade do usuário em cada transação (identidade.ts).
  */
 import { cpSync, mkdirSync, readFileSync } from "node:fs";
 import path from "node:path";
@@ -15,7 +16,11 @@ import { PGlite } from "@electric-sql/pglite";
 import { sql } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/pglite";
 import { migrate } from "drizzle-orm/pglite/migrator";
+import { drizzle as drizzlePostgres } from "drizzle-orm/postgres-js";
+import postgres, { type Sql } from "postgres";
+import { modoDeAcesso } from "./ambiente";
 import * as esquema from "./esquema";
+import { clientePostgresBase } from "./identidade";
 import { alinharValoresNormalizados } from "./normalizacao";
 import { adquirirTrava, liberarTrava } from "./trava";
 
@@ -140,6 +145,11 @@ export async function abrirBanco(diretorio?: string, opcoes: OpcoesAbertura = {}
 
 /** Fecha o banco e libera a trava da pasta (usado pelos scripts de manutenção). */
 export async function fecharBanco(banco: Banco): Promise<void> {
+  const cliente = banco.$client as unknown;
+  if (!(cliente instanceof PGlite)) {
+    await (cliente as Sql).end({ timeout: 5 });
+    return;
+  }
   await banco.$client.close();
   const diretorio = pastasAbertas.get(banco);
   if (diretorio) liberarTrava(diretorio);
@@ -147,8 +157,32 @@ export async function fecharBanco(banco: Banco): Promise<void> {
 
 const global = globalThis as typeof globalThis & { __bancoCrm?: Promise<Banco> };
 
-/** Banco compartilhado pela aplicação (uma única conexão por processo). */
-export function obterBanco(): Promise<Banco> {
+/**
+ * Conexão com um PostgreSQL de verdade pelo driver postgres, no mesmo formato da conexão com
+ * o PGlite (ver clientePostgresBase).
+ */
+export function abrirBancoPostgres(url: string, opcoes: { max?: number } = {}): Banco {
+  const sql = postgres(url, {
+    max: opcoes.max ?? 5,
+    // Todas as operações são transações curtas; o pooler do Supabase não guarda consultas preparadas.
+    prepare: false,
+    ssl: "require",
+    idle_timeout: 20,
+    connect_timeout: 15,
+    onnotice: () => {},
+  });
+  return drizzlePostgres({ client: clientePostgresBase(sql), schema: esquema }) as unknown as Banco;
+}
+
+/**
+ * Conexão-base da aplicação (uma por processo). Só requisicao.ts e os comandos de manutenção
+ * podem usá-la; as telas e as operações recebem sempre um banco com identidade.
+ */
+export function obterBancoBase(): Promise<Banco> {
+  if (modoDeAcesso() === "supabase") {
+    global.__bancoCrm ??= Promise.resolve(abrirBancoPostgres(process.env.CRM_BANCO_URL as string));
+    return global.__bancoCrm;
+  }
   verificarUsoDoBancoLocal();
   global.__bancoCrm ??= abrirBanco(diretorioDoBanco()).catch((erro) => {
     // Permite nova tentativa depois que o outro programa liberar o banco.

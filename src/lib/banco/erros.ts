@@ -11,8 +11,11 @@ export type ErroBanco = {
 export function erroDoBanco(erro: unknown): ErroBanco | undefined {
   let atual: unknown = erro;
   for (let nivel = 0; nivel < 5 && typeof atual === "object" && atual !== null; nivel++) {
-    const candidato = atual as Partial<ErroBanco> & { cause?: unknown };
-    if (typeof candidato.code === "string") return candidato as ErroBanco;
+    const candidato = atual as Partial<ErroBanco> & { cause?: unknown; constraint_name?: string };
+    if (typeof candidato.code === "string") {
+      // O driver postgres informa a regra em constraint_name; o PGlite, em constraint.
+      return { code: candidato.code, constraint: candidato.constraint ?? candidato.constraint_name, message: candidato.message };
+    }
     atual = candidato.cause;
   }
   return undefined;

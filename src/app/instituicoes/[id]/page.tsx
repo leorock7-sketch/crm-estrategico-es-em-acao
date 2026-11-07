@@ -30,6 +30,7 @@ import {
   obterInstituicao,
 } from "@/modulos/stakeholders/consultas";
 import { nomePais } from "@/modulos/stakeholders/paises";
+import { podeRegistrarNoCadastro, podeVerDadosRestritos } from "@/modulos/acesso/capacidades";
 import { ROTULOS_ESFERA, ROTULOS_NATUREZA } from "@/modulos/stakeholders/rotulos";
 
 export const metadata: Metadata = { title: "Instituição" };
@@ -50,15 +51,18 @@ async function DetalheInstituicao({ params }: Pick<PageProps<"/instituicoes/[id]
   const instituicao = await obterInstituicao(banco, id);
   if (!instituicao) notFound();
 
-  const [vinculos, subordinadas, contatos, historico, contextos] = await Promise.all([
+  const [vinculos, subordinadas, contatos, historico, contextos, podeRegistrar, dadosRestritos] = await Promise.all([
     listarVinculosDaInstituicao(banco, id),
     listarSubordinadas(banco, id),
     listarContatos(banco, id),
     historicoDoStakeholder(banco, id),
     contextosDoStakeholder(banco, id),
+    podeRegistrarNoCadastro(banco),
+    podeVerDadosRestritos(banco, id),
   ]);
   const nomes = await nomesDosRegistros(banco, idsCitadosNoHistorico(historico));
   const arquivada = instituicao.arquivadoEm !== null;
+  const editavel = podeRegistrar && !arquivada;
   const vigentes = vinculos.filter((v) => v.dataFim === null);
   const encerrados = vinculos.filter((v) => v.dataFim !== null);
 
@@ -75,17 +79,19 @@ async function DetalheInstituicao({ params }: Pick<PageProps<"/instituicoes/[id]
           </span>
         }
         acoes={
-          <>
-            {!arquivada && (
-              <Link href={`/instituicoes/${id}/editar`} className={classeBotaoPrimario}>
-                Editar
-              </Link>
-            )}
-            <BotaoArquivamento
-              acao={alterarArquivamentoInstituicao.bind(null, id, !arquivada)}
-              arquivado={arquivada}
-            />
-          </>
+          podeRegistrar && (
+            <>
+              {!arquivada && (
+                <Link href={`/instituicoes/${id}/editar`} className={classeBotaoPrimario}>
+                  Editar
+                </Link>
+              )}
+              <BotaoArquivamento
+                acao={alterarArquivamentoInstituicao.bind(null, id, !arquivada)}
+                arquivado={arquivada}
+              />
+            </>
+          )
         }
       />
 
@@ -174,12 +180,12 @@ async function DetalheInstituicao({ params }: Pick<PageProps<"/instituicoes/[id]
         <p className="mb-4 text-sm text-texto-secundario">
           Telefones, e-mails e sites da instituição, com histórico próprio.
         </p>
-        <ListaContatos contatos={contatos} somenteLeitura={arquivada} />
-        {!arquivada && (
+        <ListaContatos contatos={contatos} somenteLeitura={!editavel} />
+        {editavel && (
           <details className="mt-4 rounded-lg border border-borda p-4">
             <summary className="cursor-pointer font-medium">Registrar contato</summary>
             <div className="mt-4">
-              <FormularioContato stakeholderId={id} naturezaPadrao="institucional" />
+              <FormularioContato stakeholderId={id} naturezaPadrao="institucional" dadosRestritos={dadosRestritos} />
             </div>
           </details>
         )}

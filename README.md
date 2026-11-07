@@ -37,7 +37,7 @@ A arquitetura tecnológica inicialmente proposta utiliza Next.js, TypeScript, Po
 
 ## Situação atual
 
-Projeto em fase inicial de desenvolvimento. As Etapas 1, 1.1, 2A, 2B, 3 e 4 foram homologadas para desenvolvimento com dados fictícios e incorporadas à `main`. As escalas de avaliação foram redefinidas pela deliberação V2.2 (poder e interesse: Baixo, Médio e Alto; posicionamento: Favorável, Neutro e Contrário; "Não avaliado" à parte), e o sistema foi adaptado a elas na Etapa 2B (D-069, D-070): matriz 3 × 3, rubricas como texto de apoio, alertas orientativos que não impedem o registro e avaliações preliminares identificadas. A Etapa 3 — Matriz de Iniciativas, interações registradas uma única vez e compromissos com prazos e acompanhamento — foi homologada para desenvolvimento (D-071), com soluções provisórias ainda não homologadas (P-040 a P-046). A Etapa 4 — Plano de Ação por projeto ou tema, com versões aprovadas, marcos e acompanhamento, e Matriz de Riscos 5 × 5 do Comitê de Infraestrutura, com riscos inerentes e residuais, gatilhos e respostas — foi homologada para desenvolvimento (D-073), com soluções provisórias ainda não homologadas (P-047 a P-053). A próxima etapa é a Autenticação e Permissões (Etapa 5), cujo roteiro será validado pelo gestor antes da programação.
+Projeto em fase inicial de desenvolvimento. As Etapas 1, 1.1, 2A, 2B, 3, 4 e 5 foram homologadas para desenvolvimento com dados fictícios; a homologação de produção depende da Etapa 7. As escalas de avaliação foram redefinidas pela deliberação V2.2 (poder e interesse: Baixo, Médio e Alto; posicionamento: Favorável, Neutro e Contrário; "Não avaliado" à parte), e o sistema foi adaptado a elas na Etapa 2B (D-069, D-070): matriz 3 × 3, rubricas como texto de apoio, alertas orientativos que não impedem o registro e avaliações preliminares identificadas. A Etapa 3 — Matriz de Iniciativas, interações registradas uma única vez e compromissos com prazos e acompanhamento — foi homologada para desenvolvimento (D-071), com soluções provisórias ainda não homologadas (P-040 a P-046). A Etapa 4 — Plano de Ação por projeto ou tema, com versões aprovadas, marcos e acompanhamento, e Matriz de Riscos 5 × 5 do Comitê de Infraestrutura, com riscos inerentes e residuais, gatilhos e respostas — foi homologada para desenvolvimento (D-073), com soluções provisórias ainda não homologadas (P-047 a P-053). A próxima etapa é a Autenticação e Permissões (Etapa 5), cujo roteiro será validado pelo gestor antes da programação.
 
 Já existem a documentação, um banco de dados local de desenvolvimento, as telas do Cadastro Mestre (pessoas, instituições, vínculos, contatos e histórico de alterações) e as telas de comitês (somente consulta), projetos e temas, com comitês participantes e stakeholders associados, além da estrutura de avaliação de stakeholders (fichas, versões, evidências e matriz de poder × interesse) com uma metodologia fictícia na escala V2.2 e as metodologias de **demonstração** anteriores mantidas como histórico: os resultados exibidos são fictícios e **não homologados**. Ainda não há metodologia homologada para uso institucional, autenticação, hospedagem nem os demais módulos.
 
@@ -129,7 +129,20 @@ Para fazer uma cópia de segurança, pare a aplicação e copie a pasta `.dados/
 
 A versão compilada (`npm run build` e depois `npm start`) recusa o banco local, para que ele nunca seja usado em produção por engano. Para testá-la no seu computador, crie um arquivo `.env.local` com a linha `CRM_BANCO=pglite`.
 
-### 5. Verificações de qualidade
+### 5. Login real e Supabase de desenvolvimento (Etapa 5)
+
+Com as chaves do projeto de desenvolvimento em `.env.local` (modelo em `.env.example`), a aplicação exige login e usa o banco do Supabase. Sem elas, em desenvolvimento, funciona no modo local: banco PGlite e administrador fictício, sem login. Somente dados fictícios nos dois casos.
+
+| Comando | O que faz |
+|---|---|
+| `npm run ambiente:conferir` | Confere o projeto Supabase, sem exibir nenhum valor |
+| `npm run supabase:preparar` | Aplica as migrações e ativa o papel `crm_app`. Só no banco marcado como descartável, carrega os dados fictícios e cria as contas de teste (senhas só em `.dados/contas-teste.json`, que o Git ignora) |
+| `npm run supabase:marcar-descartavel` | Identifica o banco como descartável, com frase de confirmação; não apaga nada. Banco marcado não pode receber dados institucionais reais (D-077) |
+| `npm run ambiente:senha-admin -- gerar` e `-- aplicar` | Trocam a senha administrativa do PostgreSQL sem exibir o valor |
+| `npm run test:supabase` | Testes de autenticação, regras de acesso e navegador no Supabase (antes: `npm run build`) |
+| `npm run test:postgres` | Testes de banco das Etapas 1 a 4 no PostgreSQL do Supabase. **Apaga os dados do projeto**: só roda no banco marcado como descartável e com a frase de confirmação no próprio comando; depois, rode `npm run supabase:preparar -- --refazer`, com a mesma frase. Não executar sem necessidade e autorização específica do gestor (D-077) |
+
+### 6. Verificações de qualidade
 
 | Comando | O que verifica |
 |---|---|

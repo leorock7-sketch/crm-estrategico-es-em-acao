@@ -9,6 +9,8 @@ import { Carregando } from "@/componentes/carregando";
 import { classeBotaoPrimario, classeCartao, classeCelula, classeCelulaCabecalho, classeLink, classeTabela } from "@/componentes/estilos";
 import { FormularioStakeholderRelacionado } from "@/componentes/formulario-registro";
 import { SeloSituacao } from "@/componentes/selo-situacao";
+import { AreaConformePermissao } from "@/modulos/acesso/componentes/area-conforme-permissao";
+import { podeEditarRegistro } from "@/modulos/acesso/capacidades";
 import { bancoDaRequisicao } from "@/lib/banco/requisicao";
 import { formatarData, formatarDataHora, hojeEmBrasilia } from "@/lib/formatacao";
 import { esquemaIdentificador } from "@/lib/validacao/comuns";
@@ -102,7 +104,9 @@ async function FichaRisco({ params }: Pick<PageProps<"/riscos/[id]">, "params">)
   // Ações do mesmo projeto ou tema primeiro.
   const acoesOrdenadas = [...acoes.filter((a) => a.projetoNome === risco.projetoNome), ...acoes.filter((a) => a.projetoNome !== risco.projetoNome)];
 
+  const podeEditar = await podeEditarRegistro(banco, "risco", id);
   return (
+    <AreaConformePermissao podeEditar={podeEditar}>
     <div className="flex flex-col gap-6">
       <CabecalhoPagina
         titulo={`${risco.codigo} – ${risco.titulo}`}
@@ -451,6 +455,7 @@ async function FichaRisco({ params }: Pick<PageProps<"/riscos/[id]">, "params">)
         <HistoricoAtividade registros={historico} nomes={nomes} />
       </section>
     </div>
+    </AreaConformePermissao>
   );
 }
 

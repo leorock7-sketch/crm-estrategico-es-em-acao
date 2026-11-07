@@ -158,6 +158,8 @@ export const usuario = pgTable(
     id: uuid("id").primaryKey().defaultRandom(),
     nome: text("nome").notNull(),
     email: text("email").notNull(),
+    /** Identidade no Supabase Auth; sem ela, não há login (Etapa 5, D-074). A correspondência nunca é pelo e-mail. */
+    authId: uuid("auth_id").unique("usuario_auth_id_unico"),
     administrador: boolean("administrador").notNull().default(false),
     situacao: situacaoUsuario("situacao").notNull().default("ativo"),
     criadoEm: timestamp("criado_em", { withTimezone: true }).notNull().defaultNow(),

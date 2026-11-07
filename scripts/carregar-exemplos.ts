@@ -14,7 +14,7 @@
  * se estiver em uso, o script avisa e não grava nada). Nenhum dado aqui
  * corresponde a pessoa ou instituição real.
  */
-import { comoUsuario, diretorioDoBanco, fecharBanco, obterBanco } from "@/lib/banco/conexao";
+import { type Banco, comoUsuario, diretorioDoBanco, fecharBanco, obterBancoBase } from "@/lib/banco/conexao";
 import { isNull } from "drizzle-orm";
 import type { Executor } from "@/lib/banco/conexao";
 import { compromisso, iniciativa, instituicao, metodologiaVersao, pessoa, planoAcao, projetoTema, risco, usuario } from "@/lib/banco/esquema";
@@ -1094,10 +1094,9 @@ async function carregarPlanosERiscos(tx: Executor) {
   return { acoes: totalAcoes, riscos: totalRiscos, plano: corredor !== undefined };
 }
 
-async function principal() {
-  console.log(`Banco local: ${diretorioDoBanco()}`);
-  const banco = await obterBanco();
-  try {
+/** Carrega o que faltar, em nome do usuário informado (com a conexão-base, sem regras de acesso). */
+export async function carregarExemplos(banco: Banco, usuario: { id: string }) {
+  {
     const [pessoasExistentes, projetosExistentes, metodologiasExistentes, iniciativasExistentes, planosExistentes, riscosExistentes] =
       await Promise.all([
         banco.$count(pessoa),
@@ -1116,7 +1115,6 @@ async function principal() {
       return;
     }
 
-    const usuario = await obterUsuarioAtual(banco);
     await comoUsuario(banco, usuario.id, async (tx) => {
       if (pessoasExistentes === 0) {
         const totalContatos = await carregarStakeholders(tx);
@@ -1163,12 +1161,23 @@ async function principal() {
         console.log(`Planos e riscos: o banco já tem ${planosExistentes} plano(s) e ${riscosExistentes} risco(s); mantidos como estão.`);
       }
     });
+  }
+}
+
+async function principal() {
+  console.log(`Banco local: ${diretorioDoBanco()}`);
+  const banco = await obterBancoBase();
+  try {
+    await carregarExemplos(banco, await obterUsuarioAtual(banco));
   } finally {
     await fecharBanco(banco);
   }
 }
 
-principal().catch((erro) => {
-  console.error("Falha ao carregar os exemplos:", erro?.message ?? erro?.cause ?? erro);
-  process.exit(1);
-});
+// Também é usado por scripts/supabase-preparar.ts; sozinho, carrega o banco local.
+if (process.argv[1]?.includes("carregar-exemplos")) {
+  principal().catch((erro) => {
+    console.error("Falha ao carregar os exemplos:", erro?.message ?? erro?.cause ?? erro);
+    process.exit(1);
+  });
+}
