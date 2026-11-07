@@ -36,6 +36,7 @@
 | 0.32 | 07/11/2026 | Etapa 6 homologada para desenvolvimento (D-080), com o commit final `8708453`; pendências preservadas (arquivos no Microsoft Excel, desempenho e segurança no ambiente hospedado); próxima atividade: roteiro da Etapa 7, depois da incorporação do Pull Request #12 |
 | 0.33 | 07/11/2026 | Pull Request #12 incorporado à `main` (merge `a78af82`); V3-09 descrita no backlog da V3.0 (D-081); roteiro da Etapa 7 em preparação para validação |
 | 0.34 | 07/11/2026 | Roteiro da Etapa 7 a custo zero aprovado e Fase 7A concluída, aguardando validação (D-082, seção 12); pendências e local de trabalho renumerados (seções 13 e 14) |
+| 0.35 | 07/11/2026 | Fase 7A homologada para desenvolvimento (D-083), com ressalvas preservadas; próxima fase a custo zero: monitor assistido, cópias diárias e, depois, testes reais no Netlify Free |
 
 Legenda: ✅ Aprovado · 🔧 Proposta técnica · ⏳ Pendente.
 
@@ -63,7 +64,7 @@ Legenda: ✅ Aprovado · 🔧 Proposta técnica · ⏳ Pendente.
 | 4 | Plano de ação e matriz de riscos | Versões e aprovação, acompanhamento, riscos, gatilhos e respostas | ✅ **Concluída:** aprovada em 03/11/2026 com a matriz de riscos original do Comitê de Infraestrutura (D-072), incorporada à `main` pelo Pull Request #9 (commit de merge `1246331`, verificações Node.js 24 e 26 aprovadas) e homologada para desenvolvimento em 04/11/2026 (D-073); as soluções provisórias P-047 a P-053 continuam não homologadas (seção 9) |
 | 5 | Autenticação e permissões | Supabase Auth, perfis e permissões por projeto/tema, segurança no banco | ✅ **Homologada para desenvolvimento** (D-078; seção 10). Produção sujeita aos testes da Etapa 7 |
 | 6 | Painéis e relatórios | Indicadores executivos e relatórios, com filtros, permissões da Etapa 5 e exportação. Roteiro validado na D-079 | ✅ **Homologada para desenvolvimento** (D-080; seção 11). Produção sujeita aos testes da Etapa 7 |
-| 7 | Implantação, homologação técnica e segurança operacional | Arquitetura de custo zero (D-082): Supabase Free e Netlify Free como candidato, monitoramento, cópias e recuperação. **Pré-requisitos: C6, C7 e C8** (D-027) | 🔧 **Fase 7A concluída, aguardando validação** (D-082; seção 12). Fases 7B e 7C dependem de autorização |
+| 7 | Implantação, homologação técnica e segurança operacional | Arquitetura de custo zero (D-082): Supabase Free e Netlify Free como candidato, monitoramento, cópias e recuperação. **Pré-requisitos: C6, C7 e C8** (D-027) | ✅ **Fase 7A homologada para desenvolvimento** (D-083; seção 12). Fases seguintes dependem de autorização |
 | 8 | Piloto com dados reais | Somente após autorização formal, análise LGPD e solução de C6, C7 e C8 (D-027) | ⏳ |
 | 9 | Integrações | Outlook, calendário, SharePoint, OneDrive e IA assistiva | ✅ Futuro / 🔧 (ordem) |
 
@@ -618,9 +619,13 @@ Não executados: `npm run test:postgres` e `supabase:preparar -- --refazer`, que
 
 Página inicial; melhorias V3-01 a V3-08, inclusive a nova interface da V3-02; integrações com Outlook, Microsoft 365, ferramenta institucional indicada pelo gestor e monday.com; infraestrutura própria de geração de documentos; novas tabelas e mudanças no modelo de dados; dados reais.
 
-## 12. Etapa 7 — Implantação, homologação técnica e segurança operacional 🔧 (D-080 a D-082)
+## 12. Etapa 7 — Implantação, homologação técnica e segurança operacional 🔧 (D-080 a D-083): Fase 7A homologada para desenvolvimento
 
-**Premissa (D-082):** custo de **US$ 0/mês**, só com serviços gratuitos; conta pessoal e Supabase Free mantidos; nenhum serviço pago, upgrade ou recurso adicional. A **Fase 7A** (preparação técnica, só com dados fictícios) está concluída e aguarda a validação do gestor. Hospedagem pública, contas institucionais, segundo projeto do Supabase e dados reais dependem de autorização específica. Detalhes de operação em [OPERACAO.md](OPERACAO.md).
+**Premissa (D-082):** custo de **US$ 0/mês**, só com serviços gratuitos; conta pessoal e Supabase Free mantidos; nenhum serviço pago, upgrade ou recurso adicional. A **Fase 7A** (preparação técnica, só com dados fictícios) foi **homologada para desenvolvimento e testes com dados fictícios** (D-083), com o Pull Request #15 aprovado no GitHub Actions. Hospedagem pública, contas institucionais, segundo projeto do Supabase e dados reais dependem de autorização específica. Detalhes de operação em [OPERACAO.md](OPERACAO.md).
+
+**Ressalvas da homologação (D-083):** a restauração completa do Supabase Auth não foi demonstrada (só num projeto Supabase); não há hospedagem pública; a disponibilidade não pode ser garantida no plano Free. P-066 a P-070 continuam provisórias.
+
+**Prioridades da fase seguinte (D-083), a custo zero:** (1) ativação assistida do monitor gratuito; (2) rotina diária de cópias de segurança; (3) depois, testes reais de hospedagem no Netlify Free. Cada uma depende das autorizações indicadas nas pendências (seção 13).
 
 ### Fase 7A — entregas
 
@@ -665,23 +670,23 @@ Não executados: `npm run test:postgres` e `supabase:preparar -- --refazer`, des
 
 | Pendência | Bloqueia | Situação |
 |---|---|---|
-| C6. Reforço da auditoria | Etapas 7 e 8 (D-027) | 🔧 Implementada na Fase 7A (D-082, migração `0010`), aguardando validação. As cópias integrais de dados pessoais na auditoria seguem para a política de retenção (Q-58) |
-| C7. Cópia de segurança e restauração | Etapas 7 e 8 (D-027) | 🔧 Implementada para o banco de desenvolvimento (D-082): cópias criptografadas e ensaio de restauração isolado aprovados; agendamento diário, destino para dados reais e restauração num projeto Supabase pendentes |
+| C6. Reforço da auditoria | Etapas 7 e 8 (D-027) | ✅ Implementada na Fase 7A (D-082, migração `0010`) e homologada para desenvolvimento (D-083). As cópias integrais de dados pessoais na auditoria seguem para a política de retenção (Q-58) |
+| C7. Cópia de segurança e restauração | Etapas 7 e 8 (D-027) | ✅ Homologada para desenvolvimento (D-083): cópias criptografadas e ensaio de restauração isolado. ⏳ Pendentes: rotina diária (prioridade da fase seguinte), destino para dados reais e restauração completa num projeto Supabase, inclusive do login |
 | C8. Portabilidade em PostgreSQL real | Etapas 7 e 8 (D-027) | ✅ Compatibilidade essencial comprovada no PostgreSQL 17 de desenvolvimento (D-078): as 10 migrações e os 115 testes de banco das Etapas 1 a 4, sem alteração, além dos 103 testes da Etapa 5. ⏳ Não dispensa as verificações do ambiente definitivo |
 | Autenticação e segurança multiusuário (inclusive regras de acesso no banco) | Etapas 7 e 8 | ✅ Homologada para desenvolvimento (D-078, seção 10); ⏳ produção sujeita aos testes da Etapa 7. Soluções provisórias P-054 a P-060, não homologadas |
 | Projeto Supabase de desenvolvimento | — | ✅ Criado pelo gestor e em uso, somente com dados fictícios (D-075) |
 | Registro do CRM no Microsoft Entra ID | Login Microsoft (D1); não bloqueia a Etapa 5 | ⏳ Depende de autorização e configuração pela TI institucional |
 | Serviço de e-mail institucional (SMTP) para convites e recuperação de senha | Usuários reais (Etapa 7) | ⏳ Depende da TI institucional |
-| Senha provisória sem troca obrigatória no primeiro acesso (P-056) | Uso com contas institucionais reais (D-076); não impediu a homologação da Etapa 5 com dados fictícios (D-078) | 🔧 Implementada na Fase 7A (D-082), aguardando validação: troca obrigatória no primeiro acesso e depois de redefinição, testada no navegador com login real |
-| Leitor visualiza formulário de inclusão por acesso direto ao endereço; a gravação já é recusada | Entrada em operação institucional (D-078) | 🔧 Corrigida na Fase 7A (D-082), aguardando validação: páginas de inclusão e alteração mostram só o aviso a quem só consulta |
+| Senha provisória sem troca obrigatória no primeiro acesso (P-056) | Uso com contas institucionais reais (D-076); não impediu a homologação da Etapa 5 com dados fictícios (D-078) | ✅ Implementada na Fase 7A (D-082) e homologada para desenvolvimento (D-083): troca obrigatória no primeiro acesso e depois de redefinição |
+| Leitor visualiza formulário de inclusão por acesso direto ao endereço; a gravação já é recusada | Entrada em operação institucional (D-078) | ✅ Corrigida na Fase 7A (D-082) e homologada para desenvolvimento (D-083): páginas de inclusão e alteração mostram só o aviso a quem só consulta |
 | Verificações do ambiente hospedado: HTTPS, cookies seguros, desempenho e segurança, inclusive dos painéis e das exportações | Etapa 7 (D-078, D-080); as medições do desenvolvimento não as substituem | ⏳ Sujeitas à implantação e às providências da TI institucional |
 | Abertura e apresentação dos arquivos XLSX no Microsoft Excel | Operação institucional (D-080) | ⏳ A verificar antes da operação institucional; leitura já conferida por biblioteca independente nos testes |
 | Homologação da Etapa 6 | Etapa 7 | ✅ Homologada para desenvolvimento em 07/11/2026 (D-080), com o commit final `8708453` do Pull Request #12; incorporada à `main` pelo gestor (merge `a78af82`, D-081). P-061 a P-065 continuam provisórias, não homologadas individualmente |
-| Roteiro da Etapa 7 — Implantação, Homologação Técnica e Segurança Operacional | Programação da Etapa 7 | ✅ Aprovado com a premissa de custo zero (D-082); Fase 7A concluída, aguardando validação (seção 12) |
-| Segredos do monitoramento no GitHub Actions | Teste de quatro semanas do monitor | ⏳ Cadastro pelo gestor depois da incorporação à `main` ([OPERACAO.md](OPERACAO.md), seção 2) |
-| Tarefa diária de cópias no Windows | Cópias automáticas | ⏳ Depende de autorização (configuração permanente no computador) |
-| Site no Netlify Free (testes T2, T3, T4 e T8) | Piloto gratuito | ⏳ Depende de autorização (D-082, A1) |
-| Segundo projeto gratuito do Supabase | Homologação, piloto e restauração funcional do login | ⏳ Reservado; depende de autorização (D-082) |
+| Roteiro da Etapa 7 — Implantação, Homologação Técnica e Segurança Operacional | Programação da Etapa 7 | ✅ Aprovado com a premissa de custo zero (D-082); Fase 7A homologada para desenvolvimento (D-083, seção 12) |
+| Segredos do monitoramento no GitHub Actions | Teste de quatro semanas do monitor | ⏳ Ativação assistida, prioridade da fase seguinte (D-083): cadastro pelo gestor depois da incorporação à `main` ([OPERACAO.md](OPERACAO.md), seção 2) |
+| Tarefa diária de cópias no Windows | Cópias automáticas | ⏳ Prioridade da fase seguinte (D-083); a configuração permanente no computador depende de autorização |
+| Site no Netlify Free (testes T2, T3, T4 e T8) | Piloto gratuito | ⏳ Depois do monitor e das cópias diárias (D-083); criação do site depende de autorização (D-082, A1) |
+| Segundo projeto gratuito do Supabase | Homologação, piloto e restauração funcional do login | ⏳ Reservado; depende de autorização (D-082, D-083) |
 | Conta pessoal: solução institucional de continuidade e proteção de dados | Uso institucional real | ⏳ Consequências documentadas ([OPERACAO.md](OPERACAO.md), seção 8) |
 | Senha administrativa forte do PostgreSQL do projeto de desenvolvimento | — | ✅ Trocada pelo gestor em 06/11/2026; senha anterior recusada e nova confirmada, com `.env.local` atualizado e arquivo temporário sobrescrito e apagado (D-077) |
 | Rubricas das escalas V2.2 e plano de adaptação técnica | Etapa 2B (D-060, D-063) | ✅ **Resolvida (D-068):** Q-66 1.0 e Q-67 1.0; calibração H6 concluída, com limitações registradas; Etapa 2B pronta para autorização (documento entregue fora do repositório). Decisões Q-65.1, Q-65.4 e Q-65.6 continuam pendentes, sem bloquear a 2B |

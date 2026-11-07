@@ -3,6 +3,7 @@
 | Versão | Data | Situação |
 |---|---|---|
 | 0.1 | 07/11/2026 | Fase 7A (D-082): arquitetura de custo zero, monitoramento, consumo, cópias de segurança, restauração e conta pessoal. Somente ambiente de desenvolvimento, com dados fictícios. |
+| 0.2 | 07/11/2026 | Fase 7A homologada para desenvolvimento (D-083). Ressalvas: restauração completa do Supabase Auth não demonstrada, sem hospedagem pública e sem disponibilidade garantida no plano Free. |
 
 Legenda: ✅ Aprovado · 🔧 Proposta técnica · ⏳ Pendente.
 

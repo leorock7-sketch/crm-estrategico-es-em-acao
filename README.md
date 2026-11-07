@@ -43,7 +43,7 @@ Já existem a documentação, um banco de dados local de desenvolvimento, as tel
 
 A Etapa 6 — painéis por comitê e por projeto ou tema, e relatórios R1 a R5 em XLSX, sempre dentro das permissões de cada usuário — foi homologada para desenvolvimento (D-080), com soluções provisórias ainda não homologadas (P-061 a P-065). O menu "Painéis" dá acesso às três áreas; a impressão e o PDF usam o próprio navegador.
 
-Na Etapa 7, a meta é custo de US$ 0/mês (D-082). A Fase 7A — atualização de segurança do Next.js, troca obrigatória da senha provisória, páginas sem formulário para quem só consulta, reforço da auditoria, monitoramento gratuito, cópias criptografadas com ensaio de restauração e teste de compatibilidade com o Netlify Free — foi concluída e aguarda validação. Operação e limites: [docs/OPERACAO.md](docs/OPERACAO.md).
+Na Etapa 7, a meta é custo de US$ 0/mês (D-082). A Fase 7A — atualização de segurança do Next.js, troca obrigatória da senha provisória, páginas sem formulário para quem só consulta, reforço da auditoria, monitoramento gratuito, cópias criptografadas com ensaio de restauração e teste de compatibilidade com o Netlify Free — foi homologada para desenvolvimento (D-083), sem hospedagem pública e sem disponibilidade garantida no plano gratuito. Operação e limites: [docs/OPERACAO.md](docs/OPERACAO.md).
 
 O ambiente de testes utilizará exclusivamente dados fictícios até que o tratamento de dados institucionais reais seja devidamente autorizado.
 

@@ -22,6 +22,7 @@
 | 0.18 | 06/11/2026 | Etapa 5 (D-074, D-075): `usuario.auth_id` e regras de acesso no banco, com a migração `0009`; seção 7 implementada, aguardando homologação; propostas provisórias P-055 a P-059 |
 | 0.19 | 06/11/2026 | Etapa 5 homologada para desenvolvimento (D-078); P-054 a P-060 continuam provisórias |
 | 0.20 | 07/11/2026 | Fase 7A (D-082): coluna `registro_auditoria.papel_banco`, bloqueio de esvaziamento e papel `crm_monitor` (migração `0010`); P-069 e P-070 provisórias |
+| 0.21 | 07/11/2026 | Fase 7A homologada para desenvolvimento (D-083); P-069 e P-070 continuam provisórias |
 
 Legenda: ✅ Aprovado · 🔧 Proposta técnica · ⏳ Pendente (ver [REQUISITOS.md](REQUISITOS.md#como-ler-este-documento)).
 

@@ -19,6 +19,7 @@
 | 0.15 | 06/11/2026 | Etapa 6 implementada, aguardando homologação (D-079): módulo `paineis`, relatórios em XLSX gerados no servidor e consultas sobre o conjunto de projetos e planos |
 | 0.16 | 07/11/2026 | Etapa 6 homologada para desenvolvimento (D-080); desempenho e segurança no ambiente hospedado seguem para a Etapa 7 |
 | 0.17 | 07/11/2026 | Fase 7A (D-082): arquitetura de custo zero, papel `crm_monitor`, rota `/saude`, reforço da auditoria (C6), cópias e restauração (C7) e Next.js 16.4.5 |
+| 0.18 | 07/11/2026 | Fase 7A homologada para desenvolvimento (D-083); hospedagem pública, disponibilidade e restauração completa do login seguem pendentes |
 
 Legenda: ✅ Aprovado · 🔧 Proposta técnica · ⏳ Pendente.
 
@@ -225,7 +226,7 @@ Limites conhecidos: a identidade é informada pela aplicação ao banco, em cada
 
 Os arquivos são gerados no servidor, em memória, a cada pedido, com a conexão da aplicação e a identidade do usuário: o alcance é decidido pelas permissões válidas lidas no banco, e a rota responde sem cache. O arquivo só contém o que foi montado nas abas, sem fórmulas nem elementos ocultos, e o texto digitado é neutralizado. Nada fica guardado no servidor.
 
-### Operação a custo zero (Fase 7A) 🔧 D-082
+### Operação a custo zero (Fase 7A) ✅ D-082, D-083 (homologada para desenvolvimento)
 
 - **Monitor:** papel `crm_monitor`, sem acesso a tabelas, colunas ou funções; login só no projeto de desenvolvimento. Fluxo agendado no GitHub Actions; rota `/saude` na aplicação, sem sessão e sem dados.
 - **Cópias:** `pg_dump` 17 e `age` no computador de desenvolvimento, fora do repositório; nunca no GitHub.
