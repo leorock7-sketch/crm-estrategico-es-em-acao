@@ -37,6 +37,7 @@
 | 0.33 | 07/11/2026 | Pull Request #12 incorporado à `main` (merge `a78af82`); V3-09 descrita no backlog da V3.0 (D-081); roteiro da Etapa 7 em preparação para validação |
 | 0.34 | 07/11/2026 | Roteiro da Etapa 7 a custo zero aprovado e Fase 7A concluída, aguardando validação (D-082, seção 12); pendências e local de trabalho renumerados (seções 13 e 14) |
 | 0.35 | 07/11/2026 | Fase 7A homologada para desenvolvimento (D-083), com ressalvas preservadas; próxima fase a custo zero: monitor assistido, cópias diárias e, depois, testes reais no Netlify Free |
+| 0.36 | 07/11/2026 | Monitor ativado pelo gestor (teste de quatro semanas até cerca de 05/12/2026) e rotina diária de cópias no Windows (D-084), aguardando validação; depois, testes reais no Netlify Free, sujeitos a autorização |
 
 Legenda: ✅ Aprovado · 🔧 Proposta técnica · ⏳ Pendente.
 
@@ -655,11 +656,29 @@ Não executados: `npm run test:postgres` e `supabase:preparar -- --refazer`, des
 ### O que ainda impede um piloto institucional gratuito
 
 1. **Hospedagem não testada de verdade:** criar o site no Netlify (autorização) para os testes T2, T3 (tempo de resposta com funções em Ohio e banco em São Paulo), T4 (consumo real de créditos) e T8 (segurança na hospedagem).
-2. **Monitor sem as quatro semanas:** depende da incorporação à `main` e do cadastro dos segredos pelo gestor; mesmo depois, não garante a continuidade do plano gratuito.
-3. **Sem cópias gerenciadas e sem disponibilidade garantida** no plano gratuito; cópias próprias dependem do computador ligado e de autorização para o agendamento diário.
+2. **Monitor sem as quatro semanas:** ativado em 07/11/2026; o teste termina por volta de 05/12/2026 e, mesmo concluído, não garante a continuidade do plano gratuito.
+3. **Sem cópias gerenciadas e sem disponibilidade garantida** no plano gratuito; as cópias próprias diárias (D-084) dependem do computador ligado e do usuário conectado.
 4. **Restauração do login completo** só demonstrável num projeto Supabase (segundo projeto gratuito, não autorizado).
 5. **Dados reais:** projeto exclusivo, não descartável; LGPD (Q-13, Q-58), inclusive as cópias integrais de dados pessoais na auditoria; destino e guarda das cópias; aceite institucional da conta pessoal ou solução de continuidade.
 6. **Pendências anteriores:** arquivos XLSX no Microsoft Excel e verificações do ambiente hospedado (D-080); login Microsoft e e-mail institucional (TI).
+
+### Monitor ativado e rotina diária de cópias (D-084)
+
+**Monitor:** segredos cadastrados pelo gestor; primeira execução manual do fluxo concluída com sucesso; arquivo local dos segredos apagado; teste de quatro semanas de 07/11/2026 até cerca de 05/12/2026, sem alteração do fluxo.
+
+**Rotina diária de cópias:** tarefa no Agendador de Tarefas do Windows ([OPERACAO.md](OPERACAO.md), seção 5). Resultados, com o código final:
+
+| Verificação | Resultado |
+|---|---|
+| Testes das regras da rotina (`testes/rotina-backup.test.ts`) | 8 aprovados: registro mínimo, uma cópia por dia no calendário de Brasília, prazo do ensaio, chave conferida, integridade (byte alterado, arquivo sem criptografia, manifesto ausente), correspondência entre destinos, retenção só sobre cópias íntegras e trava contra execuções simultâneas |
+| Cópia manual completa | 3 arquivos criptografados (803.010 bytes), 44 tabelas e 31 contas do login, em 59 s; cabeçalho do age em todos os arquivos; conferida nos dois destinos; presença na nuvem do Google Drive confirmada, com os mesmos tamanhos |
+| Ensaio de restauração dessa cópia | 4 conferências e 54 testes de regras de acesso aprovados, em 17,4 s; resultado no registro da rotina |
+| Execução de teste pelo Agendador | Cópia gerada e conferida nos dois destinos, com os mesmos resumos SHA-256 e presença na nuvem confirmada; monitor conferido; código 2 (pendência: chave privada ainda não conferida pelo gestor) |
+| Falha simulada pelo Agendador (programas do PostgreSQL inexistentes, em tarefa temporária removida depois) | Código 1; notificação do Windows e mensagem na tela; cópia anterior preservada |
+| Segunda execução no mesmo dia | Cópia não duplicada ("já houve cópia hoje"); conferência aprovada |
+| Tarefa | Pronta e habilitada; próxima execução às 12:30 do dia seguinte |
+
+**Pendência da rotina:** conferência da chave privada pelo gestor (`npm run backup:conferir-chave`); até lá, as cópias não são consideradas protegidas (D-084).
 
 ### Próximas fases, dependentes de autorização
 
@@ -671,7 +690,7 @@ Não executados: `npm run test:postgres` e `supabase:preparar -- --refazer`, des
 | Pendência | Bloqueia | Situação |
 |---|---|---|
 | C6. Reforço da auditoria | Etapas 7 e 8 (D-027) | ✅ Implementada na Fase 7A (D-082, migração `0010`) e homologada para desenvolvimento (D-083). As cópias integrais de dados pessoais na auditoria seguem para a política de retenção (Q-58) |
-| C7. Cópia de segurança e restauração | Etapas 7 e 8 (D-027) | ✅ Homologada para desenvolvimento (D-083): cópias criptografadas e ensaio de restauração isolado. ⏳ Pendentes: rotina diária (prioridade da fase seguinte), destino para dados reais e restauração completa num projeto Supabase, inclusive do login |
+| C7. Cópia de segurança e restauração | Etapas 7 e 8 (D-027) | ✅ Homologada para desenvolvimento (D-083): cópias criptografadas e ensaio de restauração isolado; rotina diária no Windows (D-084), aguardando validação. ⏳ Pendentes: destino para dados reais e restauração completa num projeto Supabase, inclusive do login |
 | C8. Portabilidade em PostgreSQL real | Etapas 7 e 8 (D-027) | ✅ Compatibilidade essencial comprovada no PostgreSQL 17 de desenvolvimento (D-078): as 10 migrações e os 115 testes de banco das Etapas 1 a 4, sem alteração, além dos 103 testes da Etapa 5. ⏳ Não dispensa as verificações do ambiente definitivo |
 | Autenticação e segurança multiusuário (inclusive regras de acesso no banco) | Etapas 7 e 8 | ✅ Homologada para desenvolvimento (D-078, seção 10); ⏳ produção sujeita aos testes da Etapa 7. Soluções provisórias P-054 a P-060, não homologadas |
 | Projeto Supabase de desenvolvimento | — | ✅ Criado pelo gestor e em uso, somente com dados fictícios (D-075) |
@@ -683,9 +702,10 @@ Não executados: `npm run test:postgres` e `supabase:preparar -- --refazer`, des
 | Abertura e apresentação dos arquivos XLSX no Microsoft Excel | Operação institucional (D-080) | ⏳ A verificar antes da operação institucional; leitura já conferida por biblioteca independente nos testes |
 | Homologação da Etapa 6 | Etapa 7 | ✅ Homologada para desenvolvimento em 07/11/2026 (D-080), com o commit final `8708453` do Pull Request #12; incorporada à `main` pelo gestor (merge `a78af82`, D-081). P-061 a P-065 continuam provisórias, não homologadas individualmente |
 | Roteiro da Etapa 7 — Implantação, Homologação Técnica e Segurança Operacional | Programação da Etapa 7 | ✅ Aprovado com a premissa de custo zero (D-082); Fase 7A homologada para desenvolvimento (D-083, seção 12) |
-| Segredos do monitoramento no GitHub Actions | Teste de quatro semanas do monitor | ⏳ Ativação assistida, prioridade da fase seguinte (D-083): cadastro pelo gestor depois da incorporação à `main` ([OPERACAO.md](OPERACAO.md), seção 2) |
-| Tarefa diária de cópias no Windows | Cópias automáticas | ⏳ Prioridade da fase seguinte (D-083); a configuração permanente no computador depende de autorização |
-| Site no Netlify Free (testes T2, T3, T4 e T8) | Piloto gratuito | ⏳ Depois do monitor e das cópias diárias (D-083); criação do site depende de autorização (D-082, A1) |
+| Segredos do monitoramento no GitHub Actions | Teste de quatro semanas do monitor | ✅ Cadastrados pelo gestor em 07/11/2026; primeira execução concluída com sucesso. ⏳ Teste de quatro semanas até cerca de 05/12/2026 ([OPERACAO.md](OPERACAO.md), seção 2) |
+| Tarefa diária de cópias no Windows | Cópias automáticas | ✅ Autorizada (D-084), criada e testada pelo Agendador; aguardando validação do gestor ([OPERACAO.md](OPERACAO.md), seção 5) |
+| Conferência da chave privada do age no gerenciador de senhas | Cópias consideradas protegidas (D-084) | ⏳ Pelo gestor, no próprio terminal: `npm run backup:conferir-chave` |
+| Site no Netlify Free (testes T2, T3, T4 e T8) | Piloto gratuito | ⏳ Depois da validação da rotina diária de cópias (D-084); criação do site depende de autorização específica (D-082, A1) |
 | Segundo projeto gratuito do Supabase | Homologação, piloto e restauração funcional do login | ⏳ Reservado; depende de autorização (D-082, D-083) |
 | Conta pessoal: solução institucional de continuidade e proteção de dados | Uso institucional real | ⏳ Consequências documentadas ([OPERACAO.md](OPERACAO.md), seção 8) |
 | Senha administrativa forte do PostgreSQL do projeto de desenvolvimento | — | ✅ Trocada pelo gestor em 06/11/2026; senha anterior recusada e nova confirmada, com `.env.local` atualizado e arquivo temporário sobrescrito e apagado (D-077) |

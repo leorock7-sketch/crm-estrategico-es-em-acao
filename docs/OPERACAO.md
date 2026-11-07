@@ -4,6 +4,7 @@
 |---|---|---|
 | 0.1 | 07/11/2026 | Fase 7A (D-082): arquitetura de custo zero, monitoramento, consumo, cópias de segurança, restauração e conta pessoal. Somente ambiente de desenvolvimento, com dados fictícios. |
 | 0.2 | 07/11/2026 | Fase 7A homologada para desenvolvimento (D-083). Ressalvas: restauração completa do Supabase Auth não demonstrada, sem hospedagem pública e sem disponibilidade garantida no plano Free. |
+| 0.3 | 07/11/2026 | Monitor ativado pelo gestor (teste de quatro semanas iniciado) e rotina diária de cópias no Agendador de Tarefas do Windows (D-084). |
 
 Legenda: ✅ Aprovado · 🔧 Proposta técnica · ⏳ Pendente.
 
@@ -48,6 +49,8 @@ Limites e condições dos fornecedores, conferidos em 07/11/2026 nas páginas of
 
 **Ativação (gestor):** depois da incorporação à `main`, cadastrar em *Settings > Secrets and variables > Actions* os segredos `CRM_MONITOR_URL`, `CRM_SUPABASE_URL` e `CRM_SUPABASE_CHAVE_PUBLICA`, com os valores do arquivo `.dados/segredos-monitor-github.txt` gerado por `npm run monitor:preparar`; depois, apagar o arquivo com `npm run monitor:preparar -- --apagar-arquivo`. O teste de quatro semanas começa nesse dia.
 
+**Situação:** ✅ ativado em 07/11/2026 — segredos cadastrados pelo gestor, primeira execução manual concluída com sucesso e arquivo local dos segredos apagado. Teste de quatro semanas: de 07/11/2026 até cerca de 05/12/2026.
+
 **Conferência da própria automação:** `npm run monitor:conferir` consulta a API pública do GitHub e acusa fluxo desativado, execução com falha ou mais de 26 horas sem execução concluída.
 
 **Procedimento manual alternativo** (se o fluxo for desativado ou o GitHub estiver indisponível): reativar o fluxo na aba Actions (*Enable workflow*); enquanto isso, rodar `npm run monitor:verificar` no computador de desenvolvimento pelo menos uma vez por dia útil. Não se fazem commits artificiais para manter o repositório "ativo".
@@ -81,15 +84,37 @@ Somente do banco de desenvolvimento, com dados fictícios. **Nenhuma cópia de d
 | Consistência | Contagens e pg_dump usam o mesmo instantâneo do banco (transação somente leitura) |
 | Criptografia | age 1.3.2, para a chave pública. A chave privada fica fora do repositório e das pastas das cópias; o gestor guarda o conteúdo dela no gerenciador de senhas |
 | Destinos | Pasta local `C:\Projetos\backups-crm-desenvolvimento` e pasta do Google Drive `CRM_ES_em_Acao/Backups do CRM - desenvolvimento (dados ficticios)`. Nunca o GitHub nem artefatos públicos |
-| Retenção | 7 diárias, 4 semanais e 3 mensais (fica a mais recente de cada período); a mais recente nunca é descartada |
+| Retenção | 7 diárias, 4 semanais e 3 mensais (fica a mais recente de cada período), aplicada só às cópias íntegras; a mais recente íntegra nunca é descartada, inclusive quando uma cópia nova falha |
 | Integridade | `pg_restore --list` de cada arquivo, SHA-256 antes e depois da criptografia, manifesto e conferência das cópias nos dois destinos |
 | Ensaio | `npm run backup:ensaiar`: restaura num PostgreSQL temporário e isolado, confere contagens, estrutura, regras, projetos visíveis por conta, senhas das contas fictícias no hash restaurado e roda o conjunto completo das regras de acesso pelo papel `crm_app`; depois apaga tudo |
 | Comandos | `npm run backup:preparar` (uma vez), `npm run backup:executar`, `npm run backup:ensaiar`, `npm run backup:comparar` |
-| Agendamento | Tarefa diária do Windows: **depende de autorização** (configuração permanente no computador). Até lá, execução manual |
+| Agendamento | ✅ Tarefa diária do Windows, autorizada pela D-084 (abaixo) |
 
 **Fora da cópia, a reproduzir pelo painel** em caso de projeto novo: provedores de login e cadastro desligado, endereço do site e endereços de retorno, política de senha, Data API desligada, senhas dos papéis `crm_app` e `crm_monitor` (definidas de novo pelos comandos de preparação). As chaves de assinatura do projeto novo serão outras: as pessoas entram de novo.
 
 **Programas** (fora do repositório, em `C:\Projetos\ferramentas`): PostgreSQL 17.11 (pacote oficial em zip, sem assinatura digital nem checksum publicados; conferidos origem HTTPS, tamanho, extração e versão) e age 1.3.2 (SHA-256 conferido com o publicado no GitHub).
+
+### Rotina diária (D-084) ✅
+
+Tarefa **"CRM - copia diaria (desenvolvimento)"** no Agendador de Tarefas do Windows, somente para o banco de desenvolvimento, com dados fictícios.
+
+| Item | Como funciona |
+|---|---|
+| Horário | Diária às 12:30, só com o usuário conectado (nenhuma senha guardada no Agendador) e sem privilégio de administrador |
+| Horário perdido | Executada assim que possível, quando o computador estava desligado ou o usuário desconectado às 12:30 |
+| Sem duplicação | O Agendador não inicia uma segunda execução enquanto a primeira roda; uma trava na pasta local impede execuções simultâneas por outro caminho (trava com mais de 2 horas é desfeita); uma cópia da rotina por dia, no calendário de Brasília: nova execução no mesmo dia só confere. Limite de 30 minutos por execução |
+| Cópia | Pelo comando de cópia da seção 5: gravada com nome provisório (`.parcial-…`) e renomeada só depois de conferida. Em falha, as cópias anteriores ficam intactas |
+| Retenção | Só sobre as cópias íntegras; a mais recente íntegra nunca é descartada; pastas com problema ficam preservadas para análise; pastas provisórias de execução interrompida são apagadas depois de um dia |
+| Conferência | Todas as cópias dos dois destinos: só arquivos criptografados e o manifesto (qualquer outro arquivo, inclusive em texto aberto, reprova a cópia); tamanho e SHA-256 de cada arquivo contra o manifesto; as mesmas cópias íntegras nos dois destinos |
+| Monitor | Conferência somente leitura da automação do GitHub (`npm run monitor:conferir`); a rotina não altera o monitoramento |
+| Registro | `registro-rotina.log`, só na pasta local (não sincronizado): data, etapa, resultado, duração, categoria e nome da cópia. Nunca conexões, chaves, senhas, mensagens de erro originais ou dados |
+| Avisos | Falha: notificação do Windows e mensagem na tela. Pendência (ensaio vencido, chave não conferida, monitor com problema): notificação. Cada aviso substitui o anterior e é retirado na execução seguinte sem pendências. Sem arquivos de aviso: a Área de Trabalho pode estar no OneDrive, que impede processos do Agendador de regravar arquivos já sincronizados |
+| Ensaio mensal | `npm run backup:ensaiar` pelo menos a cada 31 dias; o resultado entra no registro, e a rotina avisa quando o prazo vence |
+| Chave privada | As cópias só contam como protegidas depois de `npm run backup:conferir-chave`, rodado pelo gestor no próprio terminal: a chave colada não aparece na tela nem é gravada; o programa confere se ela corresponde à chave pública usada nas cópias. Até lá, a rotina avisa a pendência |
+
+**Comandos:** `npm run backup:rotina` (o mesmo que a tarefa executa), `npm run backup:conferir` (só confere os destinos), `npm run backup:conferir-chave`, `npm run backup:agendar` (cria ou atualiza a tarefa) e `npm run backup:agendar -- -Remover` (remove a tarefa).
+
+**Limites:** depende do computador ligado e do usuário conectado. A conferência lê a pasta do Google Drive para computador; o envio à nuvem é feito pelo próprio aplicativo do Google Drive. A tarefa executa os scripts do repositório local, que precisa estar na `main` com esta rotina.
 
 ## 6. Restauração num projeto Supabase ⏳
 

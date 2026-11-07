@@ -13,7 +13,7 @@
  *    Os arquivos sem criptografia são sobrescritos e apagados.
  * 5. Copia para a pasta local e para a pasta do Google Drive, confere as cópias e aplica a retenção.
  */
-import { mkdirSync, mkdtempSync, readdirSync, rmSync, statSync, writeFileSync, copyFileSync } from "node:fs";
+import { copyFileSync, mkdirSync, mkdtempSync, readdirSync, renameSync, rmSync, statSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import postgres from "postgres";
@@ -23,8 +23,9 @@ import { comIdentidade } from "@/lib/banco/identidade";
 import { eliminarArquivoComSobrescrita } from "../conferencia-ambiente";
 import { lerContasDeTeste } from "../contas-teste";
 import { motivosContraCargaDeTeste } from "../protecao-destrutiva";
-import { type Contagens, executarOuFalhar, exigir, type Manifesto, mascarar, nomeDaCopia, PREFIXO_COPIA, programa, sha256, variaveisDeConexao } from "./comum";
+import { type Contagens, executarOuFalhar, exigir, type Manifesto, mascarar, nomeDaCopia, programa, sha256, variaveisDeConexao } from "./comum";
 import { selecionarParaManter } from "./retencao";
+import { conferirDestino, copiaIntegra, PREFIXO_PARCIAL } from "./rotina-regras";
 
 const inicio = Date.now();
 
@@ -154,20 +155,30 @@ async function principal() {
   };
   writeFileSync(path.join(pastaCopia, "manifesto.json"), JSON.stringify(manifesto, null, 2));
 
-  // 5. Destinos, conferência das cópias e retenção.
+  // 5. Destinos, conferência das cópias e retenção. A cópia é gravada com nome provisório e só ganha o
+  // nome definitivo depois de conferida; a retenção considera só cópias íntegras e nunca descarta a
+  // mais recente delas (D-084). Pasta provisória de execução interrompida é apagada depois de um dia.
   for (const destino of destinos) {
     mkdirSync(destino, { recursive: true });
+    const provisoria = path.join(destino, `${PREFIXO_PARCIAL}${nome}`);
+    mkdirSync(provisoria);
+    for (const arquivo of readdirSync(pastaCopia)) copyFileSync(path.join(pastaCopia, arquivo), path.join(provisoria, arquivo));
+    for (const a of arquivos) if (sha256(path.join(provisoria, a.nome)) !== a.sha256) throw new Error(`Cópia divergente em ${destino}: ${a.nome}`);
     const alvo = path.join(destino, nome);
-    mkdirSync(alvo);
-    for (const arquivo of readdirSync(pastaCopia)) copyFileSync(path.join(pastaCopia, arquivo), path.join(alvo, arquivo));
-    for (const a of arquivos) if (sha256(path.join(alvo, a.nome)) !== a.sha256) throw new Error(`Cópia divergente em ${destino}: ${a.nome}`);
-    const existentes = readdirSync(destino).filter((n) => n.startsWith(PREFIXO_COPIA));
-    const manter = selecionarParaManter(existentes, new Date());
-    const descartadas = existentes.filter((n) => !manter.has(n));
+    renameSync(provisoria, alvo);
+    if (!copiaIntegra(alvo).integra) throw new Error(`Cópia não conferiu no destino: ${nome}`);
+    const situacao = conferirDestino(destino);
+    const manter = selecionarParaManter(situacao.integras, new Date());
+    const descartadas = situacao.integras.filter((n) => !manter.has(n));
     for (const n of descartadas) rmSync(path.join(destino, n), { recursive: true, force: true });
-    console.log(`[OK] ${destino === destinos[0] ? "Pasta local" : "Pasta do Google Drive"}: cópia conferida; ${existentes.length - descartadas.length} mantida(s), ${descartadas.length} descartada(s) pela retenção.`);
+    for (const parcial of situacao.parciais) {
+      if (Date.now() - statSync(path.join(destino, parcial)).mtimeMs > 864e5) rmSync(path.join(destino, parcial), { recursive: true, force: true });
+    }
+    const avisos = situacao.problemas.length > 0 ? `; ${situacao.problemas.length} pasta(s) com problema preservada(s) para análise` : "";
+    console.log(`[OK] ${destino === destinos[0] ? "Pasta local" : "Pasta do Google Drive"}: cópia conferida; ${situacao.integras.length - descartadas.length} íntegra(s) mantida(s), ${descartadas.length} descartada(s) pela retenção${avisos}.`);
   }
   rmSync(temporaria, { recursive: true, force: true });
+  console.log(`COPIA|${nome}|${arquivos.reduce((s, a) => s + a.bytes, 0)}`);
   console.log(`[OK] Cópia ${nome}: ${arquivos.length} arquivos criptografados (${arquivos.reduce((s, a) => s + a.bytes, 0)} bytes), ${Object.keys(contagens.tabelas).length} tabelas, ${contagens.usuariosAuth} contas do login, em ${Math.round((Date.now() - inicio) / 1000)} s.`);
 }
 
