@@ -29,6 +29,11 @@
     "backup:executar": "tsx scripts/backup/backup.ts",
     "backup:ensaiar": "tsx scripts/backup/ensaio-restauracao.ts",
     "backup:comparar": "tsx scripts/backup/comparar.ts",
+    "backup:rotina": "tsx scripts/backup/rotina.ts",
+    "backup:conferir": "tsx scripts/backup/rotina.ts --so-conferir",
+    "backup:conferir-chave": "tsx scripts/backup/conferir-chave.ts",
+    "backup:conferir-chave-arquivo": "tsx scripts/backup/conferir-chave.ts --arquivo",
+    "backup:agendar": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/backup/agendar.ps1",
     "test:regras": "vitest run --config vitest.regras.config.mts",
     "test:postgres": "vitest run --config vitest.postgres.config.mts",
     "test:supabase": "vitest run --config vitest.supabase.config.mts"

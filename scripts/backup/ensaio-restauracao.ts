@@ -21,6 +21,7 @@ import { tmpdir } from "node:os";
 import path from "node:path";
 import { eliminarArquivoComSobrescrita } from "../conferencia-ambiente";
 import { executar, executarOuFalhar, exigir, type Manifesto, mascarar, PREFIXO_COPIA, programa, sha256 } from "./comum";
+import { registrar as registrarNoLog } from "./rotina-regras";
 
 const PORTA = "55432";
 const etapas: { etapa: string; ms: number }[] = [];
@@ -115,6 +116,14 @@ function principal(): number {
     }
     for (const e of etapas) console.log(`  ${e.etapa}: ${(e.ms / 1000).toFixed(1)} s`);
     console.log(`  total: ${(etapas.reduce((s, e) => s + e.ms, 0) / 1000).toFixed(1)} s`);
+    // Ensaio mensal (D-084): o resultado fica no registro da rotina.
+    registrarNoLog(exigir("CRM_BACKUP_PASTA_LOCAL"), {
+      etapa: "ensaio",
+      resultado: situacao === 0 ? "ok" : "falha",
+      duracao_ms: etapas.reduce((s, e) => s + e.ms, 0),
+      categoria: situacao === 0 ? null : "ensaio-com-falha",
+      copia: path.basename(pastaCopia),
+    });
     return situacao;
   } finally {
     if (ligado) spawnSync(pgCtl, ["-D", dados, "-m", "fast", "-w", "stop"], { stdio: "ignore", windowsHide: true });

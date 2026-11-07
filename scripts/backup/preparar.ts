@@ -3,7 +3,7 @@
  *
  * - Gera o par de chaves do age, se ainda não existir, FORA do repositório e das pastas das cópias
  *   (por padrão em %USERPROFILE%\.crm-backup\identidade-age.txt). A chave privada não é exibida:
- *   guarde o conteúdo desse arquivo no seu gerenciador de senhas.
+ *   preserve esse arquivo e, antes de dados reais, crie uma segunda cópia segura dele (D-086).
  * - Grava em .env.local a chave PÚBLICA e as pastas informadas, sem exibir segredos.
  *
  * Uso: npm run backup:preparar -- --pg "<pasta bin do PostgreSQL 17>" --age "<pasta do age>"
@@ -55,7 +55,7 @@ function principal() {
   gravar("CRM_BACKUP_DESTINATARIO_AGE", publica);
   gravar("CRM_BACKUP_IDENTIDADE_AGE", identidade);
   console.log("[OK] .env.local atualizado: programas, pastas, chave pública e local da chave privada.");
-  console.log("Guarde o conteúdo do arquivo da chave privada no seu gerenciador de senhas; sem ele, as cópias não podem ser abertas.");
+  console.log("Preserve o arquivo da chave privada; sem ele, as cópias não podem ser abertas. Antes de dados reais, crie uma segunda cópia segura dele (D-086).");
 }
 
 try {
