@@ -7,6 +7,7 @@
 | 0.3 | 06/11/2026 | Perfis implementados na Etapa 5, aguardando homologação: administração de usuários e permissões na tela "Usuários" |
 | 0.4 | 06/11/2026 | Etapa 5 homologada para desenvolvimento (D-078) |
 | 0.5 | 07/11/2026 | Etapa 6 homologada para desenvolvimento (D-080): painéis e exportações por perfil (D-079) |
+| 0.6 | 07/11/2026 | Conta pessoal mantida por decisão do gestor (D-082), com consequências documentadas em OPERACAO.md |
 
 Legenda: ✅ Aprovado · 🔧 Proposta técnica · ⏳ Pendente.
 
@@ -54,7 +55,8 @@ Conforme o README:
 
 - O repositório é administrado provisoriamente em conta pessoal, para desenvolvimento e testes.
 - Está prevista a transferência para conta institucional do ES em Ação, mediante autorização e formalização.
-- A titularidade definitiva do código, os direitos de uso e as responsabilidades institucionais deverão ser formalmente definidos. A declaração do README não constitui transferência automática de direitos.
+- A titularidade definitiva do código, os direitos de uso e as responsabilidades institucionais deverão ser formalmente definidos.
+- Por decisão do gestor (D-082), o projeto Supabase e as demais contas continuam pessoais neste momento. As consequências para continuidade, recuperação de acesso, autenticação multifator, guarda de credenciais e responsabilidade sobre os dados estão em [OPERACAO.md](OPERACAO.md), seção 8; antes de uso institucional real, é necessária solução aceita pela instituição. A declaração do README não constitui transferência automática de direitos.
 
 ## 5. Segurança ✅
 

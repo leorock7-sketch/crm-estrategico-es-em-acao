@@ -43,6 +43,8 @@ Já existem a documentação, um banco de dados local de desenvolvimento, as tel
 
 A Etapa 6 — painéis por comitê e por projeto ou tema, e relatórios R1 a R5 em XLSX, sempre dentro das permissões de cada usuário — foi homologada para desenvolvimento (D-080), com soluções provisórias ainda não homologadas (P-061 a P-065). O menu "Painéis" dá acesso às três áreas; a impressão e o PDF usam o próprio navegador.
 
+Na Etapa 7, a meta é custo de US$ 0/mês (D-082). A Fase 7A — atualização de segurança do Next.js, troca obrigatória da senha provisória, páginas sem formulário para quem só consulta, reforço da auditoria, monitoramento gratuito, cópias criptografadas com ensaio de restauração e teste de compatibilidade com o Netlify Free — foi concluída e aguarda validação. Operação e limites: [docs/OPERACAO.md](docs/OPERACAO.md).
+
 O ambiente de testes utilizará exclusivamente dados fictícios até que o tratamento de dados institucionais reais seja devidamente autorizado.
 
 ## Titularidade provisória
@@ -81,6 +83,7 @@ A documentação será atualizada conforme o desenvolvimento avançar. A pasta [
 | [GOVERNANCA.md](docs/GOVERNANCA.md) | Papéis, titularidade, fluxo de trabalho e proteção de dados |
 | [REGISTRO_DECISOES.md](docs/REGISTRO_DECISOES.md) | Decisões aprovadas, propostas técnicas e decisões pendentes |
 | [PLANO_IMPLANTACAO.md](docs/PLANO_IMPLANTACAO.md) | Etapas de implantação e critérios de aceite |
+| [OPERACAO.md](docs/OPERACAO.md) | Operação a custo zero: monitoramento, limites gratuitos, suspensão, cópias de segurança e recuperação |
 
 Em todos os documentos, cada item é classificado como **✅ Aprovado**, **🔧 Proposta técnica** ou **⏳ Pendente**.
 
