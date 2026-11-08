@@ -20,14 +20,28 @@ import { eliminarArquivoComSobrescrita } from "../conferencia-ambiente";
 import { conferirConfiguracao, motivosContraCargaDeTeste } from "../protecao-destrutiva";
 import { motivosContraConexaoDaAplicacao, VARIAVEIS_DA_HOSPEDAGEM } from "./regras";
 
-/** Segredos do servidor: depois de gravados, deixam de poder ser lidos de volta no painel (quando o plano permitir). */
+/** Públicas (vão para o navegador): compilação e execução. */
+const PUBLICAS = ["NEXT_PUBLIC_SUPABASE_URL", "NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY"];
+/**
+ * Segredos do servidor, marcados como secretos: depois de gravados, não podem ser lidos de volta no
+ * painel nem pela ferramenta, e o Netlify interrompe a compilação se o valor aparecer nos arquivos
+ * gerados. O plano Free não permite restringir escopos (conferido em 07/11/2026: a opção é ignorada),
+ * por isso eles ficam também disponíveis na compilação, que não os usa (compilação aprovada sem eles).
+ * Contextos: produção, prévias e ramos publicados (a marcação secreta exige contexto explícito).
+ */
 const SEGREDOS = ["CRM_BANCO_URL", "SUPABASE_SECRET_KEY"];
+const CONTEXTOS_DOS_SEGREDOS = ["production", "deploy-preview", "branch-deploy"];
 
 const CLI = process.env.CRM_NETLIFY_CLI ?? "C:/Projetos/ferramentas/netlify/node_modules/netlify-cli/bin/run.js";
 const site = process.argv.find((a) => a.startsWith("--site="))?.slice("--site=".length);
 
-function netlify(argumentos: string[]) {
-  const r = spawnSync(process.execPath, [CLI, ...argumentos, "--site", site as string], { encoding: "utf8", windowsHide: true, maxBuffer: 16 * 1024 * 1024 });
+function netlify(argumentos: string[], comSite = true) {
+  // --use-system-ca: a conexão com a API do Netlify é validada pelo repositório de certificados do Windows.
+  const r = spawnSync(process.execPath, ["--use-system-ca", CLI, ...argumentos, ...(comSite ? ["--site", site as string] : [])], {
+    encoding: "utf8",
+    windowsHide: true,
+    maxBuffer: 16 * 1024 * 1024,
+  });
   // A saída pode conter valores: nunca é exibida.
   return { codigo: r.status ?? 1, saida: r.stdout ?? "" };
 }
@@ -59,8 +73,9 @@ async function principal(): Promise<number> {
   }
   console.log("[OK] Projeto de desenvolvimento autorizado, descartável e só com dados fictícios; conexão da aplicação restrita (crm_app).");
 
+  // 1. Públicas, pela importação: substitui tudo o que houver no site (nada além das quatro fica lá).
   const arquivo = path.join(process.cwd(), ".dados", `netlify-importacao-${Date.now()}.env`);
-  writeFileSync(arquivo, `${VARIAVEIS_DA_HOSPEDAGEM.map((nome) => `${nome}=${exigir(nome)}`).join("\n")}\n`, { mode: 0o600 });
+  writeFileSync(arquivo, `${PUBLICAS.map((nome) => `${nome}=${exigir(nome)}`).join("\n")}\n`, { mode: 0o600 });
   let importado: boolean;
   try {
     importado = netlify(["env:import", arquivo, "--replace-existing"]).codigo === 0;
@@ -72,22 +87,34 @@ async function principal(): Promise<number> {
     return 1;
   }
 
-  const segredos: string[] = [];
+  // 2. Segredos, um a um, marcados como secretos.
   for (const nome of SEGREDOS) {
-    if (netlify(["env:set", nome, "--secret", "--force"]).codigo === 0) segredos.push(nome);
+    if (netlify(["env:set", nome, exigir(nome), "--context", ...CONTEXTOS_DOS_SEGREDOS, "--secret", "--force"]).codigo !== 0) {
+      console.log(`[PROBLEMA] O Netlify recusou a gravação de ${nome}.`);
+      return 1;
+    }
   }
 
-  const lista = netlify(["env:list", "--json"]);
-  const nomes = lista.codigo === 0 ? Object.keys(JSON.parse(lista.saida) as Record<string, unknown>).sort() : [];
+  // 3. Conferência pela API: nomes, escopos e marcação secreta (nunca os valores).
+  const dadosDoSite = netlify(["api", "getSite", "--data", JSON.stringify({ site_id: site })], false);
+  const conta = dadosDoSite.codigo === 0 ? (JSON.parse(dadosDoSite.saida) as { account_id: string }).account_id : "";
+  const lista = netlify(["api", "getEnvVars", "--data", JSON.stringify({ account_id: conta, site_id: site })], false);
+  const variaveis = lista.codigo === 0 ? (JSON.parse(lista.saida) as { key: string; scopes: string[]; is_secret?: boolean }[]) : [];
+  for (const v of variaveis.sort((a, b) => a.key.localeCompare(b.key))) {
+    console.log(`  ${v.key}: escopos ${[...v.scopes].sort().join(", ")}${v.is_secret ? "; secreta" : ""}`);
+  }
+  const nomes = variaveis.map((v) => v.key).sort();
   const esperadas = [...VARIAVEIS_DA_HOSPEDAGEM].sort();
   const iguais = nomes.length === esperadas.length && nomes.every((n, i) => n === esperadas[i]);
-  console.log(`[${iguais ? "OK" : "PROBLEMA"}] Variáveis no Netlify (só nomes): ${nomes.join(", ") || "nenhuma lida"}.`);
-  console.log(
-    segredos.length === SEGREDOS.length
-      ? `[OK] Marcadas como secretas (não podem ser lidas de volta): ${segredos.join(", ")}.`
-      : `[AVISO] Marcação como secreta indisponível para: ${SEGREDOS.filter((s) => !segredos.includes(s)).join(", ")} (recurso possivelmente fora do plano Free); os valores continuam só no servidor.`,
-  );
-  return iguais ? 0 : 1;
+  const segredosCertos = variaveis
+    .filter((v) => SEGREDOS.includes(v.key))
+    .every((v) => v.is_secret === true && ["functions", "runtime"].every((e) => v.scopes.includes(e)));
+  const publicasCertas = variaveis.filter((v) => PUBLICAS.includes(v.key)).every((v) => v.scopes.includes("builds") && v.scopes.includes("functions"));
+  console.log(`[${iguais ? "OK" : "PROBLEMA"}] Variáveis no Netlify: só as quatro da aplicação.`);
+  console.log(`[${segredosCertos ? "OK" : "PROBLEMA"}] Segredos marcados como secretos e disponíveis na execução.`);
+  console.log(`[${publicasCertas ? "OK" : "PROBLEMA"}] Públicas disponíveis na compilação e na execução.`);
+  console.log("[AVISO] O plano Free não restringe escopos: os segredos também ficam disponíveis na compilação, que não os usa.");
+  return iguais && segredosCertos && publicasCertas ? 0 : 1;
 }
 
 principal()
