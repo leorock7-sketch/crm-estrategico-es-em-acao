@@ -309,5 +309,8 @@ describe("Stakeholders dos contextos (D-030)", () => {
     expect(nomes.get(stakeholderId)).toBe("Renato Exemplo Luz");
     expect(nomes.get(comites.inovacao)).toBe("Comitê Temático de Inovação");
     expect(nomes.get(projetoTemaId)).toBe("Projeto Histórico Exemplo");
+    // P-071: a versão em uma consulta devolve exatamente o mesmo, na mesma ordem.
+    const consolidados = await stakeholders.nomesDosRegistrosEmUmaConsulta(banco, stakeholders.idsCitadosNoHistorico(historicoProjeto));
+    expect([...consolidados.entries()]).toEqual([...nomes.entries()]);
   });
 });

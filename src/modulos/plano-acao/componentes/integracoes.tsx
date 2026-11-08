@@ -68,11 +68,28 @@ function ListaRiscos({ riscos, vazio }: { riscos: RiscoResumo[]; vazio: string }
   );
 }
 
-/** Plano de ação e riscos de um projeto ou tema (resumo com atalhos). */
-export async function PlanoERiscosDoProjetoTema({ projetoTemaId, arquivado }: { projetoTemaId: string; arquivado: boolean }) {
+async function carregarPlanoERiscos(projetoTemaId: string) {
   const banco = await bancoDaRequisicao();
   const hoje = hojeEmBrasilia();
   const [[plano], riscos] = await Promise.all([listarPlanos(banco, hoje, "todos", projetoTemaId), resumoRiscosDoProjetoTema(banco, projetoTemaId, hoje)]);
+  return { plano, riscos };
+}
+
+/** Plano de ação e riscos de um projeto ou tema (resumo com atalhos). */
+export async function PlanoERiscosDoProjetoTema({
+  projetoTemaId,
+  arquivado,
+  dados,
+}: {
+  projetoTemaId: string;
+  arquivado: boolean;
+  /** Dados já lidos pela página (P-071, E2); sem eles, o componente faz a própria leitura. */
+  dados?: {
+    plano: Awaited<ReturnType<typeof listarPlanos>>[number] | undefined;
+    riscos: Awaited<ReturnType<typeof resumoRiscosDoProjetoTema>>;
+  };
+}) {
+  const { plano, riscos } = dados ?? (await carregarPlanoERiscos(projetoTemaId));
   return (
     <section aria-labelledby="titulo-plano-riscos" className={classeCartao}>
       <h2 id="titulo-plano-riscos" className="mb-4 text-lg font-semibold">

@@ -41,7 +41,25 @@ export async function permissaoNoContexto(
     .where(eq(usuario.id, usuarioId));
   if (!encontrado || encontrado.situacao !== "ativo") return { ver: false, editar: false, origem: "usuario_inativo" };
   if (encontrado.administrador) return { ver: true, editar: true, origem: "administrador" };
+  return permissaoPeloPerfil(banco, usuarioId, projetoTemaId);
+}
 
+/**
+ * Mesma regra de permissaoNoContexto para o usuário da sessão, sem reler o cadastro: a sessão já
+ * confirmou, nesta requisição, que o usuário está ativo e se é administrador (identificar_usuario).
+ * Sem essa informação (modo local de desenvolvimento), consulta o cadastro como permissaoNoContexto.
+ */
+export async function permissaoDoUsuarioDaSessao(
+  banco: Executor,
+  usuarioDaSessao: { id: string; administrador?: boolean },
+  projetoTemaId: string,
+): Promise<PermissaoNoContexto> {
+  if (usuarioDaSessao.administrador === undefined) return permissaoNoContexto(banco, usuarioDaSessao.id, projetoTemaId);
+  if (usuarioDaSessao.administrador) return { ver: true, editar: true, origem: "administrador" };
+  return permissaoPeloPerfil(banco, usuarioDaSessao.id, projetoTemaId);
+}
+
+async function permissaoPeloPerfil(banco: Executor, usuarioId: string, projetoTemaId: string): Promise<PermissaoNoContexto> {
   const [permissao] = await banco
     .select({ perfil: permissaoContexto.perfil })
     .from(permissaoContexto)
