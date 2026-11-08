@@ -51,7 +51,7 @@ const MODULOS = [
   {
     href: "/metodologias",
     titulo: "Metodologias de avaliação",
-    descricao: "Versões da metodologia de poder e interesse. Por ora, apenas demonstrações não homologadas.",
+    descricao: "Versões da metodologia de poder e interesse e a situação de cada uma.",
   },
 ] as const;
 
@@ -71,8 +71,8 @@ export default function PaginaInicial() {
         </p>
 
         <p className="mt-8 border-t border-borda pt-6 text-sm text-texto-secundario">
-          Esta aplicação está em desenvolvimento (Etapa 4 — plano de ação e matriz de riscos; avaliações na escala V2.2
-          com metodologia fictícia, não homologada). O ambiente de testes utiliza exclusivamente dados fictícios.
+          Ambiente de testes do piloto, somente com dados fictícios. O uso com dados institucionais reais depende de
+          autorização.
         </p>
       </section>
 

@@ -48,6 +48,17 @@ export const ROTULOS_SITUACAO_ACAO: Record<SituacaoAcao, string> = {
 };
 
 /**
+ * Ação sem acompanhamento com situação (D-089): a ausência de registro não é "não iniciada" e aparece
+ * assim em todas as telas e relatórios. Para o cálculo de atraso, a ação sem registro continua contando
+ * como não concluída.
+ */
+export const ROTULO_SEM_SITUACAO = "Sem situação registrada";
+
+export function rotuloDaSituacaoAcao(situacao: SituacaoAcao | null): string {
+  return situacao ? ROTULOS_SITUACAO_ACAO[situacao] : ROTULO_SEM_SITUACAO;
+}
+
+/**
  * Pilares de referência do Comitê de Infraestrutura (D-072, item 2.1): modelo
  * oferecido ao criar o plano, nunca obrigatório; cada plano pode ter os seus eixos.
  */

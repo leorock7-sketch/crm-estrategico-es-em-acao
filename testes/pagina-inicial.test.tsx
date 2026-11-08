@@ -16,10 +16,10 @@ describe("Página inicial", () => {
     ).toBeDefined();
   });
 
-  test("informa que a aplicação está em desenvolvimento", () => {
+  test("informa que é o ambiente de testes do piloto, só com dados fictícios (D-089)", () => {
     render(<PaginaInicial />);
 
     expect(screen.getByText("Em desenvolvimento")).toBeDefined();
-    expect(screen.getByText(/Esta aplicação está em desenvolvimento/)).toBeDefined();
+    expect(screen.getByText(/Ambiente de testes do piloto, somente com dados fictícios/)).toBeDefined();
   });
 });

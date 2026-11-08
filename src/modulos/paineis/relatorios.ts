@@ -23,7 +23,7 @@ import {
   ROTULOS_SITUACAO_RESSALVAS,
 } from "@/modulos/avaliacoes/rotulos";
 import { ROTULOS_SITUACAO_COMPROMISSO, ROTULOS_SITUACAO_PRAZO, situacaoDoPrazo } from "@/modulos/interacoes/rotulos";
-import { marcoAtrasado, ROTULOS_SITUACAO_ACAO, ROTULOS_SITUACAO_VERSAO } from "@/modulos/plano-acao/rotulos";
+import { marcoAtrasado, ROTULOS_SITUACAO_VERSAO, rotuloDaSituacaoAcao } from "@/modulos/plano-acao/rotulos";
 import { FAIXAS, ROTULOS_SITUACAO_RISCO } from "@/modulos/riscos/rotulos";
 import type { DadosDoPainel } from "./dados";
 import { dentroDoPeriodo, type FiltrosPainel } from "./filtros";
@@ -185,7 +185,8 @@ function relatorioPlano(dados: DadosDoPainel, escopo: ReadonlySet<string>, filtr
     ]),
     {
       nome: "Ações",
-      cabecalho: ["Projeto ou tema", "Plano", "Versão vigente", "Código", "Ação", "Pilar ou eixo", "Responsável", "Início previsto", "Fim previsto", "Situação", "Percentual informado", "Concluída em", "Atrasada"],
+      // D-089: equipe e externo em colunas próprias, como na tela do plano (sem perder o corresponsável).
+      cabecalho: ["Projeto ou tema", "Plano", "Versão vigente", "Código", "Ação", "Pilar ou eixo", "Responsável da equipe", "Responsável externo", "Início previsto", "Fim previsto", "Situação", "Percentual informado", "Concluída em", "Atrasada"],
       linhas: acoes.map((a) => [
         nomeProjeto(a.projetoTemaId),
         planoPorId.get(a.planoId)?.titulo ?? "—",
@@ -193,10 +194,11 @@ function relatorioPlano(dados: DadosDoPainel, escopo: ReadonlySet<string>, filtr
         a.codigo,
         a.titulo,
         a.eixoNome ?? "Sem pilar ou eixo",
-        a.responsavelUsuarioNome ?? a.responsavelStakeholderNome ?? "Sem responsável",
+        a.responsavelUsuarioNome ?? "Sem responsável da equipe",
+        a.responsavelStakeholderNome ?? "Sem responsável externo",
         data(a.inicioPrevisto),
         data(a.fimPrevisto, "Sem prazo"),
-        a.andamento.situacao ? ROTULOS_SITUACAO_ACAO[a.andamento.situacao] : "Sem situação registrada",
+        rotuloDaSituacaoAcao(a.andamento.situacao),
         a.andamento.percentual,
         a.andamento.situacao === "concluida" ? data(a.dataConclusao, "Sem data registrada") : "—",
         a.atrasada ? "Sim" : "Não",

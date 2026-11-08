@@ -31,7 +31,7 @@ import {
   planoEhVisivel,
   stakeholdersDaAcao,
 } from "@/modulos/plano-acao/consultas";
-import { marcoAtrasado, ROTULOS_PERIODICIDADE, ROTULOS_SITUACAO_ACAO } from "@/modulos/plano-acao/rotulos";
+import { marcoAtrasado, ROTULOS_PERIODICIDADE, ROTULOS_SITUACAO_ACAO, rotuloDaSituacaoAcao } from "@/modulos/plano-acao/rotulos";
 import { opcoesStakeholders } from "@/modulos/projetos-temas/consultas";
 import { SeloClassificacao } from "@/modulos/riscos/componentes/matriz-riscos";
 import { riscosDaAcao } from "@/modulos/riscos/consultas";
@@ -111,7 +111,7 @@ async function DetalheAcao({ params }: Pick<PageProps<"/acoes/[id]">, "params">)
             <ItemDado rotulo="Periodicidade de acompanhamento" valor={vigente.periodicidade && ROTULOS_PERIODICIDADE[vigente.periodicidade]} />
             <ItemDado
               rotulo="Andamento"
-              valor={`${ROTULOS_SITUACAO_ACAO[vigente.andamento.situacao ?? "nao_iniciada"]}${
+              valor={`${rotuloDaSituacaoAcao(vigente.andamento.situacao)}${
                 vigente.andamento.percentual !== null ? ` · ${vigente.andamento.percentual}% informado` : ""
               }`}
             />

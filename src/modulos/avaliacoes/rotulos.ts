@@ -184,6 +184,6 @@ export const AVISO_NAO_HOMOLOGADO =
 export const AVISO_DADOS_FICTICIOS =
   "Rubricas homologadas (Q-66 1.0). As avaliações são avaliações profissionais do consultor, não fatos certificados. Somente dados fictícios: o uso institucional depende de autorização.";
 
-/** Aviso sobre o controle de acesso enquanto não há autenticação real (D-034). */
+/** Aviso sobre o controle de acesso (D-034, atualizado pela D-089 depois da Etapa 5, D-078). */
 export const AVISO_SEGURANCA =
-  "O controle de acesso por projeto ou tema está preparado e testado, mas a segurança multiusuário ainda não foi homologada: não há autenticação real nem controle efetivo no banco de dados.";
+  "Acesso com login e regras de acesso por projeto ou tema aplicadas no próprio banco de dados, homologados para desenvolvimento (D-078). Ambiente de testes somente com dados fictícios: o uso com dados institucionais reais depende de autorização.";
