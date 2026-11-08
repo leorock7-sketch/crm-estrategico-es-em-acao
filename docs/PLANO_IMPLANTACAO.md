@@ -40,6 +40,7 @@
 | 0.36 | 07/11/2026 | Monitor ativado pelo gestor (teste de quatro semanas até cerca de 05/12/2026) e rotina diária de cópias no Windows (D-084), aguardando validação; depois, testes reais no Netlify Free, sujeitos a autorização |
 | 0.37 | 07/11/2026 | Resultados da rotina de cópias aprovados e tarefa reativada com condições (D-085); segundo projeto do Supabase reservado para outra ferramenta do gestor, fora do CRM; restauração completa do Supabase Auth a replanejar |
 | 0.38 | 07/11/2026 | Chave privada do age conferida pelo arquivo local, com abertura em memória da cópia mais recente (D-086); segunda cópia segura da chave pendente antes de dados reais; Pull Request #16 para homologação |
+| 0.40 | 08/11/2026 | P-071 concluída na prévia (D-088): desempenho de cerca de 3,3 s nas telas principais e relatórios; ciclo de otimização encerrado; publicação em produção e piloto do gestor aguardando aprovação final |
 | 0.39 | 08/11/2026 | Fase 7B (D-087): site de testes no Netlify Free, público e protegido pelo login e pelas permissões do CRM; segurança e testes funcionais aprovados no endereço público; desempenho lento, diagnosticado e não homologado; alternativas de otimização (P-071) para decisão; colegas só depois da aprovação do gestor |
 
 Legenda: ✅ Aprovado · 🔧 Proposta técnica · ⏳ Pendente.
@@ -732,7 +733,9 @@ Sem novas publicações só para documentação. Próximos passos, a decidir pel
 | Conferência da chave privada do age | Cópias consideradas protegidas (D-084, D-085) | ✅ Conferida em 07/11/2026 pelo arquivo local, sem gerenciador de senhas, com abertura em memória da cópia mais recente (D-086) |
 | Segunda cópia segura da chave privada do age | Uso de dados institucionais reais (D-086) | ⏳ Pendente: hoje a chave existe só no computador de desenvolvimento |
 | Site no Netlify Free (testes T2, T3, T4 e T8) | Piloto gratuito | 🔧 Publicado e testado em 08/11/2026 (D-087): T8 e T2 aprovados; T3 não homologado; T4 sem leitura no painel. Colegas não convidados |
-| Desempenho na hospedagem (idas e voltas ao banco entre Ohio e São Paulo) | Uso pelos colegas e piloto (D-087) | ⏳ Alternativas de otimização na P-071, a apresentar e decidir antes de qualquer implementação; região das funções restrita aos planos pagos |
+| Desempenho na hospedagem (idas e voltas ao banco entre Ohio e São Paulo) | Uso pelos colegas e piloto (D-087) | 🔧 P-071 concluída na prévia (D-088): telas principais e relatórios de cerca de 7–9 s para cerca de 3,3 s, projeto ou tema 5,1 s; aceitável para o piloto inicial. Ciclo de otimização encerrado |
+| Publicação da versão otimizada (P-071) em produção | Piloto operacional | ⏳ Aguarda aprovação final do gestor: merges da Etapa 7B e da P-071, ociosidade de 60 s em produção e uma publicação; reversão documentada ([OPERACAO.md](OPERACAO.md), seção 7) |
+| Primeira avaliação pessoal do gestor no endereço de produção | Convite aos colegas | ⏳ Roteiro de aceitação entregue; só dados fictícios |
 | Leitura do consumo de créditos no painel do Netlify | Conclusão do T4 | ⏳ Pendente: o contador da API mostrava 0 e não acompanha em tempo real; leitura em *Usage & billing* pelo gestor |
 | Primeira rodada pessoal do gestor no navegador | Convite aos colegas | ⏳ A realizar pelo gestor, depois da homologação técnica |
 | Convite aos colegas do ES em Ação | Homologação ampliada | ⏳ Só depois da aprovação, pelo gestor, dos testes iniciais de segurança e da avaliação do desempenho; contas com pseudônimo e e-mail fictício ([OPERACAO.md](OPERACAO.md), seção 7) |
