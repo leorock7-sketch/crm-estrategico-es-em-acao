@@ -13,7 +13,22 @@ import { drizzle as drizzlePglite } from "drizzle-orm/pglite";
 import { drizzle as drizzlePostgres } from "drizzle-orm/postgres-js";
 import type { Sql, TransactionSql } from "postgres";
 import type { Banco } from "./conexao";
+import { iniciarMedicao, type Medicao } from "./instrumentacao";
 import * as esquema from "./esquema";
+
+/** Registra o fim da transação medida (laboratório, P-071); o resultado e os erros passam intactos. */
+function concluirMedicao<T>(execucao: Promise<T>, medicao: Medicao): Promise<T> {
+  return execucao.then(
+    (resultado) => {
+      medicao.concluir();
+      return resultado;
+    },
+    (erro: unknown) => {
+      medicao.concluir(true);
+      throw erro;
+    },
+  );
+}
 
 type Parametros = Parameters<Sql["unsafe"]>[1];
 type Opcoes = Parameters<Sql["unsafe"]>[2];
@@ -36,12 +51,13 @@ function consultaAdiada(executar: (comoValores: boolean) => Promise<object>) {
 }
 
 /** Cliente de transação do driver postgres, com o formato comum de resultado. */
-export function transacaoPostgres(tx: TransactionSql): TransactionSql {
+export function transacaoPostgres(tx: TransactionSql, medicao?: Medicao | null): TransactionSql {
   return new Proxy(tx, {
     get(alvo, propriedade, receptor) {
       if (propriedade === "unsafe") {
         return (consulta: string, parametros?: Parametros, opcoes?: Opcoes) =>
           consultaAdiada((comoValores) => {
+            medicao?.contarConsulta();
             const pendente = alvo.unsafe(consulta, parametros, opcoes);
             return comoValores ? pendente.values() : pendente;
           });
@@ -84,22 +100,33 @@ function clientePostgres(sql: Sql, preparar: (tx: TransactionSql) => Promise<unk
     get(alvo, propriedade, receptor) {
       if (propriedade === "unsafe") {
         return (consulta: string, parametros?: Parametros, opcoes?: Opcoes) =>
-          consultaAdiada((comoValores) =>
-            alvo.begin(async (tx) => {
+          consultaAdiada((comoValores) => {
+            const medicao = iniciarMedicao("consulta", consulta);
+            const execucao = alvo.begin(async (tx) => {
+              medicao?.ponto("transacao");
               await preparar(tx);
+              medicao?.ponto("identidade");
               const pendente = tx.unsafe(consulta, parametros, opcoes);
-              return comoValores ? pendente.values() : pendente;
-            }) as unknown as Promise<object>,
-          );
+              if (!medicao) return comoValores ? pendente.values() : pendente;
+              const resultado = await (comoValores ? pendente.values() : pendente);
+              medicao.ponto("consultas");
+              return resultado;
+            }) as unknown as Promise<object>;
+            return medicao ? concluirMedicao(execucao, medicao) : execucao;
+          });
       }
       if (propriedade === "begin") {
         return (...argumentos: unknown[]) => {
           const operacao = argumentos[argumentos.length - 1] as (tx: TransactionSql) => unknown;
           const prefixo = argumentos.slice(0, -1) as [string];
-          return alvo.begin(...prefixo, async (tx: TransactionSql) => {
+          const medicao = iniciarMedicao("transacao");
+          const execucao = alvo.begin(...prefixo, async (tx: TransactionSql) => {
+            medicao?.ponto("transacao");
             await preparar(tx);
-            return operacao(transacaoPostgres(tx));
+            medicao?.ponto("identidade");
+            return operacao(transacaoPostgres(tx, medicao));
           });
+          return medicao ? concluirMedicao(execucao, medicao) : execucao;
         };
       }
       return Reflect.get(alvo, propriedade, receptor);

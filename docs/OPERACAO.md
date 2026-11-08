@@ -7,6 +7,7 @@
 | 0.3 | 07/11/2026 | Monitor ativado pelo gestor (teste de quatro semanas iniciado) e rotina diária de cópias no Agendador de Tarefas do Windows (D-084). |
 | 0.4 | 07/11/2026 | Reativação da tarefa diária, conferência da chave com abertura de cópia existente e reserva do segundo projeto do Supabase para outra ferramenta (D-085). |
 | 0.5 | 07/11/2026 | Chave privada conferida pelo arquivo local, sem gerenciador de senhas; segunda cópia segura da chave pendente antes de dados reais (D-086). |
+| 0.7 | 08/11/2026 | P-071 (D-088): desempenho após a otimização, ferramentas de medição, ociosidade configurável das conexões, publicação em produção e reversão. |
 | 0.6 | 08/11/2026 | Etapa 7B (D-087): site de testes no Netlify Free, público e protegido pelo login e pelas permissões do CRM; resultados de T2, T3, T4 e T8; diagnóstico do desempenho; procedimento de contas e roteiro para os colegas, que só serão convidados depois da aprovação do gestor. |
 
 Legenda: ✅ Aprovado · 🔧 Proposta técnica · ⏳ Pendente.
@@ -198,6 +199,28 @@ O banco gasta no máximo 0,18 s por tela; nenhuma consulta do CRM se repete no m
 Hipótese, coerente com as medidas mas não comprovada por instrumentação na função: o tempo das telas é dominado pelo número de idas e voltas em série ao banco, cada uma de cerca de 0,16 s entre Ohio e São Paulo; somam-se a abertura de conexões novas (0 a 4 por carregamento, cada uma com várias idas e voltas) e o processamento da função e do navegador, não separados por esta medição.
 
 **T4: créditos.** Confirmado no painel do Netlify: **ainda não lido** (o painel atualiza diariamente e exige login do gestor). Pela API, o contador da conta mostrava 0 de 300, o que **não** comprova consumo nulo, porque não acompanha em tempo real. Conferido pela API: plano Free de créditos, sem recarga automática, sem forma de pagamento cadastrada, sem avaliação de plano pago e com compilações bloqueadas ao esgotar. Estimativa, não confirmada: 2 publicações em produção (30 créditos, pela tabela do Netlify) mais cerca de 660 carregamentos de telas e relatórios nos testes (processamento, requisições e transferência, entre 15 e 35 créditos): **de 45 a 65 créditos**, de 15% a 22% do mês. No desempenho atual, cada tela mantém a função ativa por vários segundos; 1 crédito corresponde a algo como 45 a 50 carregamentos, o que comporta uma homologação pequena, mas exige reavaliação antes de uso regular.
+
+### Desempenho depois da P-071 (prévia, 08/11/2026, D-088)
+
+Medido no mesmo horário que a produção (código original), com as mesmas contas e dados fictícios:
+
+| Tela | Produção atual | Prévia otimizada |
+|---|---|---|
+| Visão executiva | 7,3 s | 3,35 s |
+| Painel do projeto | 7,2 s | 3,2 s |
+| Página de relatórios | 7,8 s | 3,3 s |
+| R1 e R5 em XLSX | 8,3 e 8,6 s | 3,3 e 3,4 s |
+| Projeto ou tema | 9,3 s | 5,1 s; com ociosidade de 60 s, 3,3 s depois de pausas de 5 s e 3,9 s depois de 30 s |
+
+Depois de pausas longas (90 s ou mais), a função do Netlify esfria e as conexões são reabertas qualquer que seja a ociosidade (6,9 a 8 s na primeira tela). **Ociosidade das conexões:** `CRM_BANCO_OCIOSIDADE_S` (inteiro de 1 a 600; sem ela, 20 s) ajusta só o pool da aplicação; 60 s aceitos na prévia (contexto `branch-deploy`). A produção só a recebe na publicação aprovada pelo gestor.
+
+Ferramentas (somente leitura, salvo onde indicado; contas fictícias): `hospedagem:laboratorio` (servidor local com a distância até o banco simulada, sem deploy), `hospedagem:consultas` (comandos, transações e decomposição do tempo por tela), `hospedagem:equivalencia` e `hospedagem:equivalencia-paineis` (páginas e R1 a R5 comparados célula a célula entre versões, para oito contas), `hospedagem:concorrencia` (grava e arquiva uma iniciativa fictícia durante downloads do R1) e `hospedagem:reuso` (conexões depois de intervalos sem uso).
+
+### Publicação em produção e reversão
+
+**Sequência (depende de aprovação final do gestor):** (1) merge do Pull Request da Etapa 7B na `main`; (2) troca da base do Pull Request da P-071 para a `main`, conferência do GitHub Actions e merge; (3) `CRM_BANCO_OCIOSIDADE_S=60` também no contexto de produção; (4) o mesmo commit da `main` levado ao ramo `hospedagem-producao` (15 créditos); (5) conferências: segurança (T8), equivalência com a prévia, tempos e avaliação pessoal do gestor.
+
+**Reversão para a versão atual (`038945d`, publicação `6af0002`), sem custo de publicação:** no painel do Netlify, *Deploys* › publicação `6af0002` › **Publish deploy**, e **Lock to stop auto publishing** até a correção; remover `CRM_BANCO_OCIOSIDADE_S` do contexto de produção. No Git, sem reescrever o histórico: reverter os merges por Pull Request e só então destravar a publicação automática.
 
 ### Contas individuais de teste para os colegas (só depois da liberação pelo gestor)
 

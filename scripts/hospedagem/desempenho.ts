@@ -12,6 +12,7 @@
 import { spawn } from "node:child_process";
 import { mkdirSync, writeFileSync } from "node:fs";
 import path from "node:path";
+import { loadEnvConfig } from "@next/env";
 import { chromium, type Page } from "playwright-core";
 import { lerContasDeTeste } from "../contas-teste";
 import { estatisticas } from "./regras";
@@ -23,6 +24,19 @@ const PORTA_LOCAL = 3299;
 const BASE = (LOCAL ? `http://127.0.0.1:${PORTA_LOCAL}` : (argumento("base") ?? process.env.CRM_TESTE_BASE_URL ?? "")).replace(/\/$/, "");
 const RODADAS = Number(argumento("rodadas") ?? 5);
 const ROTULO = argumento("rotulo") ?? "hospedagem";
+// --banco-via=<porta>: com --local, o servidor local fala com o banco por um intermediário em 127.0.0.1
+// (laboratório de latência, que simula a distância entre a função e o banco). Só para medição.
+const BANCO_VIA = argumento("banco-via");
+
+/** Conexão da aplicação apontada para o intermediário local (o usuário, a senha e o banco não mudam). */
+function conexaoViaLaboratorio(conexao: string | undefined, porta: string): string {
+  // O servidor local lê o .env.local sozinho; aqui é preciso lê-lo para redirecionar a conexão (sem exibi-la).
+  if (!conexao) loadEnvConfig(process.cwd(), true, { info: () => {}, error: () => {} });
+  const url = new URL(conexao ?? process.env.CRM_BANCO_URL ?? "");
+  url.hostname = "127.0.0.1";
+  url.port = porta;
+  return url.toString();
+}
 
 async function medirTela(pagina: Page, caminho: string) {
   const inicio = Date.now();
@@ -90,7 +104,14 @@ async function aguardarServidor() {
 async function principal() {
   if (!BASE) throw new Error("Informe --base=<endereço>, --local ou CRM_TESTE_BASE_URL.");
   const servidor = LOCAL
-    ? spawn(process.execPath, ["node_modules/next/dist/bin/next", "start", "-H", "127.0.0.1", "-p", String(PORTA_LOCAL)], { env: { ...process.env, NODE_ENV: "production" }, stdio: "ignore" })
+    ? spawn(process.execPath, ["node_modules/next/dist/bin/next", "start", "-H", "127.0.0.1", "-p", String(PORTA_LOCAL)], {
+        env: {
+          ...process.env,
+          NODE_ENV: "production",
+          ...(BANCO_VIA ? { CRM_BANCO_URL: conexaoViaLaboratorio(process.env.CRM_BANCO_URL, BANCO_VIA) } : {}),
+        },
+        stdio: "ignore",
+      })
     : undefined;
   if (servidor) await aguardarServidor();
   const rede = await medirRede();

@@ -12,18 +12,27 @@
  * hospedagem; os textos dos comandos vêm normalizados pelo PostgreSQL, sem valores.
  * Requer que não haja outro uso do CRM durante a medição (o resultado seria somado).
  */
-import { mkdirSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import path from "node:path";
 import { sql } from "drizzle-orm";
 import { chromium, type Page } from "playwright-core";
 import { abrirBancoPostgres, fecharBanco } from "@/lib/banco/conexao";
 import { exigir } from "../backup/comum";
 import { lerContasDeTeste } from "../contas-teste";
-import { estatisticas } from "./regras";
+import { analisarCarregamento, type EventoDeBanco, estatisticas } from "./regras";
 
 const argumento = (nome: string) => process.argv.find((a) => a.startsWith(`--${nome}=`))?.slice(nome.length + 3);
 const BASE = (argumento("base") ?? process.env.CRM_TESTE_BASE_URL ?? "").replace(/\/$/, "");
 const REPETICOES = Number(argumento("repeticoes") ?? 3);
+// --instrumentacao=<arquivo>: eventos gravados pelo servidor do laboratório (CRM_INSTRUMENTACAO), para
+// decompor o tempo de banco de cada carregamento. --telas=<lista>: só as telas indicadas (parte do nome).
+const INSTRUMENTACAO = argumento("instrumentacao");
+const FILTRO_TELAS = argumento("telas")?.split(",").map((t) => t.trim().toLowerCase());
+const ROTULO = argumento("rotulo") ?? "medicao";
+const lerEventos = (): EventoDeBanco[] =>
+  INSTRUMENTACAO && existsSync(INSTRUMENTACAO)
+    ? readFileSync(INSTRUMENTACAO, "utf8").split("\n").filter(Boolean).map((l) => JSON.parse(l) as EventoDeBanco)
+    : [];
 
 type Contador = { texto: string; comandos: number; ms: number };
 
@@ -69,8 +78,13 @@ async function principal() {
     ["pessoas", "/pessoas", false],
     ["planos de ação", "/planos", false],
     ["R1 em XLSX", "/paineis/relatorios/R1", true],
-  ];
-  type Medida = { comandos: number; abertura: number; fim: number; identidade: number; conexao: number; consulta: number; consultasDistintas: number; msBanco: number; msTela: number; repetidos: Contador[]; lista: Contador[] };
+    ["relatórios (página)", "/paineis/relatorios", false],
+    ["R2 em XLSX", "/paineis/relatorios/R2", true],
+    ["R3 em XLSX", "/paineis/relatorios/R3", true],
+    ["R4 em XLSX", "/paineis/relatorios/R4", true],
+    ["R5 em XLSX", "/paineis/relatorios/R5", true],
+  ].filter(([nome]) => !FILTRO_TELAS || FILTRO_TELAS.some((f) => String(nome).toLowerCase().includes(f))) as [string, string, boolean][];
+  type Medida = { comandos: number; abertura: number; fim: number; identidade: number; conexao: number; consulta: number; consultasDistintas: number; msBanco: number; msTela: number; repetidos: Contador[]; lista: Contador[]; banco?: ReturnType<typeof analisarCarregamento> };
   const resultados: { tela: string; medidas: Medida[] }[] = [];
   try {
     await pagina.goto(`${BASE}/login`, { waitUntil: "domcontentloaded" });
@@ -91,7 +105,8 @@ async function principal() {
           await pagina.goto(`${BASE}${caminho}`, { waitUntil: "domcontentloaded", timeout: 120_000 });
           await pagina.waitForFunction(() => !document.body.innerText.includes("Carregando"), undefined, { timeout: 120_000 }).catch(() => undefined);
         }
-        const msTela = Date.now() - inicio;
+        const fimDoCarregamento = Date.now();
+        const msTela = fimDoCarregamento - inicio;
         await pagina.waitForTimeout(2500); // as estatísticas são gravadas ao fim de cada comando
         const lista = diferenca(antes, await instantaneo());
         const soma = (classe: string) => lista.filter((c) => classeDoComando(c.texto) === classe).reduce((t, c) => t + c.comandos, 0);
@@ -106,7 +121,8 @@ async function principal() {
           msBanco: Math.round(lista.reduce((t, c) => t + c.ms, 0)),
           msTela,
           repetidos: lista.filter((c) => classeDoComando(c.texto) === "consulta" && c.comandos > 1).sort((a, b) => b.comandos - a.comandos),
-          lista: lista.map((c) => ({ ...c, texto: c.texto.replace(/s+/g, " ").slice(0, 300), ms: Math.round(c.ms * 10) / 10 })),
+          lista: lista.map((c) => ({ ...c, texto: c.texto.replace(/\s+/g, " ").slice(0, 300), ms: Math.round(c.ms * 10) / 10 })),
+          banco: INSTRUMENTACAO ? analisarCarregamento(lerEventos(), inicio, fimDoCarregamento) : undefined,
         });
       }
       resultados.push({ tela, medidas });
@@ -124,8 +140,22 @@ async function principal() {
   console.log("| Tela | Comandos | Transações (abertura/fim) | Identificação | Conexões novas | Consultas do CRM (distintas) | Tempo no banco (ms) | Tela completa (ms) |");
   console.log("|---|---|---|---|---|---|---|---|");
   for (const { tela, medidas } of resultados) {
-    const m = (campo: keyof Omit<Medida, "repetidos" | "lista">) => faixa(medidas.map((x) => x[campo]));
+    const m = (campo: keyof Omit<Medida, "repetidos" | "lista" | "banco">) => faixa(medidas.map((x) => x[campo]));
     console.log(`| ${tela} | ${m("comandos")} | ${m("abertura")} / ${m("fim")} | ${m("identidade")} | ${m("conexao")} | ${m("consulta")} (${m("consultasDistintas")}) | ${m("msBanco")} | ${m("msTela")} |`);
+  }
+  if (INSTRUMENTACAO) {
+    const lab = path.join(process.cwd(), ".dados", "hospedagem", "laboratorio.json");
+    const idaEVolta = existsSync(lab) ? (JSON.parse(readFileSync(lab, "utf8")) as { idaEVoltaMs: number }).idaEVoltaMs : 0;
+    console.log(`\nDecomposição do tempo (instrumentação; ida e volta do laboratório: ${idaEVolta} ms; mediana [mínimo–máximo])`);
+    console.log("| Tela | Tela completa | Antes do banco | Banco no relógio (união) | Depois do banco | Transações | Paralelismo (x10) | Espera+BEGIN | Identidade | Consultas | COMMIT | Idas e voltas em série (estim.) |");
+    console.log("|---|---|---|---|---|---|---|---|---|---|---|---|");
+    for (const { tela, medidas } of resultados) {
+      const b = medidas.map((x) => x.banco).filter((x): x is NonNullable<typeof x> => Boolean(x));
+      if (b.length === 0) continue;
+      const f = (sel: (x: (typeof b)[number]) => number) => faixa(b.map(sel));
+      const serie = idaEVolta ? f((x) => Math.round(x.uniaoMs / idaEVolta)) : "-";
+      console.log(`| ${tela} | ${faixa(medidas.map((x) => x.msTela))} | ${f((x) => x.antesDoBancoMs)} | ${f((x) => x.uniaoMs)} | ${f((x) => x.depoisDoBancoMs)} | ${f((x) => x.transacoes)} | ${f((x) => Math.round(x.paralelismo * 10))} | ${f((x) => x.fases.espera)} | ${f((x) => x.fases.identidade)} | ${f((x) => x.fases.consultas)} | ${f((x) => x.fases.encerramento)} | ${serie} |`);
+    }
   }
   console.log("\nConsultas repetidas no mesmo carregamento (última repetição; texto normalizado, sem valores):");
   for (const { tela, medidas } of resultados) {
@@ -136,7 +166,7 @@ async function principal() {
   }
   const pasta = path.join(process.cwd(), ".dados", "hospedagem");
   mkdirSync(pasta, { recursive: true });
-  const arquivo = path.join(pasta, `consultas-${new Date().toISOString().replace(/[:.]/g, "-")}.json`);
+  const arquivo = path.join(pasta, `consultas-${ROTULO}-${new Date().toISOString().replace(/[:.]/g, "-")}.json`);
   writeFileSync(arquivo, JSON.stringify({ base: BASE, repeticoes: REPETICOES, quando: new Date().toISOString(), resultados }, null, 2));
   console.log(`Resultados: ${path.relative(process.cwd(), arquivo)}`);
 }

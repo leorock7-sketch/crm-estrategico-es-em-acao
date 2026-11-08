@@ -81,6 +81,64 @@ export function detalhesTecnicosNoErro(corpo: string): string[] {
 }
 
 /** Mediana e percentil 90 (arredondados), para os tempos de resposta. */
+/** Registro da instrumentação (src/lib/banco/instrumentacao.ts): tempos em ms desde o pedido (t0). */
+export type EventoDeBanco = {
+  t0: number;
+  tipo: "consulta" | "transacao";
+  rotulo: string;
+  consultas: number;
+  marcas: { transacao?: number; identidade?: number; consultas?: number };
+  fim: number;
+  falhou: boolean;
+};
+
+/**
+ * Decomposição do tempo de banco de um carregamento (P-071, E1), a partir dos eventos cujo pedido
+ * ocorreu entre o início e o fim do carregamento: soma dos tempos por fase, tempo de relógio em que
+ * havia ao menos uma transação em andamento (união dos intervalos) e grau de paralelismo.
+ * Fases: espera (obter conexão + BEGIN), identidade, consultas e encerramento (COMMIT). Nas
+ * transações com várias consultas, o encerramento fica somado às consultas.
+ */
+export function analisarCarregamento(eventos: EventoDeBanco[], inicio: number, fim: number) {
+  const doCarregamento = eventos.filter((e) => e.t0 >= inicio && e.t0 <= fim);
+  const intervalos = doCarregamento.map((e) => [e.t0, e.t0 + e.fim] as const).sort((a, b) => a[0] - b[0]);
+  let uniao = 0;
+  let aberto: [number, number] | null = null;
+  for (const [a, b] of intervalos) {
+    if (!aberto || a > aberto[1]) {
+      if (aberto) uniao += aberto[1] - aberto[0];
+      aberto = [a, b];
+    } else aberto[1] = Math.max(aberto[1], b);
+  }
+  if (aberto) uniao += aberto[1] - aberto[0];
+  const fases = { espera: 0, identidade: 0, consultas: 0, encerramento: 0 };
+  for (const e of doCarregamento) {
+    const t = e.marcas.transacao ?? 0;
+    const i = e.marcas.identidade ?? t;
+    fases.espera += t;
+    fases.identidade += i - t;
+    if (e.marcas.consultas !== undefined) {
+      fases.consultas += e.marcas.consultas - i;
+      fases.encerramento += e.fim - e.marcas.consultas;
+    } else fases.consultas += e.fim - i;
+  }
+  const soma = doCarregamento.reduce((t, e) => t + e.fim, 0);
+  const primeiro = intervalos.length ? intervalos[0][0] : fim;
+  const ultimo = intervalos.length ? Math.max(...intervalos.map((x) => x[1])) : inicio;
+  const arredondar = (v: number) => Math.round(v);
+  return {
+    transacoes: doCarregamento.length,
+    consultas: doCarregamento.reduce((t, e) => t + e.consultas, 0),
+    falhas: doCarregamento.filter((e) => e.falhou).length,
+    somaMs: arredondar(soma),
+    uniaoMs: arredondar(uniao),
+    paralelismo: uniao > 0 ? Math.round((soma / uniao) * 10) / 10 : 0,
+    antesDoBancoMs: arredondar(Math.max(0, primeiro - inicio)),
+    depoisDoBancoMs: arredondar(Math.max(0, fim - ultimo)),
+    fases: { espera: arredondar(fases.espera), identidade: arredondar(fases.identidade), consultas: arredondar(fases.consultas), encerramento: arredondar(fases.encerramento) },
+  };
+}
+
 /** Percentis pelo método da posição mais próxima (com poucas amostras, o p95 coincide com o máximo). */
 export function estatisticas(valores: number[]): { n: number; mediana: number; p90: number; p95: number; minimo: number; maximo: number } {
   if (valores.length === 0) return { n: 0, mediana: 0, p90: 0, p95: 0, minimo: 0, maximo: 0 };

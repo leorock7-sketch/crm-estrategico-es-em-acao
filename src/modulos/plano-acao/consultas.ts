@@ -585,9 +585,13 @@ export type Andamento = { situacao: SituacaoAcao | null; percentual: number | nu
 
 /** Situação e percentual mais recentes de cada ação. */
 export async function andamentoDasAcoes(banco: Executor, acaoIds: readonly string[]): Promise<Map<string, Andamento>> {
-  const mapa = new Map<string, Andamento>();
-  if (acaoIds.length === 0) return mapa;
-  const linhas = await banco
+  return andamentoDasLinhas(await acompanhamentosDasAcoes(banco, acaoIds));
+}
+
+/** Acompanhamentos não arquivados das ações, do mais recente para o mais antigo (data e momento do registro). */
+export async function acompanhamentosDasAcoes(banco: Executor, acaoIds: readonly string[]) {
+  if (acaoIds.length === 0) return [];
+  return banco
     .select({
       acaoId: acaoAcompanhamento.acaoId,
       data: acaoAcompanhamento.data,
@@ -597,6 +601,11 @@ export async function andamentoDasAcoes(banco: Executor, acaoIds: readonly strin
     .from(acaoAcompanhamento)
     .where(and(inArray(acaoAcompanhamento.acaoId, [...acaoIds]), isNull(acaoAcompanhamento.arquivadoEm)))
     .orderBy(desc(acaoAcompanhamento.data), desc(acaoAcompanhamento.criadoEm));
+}
+
+/** Andamento de cada ação a partir dos acompanhamentos já ordenados (o mais recente decide cada campo). */
+export function andamentoDasLinhas(linhas: Awaited<ReturnType<typeof acompanhamentosDasAcoes>>): Map<string, Andamento> {
+  const mapa = new Map<string, Andamento>();
   for (const l of linhas) {
     const atual = mapa.get(l.acaoId) ?? { situacao: null, percentual: null, data: l.data };
     if (atual.situacao === null && l.situacao) atual.situacao = l.situacao;
@@ -638,6 +647,16 @@ export async function acoesDasVersoes(banco: Executor, versaoIds: readonly strin
       todas.flatMap((a) => a.marcos.map((m) => m.marcoId)),
     ),
   ]);
+  return completarAcoesDasVersoes(planejadas, andamentos, alcancados, hoje);
+}
+
+/** Acrescenta andamento, atraso e marcos alcançados às ações planejadas de cada versão (sem consultar o banco). */
+export function completarAcoesDasVersoes(
+  planejadas: Awaited<ReturnType<typeof planejamentoDasVersoes>>,
+  andamentos: Map<string, Andamento>,
+  alcancados: Map<string, string>,
+  hoje: string,
+) {
   const comAndamento = (a: AcaoDaVersao) => {
     const andamento = andamentos.get(a.acaoId) ?? { situacao: null, percentual: null, data: null };
     return {

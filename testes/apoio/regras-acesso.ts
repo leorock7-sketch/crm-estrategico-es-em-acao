@@ -26,6 +26,7 @@ import {
   usuario,
 } from "@/lib/banco/esquema";
 import { comIdentidade } from "@/lib/banco/identidade";
+import { nomesDosRegistros, nomesDosRegistrosEmUmaConsulta } from "@/modulos/stakeholders/consultas";
 import { erroDoBanco } from "@/lib/banco/erros";
 import { ehAdministrador, podeDecidirNoProjeto, podeEditarNoProjeto, podeRegistrarNoCadastro, podeVerDadosRestritos } from "@/modulos/acesso/capacidades";
 import * as avaliacoes from "@/modulos/avaliacoes/consultas";
@@ -201,6 +202,21 @@ export function regrasDeAcesso(obterAmbiente: () => Ambiente) {
       expect(await visiveis(u.semPermissao)).toEqual([]);
       const doAdministrador = await visiveis(u.administrador);
       expect(doAdministrador).toEqual(expect.arrayContaining([projetoA, projetoB]));
+    });
+
+    test("P-071: a busca de nomes numa única consulta devolve o mesmo que a original, sob as regras de cada perfil", async () => {
+      const [{ id: comiteId }] = (await adm.execute(sql`select id from comite order by nome limit 1`)).rows as { id: string }[];
+      const ids = [projetoA, projetoB, comiteId];
+      for (const usuarioId of [u.administrador, u.gestorA, u.leitorA, u.semPermissao]) {
+        const original = await nomesDosRegistros(como(usuarioId), ids);
+        const consolidada = await nomesDosRegistrosEmUmaConsulta(como(usuarioId), ids);
+        expect([...consolidada.entries()]).toEqual([...original.entries()]);
+        // Também dentro de uma transação com identidade, como na página de projeto ou tema.
+        const naTransacao = await como(usuarioId).transaction((tx) => nomesDosRegistrosEmUmaConsulta(tx, ids));
+        expect([...naTransacao.entries()]).toEqual([...original.entries()]);
+      }
+      expect((await nomesDosRegistrosEmUmaConsulta(como(u.gestorA), ids)).has(projetoB)).toBe(false);
+      expect((await nomesDosRegistrosEmUmaConsulta(como(u.semPermissao), ids)).has(projetoA)).toBe(false);
     });
 
     test("os gatilhos de auditoria e de integridade continuam funcionando sob as regras", async () => {
