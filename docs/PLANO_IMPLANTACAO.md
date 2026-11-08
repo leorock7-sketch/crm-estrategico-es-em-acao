@@ -735,6 +735,7 @@ Sem novas publicações só para documentação. Próximos passos, a decidir pel
 | Site no Netlify Free (testes T2, T3, T4 e T8) | Piloto gratuito | 🔧 Publicado e testado em 08/11/2026 (D-087): T8 e T2 aprovados; T3 não homologado; T4 sem leitura no painel. Colegas não convidados |
 | Desempenho na hospedagem (idas e voltas ao banco entre Ohio e São Paulo) | Uso pelos colegas e piloto (D-087) | 🔧 P-071 concluída na prévia (D-088): telas principais e relatórios de cerca de 7–9 s para cerca de 3,3 s, projeto ou tema 5,1 s; aceitável para o piloto inicial. Ciclo de otimização encerrado |
 | Publicação da versão otimizada (P-071) em produção | Piloto operacional | ⏳ Aguarda aprovação final do gestor: merges da Etapa 7B e da P-071, ociosidade de 60 s em produção e uma publicação; reversão documentada ([OPERACAO.md](OPERACAO.md), seção 7) |
+| Correções de consistência da validação independente (V-01, V-02 e avisos, D-089) | Uso do R3 para decisões | 🔧 Implementadas em ramo próprio, com testes; publicação na prévia e em produção aguardam autorização |
 | Primeira avaliação pessoal do gestor no endereço de produção | Convite aos colegas | ⏳ Roteiro de aceitação entregue; só dados fictícios |
 | Leitura do consumo de créditos no painel do Netlify | Conclusão do T4 | ⏳ Pendente: o contador da API mostrava 0 e não acompanha em tempo real; leitura em *Usage & billing* pelo gestor |
 | Primeira rodada pessoal do gestor no navegador | Convite aos colegas | ⏳ A realizar pelo gestor, depois da homologação técnica |
