@@ -5,6 +5,7 @@
 import { readFileSync } from "node:fs";
 import { describe, expect, test } from "vitest";
 import { opcoesDosCookiesDaSessao } from "../src/lib/autenticacao/cookies-da-sessao";
+import { OCIOSIDADE_PADRAO_S, ociosidadeDaAplicacao } from "../src/lib/banco/conexao";
 import {
   analisarCarregamento,
   type EventoDeBanco,
@@ -118,6 +119,20 @@ describe("Instrumentação do laboratório (P-071, E1)", () => {
 
   test("sem eventos, nada é atribuído ao banco", () => {
     expect(analisarCarregamento([], 0, 500)).toMatchObject({ transacoes: 0, uniaoMs: 0, paralelismo: 0 });
+  });
+});
+
+describe("Ociosidade das conexões da aplicação (P-071, E5)", () => {
+  test("sem a variável, ou com valor inválido, mantém os 20 s de sempre", () => {
+    for (const v of [undefined, "", "abc", "0", "601", "-5", "30.5", "1e3"]) expect(ociosidadeDaAplicacao(v)).toBe(OCIOSIDADE_PADRAO_S);
+    expect(OCIOSIDADE_PADRAO_S).toBe(20);
+  });
+
+  test("aceita inteiros de 1 a 600 segundos", () => {
+    expect(ociosidadeDaAplicacao("60")).toBe(60);
+    expect(ociosidadeDaAplicacao(" 120 ")).toBe(120);
+    expect(ociosidadeDaAplicacao("1")).toBe(1);
+    expect(ociosidadeDaAplicacao("600")).toBe(600);
   });
 });
 
