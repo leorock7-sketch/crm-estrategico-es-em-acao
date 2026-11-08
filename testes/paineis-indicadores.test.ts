@@ -226,6 +226,30 @@ describe("A. Ausência de dados não vira outro valor", () => {
     expect(valor(b, "planos", "Atrasadas")).toBe(0);
   });
 
+  test("D-090: 'Com responsável externo' conta toda ação com externo, inclusive com corresponsável da equipe, uma vez cada", () => {
+    const S1 = ID(901);
+    const S2 = ID(902);
+    const acoes = [
+      acao(1, { responsavelUsuarioId: U1, responsavelStakeholderId: null }), // só equipe: não conta
+      acao(2, { responsavelUsuarioId: null, responsavelStakeholderId: S1 }), // só externo: conta
+      acao(3, { responsavelUsuarioId: U1, responsavelStakeholderId: S2 }), // equipe e externo: conta uma vez
+      acao(4, { responsavelUsuarioId: null, responsavelStakeholderId: null }), // sem responsável: não conta
+    ];
+    const dados = dadosDe({ planos: [plano(1, { acoes })] });
+    const geral = blocos(dados);
+    expect(valor(geral, "planos", "Com responsável externo")).toBe(2);
+    expect(indicador(geral, "planos", "Com responsável externo").nota).toMatch(/também têm responsável da equipe/);
+    // Os demais totais do bloco não mudam.
+    expect(valor(geral, "planos", "Ações")).toBe(4);
+    expect(valor(geral, "planos", "Em andamento")).toBe(4);
+    expect(valor(geral, "planos", "Atrasadas")).toBe(0);
+    // Painel geral filtrado pelo projeto e painel do projeto (mesmo escopo) dão o mesmo resultado.
+    const filtrado = blocos(dados, { projetoTemaId: P1 });
+    const doProjeto = calcularBlocos(dados, new Set([P1]), { projetoTemaId: P1 }, HOJE);
+    expect(valor(filtrado, "planos", "Com responsável externo")).toBe(2);
+    expect(valor(doProjeto, "planos", "Com responsável externo")).toBe(2);
+  });
+
   test("iniciativa sem previsão, sem responsável e sem prioridade é contada à parte", () => {
     const b = blocos(dadosDe({ iniciativas: [iniciativa(1, { dataPrevistaConclusao: null, responsavelId: null, prioridade: null })] }));
     expect(valor(b, "iniciativas", "Em curso sem previsão de conclusão")).toBe(1);
