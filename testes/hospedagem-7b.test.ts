@@ -6,6 +6,8 @@ import { readFileSync } from "node:fs";
 import { describe, expect, test } from "vitest";
 import { opcoesDosCookiesDaSessao } from "../src/lib/autenticacao/cookies-da-sessao";
 import {
+  analisarCarregamento,
+  type EventoDeBanco,
   avaliarCabecalhos,
   detalhesTecnicosNoErro,
   estatisticas,
@@ -89,6 +91,33 @@ describe("Segredos em arquivos entregues ao navegador", () => {
 
   test("valores curtos não entram na busca, para evitar falso alarme", () => {
     expect(valoresSensiveis({ SUPABASE_SECRET_KEY: "curta" })).toEqual([]);
+  });
+});
+
+describe("Instrumentação do laboratório (P-071, E1)", () => {
+  const evento = (t0: number, fim: number, marcas: EventoDeBanco["marcas"], tipo: EventoDeBanco["tipo"] = "consulta"): EventoDeBanco => ({
+    t0, tipo, rotulo: "x", consultas: 1, marcas, fim, falhou: false,
+  });
+
+  test("união dos intervalos, paralelismo e fases", () => {
+    const eventos = [
+      evento(1000, 600, { transacao: 100, identidade: 300, consultas: 500 }),
+      evento(1200, 600, { transacao: 100, identidade: 300, consultas: 500 }), // sobrepõe o primeiro
+      evento(3000, 400, { transacao: 100, identidade: 200 }, "transacao"),
+      evento(9000, 100, { transacao: 50 }), // fora da janela
+    ];
+    const r = analisarCarregamento(eventos, 900, 4000);
+    expect(r.transacoes).toBe(3);
+    expect(r.uniaoMs).toBe(800 + 400);
+    expect(r.somaMs).toBe(1600);
+    expect(r.paralelismo).toBe(1.3);
+    expect(r.antesDoBancoMs).toBe(100);
+    expect(r.depoisDoBancoMs).toBe(600);
+    expect(r.fases).toEqual({ espera: 300, identidade: 500, consultas: 600, encerramento: 200 });
+  });
+
+  test("sem eventos, nada é atribuído ao banco", () => {
+    expect(analisarCarregamento([], 0, 500)).toMatchObject({ transacoes: 0, uniaoMs: 0, paralelismo: 0 });
   });
 });
 
