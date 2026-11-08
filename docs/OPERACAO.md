@@ -7,6 +7,8 @@
 | 0.3 | 07/11/2026 | Monitor ativado pelo gestor (teste de quatro semanas iniciado) e rotina diária de cópias no Agendador de Tarefas do Windows (D-084). |
 | 0.4 | 07/11/2026 | Reativação da tarefa diária, conferência da chave com abertura de cópia existente e reserva do segundo projeto do Supabase para outra ferramenta (D-085). |
 | 0.5 | 07/11/2026 | Chave privada conferida pelo arquivo local, sem gerenciador de senhas; segunda cópia segura da chave pendente antes de dados reais (D-086). |
+| 0.7 | 08/11/2026 | P-071 (D-088): desempenho após a otimização, ferramentas de medição, ociosidade configurável das conexões, publicação em produção e reversão. |
+| 0.6 | 08/11/2026 | Etapa 7B (D-087): site de testes no Netlify Free, público e protegido pelo login e pelas permissões do CRM; resultados de T2, T3, T4 e T8; diagnóstico do desempenho; procedimento de contas e roteiro para os colegas, que só serão convidados depois da aprovação do gestor. |
 
 Legenda: ✅ Aprovado · 🔧 Proposta técnica · ⏳ Pendente.
 
@@ -17,7 +19,7 @@ Legenda: ✅ Aprovado · 🔧 Proposta técnica · ⏳ Pendente.
 | Parte | Serviço | Situação |
 |---|---|---|
 | Banco e login | Supabase Free, conta pessoal do gestor, projeto `crm-es-em-acao-dev` (São Paulo), descartável, só dados fictícios | Em uso |
-| Aplicação | Netlify Free (candidato, A1) | Não criada; compatibilidade testada sem conta (seção 7) |
+| Aplicação | Netlify Free, site de testes `crm-estrategico-es-em-acao-testes` (D-087) | Publicado e público desde 08/11/2026, só com dados fictícios; colegas ainda não convidados (seção 7) |
 | Monitoramento | GitHub Actions do repositório público | Preparado; ativação depende de cadastrar os segredos (seção 2) |
 | Cópias de segurança | pg_dump (PostgreSQL 17.11) e age 1.3.2 no computador do gestor, sem Docker | Em uso com dados fictícios |
 
@@ -29,7 +31,7 @@ Limites e condições dos fornecedores, conferidos em 07/11/2026 nas páginas of
 | Supabase Free | Projeto pausado após cerca de 7 dias de pouca atividade, **sem garantia** de que consultas evitem a pausa | Monitoramento reduz o risco; reativação manual (seção 4) |
 | Supabase Free | Sem cópias automáticas, sem recuperação a um ponto no tempo e sem download de cópias | Cópias próprias (seção 5) |
 | Netlify Free | 300 créditos por mês, limite rígido; ao esgotar, **todos** os sites da conta param até o ciclo seguinte; publicação em produção gasta 15 créditos; prévias não gastam | Sem cobrança, mas com interrupção. Consumo real só será conhecido nos testes T3 e T4 |
-| Netlify Free | Funções em Ohio (padrão); mudança de região no plano gratuito não confirmada; até 60 s por requisição; memória de 1024 MB | Risco de lentidão com o banco em São Paulo (teste T3) |
+| Netlify Free | Funções em Ohio (us-east-2); a escolha da região das funções é restrita aos planos Pro e Enterprise, segundo a documentação oficial; até 60 s por requisição; memória de 1024 MB | **Restrição do ambiente gratuito:** o banco fica em São Paulo, e cada ida e volta ao banco custa cerca de 0,16 s (teste T3, seção 7) |
 | Netlify e Supabase | Plano gratuito sem garantia de disponibilidade, alterável ou encerrável pelo fornecedor | Continuidade não garantida |
 | GitHub Actions | Fluxos agendados de repositório público desativados após 60 dias sem atividade no repositório; atrasos e descartes em horários de pico; registros e artefatos visíveis a usuários do GitHub | Conferência da própria automação e procedimento manual (seção 2); nenhum dado ou cópia no GitHub |
 
@@ -63,7 +65,7 @@ Limites e condições dos fornecedores, conferidos em 07/11/2026 nas páginas of
 |---|---|---|
 | Tamanho do banco | PostgreSQL (`pg_database_size`), lido pelo monitor | 3 vezes ao dia |
 | Transferência, usuários ativos e armazenamento do Supabase | Painel *Usage* do Supabase | Mensal, pelo gestor |
-| Créditos do Netlify | Painel de uso do Netlify e avisos do próprio Netlify (50%, 75%, 90%, 100%) | Mensal, quando houver hospedagem |
+| Créditos do Netlify | Painel de uso do Netlify (*Usage & billing*, atualizado diariamente) e avisos do próprio Netlify (50%, 75%, 90%, 100%). O contador da API não acompanha em tempo real: zero na API **não** significa consumo nulo | Mensal, e depois de cada rodada de testes ou publicação |
 
 Os alertas de **70% e 85%** são parâmetros de gestão (D-082), não regras dos fornecedores. A automação de transferência e usuários ativos exigiria um token de acesso amplo à conta: não adotada.
 
@@ -124,14 +126,124 @@ Tarefa **"CRM - copia diaria (desenvolvimento)"** no Agendador de Tarefas do Win
 
 O ensaio local comprova dados, estrutura, regras, permissões e credenciais restauradas, mas **não** o login completo do Supabase Auth, que só roda num projeto Supabase. **A demonstração no segundo projeto gratuito não será feita:** ele está reservado para outra ferramenta institucional indicada pelo gestor (a mesma da V3-07) (D-085). A validação integral será replanejada, com uma alternativa tecnicamente segura e gratuita a apresentar; até lá, mantêm-se os ensaios locais isolados, e a pendência **não** está resolvida enquanto a restauração completa não for efetivamente comprovada. Roteiro técnico, para quando houver ambiente autorizado: preparar o projeto; aplicar `npm run supabase:preparar` com a conexão nova; restaurar os dados com `pg_restore --data-only` nas tabelas de `public` e de `auth`; reproduzir as configurações da seção 5; conferir com `backup:comparar` e com os testes não destrutivos.
 
-## 7. Hospedagem candidata: Netlify Free 🔧 (A1)
+## 7. Hospedagem de testes: Netlify Free 🔧 (A1, D-087)
+
+### Configuração (08/11/2026)
+
+| Item | Configuração |
+|---|---|
+| Site | `crm-estrategico-es-em-acao-testes`, na equipe do gestor, plano Free (créditos): https://crm-estrategico-es-em-acao-testes.netlify.app |
+| Visibilidade | **Pública**, produção e prévias (D-087). O plano Free oferece uma única opção para o site, e a privada exige conta Netlify do dono da equipe. A proteção é o login e as permissões do CRM, com as regras de acesso do banco (RLS) |
+| Repositório | Integração nativa do Netlify com o GitHub, autorizada pelo gestor só para este repositório |
+| Publicações | Produção pelo ramo `hospedagem-producao`; publicação de ramo só para `hospedagem-previa`; prévias de Pull Requests desligadas; a `main` e os demais ramos não publicam. Duas barreiras: a lista de ramos permitidos no Netlify e a regra `ignore` do `netlify.toml` |
+| Credenciais | Só as quatro variáveis da aplicação, gravadas por `npm run hospedagem:credenciais -- --site=<identificador>`, que confere antes o projeto autorizado, a marca de banco descartável e o papel restrito `crm_app`; as duas do servidor ficam marcadas como secretas. O plano Free não restringe escopos: os segredos ficam disponíveis também na compilação, que não os usa (compilação aprovada sem eles). **Nunca** vão para o Netlify: a conexão administrativa, a do monitor, as chaves das cópias e qualquer credencial administrativa |
+| Servidor | Adaptador Next.js 5.16.6: uma função do servidor (Node 24, 1 GB, Ohio, us-east-2) e uma Edge Function (o proxy, que leva ao login); banco em São Paulo |
+| Contas | Autocadastro público desligado no Supabase (conferido por `npm run ambiente:conferir`); contas só pelo administrador do CRM, com troca obrigatória da senha provisória (P-056) |
+
+**Como publicar uma alteração aprovada:** depois do merge na `main` pelo gestor, testar antes, se útil, no ramo `hospedagem-previa` (publicação de ramo, sem custo de publicação) e então levar o mesmo commit ao ramo `hospedagem-producao` (15 créditos por publicação). Alterações só de documentação não precisam ser publicadas.
+
+### Testes anteriores, sem conta
 
 | Teste | Resultado |
 |---|---|
 | Ferramenta oficial no Windows (`netlify build --offline`, adaptador 5.16.6) | Next.js e funções compilam; o empacotamento do proxy como Edge Function falha por erro de caminhos do Windows na ferramenta (com Turbopack e com webpack). Não conclusivo: o Netlify compila em Linux |
 | Mesma compilação em Linux (GitHub Actions, sem conta e sem segredos) | Aprovada em 07/11/2026 (execução de 1f4c1c0): compilação com o adaptador 5.16.6, funções do servidor e Edge Function do proxy geradas; no servidor local do Netlify, /login com HTTP 200 e /paineis sem sessão levado ao login pelo proxy |
 
-Pendentes, todos dependentes de autorização: T2 (prévia publicada com o banco de desenvolvimento), T3 (tempo de resposta Ohio–São Paulo), T4 (consumo real de créditos), T8 (segurança na hospedagem). A estimativa anterior de créditos **não** é previsão (D-082). Vercel Hobby fica excluído para uso institucional (termos restritos a uso pessoal e não comercial).
+Vercel Hobby fica excluído para uso institucional (termos restritos a uso pessoal e não comercial).
+
+### Resultados no endereço público (08/11/2026, commit `038945d`)
+
+| Teste | Resultado |
+|---|---|
+| Publicações | 2 em produção, ambas prontas (`24ddd49`, 61 s de compilação; `038945d`, 40 s), nenhuma de ramo ou de Pull Request. Adaptador Next.js 5.16.6, uma função do servidor e uma Edge Function |
+| T8 — segurança | 24 conferências aprovadas: HTTP levado a HTTPS; cabeçalhos de segurança; telas, relatórios e arquivos sem sessão levados ao login; `/saude` sem dados; erro sem detalhes técnicos; 12 arquivos do navegador sem segredos e sem mapas do código-fonte; cookie da sessão `Secure`, `HttpOnly` e `SameSite=Lax`; chave pública sem leitura de dados. A primeira rodada apontou o cookie sem `Secure`; corrigido no commit `038945d` e conferido de novo |
+| T2 — testes reais (`test:supabase`, com os testes de navegador apontados ao endereço público) | 159 de 159 aprovados em 18,5 min: autenticação, regras de acesso, painéis e exportações por perfil, monitor, credenciais e 41 cenários de navegador nos quatro perfis |
+| T3 — desempenho | Ver abaixo: funcional, mas lento; **não homologado** para uso pelos colegas |
+| T4 — créditos | Ver abaixo: leitura no painel pendente |
+
+**T3: tempos por tela** (10 rodadas; a 1ª rodada à parte; nas demais, 9 observações por tela; o p95 é exploratório e, com 9 observações, coincide com o máximo):
+
+| Tela | Local: mediana | Netlify: 1º byte, mediana | Netlify: tela completa, mediana [mín.–máx.] | Netlify: 1ª rodada |
+|---|---|---|---|---|
+| Visão executiva | 1,6 s | 0,6 s | 8,4 s [8,3–8,9] | 8,2 s |
+| Painel do projeto | 1,9 s | 0,3 s | 8,1 s [7,9–8,4] | 9,2 s |
+| Relatórios | 1,7 s | 0,3 s | 8,7 s [8,7–9,9] | 8,8 s |
+| Matriz de stakeholders | 0,9 s | 0,3 s | 6,1 s [4,7–7,4] | 7,3 s |
+| Projeto ou tema | 1,7 s | 0,3 s | 9,4 s [8,8–11,1] | 9,4 s |
+| Pessoas | 0,7 s | 0,3 s | 4,3 s [2,8–5,0] | 4,4 s |
+| Instituições | 0,4 s | 0,3 s | 2,5 s [2,0–5,2] | 4,3 s |
+| Interações | 0,7 s | 0,3 s | 3,3 s [3,3–6,8] | 6,8 s |
+| Iniciativas | 1,2 s | 0,3 s | 3,9 s [3,7–4,4] | 3,9 s |
+| Planos de ação | 0,7 s | 0,3 s | 3,3 s [3,0–3,5] | 3,6 s |
+| Riscos | 1,0 s | 0,3 s | 4,1 s [4,1–6,8] | 4,1 s |
+| Usuários | 0,7 s | 0,3 s | 3,5 s [3,3–3,7] | 3,6 s |
+| R1 a R5 em XLSX | 1,7 a 2,1 s | — | 9,3 a 9,7 s [9,0–11,5] | 9,1 a 9,5 s |
+| Entrada (login até o painel, uma medida) | 3,3 s | — | 12,3 s | — |
+
+O primeiro byte chega em cerca de 0,3 s (a estrutura da tela aparece logo, com "Carregando"); a demora está no preenchimento dos dados. A 1ª rodada não difere muito das demais (funções "frias" não são a causa principal), salvo Instituições e Interações.
+
+**Medido x hipótese.** Medido: arquivo estático pela CDN, 27 ms (local, 4 ms); `/saude`, que faz uma única consulta sem tabelas, 905 ms (local, 133 ms); comandos do banco por tela, pelas estatísticas do PostgreSQL (`npm run hospedagem:consultas`, comparação antes e depois de cada carregamento, sem reiniciar as estatísticas):
+
+| Tela | Comandos | Transações | Consultas do CRM | Conexões novas | Tempo no banco | Tela completa |
+|---|---|---|---|---|---|---|
+| Visão executiva | 36 | 2 | 29 | 0 a 1 | 0,16 s | 8,1 s |
+| Painel do projeto | 36 | 2 | 29 | 0 | 0,15 s | 8,0 s |
+| Projeto ou tema | 104 | 26 | 25 | 0 a 4 | 0,17 s | 8,8 s |
+| Matriz de stakeholders | 39 | 9 | 8 | 0 a 4 | 0,01 s | 7,1 s |
+| Pessoas | 14 | 3 | 2 | 0 a 2 | 0,04 s | 4,3 s |
+| Planos de ação | 18 | 4 | 3 | 0 a 2 | 0,18 s | 5,6 s |
+| R1 em XLSX | 44 | 4 | 30 | 0 | 0,15 s | 9,3 s |
+
+O banco gasta no máximo 0,18 s por tela; nenhuma consulta do CRM se repete no mesmo carregamento (sem padrão N+1 de comandos iguais). Teste local controlado, só leitura e sem tabelas, pela mesma conexão da aplicação: uma ida e volta, 29 ms; transação com identidade, 90 ms; 10 consultas **com parâmetros** numa transação, cerca de 650 ms **tanto em série quanto em paralelo**; 10 consultas **sem parâmetros** em paralelo, 91 ms. Logo, nesta configuração (driver `postgres` sem consultas preparadas, exigência do pooler de transações), cada consulta com parâmetros custa duas idas e voltas e não se sobrepõe às outras, mesmo quando o código as dispara em paralelo, como já faz o painel.
+
+Hipótese, coerente com as medidas mas não comprovada por instrumentação na função: o tempo das telas é dominado pelo número de idas e voltas em série ao banco, cada uma de cerca de 0,16 s entre Ohio e São Paulo; somam-se a abertura de conexões novas (0 a 4 por carregamento, cada uma com várias idas e voltas) e o processamento da função e do navegador, não separados por esta medição.
+
+**T4: créditos.** Confirmado no painel do Netlify: **ainda não lido** (o painel atualiza diariamente e exige login do gestor). Pela API, o contador da conta mostrava 0 de 300, o que **não** comprova consumo nulo, porque não acompanha em tempo real. Conferido pela API: plano Free de créditos, sem recarga automática, sem forma de pagamento cadastrada, sem avaliação de plano pago e com compilações bloqueadas ao esgotar. Estimativa, não confirmada: 2 publicações em produção (30 créditos, pela tabela do Netlify) mais cerca de 660 carregamentos de telas e relatórios nos testes (processamento, requisições e transferência, entre 15 e 35 créditos): **de 45 a 65 créditos**, de 15% a 22% do mês. No desempenho atual, cada tela mantém a função ativa por vários segundos; 1 crédito corresponde a algo como 45 a 50 carregamentos, o que comporta uma homologação pequena, mas exige reavaliação antes de uso regular.
+
+### Desempenho depois da P-071 (prévia, 08/11/2026, D-088)
+
+Medido no mesmo horário que a produção (código original), com as mesmas contas e dados fictícios:
+
+| Tela | Produção atual | Prévia otimizada |
+|---|---|---|
+| Visão executiva | 7,3 s | 3,35 s |
+| Painel do projeto | 7,2 s | 3,2 s |
+| Página de relatórios | 7,8 s | 3,3 s |
+| R1 e R5 em XLSX | 8,3 e 8,6 s | 3,3 e 3,4 s |
+| Projeto ou tema | 9,3 s | 5,1 s; com ociosidade de 60 s, 3,3 s depois de pausas de 5 s e 3,9 s depois de 30 s |
+
+Depois de pausas longas (90 s ou mais), a função do Netlify esfria e as conexões são reabertas qualquer que seja a ociosidade (6,9 a 8 s na primeira tela). **Ociosidade das conexões:** `CRM_BANCO_OCIOSIDADE_S` (inteiro de 1 a 600; sem ela, 20 s) ajusta só o pool da aplicação; 60 s aceitos na prévia (contexto `branch-deploy`). A produção só a recebe na publicação aprovada pelo gestor.
+
+Ferramentas (somente leitura, salvo onde indicado; contas fictícias): `hospedagem:laboratorio` (servidor local com a distância até o banco simulada, sem deploy), `hospedagem:consultas` (comandos, transações e decomposição do tempo por tela), `hospedagem:equivalencia` e `hospedagem:equivalencia-paineis` (páginas e R1 a R5 comparados célula a célula entre versões, para oito contas), `hospedagem:concorrencia` (grava e arquiva uma iniciativa fictícia durante downloads do R1) e `hospedagem:reuso` (conexões depois de intervalos sem uso).
+
+### Publicação em produção e reversão
+
+**Sequência (depende de aprovação final do gestor):** (1) merge do Pull Request da Etapa 7B na `main`; (2) troca da base do Pull Request da P-071 para a `main`, conferência do GitHub Actions e merge; (3) `CRM_BANCO_OCIOSIDADE_S=60` também no contexto de produção; (4) o mesmo commit da `main` levado ao ramo `hospedagem-producao` (15 créditos); (5) conferências: segurança (T8), equivalência com a prévia, tempos e avaliação pessoal do gestor.
+
+**Reversão para a versão atual (`038945d`, publicação `6af0002`), sem custo de publicação:** no painel do Netlify, *Deploys* › publicação `6af0002` › **Publish deploy**, e **Lock to stop auto publishing** até a correção; remover `CRM_BANCO_OCIOSIDADE_S` do contexto de produção. No Git, sem reescrever o histórico: reverter os merges por Pull Request e só então destravar a publicação automática.
+
+### Contas individuais de teste para os colegas (só depois da liberação pelo gestor)
+
+O banco de desenvolvimento é descartável e só pode ter dados fictícios (D-077): **as contas usam pseudônimo e e-mail fictício**. As proteções do projeto recusam contas fora dos domínios fictícios (`.example.com`, `.invalid`, `.test`), e uma conta com e-mail real faria a rotina diária de cópias e os comandos de manutenção pararem. O e-mail serve só para entrar: o CRM não envia mensagens.
+
+1. O gestor entra no CRM com uma conta de **administrador** (nunca repassada a terceiros).
+2. **Usuários e permissões › Novo usuário:** nome `Homologador 01` (02, 03…), e-mail `homologador01@homologacao.crm-es-em-acao.example.com`; **não** marcar "administrador do sistema"; salvar.
+3. Copiar a **senha provisória**, mostrada uma única vez, e repassá-la ao colega por canal individual (pessoalmente ou mensagem direta), nunca em grupo ou lista de e-mail.
+4. Na página da conta, **Conceder permissão:** um projeto fictício, o perfil do teste (Gestor, Colaborador ou Leitor) e **Válida até** a data de encerramento da homologação.
+5. A correspondência entre pseudônimo e pessoa fica só com o gestor, fora do CRM e do repositório.
+6. No primeiro acesso, o colega troca a senha provisória (P-056). Ao fim da homologação, o gestor **suspende** ou exclui a conta.
+
+### Roteiro de homologação para os colegas
+
+Regra para todos: registrar **somente informações fictícias**, nunca nomes, cargos ou dados reais de stakeholders.
+
+1. **Acesso:** abrir o endereço, entrar com o e-mail e a senha provisória, criar a senha nova, sair e entrar de novo com ela.
+2. **Navegação:** Painéis (visão executiva e painel do projeto), página do projeto, matriz de stakeholders, Pessoas, Instituições, Interações, Iniciativas, Planos e Riscos.
+3. **Conforme o perfil:** Leitor, só consulta (não deve haver botões de inclusão nem formulários); Colaborador, registrar e alterar uma interação e uma iniciativa fictícias; Gestor, também decidir sobre uma versão do plano.
+4. **Relatórios:** baixar R1 a R5 (perfis com exportação) e abri-los no Microsoft Excel, conferindo leitura e apresentação.
+5. **Isolamento:** confirmar que só aparecem dados do projeto concedido.
+6. **Celular:** repetir a entrada e a navegação principal no celular.
+7. **Registro:** anotar o que funcionou, erros (com captura de tela), lentidão (tela e tempo aproximado) e sugestões, num formulário ou planilha do gestor, fora do repositório.
 
 ## 8. Conta pessoal: consequências ⏳ (D-082)
 

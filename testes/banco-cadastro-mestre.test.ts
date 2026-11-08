@@ -378,6 +378,9 @@ describe("Vínculos", () => {
 
     const nomes = await consultas.nomesDosRegistros(banco, consultas.idsCitadosNoHistorico(historicoPessoa));
     expect(nomes.get(instituicaoId)).toBe("Empresa Eta Exemplo");
+    // P-071: inclui vínculo (cargo · instituição); a versão em uma consulta devolve o mesmo, na mesma ordem.
+    const consolidados = await consultas.nomesDosRegistrosEmUmaConsulta(banco, consultas.idsCitadosNoHistorico(historicoPessoa));
+    expect([...consolidados.entries()]).toEqual([...nomes.entries()]);
   });
 
   test("a lista de pessoas mostra o vínculo principal vigente", async () => {

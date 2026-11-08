@@ -1,6 +1,7 @@
 import "server-only";
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
+import { opcoesDosCookiesDaSessao } from "./cookies-da-sessao";
 
 /**
  * Cliente do Supabase Auth ligado aos cookies da requisição. Usa somente a chave pública
@@ -13,7 +14,7 @@ export async function clienteSupabaseDaRequisicao() {
     process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY as string,
     {
       // O navegador não usa o cliente do Supabase; os programas da página não precisam do cookie.
-      cookieOptions: { httpOnly: true, sameSite: "lax" },
+      cookieOptions: opcoesDosCookiesDaSessao(),
       cookies: {
         getAll: () => armazenamento.getAll(),
         setAll: (novos) => {

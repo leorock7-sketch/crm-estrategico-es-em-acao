@@ -17,8 +17,13 @@ import { ROTULOS_PRESENCA, ROTULOS_TIPO_INTERACAO } from "@/modulos/interacoes/r
 import { iniciativasDoProjetoTema, iniciativasDoStakeholder } from "../consultas";
 import { ROTULOS_PAPEL_INICIATIVA, ROTULOS_TIPO_INICIATIVA, type PapelIniciativa } from "../rotulos";
 
-/** Iniciativas, interações e compromissos de um projeto ou tema (com atalhos para registrar). */
-export async function AtividadesDoProjetoTema({ projetoTemaId, arquivado }: { projetoTemaId: string; arquivado: boolean }) {
+type AtividadesDoProjetoTemaDados = {
+  iniciativas: Awaited<ReturnType<typeof iniciativasDoProjetoTema>>;
+  interacoes: Awaited<ReturnType<typeof interacoesDoProjetoTema>>;
+  resumo: Awaited<ReturnType<typeof resumoDoProjetoTema>>;
+};
+
+async function carregarAtividadesDoProjetoTema(projetoTemaId: string): Promise<AtividadesDoProjetoTemaDados> {
   const banco = await bancoDaRequisicao();
   const hoje = hojeEmBrasilia();
   const [iniciativas, interacoes, resumo] = await Promise.all([
@@ -26,6 +31,21 @@ export async function AtividadesDoProjetoTema({ projetoTemaId, arquivado }: { pr
     interacoesDoProjetoTema(banco, projetoTemaId),
     resumoDoProjetoTema(banco, projetoTemaId, hoje),
   ]);
+  return { iniciativas, interacoes, resumo };
+}
+
+/** Iniciativas, interações e compromissos de um projeto ou tema (com atalhos para registrar). */
+export async function AtividadesDoProjetoTema({
+  projetoTemaId,
+  arquivado,
+  dados,
+}: {
+  projetoTemaId: string;
+  arquivado: boolean;
+  /** Dados já lidos pela página (P-071, E2); sem eles, o componente faz a própria leitura. */
+  dados?: AtividadesDoProjetoTemaDados;
+}) {
+  const { iniciativas, interacoes, resumo } = dados ?? (await carregarAtividadesDoProjetoTema(projetoTemaId));
   return (
     <section aria-labelledby="titulo-atividades" className={classeCartao}>
       <div className="mb-1 flex flex-wrap items-baseline justify-between gap-2">

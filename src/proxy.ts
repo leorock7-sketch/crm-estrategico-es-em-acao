@@ -5,6 +5,7 @@
  */
 import { createServerClient } from "@supabase/ssr";
 import { type NextRequest, NextResponse } from "next/server";
+import { opcoesDosCookiesDaSessao } from "@/lib/autenticacao/cookies-da-sessao";
 import { DESTINO_DA_TROCA, exigeTrocaDeSenha, PAGINA_DA_TROCA } from "@/lib/autenticacao/troca-obrigatoria";
 import { modoDeAcesso } from "@/lib/banco/ambiente";
 
@@ -22,7 +23,7 @@ export async function proxy(requisicao: NextRequest) {
     process.env.NEXT_PUBLIC_SUPABASE_URL as string,
     process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY as string,
     {
-      cookieOptions: { httpOnly: true, sameSite: "lax" },
+      cookieOptions: opcoesDosCookiesDaSessao(),
       cookies: {
         getAll: () => requisicao.cookies.getAll(),
         setAll: (novos) => {

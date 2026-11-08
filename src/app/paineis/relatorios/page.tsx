@@ -25,8 +25,8 @@ export default function PaginaRelatorios({ searchParams }: PageProps<"/paineis/r
 async function Conteudo({ searchParams }: Pick<PageProps<"/paineis/relatorios">, "searchParams">) {
   const { filtros, periodoInvertido } = lerFiltros(await searchParams);
   const banco = await bancoDaRequisicao();
-  const dados = await carregarDadosDoPainel(banco, hojeEmBrasilia());
-  const escopo = await escopoDeExportacao(banco);
+  // P-071, E3: leituras independentes, em paralelo (cada uma com a identidade do usuário).
+  const [dados, escopo] = await Promise.all([carregarDadosDoPainel(banco, hojeEmBrasilia()), escopoDeExportacao(banco)]);
   const parametros = parametrosDosFiltros(filtros);
 
   return (

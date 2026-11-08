@@ -40,6 +40,8 @@
 | 0.36 | 07/11/2026 | Monitor ativado pelo gestor (teste de quatro semanas até cerca de 05/12/2026) e rotina diária de cópias no Windows (D-084), aguardando validação; depois, testes reais no Netlify Free, sujeitos a autorização |
 | 0.37 | 07/11/2026 | Resultados da rotina de cópias aprovados e tarefa reativada com condições (D-085); segundo projeto do Supabase reservado para outra ferramenta do gestor, fora do CRM; restauração completa do Supabase Auth a replanejar |
 | 0.38 | 07/11/2026 | Chave privada do age conferida pelo arquivo local, com abertura em memória da cópia mais recente (D-086); segunda cópia segura da chave pendente antes de dados reais; Pull Request #16 para homologação |
+| 0.40 | 08/11/2026 | P-071 concluída na prévia (D-088): desempenho de cerca de 3,3 s nas telas principais e relatórios; ciclo de otimização encerrado; publicação em produção e piloto do gestor aguardando aprovação final |
+| 0.39 | 08/11/2026 | Fase 7B (D-087): site de testes no Netlify Free, público e protegido pelo login e pelas permissões do CRM; segurança e testes funcionais aprovados no endereço público; desempenho lento, diagnosticado e não homologado; alternativas de otimização (P-071) para decisão; colegas só depois da aprovação do gestor |
 
 Legenda: ✅ Aprovado · 🔧 Proposta técnica · ⏳ Pendente.
 
@@ -67,7 +69,7 @@ Legenda: ✅ Aprovado · 🔧 Proposta técnica · ⏳ Pendente.
 | 4 | Plano de ação e matriz de riscos | Versões e aprovação, acompanhamento, riscos, gatilhos e respostas | ✅ **Concluída:** aprovada em 03/11/2026 com a matriz de riscos original do Comitê de Infraestrutura (D-072), incorporada à `main` pelo Pull Request #9 (commit de merge `1246331`, verificações Node.js 24 e 26 aprovadas) e homologada para desenvolvimento em 04/11/2026 (D-073); as soluções provisórias P-047 a P-053 continuam não homologadas (seção 9) |
 | 5 | Autenticação e permissões | Supabase Auth, perfis e permissões por projeto/tema, segurança no banco | ✅ **Homologada para desenvolvimento** (D-078; seção 10). Produção sujeita aos testes da Etapa 7 |
 | 6 | Painéis e relatórios | Indicadores executivos e relatórios, com filtros, permissões da Etapa 5 e exportação. Roteiro validado na D-079 | ✅ **Homologada para desenvolvimento** (D-080; seção 11). Produção sujeita aos testes da Etapa 7 |
-| 7 | Implantação, homologação técnica e segurança operacional | Arquitetura de custo zero (D-082): Supabase Free e Netlify Free como candidato, monitoramento, cópias e recuperação. **Pré-requisitos: C6, C7 e C8** (D-027) | ✅ **Fase 7A homologada para desenvolvimento** (D-083; seção 12). Fases seguintes dependem de autorização |
+| 7 | Implantação, homologação técnica e segurança operacional | Arquitetura de custo zero (D-082): Supabase Free e Netlify Free como candidato, monitoramento, cópias e recuperação. **Pré-requisitos: C6, C7 e C8** (D-027) | ✅ **Fase 7A homologada para desenvolvimento** (D-083; seção 12). 🔧 **Fase 7B** (D-087): hospedagem de testes publicada; segurança e funções aprovadas; desempenho não homologado |
 | 8 | Piloto com dados reais | Somente após autorização formal, análise LGPD e solução de C6, C7 e C8 (D-027) | ⏳ |
 | 9 | Integrações | Outlook, calendário, SharePoint, OneDrive e IA assistiva | ✅ Futuro / 🔧 (ordem) |
 
@@ -657,7 +659,7 @@ Não executados: `npm run test:postgres` e `supabase:preparar -- --refazer`, des
 
 ### O que ainda impede um piloto institucional gratuito
 
-1. **Hospedagem não testada de verdade:** criar o site no Netlify (autorização) para os testes T2, T3 (tempo de resposta com funções em Ohio e banco em São Paulo), T4 (consumo real de créditos) e T8 (segurança na hospedagem).
+1. **Desempenho na hospedagem não homologado** (Fase 7B, D-087): telas de 2,5 a 9,4 s e relatórios de cerca de 9,5 s, pelas idas e voltas em série ao banco entre Ohio e São Paulo; alternativas na P-071, a decidir. Consumo de créditos ainda não lido no painel do Netlify.
 2. **Monitor sem as quatro semanas:** ativado em 07/11/2026; o teste termina por volta de 05/12/2026 e, mesmo concluído, não garante a continuidade do plano gratuito.
 3. **Sem cópias gerenciadas e sem disponibilidade garantida** no plano gratuito; as cópias próprias diárias (D-084) dependem do computador ligado e do usuário conectado.
 4. **Restauração completa do login (Supabase Auth) não comprovada:** o segundo projeto gratuito está reservado para outra ferramenta (D-085); a validação integral será replanejada, com alternativa segura e gratuita a apresentar.
@@ -691,9 +693,22 @@ Não executados: `npm run test:postgres` e `supabase:preparar -- --refazer`, des
 | Teste controlado pelo Agendador | Tarefa habilitada antes e depois; cópia do dia não duplicada; conferência dos dois destinos e do monitor aprovadas; cópia íntegra preservada |
 | Depois de reiniciar o Windows | ⏳ A conferir quando possível, com `npm run backup:conferir`, que passou a mostrar se a tarefa continua habilitada |
 
+### Fase 7B — hospedagem de testes no Netlify Free (D-087) 🔧
+
+Site `crm-estrategico-es-em-acao-testes` (https://crm-estrategico-es-em-acao-testes.netlify.app), público por decisão do gestor, com a proteção a cargo do login, das permissões e das regras de acesso do CRM; integração nativa com o GitHub restrita a este repositório; produção pelo ramo `hospedagem-producao` e publicação de ramo só para `hospedagem-previa`, sem prévias de Pull Requests; só as quatro variáveis da aplicação, com os segredos marcados; autocadastro desligado; banco `crm-es-em-acao-dev`, só com dados fictícios. Configuração, resultados completos, procedimento de contas e roteiro para os colegas em [OPERACAO.md](OPERACAO.md), seção 7.
+
+| Teste | Resultado (08/11/2026) |
+|---|---|
+| T8 — segurança no endereço público | ✅ 24 conferências aprovadas, depois da correção do cookie da sessão sem `Secure` (commit `038945d`) |
+| T2 — testes reais com os testes de navegador no endereço público | ✅ 159 de 159, inclusive painéis, matrizes, relatórios R1 a R5, arquivos XLSX e os quatro perfis |
+| T3 — desempenho (10 rodadas, mais o diagnóstico pelas estatísticas do PostgreSQL) | ⏳ Funcional, mas lento: primeiro byte em cerca de 0,3 s; telas completas de 2,5 a 9,4 s e relatórios XLSX de 9,3 a 9,7 s (local: 0,4 a 2,1 s). O banco gasta até 0,18 s por tela; o tempo vem das idas e voltas em série (duas por consulta com parâmetros, cerca de 0,16 s cada entre Ohio e São Paulo). **Não homologado** para uso pelos colegas; alternativas na P-071 |
+| T4 — créditos | ⏳ Leitura no painel do Netlify pendente; estimativa de 45 a 65 créditos (15% a 22% do mês), inclusive 30 das duas publicações; sem recarga automática nem forma de pagamento |
+| Testes destrutivos | Não executados (D-077) |
+
+Sem novas publicações só para documentação. Próximos passos, a decidir pelo gestor: primeira rodada pessoal de testes no navegador; decisão sobre as alternativas de otimização (P-071), apresentadas antes de qualquer implementação; leitura dos créditos no painel; convite aos colegas só depois da aprovação dos testes iniciais de segurança e da avaliação do desempenho.
+
 ### Próximas fases, dependentes de autorização
 
-- **7B — Hospedagem de teste:** site no Netlify Free ligado ao projeto de desenvolvimento, só com dados fictícios; testes T2, T3, T4 e T8; monitor com a rota `/saude`.
 - **7C — Ambiente do piloto:** a definir, sem o segundo projeto gratuito, reservado para outra ferramenta (D-085); ambiente não descartável, vazio, com cópias e restauração ensaiadas; contas institucionais; critérios objetivos do piloto (Etapa 8). Depende de solução apropriada de ambiente, segurança, LGPD e continuidade operacional, e de autorização.
 
 ## 13. Pendências efetivas (atualizadas em 07/11/2026)
@@ -709,7 +724,7 @@ Não executados: `npm run test:postgres` e `supabase:preparar -- --refazer`, des
 | Serviço de e-mail institucional (SMTP) para convites e recuperação de senha | Usuários reais (Etapa 7) | ⏳ Depende da TI institucional |
 | Senha provisória sem troca obrigatória no primeiro acesso (P-056) | Uso com contas institucionais reais (D-076); não impediu a homologação da Etapa 5 com dados fictícios (D-078) | ✅ Implementada na Fase 7A (D-082) e homologada para desenvolvimento (D-083): troca obrigatória no primeiro acesso e depois de redefinição |
 | Leitor visualiza formulário de inclusão por acesso direto ao endereço; a gravação já é recusada | Entrada em operação institucional (D-078) | ✅ Corrigida na Fase 7A (D-082) e homologada para desenvolvimento (D-083): páginas de inclusão e alteração mostram só o aviso a quem só consulta |
-| Verificações do ambiente hospedado: HTTPS, cookies seguros, desempenho e segurança, inclusive dos painéis e das exportações | Etapa 7 (D-078, D-080); as medições do desenvolvimento não as substituem | ⏳ Sujeitas à implantação e às providências da TI institucional |
+| Verificações do ambiente hospedado: HTTPS, cookies seguros, desempenho e segurança, inclusive dos painéis e das exportações | Etapa 7 (D-078, D-080); as medições do desenvolvimento não as substituem | 🔧 No site de testes (D-087): HTTPS, cookies seguros, segurança, painéis e exportações aprovados; desempenho não homologado (P-071). ⏳ Ambiente definitivo e providências da TI institucional |
 | Abertura e apresentação dos arquivos XLSX no Microsoft Excel | Operação institucional (D-080) | ⏳ A verificar antes da operação institucional; leitura já conferida por biblioteca independente nos testes |
 | Homologação da Etapa 6 | Etapa 7 | ✅ Homologada para desenvolvimento em 07/11/2026 (D-080), com o commit final `8708453` do Pull Request #12; incorporada à `main` pelo gestor (merge `a78af82`, D-081). P-061 a P-065 continuam provisórias, não homologadas individualmente |
 | Roteiro da Etapa 7 — Implantação, Homologação Técnica e Segurança Operacional | Programação da Etapa 7 | ✅ Aprovado com a premissa de custo zero (D-082); Fase 7A homologada para desenvolvimento (D-083, seção 12) |
@@ -717,7 +732,13 @@ Não executados: `npm run test:postgres` e `supabase:preparar -- --refazer`, des
 | Tarefa diária de cópias no Windows | Cópias automáticas | ✅ Resultados aprovados (D-085); habilitada e testada pelo Agendador depois da desativação de 07/11/2026, de causa não identificada. ⏳ Conferir depois de reiniciar o Windows ([OPERACAO.md](OPERACAO.md), seção 5) |
 | Conferência da chave privada do age | Cópias consideradas protegidas (D-084, D-085) | ✅ Conferida em 07/11/2026 pelo arquivo local, sem gerenciador de senhas, com abertura em memória da cópia mais recente (D-086) |
 | Segunda cópia segura da chave privada do age | Uso de dados institucionais reais (D-086) | ⏳ Pendente: hoje a chave existe só no computador de desenvolvimento |
-| Site no Netlify Free (testes T2, T3, T4 e T8) | Piloto gratuito | ⏳ Próximo passo (D-085), só com dados fictícios e custo zero; criação do site depende de autorização específica (D-082, A1) |
+| Site no Netlify Free (testes T2, T3, T4 e T8) | Piloto gratuito | 🔧 Publicado e testado em 08/11/2026 (D-087): T8 e T2 aprovados; T3 não homologado; T4 sem leitura no painel. Colegas não convidados |
+| Desempenho na hospedagem (idas e voltas ao banco entre Ohio e São Paulo) | Uso pelos colegas e piloto (D-087) | 🔧 P-071 concluída na prévia (D-088): telas principais e relatórios de cerca de 7–9 s para cerca de 3,3 s, projeto ou tema 5,1 s; aceitável para o piloto inicial. Ciclo de otimização encerrado |
+| Publicação da versão otimizada (P-071) em produção | Piloto operacional | ⏳ Aguarda aprovação final do gestor: merges da Etapa 7B e da P-071, ociosidade de 60 s em produção e uma publicação; reversão documentada ([OPERACAO.md](OPERACAO.md), seção 7) |
+| Primeira avaliação pessoal do gestor no endereço de produção | Convite aos colegas | ⏳ Roteiro de aceitação entregue; só dados fictícios |
+| Leitura do consumo de créditos no painel do Netlify | Conclusão do T4 | ⏳ Pendente: o contador da API mostrava 0 e não acompanha em tempo real; leitura em *Usage & billing* pelo gestor |
+| Primeira rodada pessoal do gestor no navegador | Convite aos colegas | ⏳ A realizar pelo gestor, depois da homologação técnica |
+| Convite aos colegas do ES em Ação | Homologação ampliada | ⏳ Só depois da aprovação, pelo gestor, dos testes iniciais de segurança e da avaliação do desempenho; contas com pseudônimo e e-mail fictício ([OPERACAO.md](OPERACAO.md), seção 7) |
 | Segundo projeto gratuito do Supabase | — | Reservado para a versão 2.0 de outra ferramenta institucional indicada pelo gestor (a mesma da V3-07); não será usado pelo CRM nem criado agora (D-085) |
 | Restauração completa do Supabase Auth | Uso institucional real | ⏳ A replanejar (D-085): alternativa tecnicamente segura e gratuita a apresentar; ensaios locais isolados mantidos; não resolvida até a comprovação efetiva |
 | Conta pessoal: solução institucional de continuidade e proteção de dados | Uso institucional real | ⏳ Consequências documentadas ([OPERACAO.md](OPERACAO.md), seção 8) |

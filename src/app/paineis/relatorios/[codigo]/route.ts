@@ -16,15 +16,27 @@ export async function GET(requisicao: NextRequest, contexto: RouteContext<"/pain
   if (!ehCodigoRelatorio(codigo)) return new Response("Relatório não encontrado.", { status: 404 });
 
   const banco = await bancoDaSessao();
-  const escopo = await escopoDeExportacao(banco);
+  const hoje = hojeEmBrasilia();
+  // P-071, E3: a permissão e a leitura dos dados correm em paralelo; a decisão é a mesma de antes e vem
+  // primeiro. Sem permissão, a resposta é a recusa, e o que foi lido (só o que as regras de acesso do
+  // banco permitem a esse usuário) é descartado sem sair do servidor; uma falha na leitura não muda a recusa.
+  // O nome do usuário (para a aba de extração) também vem em paralelo: numa rota, o cache da sessão por
+  // requisição do React não vale, e a identificação seria refeita só depois da leitura.
+  const [permissao, leitura, responsavel] = await Promise.allSettled([
+    escopoDeExportacao(banco),
+    carregarDadosDoPainel(banco, hoje),
+    obterUsuarioAtual(banco),
+  ]);
+  if (permissao.status === "rejected") throw permissao.reason;
+  const escopo = permissao.value;
   if (!escopo.podeExportar) {
     return new Response("Seu perfil permite consultar os painéis, mas não exportar relatórios pelo sistema.", { status: 403 });
   }
-
-  const usuario = await obterUsuarioAtual(banco);
+  if (leitura.status === "rejected") throw leitura.reason;
+  if (responsavel.status === "rejected") throw responsavel.reason;
+  const dados = leitura.value;
+  const usuario = responsavel.value;
   const { filtros } = lerFiltros(Object.fromEntries(requisicao.nextUrl.searchParams));
-  const hoje = hojeEmBrasilia();
-  const dados = await carregarDadosDoPainel(banco, hoje);
   const arquivo = montarRelatorio(codigo, dados, escopo, filtros, { hoje, extraidoEm: new Date(), usuario: usuario.nome });
   const conteudo = await gerarXlsx(arquivo);
   return new Response(new Uint8Array(conteudo), {

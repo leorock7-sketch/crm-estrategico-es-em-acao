@@ -599,6 +599,35 @@ export async function nomesDosRegistros(
   ]);
 }
 
+/**
+ * Mesmo resultado de nomesDosRegistros numa única consulta (P-071, E2): as cinco leituras viram uma
+ * união, e cada parte continua sujeita às regras de acesso da sua tabela. Útil dentro de uma
+ * transação, onde as consultas não se sobrepõem.
+ */
+export async function nomesDosRegistrosEmUmaConsulta(banco: Executor, ids: string[]): Promise<Map<string, string>> {
+  const unicos = [...new Set(ids)];
+  if (unicos.length === 0) return new Map();
+  const lista = sql.join(unicos.map((u) => sql`${u}`), sql`, `);
+  const resultado = await banco.execute(sql`
+    select 'pessoa' as tipo, ${pessoa.id}::text as id, ${pessoa.nomeCompleto} as nome, null::text as cargo, null::text as instituicao
+      from ${pessoa} where ${pessoa.id} in (${lista})
+    union all
+    select 'instituicao', ${instituicao.id}::text, ${instituicao.nome}, null, null from ${instituicao} where ${instituicao.id} in (${lista})
+    union all
+    select 'comite', ${comite.id}::text, ${comite.nome}, null, null from ${comite} where ${comite.id} in (${lista})
+    union all
+    select 'projeto', ${projetoTema.id}::text, ${projetoTema.nome}, null, null from ${projetoTema} where ${projetoTema.id} in (${lista})
+    union all
+    select 'vinculo', ${vinculo.id}::text, null, ${vinculo.cargo}, ${instituicao.nome}
+      from ${vinculo} inner join ${instituicao} on ${instituicao.id} = ${vinculo.instituicaoId} where ${vinculo.id} in (${lista})`);
+  const linhas = resultado.rows as unknown as { tipo: string; id: string; nome: string | null; cargo: string | null; instituicao: string | null }[];
+  // Mesma ordem de montagem de nomesDosRegistros: pessoas, instituições, comitês, projetos e, por fim, vínculos.
+  const ordem = ["pessoa", "instituicao", "comite", "projeto"];
+  const simples = ordem.flatMap((tipo) => linhas.filter((l) => l.tipo === tipo)).map((l) => [l.id, l.nome as string] as const);
+  const vinculos = linhas.filter((l) => l.tipo === "vinculo").map((v) => [v.id, [v.cargo, v.instituicao].filter(Boolean).join(" · ")] as const);
+  return new Map([...simples, ...vinculos]);
+}
+
 /** Identificadores de pessoas e instituições citados nos registros do histórico. */
 export function idsCitadosNoHistorico(registros: RegistroHistorico[]): string[] {
   const ids: string[] = [];

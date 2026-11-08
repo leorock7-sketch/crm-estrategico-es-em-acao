@@ -10,7 +10,7 @@ import { FormularioEncerramento } from "@/componentes/formulario-encerramento";
 import { SeloSituacao } from "@/componentes/selo-situacao";
 import { AreaConformePermissao } from "@/modulos/acesso/componentes/area-conforme-permissao";
 import { bancoDaRequisicao } from "@/lib/banco/requisicao";
-import { descreverPeriodo, formatarData, formatarDataHora } from "@/lib/formatacao";
+import { descreverPeriodo, formatarData, formatarDataHora, hojeEmBrasilia } from "@/lib/formatacao";
 import { esquemaIdentificador } from "@/lib/validacao/comuns";
 import {
   alterarArquivamentoProjetoTema,
@@ -21,27 +21,18 @@ import { AtividadesDoProjetoTema } from "@/modulos/iniciativas/componentes/ativi
 import { PlanoERiscosDoProjetoTema } from "@/modulos/plano-acao/componentes/integracoes";
 import { FormularioAssociacao } from "@/modulos/projetos-temas/componentes/formulario-associacao";
 import { FormularioParticipacao } from "@/modulos/projetos-temas/componentes/formulario-participacao";
-import {
-  historicoDoProjetoTema,
-  listarParticipantes,
-  listarStakeholdersDoContexto,
-  obterProjetoTema,
-  opcoesComites,
-  opcoesStakeholders,
-} from "@/modulos/projetos-temas/consultas";
+import { carregarPaginaProjetoTema } from "@/modulos/projetos-temas/carga-da-pagina";
+import type { listarStakeholdersDoContexto } from "@/modulos/projetos-temas/consultas";
 import {
   ROTULOS_SITUACAO_PROJETO_TEMA,
   ROTULOS_TIPO_PROJETO_TEMA,
   ROTULOS_TIPO_RELACAO,
 } from "@/modulos/projetos-temas/rotulos";
-import { permissaoNoContexto } from "@/modulos/acesso/permissoes";
 import { obterUsuarioAtual } from "@/modulos/acesso/usuario-atual";
 import { SeloPosicionamento } from "@/modulos/avaliacoes/componentes/selo-posicionamento";
-import { fichasDoContexto } from "@/modulos/avaliacoes/consultas";
 import type { FichaParaMatriz } from "@/modulos/avaliacoes/matriz";
 import { BotaoArquivamento } from "@/modulos/stakeholders/componentes/botao-arquivamento";
 import { ListaHistorico } from "@/modulos/stakeholders/componentes/lista-historico";
-import { idsCitadosNoHistorico, nomesDosRegistros } from "@/modulos/stakeholders/consultas";
 
 export const metadata: Metadata = { title: "Projeto ou tema" };
 
@@ -58,20 +49,11 @@ async function DetalheProjetoTema({ params }: Pick<PageProps<"/projetos-temas/[i
   if (!esquemaIdentificador.safeParse(id).success) notFound();
 
   const banco = await bancoDaRequisicao();
-  const projeto = await obterProjetoTema(banco, id);
-  if (!projeto) notFound();
-
-  const [participantes, stakeholders, historico, comites, opcoes] = await Promise.all([
-    listarParticipantes(banco, id),
-    listarStakeholdersDoContexto(banco, id),
-    historicoDoProjetoTema(banco, id),
-    opcoesComites(banco),
-    opcoesStakeholders(banco),
-  ]);
-  const nomes = await nomesDosRegistros(banco, idsCitadosNoHistorico(historico));
   const usuario = await obterUsuarioAtual(banco);
-  const permissao = await permissaoNoContexto(banco, usuario.id, id);
-  const fichas = permissao.ver ? await fichasDoContexto(banco, id) : [];
+  // P-071, E2: leituras em cinco grupos paralelos, cada um numa transação com a identidade do usuário.
+  const dados = await carregarPaginaProjetoTema(banco, id, usuario, hojeEmBrasilia());
+  const { projeto, participantes, stakeholders, historico, comites, opcoes, nomes, permissao, fichas } = dados;
+  if (!projeto) notFound();
   const arquivado = projeto.arquivadoEm !== null;
   const tipo = ROTULOS_TIPO_PROJETO_TEMA[projeto.tipo];
   // O comitê principal e os que já participam não podem ser incluídos de novo.
@@ -227,9 +209,9 @@ async function DetalheProjetoTema({ params }: Pick<PageProps<"/projetos-temas/[i
 
       <SecaoAvaliacoes projetoTemaId={id} fichas={fichas} podeVer={permissao.ver} />
 
-      <AtividadesDoProjetoTema projetoTemaId={id} arquivado={arquivado} />
+      <AtividadesDoProjetoTema projetoTemaId={id} arquivado={arquivado} dados={dados.atividades} />
 
-      <PlanoERiscosDoProjetoTema projetoTemaId={id} arquivado={arquivado} />
+      <PlanoERiscosDoProjetoTema projetoTemaId={id} arquivado={arquivado} dados={dados.planoERiscos} />
 
       <section aria-labelledby="titulo-historico" className={classeCartao}>
         <h2 id="titulo-historico" className="mb-4 text-lg font-semibold">

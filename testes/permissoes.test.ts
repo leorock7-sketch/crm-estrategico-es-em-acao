@@ -7,7 +7,7 @@
 import { beforeAll, describe, expect, test } from "vitest";
 import { abrirBanco, type Banco, comoUsuario } from "@/lib/banco/conexao";
 import { comite, permissaoContexto, usuario } from "@/lib/banco/esquema";
-import { AcessoNegadoError, exigirPermissao, permissaoNoContexto } from "@/modulos/acesso/permissoes";
+import { AcessoNegadoError, exigirPermissao, permissaoDoUsuarioDaSessao, permissaoNoContexto } from "@/modulos/acesso/permissoes";
 import { obterUsuarioAtual } from "@/modulos/acesso/usuario-atual";
 import { criarProjetoTema } from "@/modulos/projetos-temas/consultas";
 
@@ -80,6 +80,20 @@ describe("Permissões por contexto", () => {
       editar: false,
       origem: "usuario_inativo",
     });
+  });
+
+  test("P-071: a permissão com os dados da sessão coincide com a lida do cadastro, em todos os perfis", async () => {
+    const casos: [string, boolean][] = [
+      [administradorId, true],
+      ...["gestor", "colaborador", "leitor", "semPermissao", "vencida", "arquivada"].map((c) => [usuarios[c], false] as [string, boolean]),
+    ];
+    for (const projeto of [projetoA, projetoB]) {
+      for (const [id, administrador] of casos) {
+        expect(await permissaoDoUsuarioDaSessao(banco, { id, administrador }, projeto)).toEqual(await permissaoNoContexto(banco, id, projeto));
+      }
+      // Sem a informação da sessão (modo local), consulta o cadastro como antes.
+      expect(await permissaoDoUsuarioDaSessao(banco, { id: usuarios.leitor }, projeto)).toEqual(await permissaoNoContexto(banco, usuarios.leitor, projeto));
+    }
   });
 
   test("exigirPermissao recusa a ação não autorizada com mensagem clara", async () => {

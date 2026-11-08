@@ -162,17 +162,31 @@ const global = globalThis as typeof globalThis & { __bancoCrm?: Promise<Banco> }
  * o PGlite (ver clientePostgresBase).
  */
 /** ssl: false só para o banco temporário e local do ensaio de restauração (scripts/backup). */
-export function abrirBancoPostgres(url: string, opcoes: { max?: number; ssl?: boolean } = {}): Banco {
+export function abrirBancoPostgres(url: string, opcoes: { max?: number; ssl?: boolean; ociosidadeS?: number } = {}): Banco {
   const sql = postgres(url, {
     max: opcoes.max ?? 5,
     // Todas as operações são transações curtas; o pooler do Supabase não guarda consultas preparadas.
     prepare: false,
     ssl: opcoes.ssl === false ? false : "require",
-    idle_timeout: 20,
+    idle_timeout: opcoes.ociosidadeS ?? OCIOSIDADE_PADRAO_S,
     connect_timeout: 15,
     onnotice: () => {},
   });
   return drizzlePostgres({ client: clientePostgresBase(sql), schema: esquema }) as unknown as Banco;
+}
+
+/** Segundos sem uso até uma conexão do pool ser fechada (valor histórico do CRM). */
+export const OCIOSIDADE_PADRAO_S = 20;
+
+/**
+ * Tempo de ociosidade das conexões da aplicação (P-071, E5, experimento controlado na prévia): lido de
+ * CRM_BANCO_OCIOSIDADE_S quando é um número inteiro de 1 a 600; qualquer outro caso, inclusive a
+ * ausência da variável, mantém os 20 segundos de sempre. Só o pool da aplicação usa este valor.
+ */
+export function ociosidadeDaAplicacao(valor: string | undefined): number {
+  if (!valor || !/^\d+$/.test(valor.trim())) return OCIOSIDADE_PADRAO_S;
+  const segundos = Number(valor.trim());
+  return segundos >= 1 && segundos <= 600 ? segundos : OCIOSIDADE_PADRAO_S;
 }
 
 /**
@@ -181,7 +195,9 @@ export function abrirBancoPostgres(url: string, opcoes: { max?: number; ssl?: bo
  */
 export function obterBancoBase(): Promise<Banco> {
   if (modoDeAcesso() === "supabase") {
-    global.__bancoCrm ??= Promise.resolve(abrirBancoPostgres(process.env.CRM_BANCO_URL as string));
+    global.__bancoCrm ??= Promise.resolve(
+      abrirBancoPostgres(process.env.CRM_BANCO_URL as string, { ociosidadeS: ociosidadeDaAplicacao(process.env.CRM_BANCO_OCIOSIDADE_S) }),
+    );
     return global.__bancoCrm;
   }
   verificarUsoDoBancoLocal();
