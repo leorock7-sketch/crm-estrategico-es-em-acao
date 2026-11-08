@@ -36,7 +36,7 @@ import {
   SITUACOES_INTERACAO,
   TIPOS_INTERACAO,
 } from "@/modulos/interacoes/rotulos";
-import { marcoAtrasado, ROTULOS_SITUACAO_ACAO, SITUACOES_ACAO } from "@/modulos/plano-acao/rotulos";
+import { marcoAtrasado, ROTULO_SEM_SITUACAO, ROTULOS_SITUACAO_ACAO, SITUACOES_ACAO } from "@/modulos/plano-acao/rotulos";
 import { CLASSIFICACOES, FAIXAS, ROTULOS_SITUACAO_RISCO, SITUACOES_RISCO } from "@/modulos/riscos/rotulos";
 import {
   ROTULOS_SITUACAO_PROJETO_TEMA,
@@ -349,7 +349,7 @@ export function blocoPlanos(contexto: Contexto): Bloco {
             valor: contar(acoes, (a) => a.andamento.situacao === s),
             dataUsada: "Último acompanhamento com situação",
           })),
-          { rotulo: "Sem situação registrada", valor: contar(acoes, (a) => a.andamento.situacao === null), dataUsada: SITUACAO_ATUAL, nota: "Não é o mesmo que não iniciada." },
+          { rotulo: ROTULO_SEM_SITUACAO, valor: contar(acoes, (a) => a.andamento.situacao === null), dataUsada: SITUACAO_ATUAL, nota: "Não é o mesmo que não iniciada." },
           { rotulo: "Atrasadas", valor: contar(acoes, (a) => a.atrasada), dataUsada: "Fim previsto da ação", atencao: true },
           { rotulo: "Sem fim previsto", valor: contar(acoes, (a) => !a.fimPrevisto), dataUsada: SITUACAO_ATUAL, nota: "Sem prazo não significa em dia." },
           { rotulo: "Com responsável externo", valor: contar(acoes, (a) => !a.responsavelUsuarioId && Boolean(a.responsavelStakeholderId)), dataUsada: SITUACAO_ATUAL },

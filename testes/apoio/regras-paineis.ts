@@ -758,6 +758,15 @@ export function regrasDosPaineis(obterAmbiente: () => AmbientePaineis) {
       expect(semPrazo[cabecalho.indexOf("Situação")]).toBe("Sem situação registrada");
       expect(semPrazo[cabecalho.indexOf("Fim previsto")]).toBe("Sem prazo");
       expect(semPrazo[cabecalho.indexOf("Percentual informado")]).toBe("");
+      // D-089 (V-02): responsável da equipe e responsável externo em colunas próprias, sem perda.
+      expect(cabecalho).toContain("Responsável da equipe");
+      expect(cabecalho).toContain("Responsável externo");
+      expect(cabecalho).not.toContain("Responsável");
+      expect(semPrazo[cabecalho.indexOf("Responsável da equipe")]).toBe("Sem responsável da equipe");
+      expect(semPrazo[cabecalho.indexOf("Responsável externo")]).toBe(AVALIADO_A);
+      const atrasada = acoes.find((l) => l[4] === `Ação A atrasada ${sufixo}`)!;
+      expect(atrasada[cabecalho.indexOf("Responsável da equipe")]).not.toBe("Sem responsável da equipe");
+      expect(atrasada[cabecalho.indexOf("Responsável externo")]).toBe("Sem responsável externo");
     });
 
     test("R4: inerente e residual em pontos e faixas, sem percentuais, e P-049 identificada", async () => {

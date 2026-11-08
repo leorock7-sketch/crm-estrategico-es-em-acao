@@ -1,17 +1,16 @@
 import { SeloSituacao } from "@/componentes/selo-situacao";
-import { ROTULOS_SITUACAO_ACAO, ROTULOS_SITUACAO_VERSAO, type SituacaoAcao, type SituacaoVersaoPlano } from "../rotulos";
+import { ROTULOS_SITUACAO_VERSAO, rotuloDaSituacaoAcao, type SituacaoAcao, type SituacaoVersaoPlano } from "../rotulos";
 
 export function SeloVersao({ situacao }: { situacao: SituacaoVersaoPlano }) {
   const tom = situacao === "aprovada" ? "sucesso" : situacao === "em_aprovacao" || situacao === "rascunho" ? "aviso" : "neutro";
   return <SeloSituacao tom={tom}>{ROTULOS_SITUACAO_VERSAO[situacao]}</SeloSituacao>;
 }
 
-/** Situação da ação (sem registro, "não iniciada") e o destaque de atraso. */
+/** Situação da ação (sem registro, "Sem situação registrada", D-089) e o destaque de atraso. */
 export function SeloAcao({ situacao, atrasada }: { situacao: SituacaoAcao | null; atrasada?: boolean }) {
-  const atual = situacao ?? "nao_iniciada";
   return (
     <span className="inline-flex flex-wrap items-center gap-1 whitespace-nowrap">
-      <SeloSituacao tom={atual === "concluida" ? "sucesso" : atual === "suspensa" ? "aviso" : "neutro"}>{ROTULOS_SITUACAO_ACAO[atual]}</SeloSituacao>
+      <SeloSituacao tom={situacao === "concluida" ? "sucesso" : situacao === "suspensa" ? "aviso" : "neutro"}>{rotuloDaSituacaoAcao(situacao)}</SeloSituacao>
       {atrasada && (
         <span className="inline-flex items-center rounded-full border border-red-300 bg-red-50 px-3 py-1 text-sm font-semibold text-red-900 dark:border-red-800 dark:bg-red-950 dark:text-red-100">
           Atrasada

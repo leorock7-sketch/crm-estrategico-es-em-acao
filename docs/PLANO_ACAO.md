@@ -88,7 +88,7 @@ Ainda em aberto: a correção de erro de digitação numa versão aprovada. Por 
 | Stakeholders relacionados | Não | Pessoas e instituições do Cadastro Mestre |
 | Andamento | — | Registrado à parte, com histórico preservado |
 
-Situações de andamento: não iniciada, em andamento, concluída, suspensa e cancelada. A condição **atrasada** é calculada: prazo final vencido e ação não concluída nem cancelada (sem registro, a ação conta como não iniciada). O acompanhamento é registrado nas ações da versão vigente; os registros não são alterados (uma correção é um novo registro).
+Situações de andamento: não iniciada, em andamento, concluída, suspensa e cancelada. A condição **atrasada** é calculada: prazo final vencido e ação não concluída nem cancelada (para esse cálculo, a ação sem registro conta como não concluída; nas telas e nos relatórios, ela aparece como "Sem situação registrada", que não equivale a "não iniciada" — D-089). O acompanhamento é registrado nas ações da versão vigente; os registros não são alterados (uma correção é um novo registro).
 
 ## 6. Relação com outros módulos ✅ (D-072, item 4)
 
