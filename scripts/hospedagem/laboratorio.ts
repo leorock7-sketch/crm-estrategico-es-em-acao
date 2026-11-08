@@ -20,7 +20,9 @@ import { estatisticas } from "./regras";
 
 loadEnvConfig(process.cwd(), true, { info: () => {}, error: () => {} });
 const argumento = (nome: string) => process.argv.find((a) => a.startsWith(`--${nome}=`))?.slice(nome.length + 3);
-const ATRASO = Number(argumento("atraso") ?? 60);
+// --rtt=<ms>: calcula o atraso para que a ida e volta total chegue ao alvo (mesmas condições entre medições).
+const ALVO_RTT = argumento("rtt") ? Number(argumento("rtt")) : null;
+let ATRASO = Number(argumento("atraso") ?? 60);
 const MINUTOS = Number(argumento("minutos") ?? 60);
 const PORTA_INTERMEDIARIO = 6544;
 const PORTA_SERVIDOR = 3299;
@@ -51,6 +53,18 @@ async function principal() {
   viaLaboratorio.port = String(PORTA_INTERMEDIARIO);
   mkdirSync(PASTA, { recursive: true });
   writeFileSync(ARQUIVO_INSTRUMENTACAO, "");
+  if (ALVO_RTT !== null) {
+    const direto = postgres(original, { max: 1, prepare: false, ssl: "require", onnotice: () => {} });
+    await direto`select 1`;
+    const base: number[] = [];
+    for (let i = 0; i < 9; i++) {
+      const inicio = performance.now();
+      await direto`select 1`;
+      base.push(performance.now() - inicio);
+    }
+    await direto.end();
+    ATRASO = Math.max(0, Math.round((ALVO_RTT - estatisticas(base).mediana) / 2));
+  }
   const intermediario = await iniciarIntermediario(new URL(original));
 
   // Ida e volta pelo intermediário (consulta sem parâmetros nem tabelas, pelo papel da aplicação).

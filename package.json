@@ -40,6 +40,7 @@
     "hospedagem:consultas": "tsx scripts/hospedagem/consultas-por-tela.ts",
     "hospedagem:laboratorio": "tsx scripts/hospedagem/laboratorio.ts",
     "hospedagem:equivalencia": "tsx scripts/hospedagem/equivalencia-projeto.ts",
+    "hospedagem:equivalencia-paineis": "tsx scripts/hospedagem/equivalencia-paineis.ts",
     "test:regras": "vitest run --config vitest.regras.config.mts",
     "test:postgres": "vitest run --config vitest.postgres.config.mts",
     "test:supabase": "vitest run --config vitest.supabase.config.mts"

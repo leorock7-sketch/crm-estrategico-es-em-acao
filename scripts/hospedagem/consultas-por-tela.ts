@@ -78,7 +78,12 @@ async function principal() {
     ["pessoas", "/pessoas", false],
     ["planos de ação", "/planos", false],
     ["R1 em XLSX", "/paineis/relatorios/R1", true],
-  ].filter(([nome]) => !FILTRO_TELAS || FILTRO_TELAS.some((f) => String(nome).includes(f))) as [string, string, boolean][];
+    ["relatórios (página)", "/paineis/relatorios", false],
+    ["R2 em XLSX", "/paineis/relatorios/R2", true],
+    ["R3 em XLSX", "/paineis/relatorios/R3", true],
+    ["R4 em XLSX", "/paineis/relatorios/R4", true],
+    ["R5 em XLSX", "/paineis/relatorios/R5", true],
+  ].filter(([nome]) => !FILTRO_TELAS || FILTRO_TELAS.some((f) => String(nome).toLowerCase().includes(f))) as [string, string, boolean][];
   type Medida = { comandos: number; abertura: number; fim: number; identidade: number; conexao: number; consulta: number; consultasDistintas: number; msBanco: number; msTela: number; repetidos: Contador[]; lista: Contador[]; banco?: ReturnType<typeof analisarCarregamento> };
   const resultados: { tela: string; medidas: Medida[] }[] = [];
   try {
