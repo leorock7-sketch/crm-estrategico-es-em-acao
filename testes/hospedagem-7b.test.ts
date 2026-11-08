@@ -99,8 +99,10 @@ describe("Páginas de erro e estatísticas", () => {
     expect(detalhesTecnicosNoErro("connect ECONNREFUSED 127.0.0.1:5432")).toEqual(["erro de conexão"]);
   });
 
-  test("mediana e percentil 90", () => {
-    expect(estatisticas([])).toEqual({ n: 0, mediana: 0, p90: 0, minimo: 0, maximo: 0 });
-    expect(estatisticas([5, 1, 3, 2, 4, 6, 7, 8, 9, 10])).toEqual({ n: 10, mediana: 5, p90: 9, minimo: 1, maximo: 10 });
+  test("mediana e percentis 90 e 95", () => {
+    expect(estatisticas([])).toEqual({ n: 0, mediana: 0, p90: 0, p95: 0, minimo: 0, maximo: 0 });
+    expect(estatisticas([5, 1, 3, 2, 4, 6, 7, 8, 9, 10])).toEqual({ n: 10, mediana: 5, p90: 9, p95: 10, minimo: 1, maximo: 10 });
+    const vinte = Array.from({ length: 20 }, (_, i) => i + 1);
+    expect(estatisticas(vinte)).toMatchObject({ mediana: 10, p90: 18, p95: 19, maximo: 20 });
   });
 });

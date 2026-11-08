@@ -81,9 +81,17 @@ export function detalhesTecnicosNoErro(corpo: string): string[] {
 }
 
 /** Mediana e percentil 90 (arredondados), para os tempos de resposta. */
-export function estatisticas(valores: number[]): { n: number; mediana: number; p90: number; minimo: number; maximo: number } {
-  if (valores.length === 0) return { n: 0, mediana: 0, p90: 0, minimo: 0, maximo: 0 };
+/** Percentis pelo método da posição mais próxima (com poucas amostras, o p95 coincide com o máximo). */
+export function estatisticas(valores: number[]): { n: number; mediana: number; p90: number; p95: number; minimo: number; maximo: number } {
+  if (valores.length === 0) return { n: 0, mediana: 0, p90: 0, p95: 0, minimo: 0, maximo: 0 };
   const ordenados = [...valores].sort((a, b) => a - b);
   const quantil = (q: number) => ordenados[Math.min(ordenados.length - 1, Math.ceil(q * ordenados.length) - 1)];
-  return { n: ordenados.length, mediana: Math.round(quantil(0.5)), p90: Math.round(quantil(0.9)), minimo: Math.round(ordenados[0]), maximo: Math.round(ordenados.at(-1) as number) };
+  return {
+    n: ordenados.length,
+    mediana: Math.round(quantil(0.5)),
+    p90: Math.round(quantil(0.9)),
+    p95: Math.round(quantil(0.95)),
+    minimo: Math.round(ordenados[0]),
+    maximo: Math.round(ordenados.at(-1) as number),
+  };
 }

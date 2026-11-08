@@ -35,6 +35,46 @@ async function medirTela(pagina: Page, caminho: string) {
   return { status: resposta?.status() ?? 0, primeiroByte, completa: Date.now() - inicio, final: new URL(pagina.url()).pathname };
 }
 
+/** Tempo até os cabeçalhos da resposta (rede + servidor), sem baixar o corpo além do necessário. */
+async function tempoAteResposta(url: string): Promise<{ ms: number; status: number }> {
+  const inicio = performance.now();
+  const resposta = await fetch(url, { redirect: "manual", cache: "no-store" });
+  const ms = performance.now() - inicio;
+  await resposta.arrayBuffer().catch(() => undefined);
+  return { ms, status: resposta.status };
+}
+
+/**
+ * Separação aproximada entre rede e processamento (sem login): um arquivo estático entregue pela CDN
+ * (só rede), /saude (função do servidor + uma consulta ao banco) e a tela de login (proxy + página).
+ * A primeira requisição de cada um, que inclui a abertura da conexão segura, fica de fora.
+ */
+async function medirRede(amostras = 15) {
+  const html = await (await fetch(`${BASE}/login`)).text();
+  const estatico = html.match(/(?:src|href)="(\/_next\/static\/[^"]+\.(?:js|css))"/)?.[1];
+  const alvos: [string, string][] = [
+    ["arquivo estático (CDN: só rede)", estatico ? `${BASE}${estatico}` : ""],
+    ["/saude (função + 1 consulta ao banco)", `${BASE}/saude`],
+    ["tela de login (proxy + página)", `${BASE}/login`],
+  ];
+  const resultado: { alvo: string; status: string; tempos: ReturnType<typeof estatisticas>; valores: number[] }[] = [];
+  for (const [alvo, url] of alvos) {
+    if (!url) continue;
+    await tempoAteResposta(url);
+    const valores: number[] = [];
+    const situacoes = new Set<number>();
+    for (let i = 0; i < amostras; i++) {
+      const m = await tempoAteResposta(url);
+      valores.push(Math.round(m.ms));
+      situacoes.add(m.status);
+    }
+    resultado.push({ alvo, status: [...situacoes].join("/"), tempos: estatisticas(valores), valores });
+  }
+  console.log(`Rede e processamento (${amostras} amostras, ms: mediana / p95)`);
+  for (const r of resultado) console.log(`  ${r.alvo.padEnd(40)} HTTP ${r.status.padEnd(4)} ${r.tempos.mediana} / ${r.tempos.p95}`);
+  return resultado;
+}
+
 async function aguardarServidor() {
   for (let tentativa = 0; tentativa < 120; tentativa++) {
     try {
@@ -53,6 +93,7 @@ async function principal() {
     ? spawn(process.execPath, ["node_modules/next/dist/bin/next", "start", "-H", "127.0.0.1", "-p", String(PORTA_LOCAL)], { env: { ...process.env, NODE_ENV: "production" }, stdio: "ignore" })
     : undefined;
   if (servidor) await aguardarServidor();
+  const rede = await medirRede();
   const { contas, projetoA } = lerContasDeTeste();
   const navegador = await chromium.launch({ channel: "msedge", headless: true });
   const contexto = await navegador.newContext({ viewport: { width: 1280, height: 900 }, locale: "pt-BR" });
@@ -109,16 +150,17 @@ async function principal() {
     status: [...new Set(r.status)].join("/"),
     primeiroByte: r.primeiroByte[0] >= 0 ? estatisticas(r.primeiroByte) : null,
     completa: estatisticas(r.completa),
+    valores: { primeiroByte: r.primeiroByte.map(Math.round), completa: r.completa },
   }));
-  console.log(`T3 — ${ROTULO}: ${RODADAS} rodada(s); tempos em milissegundos (mediana / p90)`);
+  console.log(`T3 — ${ROTULO}: ${RODADAS} rodada(s); tempos em milissegundos (mediana / p95)`);
   for (const l of resumo) {
-    const ttfb = l.primeiroByte ? `${l.primeiroByte.mediana} / ${l.primeiroByte.p90}` : "—";
-    console.log(`  ${l.tela.padEnd(34)} HTTP ${l.status.padEnd(7)} 1º byte ${ttfb.padEnd(13)} completa ${l.completa.mediana} / ${l.completa.p90}`);
+    const ttfb = l.primeiroByte ? `${l.primeiroByte.mediana} / ${l.primeiroByte.p95}` : "—";
+    console.log(`  ${l.tela.padEnd(34)} HTTP ${l.status.padEnd(7)} 1º byte ${ttfb.padEnd(13)} completa ${l.completa.mediana} / ${l.completa.p95}`);
   }
   const pasta = path.join(process.cwd(), ".dados", "hospedagem");
   mkdirSync(pasta, { recursive: true });
   const arquivo = path.join(pasta, `desempenho-${ROTULO}-${new Date().toISOString().replace(/[:.]/g, "-")}.json`);
-  writeFileSync(arquivo, JSON.stringify({ rotulo: ROTULO, rodadas: RODADAS, quando: new Date().toISOString(), resumo }, null, 2));
+  writeFileSync(arquivo, JSON.stringify({ rotulo: ROTULO, rodadas: RODADAS, quando: new Date().toISOString(), rede, resumo }, null, 2));
   console.log(`Resultados: ${path.relative(process.cwd(), arquivo)}`);
 }
 
