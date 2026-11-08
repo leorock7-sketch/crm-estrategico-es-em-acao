@@ -4,10 +4,9 @@
  * Não há limite de linhas, para os totais nunca ficarem incompletos. Usa as mesmas funções das telas
  * de cada módulo, para o painel e o registro de origem coincidirem.
  */
-import { and, asc, desc, eq, inArray, isNull, or, sql } from "drizzle-orm";
+import { and, asc, eq, inArray, isNull, or, sql } from "drizzle-orm";
 import type { Banco, Executor } from "@/lib/banco/conexao";
 import {
-  acaoAcompanhamento,
   comite,
   compromisso,
   iniciativa,
@@ -26,7 +25,14 @@ import {
 } from "@/lib/banco/esquema";
 import { fichasDosContextos, metodologiaVigente } from "@/modulos/avaliacoes/consultas";
 import type { FichaParaMatriz } from "@/modulos/avaliacoes/matriz";
-import { acoesDasVersoes, type AcaoVigente, planejamentoDasVersoes } from "@/modulos/plano-acao/consultas";
+import {
+  type AcaoVigente,
+  acompanhamentosDasAcoes,
+  andamentoDasLinhas,
+  completarAcoesDasVersoes,
+  marcosAlcancados,
+  planejamentoDasVersoes,
+} from "@/modulos/plano-acao/consultas";
 import { listarRiscos, type RiscoDaLista } from "@/modulos/riscos/consultas";
 
 export type ProjetoDoPainel = {
@@ -168,8 +174,9 @@ async function carregarIniciativas(tx: Executor): Promise<IniciativaDoPainel[]> 
   return linhas.map((l) => ({ ...l, projetos: porIniciativa.get(l.id) ?? [] }));
 }
 
-async function carregarInteracoes(tx: Executor, iniciativas: readonly IniciativaDoPainel[]): Promise<InteracaoDoPainel[]> {
-  const [linhas, diretas, indiretas, participantes] = await Promise.all([
+/** Leituras das interações; não dependem das iniciativas (que só servem para a montagem). */
+async function consultarInteracoes(tx: Executor) {
+  return Promise.all([
     tx
       .select({
         id: interacao.id,
@@ -192,6 +199,12 @@ async function carregarInteracoes(tx: Executor, iniciativas: readonly Iniciativa
       .from(interacaoParticipante)
       .where(isNull(interacaoParticipante.arquivadoEm)),
   ]);
+}
+
+function montarInteracoes(
+  [linhas, diretas, indiretas, participantes]: Awaited<ReturnType<typeof consultarInteracoes>>,
+  iniciativas: readonly IniciativaDoPainel[],
+): InteracaoDoPainel[] {
   const projetosDaIniciativa = new Map(iniciativas.map((i) => [i.id, i.projetos]));
   const projetos = new Map<string, Set<string>>();
   const incluir = (interacaoId: string, ids: readonly string[]) => {
@@ -213,12 +226,9 @@ async function carregarInteracoes(tx: Executor, iniciativas: readonly Iniciativa
   }));
 }
 
-async function carregarCompromissos(
-  tx: Executor,
-  iniciativas: readonly IniciativaDoPainel[],
-  interacoes: readonly InteracaoDoPainel[],
-): Promise<CompromissoDoPainel[]> {
-  const linhas = await tx
+/** Leitura dos compromissos; iniciativas e interações só servem para a montagem. */
+function consultarCompromissos(tx: Executor) {
+  return tx
     .select({
       id: compromisso.id,
       descricao: compromisso.descricao,
@@ -237,6 +247,13 @@ async function carregarCompromissos(
     .leftJoin(pessoa, eq(pessoa.id, compromisso.responsavelStakeholderId))
     .leftJoin(instituicao, eq(instituicao.id, compromisso.responsavelStakeholderId))
     .where(isNull(compromisso.arquivadoEm));
+}
+
+function montarCompromissos(
+  linhas: Awaited<ReturnType<typeof consultarCompromissos>>,
+  iniciativas: readonly IniciativaDoPainel[],
+  interacoes: readonly InteracaoDoPainel[],
+): CompromissoDoPainel[] {
   const projetosDaIniciativa = new Map(iniciativas.map((i) => [i.id, i.projetos]));
   const projetosDaInteracao = new Map(interacoes.map((i) => [i.id, i.projetos]));
   return linhas.map((l) => ({
@@ -258,22 +275,18 @@ async function carregarCompromissos(
   }));
 }
 
-/** Data do acompanhamento mais recente que registrou a conclusão de cada ação. */
-async function datasDeConclusao(tx: Executor, acaoIds: readonly string[]): Promise<Map<string, string>> {
+/**
+ * Data do acompanhamento mais recente que registrou a conclusão de cada ação concluída. Usa os mesmos
+ * acompanhamentos já lidos para o andamento (não arquivados, do mais recente para o mais antigo por
+ * data e momento do registro): o resultado é o da antiga consulta própria, sem nova ida ao banco (P-071).
+ */
+function datasDeConclusao(
+  acompanhamentos: Awaited<ReturnType<typeof acompanhamentosDasAcoes>>,
+  concluidas: readonly string[],
+): Map<string, string> {
+  const alvo = new Set(concluidas);
   const mapa = new Map<string, string>();
-  if (acaoIds.length === 0) return mapa;
-  const linhas = await tx
-    .select({ acaoId: acaoAcompanhamento.acaoId, data: acaoAcompanhamento.data })
-    .from(acaoAcompanhamento)
-    .where(
-      and(
-        inArray(acaoAcompanhamento.acaoId, [...acaoIds]),
-        eq(acaoAcompanhamento.situacao, "concluida"),
-        isNull(acaoAcompanhamento.arquivadoEm),
-      ),
-    )
-    .orderBy(desc(acaoAcompanhamento.data), desc(acaoAcompanhamento.criadoEm));
-  for (const l of linhas) if (!mapa.has(l.acaoId)) mapa.set(l.acaoId, l.data);
+  for (const l of acompanhamentos) if (alvo.has(l.acaoId) && l.situacao === "concluida" && !mapa.has(l.acaoId)) mapa.set(l.acaoId, l.data);
   return mapa;
 }
 
@@ -301,12 +314,19 @@ async function carregarPlanos(tx: Executor, hoje: string): Promise<PlanoDoPainel
   const aprovadas = versoes.filter((v) => v.situacao === "aprovada");
   const naoAprovadas = versoes.filter((v) => v.situacao !== "aprovada");
   // Consultas sobre o conjunto, e não uma por plano: o tempo não cresce com o número de planos.
-  const [acoesPorVersao, planejadasPorVersao] = await Promise.all([
-    acoesDasVersoes(tx, aprovadas.map((v) => v.id), hoje),
-    planejamentoDasVersoes(tx, naoAprovadas.map((v) => v.id)),
+  // P-071: o planejamento de todas as versões numa só leitura, separado depois por versão.
+  const planejadas = await planejamentoDasVersoes(tx, versoes.map((v) => v.id));
+  const doConjunto = (lista: typeof versoes) => new Map(lista.map((v) => [v.id, planejadas.get(v.id) ?? []]));
+  const planejadasAprovadas = doConjunto(aprovadas);
+  const planejadasPorVersao = doConjunto(naoAprovadas);
+  const todas = [...planejadasAprovadas.values()].flat();
+  const [acompanhamentos, alcancados] = await Promise.all([
+    acompanhamentosDasAcoes(tx, todas.map((a) => a.acaoId)),
+    marcosAlcancados(tx, todas.flatMap((a) => a.marcos.map((m) => m.marcoId))),
   ]);
+  const acoesPorVersao = completarAcoesDasVersoes(planejadasAprovadas, andamentoDasLinhas(acompanhamentos), alcancados, hoje);
   const concluidas = [...acoesPorVersao.values()].flat().filter((a) => a.andamento.situacao === "concluida").map((a) => a.acaoId);
-  const datas = await datasDeConclusao(tx, concluidas);
+  const datas = datasDeConclusao(acompanhamentos, concluidas);
   return planos.map((plano) => {
     const vigente = aprovadas.find((v) => v.planoAcaoId === plano.id);
     return {
@@ -329,44 +349,56 @@ async function carregarPlanos(tx: Executor, hoje: string): Promise<PlanoDoPainel
 }
 
 export async function carregarDadosDoPainel(banco: Banco, hoje: string): Promise<DadosDoPainel> {
-  // Uma única transação: menos idas e vindas ao banco, com a mesma identidade do início ao fim.
-  return banco.transaction(async (tx) => {
-    const [projetos, comites, iniciativas, vigente, usuarios, planos, riscos] = await Promise.all([
-      carregarProjetos(tx),
-      tx
-        .select({ id: comite.id, nome: comite.nome })
-        .from(comite)
-        .where(isNull(comite.arquivadoEm))
-        .orderBy(sql`${comite.tipo} = 'tematico'`, asc(comite.nome)),
-      carregarIniciativas(tx),
-      metodologiaVigente(tx),
-      tx
-        .select({ id: usuario.id, nome: usuario.nome })
-        .from(usuario)
-        .where(eq(usuario.situacao, "ativo"))
-        .orderBy(asc(usuario.nome)),
-      carregarPlanos(tx, hoje),
-      listarRiscos(tx, { semLimite: true }, hoje),
-    ]);
-    const interacoes = await carregarInteracoes(tx, iniciativas);
-    const [compromissos, fichasPorProjeto] = await Promise.all([
-      carregarCompromissos(tx, iniciativas, interacoes),
-      fichasDosContextos(tx, projetos.map((p) => p.id)),
-    ]);
-    const fichas = projetos.map((p): FichasDoProjeto => ({ projetoTemaId: p.id, fichas: fichasPorProjeto.get(p.id) ?? [] }));
-    return {
-      comites,
-      projetos,
-      iniciativas,
-      interacoes,
-      compromissos,
-      planos,
-      riscos,
-      fichas,
-      metodologia: vigente
-        ? { id: vigente.id, nome: vigente.nome, ordinal: vigente.escalaPoderInteresse === "ordinal_tres_niveis" }
-        : null,
-      usuarios,
-    };
-  });
+  // P-071, E3: quatro grupos independentes, iniciados juntos, cada um numa transação com a identidade
+  // do usuário (as regras de acesso valem em todas as consultas). Numa transação única as consultas com
+  // parâmetros não se sobrepõem, e a carga ficava em fila. Conjuntos que se referem uns aos outros
+  // continuam lidos na mesma transação (iniciativas, interações e compromissos; projetos e fichas). Como
+  // o banco usa READ COMMITTED, cada consulta já via o seu próprio instante também na transação única.
+  const [planos, projetosEFichas, atividades, riscos] = await Promise.all([
+    banco.transaction((tx) => carregarPlanos(tx, hoje)),
+    banco.transaction(async (tx) => {
+      const projetos = await carregarProjetos(tx);
+      return { projetos, fichasPorProjeto: await fichasDosContextos(tx, projetos.map((p) => p.id)) };
+    }),
+    banco.transaction(async (tx) => {
+      // Leituras sem parâmetros primeiro: o driver as envia em sequência, sem esperar cada resposta.
+      const [iniciativas, leiturasDeInteracoes, linhasDeCompromissos, comites, vigente, usuarios] = await Promise.all([
+        carregarIniciativas(tx),
+        consultarInteracoes(tx),
+        consultarCompromissos(tx),
+        tx
+          .select({ id: comite.id, nome: comite.nome })
+          .from(comite)
+          .where(isNull(comite.arquivadoEm))
+          .orderBy(sql`${comite.tipo} = 'tematico'`, asc(comite.nome)),
+        metodologiaVigente(tx),
+        tx
+          .select({ id: usuario.id, nome: usuario.nome })
+          .from(usuario)
+          .where(eq(usuario.situacao, "ativo"))
+          .orderBy(asc(usuario.nome)),
+      ]);
+      const interacoes = montarInteracoes(leiturasDeInteracoes, iniciativas);
+      const compromissos = montarCompromissos(linhasDeCompromissos, iniciativas, interacoes);
+      return { iniciativas, interacoes, compromissos, comites, vigente, usuarios };
+    }),
+    banco.transaction((tx) => listarRiscos(tx, { semLimite: true }, hoje)),
+  ]);
+  const { projetos, fichasPorProjeto } = projetosEFichas;
+  const { iniciativas, interacoes, compromissos, comites, vigente, usuarios } = atividades;
+  const fichas = projetos.map((p): FichasDoProjeto => ({ projetoTemaId: p.id, fichas: fichasPorProjeto.get(p.id) ?? [] }));
+  return {
+    comites,
+    projetos,
+    iniciativas,
+    interacoes,
+    compromissos,
+    planos,
+    riscos,
+    fichas,
+    metodologia: vigente
+      ? { id: vigente.id, nome: vigente.nome, ordinal: vigente.escalaPoderInteresse === "ordinal_tres_niveis" }
+      : null,
+    usuarios,
+  };
 }
