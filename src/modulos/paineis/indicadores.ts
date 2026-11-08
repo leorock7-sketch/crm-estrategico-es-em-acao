@@ -352,7 +352,14 @@ export function blocoPlanos(contexto: Contexto): Bloco {
           { rotulo: ROTULO_SEM_SITUACAO, valor: contar(acoes, (a) => a.andamento.situacao === null), dataUsada: SITUACAO_ATUAL, nota: "Não é o mesmo que não iniciada." },
           { rotulo: "Atrasadas", valor: contar(acoes, (a) => a.atrasada), dataUsada: "Fim previsto da ação", atencao: true },
           { rotulo: "Sem fim previsto", valor: contar(acoes, (a) => !a.fimPrevisto), dataUsada: SITUACAO_ATUAL, nota: "Sem prazo não significa em dia." },
-          { rotulo: "Com responsável externo", valor: contar(acoes, (a) => !a.responsavelUsuarioId && Boolean(a.responsavelStakeholderId)), dataUsada: SITUACAO_ATUAL },
+          // D-090: toda ação com responsável externo, inclusive com corresponsável da equipe (o responsável é
+          // da equipe e/ou externo, Plano de Ação); cada ação conta uma vez.
+          {
+            rotulo: "Com responsável externo",
+            valor: contar(acoes, (a) => Boolean(a.responsavelStakeholderId)),
+            dataUsada: SITUACAO_ATUAL,
+            nota: "Inclui as ações que também têm responsável da equipe.",
+          },
           { rotulo: `Fim previsto ${periodo}`, valor: contar(acoes, (a) => dentroDoPeriodo(a.fimPrevisto, filtros)), dataUsada: "Fim previsto da ação" },
           {
             rotulo: `Concluídas ${periodo}`,
