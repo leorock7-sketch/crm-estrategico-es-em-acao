@@ -2,7 +2,9 @@
 /**
  * Hospedagem de testes da Etapa 7B (D-087): regras sem rede nem banco, com valores fictícios.
  */
+import { readFileSync } from "node:fs";
 import { describe, expect, test } from "vitest";
+import { opcoesDosCookiesDaSessao } from "../src/lib/autenticacao/cookies-da-sessao";
 import {
   avaliarCabecalhos,
   detalhesTecnicosNoErro,
@@ -49,6 +51,23 @@ describe("Cabeçalhos de segurança", () => {
     expect(falhas).toContain("strict-transport-security");
     expect(falhas).toContain("x-powered-by");
     expect(falhas).toContain("x-frame-options");
+  });
+});
+
+describe("Cookies da sessão", () => {
+  test("na hospedagem: só por HTTPS, inacessíveis aos programas da página e sem envio entre sites", () => {
+    expect(opcoesDosCookiesDaSessao("production")).toEqual({ httpOnly: true, sameSite: "lax", secure: true });
+  });
+
+  test("no desenvolvimento local (sem HTTPS) o cookie não exige HTTPS, mas mantém as demais proteções", () => {
+    expect(opcoesDosCookiesDaSessao("development")).toEqual({ httpOnly: true, sameSite: "lax", secure: false });
+  });
+
+  test("o proxy e o servidor usam as mesmas opções", () => {
+    for (const arquivo of ["src/proxy.ts", "src/lib/autenticacao/supabase-servidor.ts"]) {
+      const fonte = readFileSync(arquivo, "utf8");
+      expect(fonte).toContain("cookieOptions: opcoesDosCookiesDaSessao()");
+    }
   });
 });
 
