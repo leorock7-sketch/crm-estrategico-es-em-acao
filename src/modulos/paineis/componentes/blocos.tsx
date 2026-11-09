@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { classeCartao, classeCelula, classeCelulaCabecalho, classeEntrada, classeBotaoPrimario, classeBotaoSecundario, classeLink, classeTabela } from "@/componentes/estilos";
-import type { FiltrosPainel } from "../filtros";
+import { parametrosDosFiltros, type FiltrosPainel } from "../filtros";
 import type { Bloco, Indicador, LinhaPanorama } from "../indicadores";
 
 /** A base aparece no cartão só quando difere das demais do grupo; igual em todos, fica no título do grupo. */
@@ -231,8 +231,11 @@ export function FiltrosDoPainel({
       </select>
     </div>
   );
+  // D-091: a chave muda com os filtros do endereço e recria o formulário. Sem ela, ao navegar sem
+  // recarregar a página (botão "Limpar", voltar do navegador), os campos mantinham a escolha anterior,
+  // porque o valor inicial (defaultValue) só é lido quando o campo é criado.
   return (
-    <form role="search" className={`${classeCartao} grid gap-3 print:hidden sm:grid-cols-2 lg:grid-cols-5`}>
+    <form key={parametrosDosFiltros(filtros)} role="search" className={`${classeCartao} grid gap-3 print:hidden sm:grid-cols-2 lg:grid-cols-5`}>
       {comites && selecao("filtro-comite", "comite", "Comitê", filtros.comiteId, comites, "Todos")}
       {projetos && selecao("filtro-projeto", "projeto", "Projeto ou tema", filtros.projetoTemaId, projetos, "Todos")}
       {selecao("filtro-responsavel", "responsavel", "Responsável (equipe)", filtros.responsavelId, usuarios, "Todos")}
